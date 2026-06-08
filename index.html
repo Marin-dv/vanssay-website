@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vanssay — Multi-Platform Reviews for Framer</title>
+  <meta name="description" content="Display Google and Trustpilot reviews natively on your Framer site. One plugin, all your reviews, automatic sync." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0c0e;
+      --surface: #141416;
+      --border: #222226;
+      --text: #f0f0f0;
+      --muted: #666;
+      --accent: #4f8fff;
+      --accent2: #00c896;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(12,12,14,0.85);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--accent); }
+
+    nav a.contact {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    nav a.contact:hover { color: var(--text); }
+
+    /* HERO */
+    .hero {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 120px 40px 80px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(79,143,255,0.08);
+      border: 1px solid rgba(79,143,255,0.2);
+      padding: 6px 12px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+    }
+
+    .badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    h1 {
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 480px;
+      margin: 0 auto 40px;
+    }
+
+    .cta-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 12px 22px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      padding: 12px 22px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover { border-color: #444; color: var(--text); }
+
+    /* PREVIEW */
+    .preview {
+      max-width: 800px;
+      margin: 60px auto 0;
+      padding: 0 40px;
+    }
+
+    .preview-inner {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 600px) {
+      .preview { padding: 0 24px; margin-top: 40px; }
+    }
+
+    /* PLATFORMS */
+    .platforms {
+      max-width: 720px;
+      margin: 80px auto 0;
+      padding: 0 40px;
+      text-align: center;
+    }
+
+    .platforms-label {
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .platform-chips {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: #aaa;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 100px;
+    }
+
+    .chip svg { flex-shrink: 0; }
+
+    .chip.coming {
+      opacity: 0.4;
+      font-size: 12px;
+    }
+
+    /* FEATURES */
+    .features {
+      max-width: 800px;
+      margin: 100px auto 0;
+      padding: 0 40px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .feature {
+      background: var(--surface);
+      padding: 28px 24px;
+      transition: background 0.2s;
+    }
+
+    .feature:hover { background: #181820; }
+
+    .feature-icon {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .feature h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .feature p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ABOUT */
+    .about {
+      max-width: 720px;
+      margin: 100px auto 0;
+      padding: 0 40px;
+      border-top: 1px solid var(--border);
+      padding-top: 60px;
+    }
+
+    .about h2 {
+      font-size: 13px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .about p {
+      font-size: 15px;
+      color: #999;
+      line-height: 1.7;
+    }
+
+    .about p a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .about p a:hover { text-decoration: underline; }
+
+    /* FOOTER */
+    footer {
+      max-width: 720px;
+      margin: 60px auto 0;
+      padding: 24px 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    footer span {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    footer a {
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover { color: var(--text); }
+
+    /* FADE IN */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    .fade-in:nth-child(1) { animation-delay: 0.05s; }
+    .fade-in:nth-child(2) { animation-delay: 0.15s; }
+    .fade-in:nth-child(3) { animation-delay: 0.25s; }
+    .fade-in:nth-child(4) { animation-delay: 0.35s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 20px 24px; }
+      .hero { padding: 80px 24px 60px; }
+      .platforms { padding: 0 24px; }
+      .features { margin: 80px 24px 0; }
+      .about { padding: 60px 24px 0; }
+      footer { padding: 24px 24px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="logo">vanssay<span>.</span>net</a>
+    <a href="mailto:support@vanssay.net" class="contact">support@vanssay.net</a>
+  </nav>
+
+  <section class="hero">
+    <div class="badge fade-in">Framer Plugin — Coming Soon</div>
+    <h1 class="fade-in">All your reviews.<br /><em>One plugin.</em></h1>
+    <p class="subtitle fade-in">Display live Google and Trustpilot reviews natively on your Framer site. Automatic sync, no embeds, no manual work.</p>
+    <div class="cta-row fade-in">
+      <a href="mailto:support@vanssay.net?subject=Early access" class="btn-primary">
+        Get early access
+      </a>
+    </div>
+  </section>
+
+  <!-- PREVIEW IMAGE -->
+  <section class="preview">
+    <div class="preview-inner">
+      <svg width="100%" viewBox="0 0 680 440" role="img" xmlns="http://www.w3.org/2000/svg">
+        <title>Vanssay plugin preview</title>
+        <desc>Plugin preview showing Google, Trustpilot and G2 review cards</desc>
+        <style>
+          .bg { fill: #111113; }
+          .label { font-family: 'DM Sans', sans-serif; fill: #f0f0f0; font-size: 13px; font-weight: 600; }
+          .sub { font-family: 'DM Sans', sans-serif; fill: #666; font-size: 11px; font-weight: 400; }
+          .star { fill: #f5b91e; }
+          .badge-text { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.06em; }
+          .title-text { font-family: 'DM Sans', sans-serif; fill: #f0f0f0; font-weight: 700; font-size: 22px; letter-spacing: -0.02em; }
+          .title-accent { fill: #4f8fff; }
+        </style>
+        <rect width="680" height="440" rx="16" class="bg"/>
+        <line x1="0" y1="220" x2="680" y2="220" stroke="#1e1e22" stroke-width="0.5"/>
+        <line x1="340" y1="0" x2="340" y2="440" stroke="#1e1e22" stroke-width="0.5"/>
+        <text x="340" y="48" text-anchor="middle" class="title-text">All your reviews.</text>
+        <text x="340" y="74" text-anchor="middle" class="title-text"><tspan class="title-accent">One plugin.</tspan></text>
+        <!-- GOOGLE CARD -->
+        <rect x="40" y="108" width="184" height="220" rx="12" fill="#1c1c1f"/>
+        <rect x="40" y="108" width="184" height="220" rx="12" fill="none" stroke="#2a2a2e" stroke-width="0.75"/>
+        <circle cx="68" cy="136" r="14" fill="#fff"/>
+        <text x="68" y="141" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="#4285F4">G</text>
+        <text x="92" y="133" class="label" font-size="12">Google Reviews</text>
+        <text x="92" y="147" class="sub">4.9 · 247 reviews</text>
+        <text x="56" y="174" class="star" font-size="13">★★★★★</text>
+        <rect x="56" y="184" width="140" height="7" rx="3" fill="#2a2a2e"/>
+        <rect x="56" y="197" width="110" height="7" rx="3" fill="#2a2a2e"/>
+        <rect x="56" y="210" width="125" height="7" rx="3" fill="#2a2a2e"/>
+        <line x1="56" y1="228" x2="208" y2="228" stroke="#2a2a2e" stroke-width="0.5"/>
+        <circle cx="68" cy="247" r="9" fill="#2a2a2e"/>
+        <rect x="83" y="241" width="60" height="6" rx="3" fill="#2a2a2e"/>
+        <rect x="83" y="252" width="40" height="5" rx="2" fill="#222"/>
+        <text x="56" y="284" class="star" font-size="13">★★★★★</text>
+        <rect x="56" y="293" width="130" height="7" rx="3" fill="#2a2a2e"/>
+        <rect x="56" y="306" width="95" height="7" rx="3" fill="#2a2a2e"/>
+        <!-- TRUSTPILOT CARD -->
+        <rect x="248" y="108" width="184" height="220" rx="12" fill="#1c1c1f"/>
+        <rect x="248" y="108" width="184" height="220" rx="12" fill="none" stroke="#2a2a2e" stroke-width="0.75"/>
+        <rect x="254" y="121" width="26" height="26" rx="4" fill="#00b67a"/>
+        <text x="267" y="139" text-anchor="middle" font-size="14" fill="#fff">★</text>
+        <text x="290" y="133" class="label" font-size="12">Trustpilot</text>
+        <text x="290" y="147" class="sub">4.8 · 189 reviews</text>
+        <text x="264" y="174" fill="#00b67a" font-size="13">★★★★★</text>
+        <rect x="264" y="184" width="140" height="7" rx="3" fill="#2a2a2e"/>
+        <rect x="264" y="197" width="115" height="7" rx="3" fill="#2a2a2e"/>
+        <rect x="264" y="210" width="100" height="7" rx="3" fill="#2a2a2e"/>
+        <line x1="264" y1="228" x2="416" y2="228" stroke="#2a2a2e" stroke-width="0.5"/>
+        <circle cx="276" cy="247" r="9" fill="#2a2a2e"/>
+        <rect x="291" y="241" width="65" height="6" rx="3" fill="#2a2a2e"/>
+        <rect x="291" y="252" width="45" height="5" rx="2" fill="#222"/>
+        <text x="264" y="284" fill="#00b67a" font-size="13">★★★★☆</text>
+        <rect x="264" y="293" width="120" height="7" rx="3" fill="#2a2a2e"/>
+        <rect x="264" y="306" width="90" height="7" rx="3" fill="#2a2a2e"/>
+        <!-- G2 CARD -->
+        <rect x="456" y="108" width="184" height="220" rx="12" fill="#1c1c1f"/>
+        <rect x="456" y="108" width="184" height="220" rx="12" fill="none" stroke="#2a2a2e" stroke-width="0.75"/>
+        <circle cx="484" cy="136" r="14" fill="#ff492c"/>
+        <text x="484" y="141" text-anchor="middle" font-family="Arial" font-size="13" font-weight="800" fill="#fff">G2</text>
+        <text x="506" y="133" class="label" font-size="12">G2</text>
+        <text x="506" y="147" class="sub">4.7 · 312 reviews</text>
+        <text x="472" y="174" fill="#ff492c" font-size="13">★★★★★</text>
+        <rect x="472" y="184" width="140" height="7" rx="3" fill="#2a2a2e"/>
+        <rect x="472" y="197" width="118" height="7" rx="3" fill="#2a2a2e"/>
+        <rect x="472" y="210" width="105" height="7" rx="3" fill="#2a2a2e"/>
+        <line x1="472" y1="228" x2="624" y2="228" stroke="#2a2a2e" stroke-width="0.5"/>
+        <circle cx="484" cy="247" r="9" fill="#2a2a2e"/>
+        <rect x="499" y="241" width="60" height="6" rx="3" fill="#2a2a2e"/>
+        <rect x="499" y="252" width="42" height="5" rx="2" fill="#222"/>
+        <text x="472" y="284" fill="#ff492c" font-size="13">★★★★★</text>
+        <rect x="472" y="293" width="125" height="7" rx="3" fill="#2a2a2e"/>
+        <rect x="472" y="306" width="88" height="7" rx="3" fill="#2a2a2e"/>
+        <!-- bottom badge -->
+        <rect x="270" y="358" width="140" height="28" rx="14" fill="#1a1a2e" stroke="#2a2a3e" stroke-width="0.75"/>
+        <text x="340" y="377" text-anchor="middle" class="badge-text" fill="#4f8fff">FRAMER PLUGIN</text>
+        <circle cx="132" cy="348" r="3" fill="#2a2a2e"/>
+        <circle cx="340" cy="348" r="3" fill="#4f8fff"/>
+        <circle cx="548" cy="348" r="3" fill="#2a2a2e"/>
+        <line x1="135" y1="348" x2="270" y2="362" stroke="#2a2a2e" stroke-width="0.5"/>
+        <line x1="410" y1="362" x2="545" y2="348" stroke="#2a2a2e" stroke-width="0.5"/>
+        <text x="340" y="420" text-anchor="middle" font-family="monospace" font-size="10" fill="#333" letter-spacing="0.1em">vanssay.net</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="platforms">
+    <p class="platforms-label">Supported platforms</p>
+    <div class="platform-chips">
+      <span class="chip">
+        <!-- Google icon -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Google Reviews
+      </span>
+      <span class="chip">
+        <!-- Trustpilot star -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#00b67a">
+          <path d="M12 2l2.9 8.9H24l-7.5 5.5 2.9 8.9L12 20l-7.4 5.3 2.9-8.9L0 10.9h9.1z"/>
+        </svg>
+        Trustpilot
+      </span>
+      <span class="chip coming">
+        G2 — soon
+      </span>
+      <span class="chip coming">
+        Capterra — soon
+      </span>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feature">
+      <div class="feature-icon">⚡</div>
+      <h3>Native Framer component</h3>
+      <p>Renders as a real code component — inherits your site's fonts and spacing. No iframes.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🔄</div>
+      <h3>Automatic sync</h3>
+      <p>New reviews appear on your site without touching Framer. Set it and forget it.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🧩</div>
+      <h3>Multi-platform</h3>
+      <p>Google and Trustpilot in one widget. One subscription, all your social proof.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🎨</div>
+      <h3>Multiple layouts</h3>
+      <p>Grid, carousel, ticker, badge. Matches any Framer site out of the box.</p>
+    </div>
+  </section>
+
+  <section class="about">
+    <h2>About</h2>
+    <p>
+      Vanssay is an independent software studio building tools for designers and agencies.
+      This plugin is built by <a href="mailto:support@vanssay.net">Marin de Vanssay</a>, a developer focused on making social proof effortless for Framer users.
+      Questions or early access requests: <a href="mailto:support@vanssay.net">support@vanssay.net</a>
+    </p>
+  </section>
+
+  <footer>
+    <span>© 2026 Vanssay</span>
+    <a href="mailto:support@vanssay.net">support@vanssay.net</a>
+  </footer>
+
+</body>
+</html>
