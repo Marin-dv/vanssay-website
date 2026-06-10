@@ -58,9 +58,14 @@
     <h1 id="auth-title">Welcome back</h1>
     <p class="sub">Same account as the Framer plugin.</p>
     <div class="card">
-      <label>Email</label><input id="email" type="email" placeholder="you@company.com" autocomplete="email" />
-      <label>Password</label><input id="password" type="password" placeholder="Your password" autocomplete="current-password" />
+      <div id="f-email"><label>Email</label><input id="email" type="email" placeholder="you@company.com" autocomplete="email" /></div>
+      <div id="f-pass">
+        <label style="display:flex;justify-content:space-between">Password <a id="toggle-pass" style="color:var(--accent);cursor:pointer;font-weight:600">Show</a></label>
+        <input id="password" type="password" placeholder="Your password" autocomplete="current-password" />
+        <div style="text-align:right;margin-top:6px"><a id="forgot-link" style="font-size:12.5px;color:var(--accent);cursor:pointer">Forgot password?</a></div>
+      </div>
       <div class="err" id="auth-err"></div>
+      <div class="err" id="auth-ok" style="background:#e9f7ef;color:#16a34a"></div>
       <button class="btn btn-blue" id="auth-btn">Sign in</button>
       <div class="switch" id="auth-switch">New to Vanssay? <a>Create an account</a></div>
     </div>
@@ -114,21 +119,54 @@ const api = async (path, opts = {}) => {
 };
 const showErr = (id, msg) => { const el = $(id); el.textContent = msg; el.style.display = msg ? "block" : "none"; };
 
-$("auth-switch").onclick = () => {
-  registerMode = !registerMode;
-  $("auth-title").textContent = registerMode ? "Create your account" : "Welcome back";
-  $("auth-btn").textContent = registerMode ? "Create account" : "Sign in";
-  $("auth-switch").innerHTML = registerMode ? "Already have an account? <a>Sign in</a>" : "New to Vanssay? <a>Create an account</a>";
+// Modes: login | register | forgot | reset (arriving from the email link)
+let mode = location.hash.startsWith("#reset=") ? "reset" : "login";
+const resetToken = mode === "reset" ? location.hash.slice(7) : "";
+const COPY = {
+  login: ["Welcome back", "Sign in", 'New to Vanssay? <a>Create an account</a>'],
+  register: ["Create your account", "Create account", 'Already have an account? <a>Sign in</a>'],
+  forgot: ["Reset your password", "Send reset link", '<a>Back to sign in</a>'],
+  reset: ["Choose a new password", "Set new password", '<a>Back to sign in</a>'],
+};
+function render() {
+  $("auth-title").textContent = COPY[mode][0];
+  $("auth-btn").textContent = COPY[mode][1];
+  $("auth-switch").innerHTML = COPY[mode][2];
+  $("f-email").style.display = mode === "reset" ? "none" : "block";
+  $("f-pass").style.display = mode === "forgot" ? "none" : "block";
+  $("forgot-link").style.display = mode === "login" ? "inline" : "none";
+  $("password").placeholder = mode === "reset" || mode === "register" ? "At least 8 characters" : "Your password";
+  showErr("auth-err", ""); showErr("auth-ok", "");
+}
+$("auth-switch").onclick = () => { mode = mode === "login" ? "register" : "login"; render(); };
+$("forgot-link").onclick = () => { mode = "forgot"; render(); };
+$("toggle-pass").onclick = () => {
+  const p = $("password");
+  p.type = p.type === "password" ? "text" : "password";
+  $("toggle-pass").textContent = p.type === "password" ? "Show" : "Hide";
 };
 
 $("auth-btn").onclick = async () => {
-  showErr("auth-err", "");
+  showErr("auth-err", ""); showErr("auth-ok", "");
   try {
-    const r = await api(registerMode ? "/auth/register" : "/auth/login", { method: "POST", body: { email: $("email").value.trim(), password: $("password").value } });
+    if (mode === "forgot") {
+      await api("/auth/forgot-password", { method: "POST", body: { email: $("email").value.trim() } });
+      showErr("auth-ok", "If an account exists for that email, a reset link from no-reply@vanssay.net is on its way. Check your inbox (and spam).");
+      return;
+    }
+    if (mode === "reset") {
+      await api("/auth/reset-password", { method: "POST", body: { token: resetToken, password: $("password").value } });
+      history.replaceState(null, "", location.pathname);
+      mode = "login"; render();
+      showErr("auth-ok", "Password updated — sign in with your new password.");
+      return;
+    }
+    const r = await api(mode === "register" ? "/auth/register" : "/auth/login", { method: "POST", body: { email: $("email").value.trim(), password: $("password").value } });
     localStorage.setItem(TKEY, r.token);
     load();
   } catch (e) { showErr("auth-err", e.message); }
 };
+render();
 $("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-btn").click());
 
 async function load() {
