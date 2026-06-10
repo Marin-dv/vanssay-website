@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account — Vanssay</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#fafafa; --surface:#fff; --surface-2:#f4f4f5; --border:#e4e4e7; --text:#18181b;
+      --text-2:#52525b; --muted:#a1a1aa; --accent:#0e7afe; --pro:#7c5cff; --error:#dc2626;
+      --shadow:0 1px 2px rgba(0,0,0,.05); --shadow-md:0 8px 30px rgba(0,0,0,.08);
+    }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; min-height:100vh; -webkit-font-smoothing:antialiased; }
+    a { color:inherit; text-decoration:none; }
+    nav { position:sticky; top:0; background:rgba(250,250,250,.85); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+    .nav-in { max-width:1140px; margin:0 auto; padding:0 28px; display:flex; align-items:center; justify-content:space-between; height:64px; }
+    .logo { display:flex; align-items:center; gap:9px; font-weight:800; font-size:17px; }
+    .logo-dot { width:22px; height:22px; border-radius:7px; background:linear-gradient(135deg,var(--accent),var(--pro)); }
+    .nav-links { display:flex; gap:28px; font-size:14px; font-weight:500; color:var(--text-2); }
+    main { max-width:520px; margin:0 auto; padding:64px 28px 96px; }
+    h1 { font-size:30px; font-weight:900; letter-spacing:-.02em; margin-bottom:6px; }
+    .sub { color:var(--text-2); margin-bottom:28px; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:28px; box-shadow:var(--shadow-md); margin-bottom:18px; }
+    label { display:block; font-size:13px; font-weight:600; margin:14px 0 5px; }
+    input { width:100%; padding:11px 14px; border:1px solid var(--border); border-radius:10px; font:inherit; font-size:14px; outline:none; }
+    input:focus { border-color:var(--accent); box-shadow:0 0 0 3px #eaf3ff; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:12px 20px; margin-top:18px;
+      border-radius:11px; font:inherit; font-size:14.5px; font-weight:700; border:1px solid transparent; cursor:pointer; }
+    .btn-blue { background:linear-gradient(120deg,var(--accent),var(--pro)); color:#fff; }
+    .btn-line { background:var(--surface); border-color:var(--border); color:var(--text); }
+    .btn-sm { width:auto; padding:8px 16px; font-size:13px; margin-top:0; }
+    .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .muted { color:var(--muted); font-size:13px; }
+    .err { background:#fdecec; color:var(--error); border-radius:10px; padding:10px 14px; font-size:13px; margin-top:14px; display:none; }
+    .switch { text-align:center; font-size:13.5px; color:var(--text-2); margin-top:18px; }
+    .switch a { color:var(--accent); font-weight:600; cursor:pointer; }
+    .badge { display:inline-flex; padding:3px 12px; border-radius:99px; font-size:12px; font-weight:800; }
+    .b-free { background:var(--surface-2); color:var(--text-2); } .b-pro { background:#f1edff; color:var(--pro); } .b-ultra { background:linear-gradient(90deg,var(--accent),var(--pro)); color:#fff; }
+    .meter { height:8px; border-radius:99px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden; margin-top:8px; }
+    .meter span { display:block; height:100%; background:var(--accent); border-radius:99px; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+    .actions .btn { width:auto; flex:1; margin-top:0; }
+    #dash { display:none; }
+    h3 { font-size:15px; font-weight:800; margin-bottom:4px; }
+  </style>
+</head>
+<body>
+<nav><div class="nav-in">
+  <a class="logo" href="index.html"><span class="logo-dot"></span>Vanssay</a>
+  <div class="nav-links"><a href="index.html#widgets">Widgets</a><a href="demo.html">Live demo</a><a href="index.html#pricing">Pricing</a></div>
+</div></nav>
+
+<main>
+  <!-- Auth -->
+  <div id="auth">
+    <h1 id="auth-title">Welcome back</h1>
+    <p class="sub">Same account as the Framer plugin.</p>
+    <div class="card">
+      <label>Email</label><input id="email" type="email" placeholder="you@company.com" autocomplete="email" />
+      <label>Password</label><input id="password" type="password" placeholder="Your password" autocomplete="current-password" />
+      <div class="err" id="auth-err"></div>
+      <button class="btn btn-blue" id="auth-btn">Sign in</button>
+      <div class="switch" id="auth-switch">New to Vanssay? <a>Create an account</a></div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dash">
+    <h1>Your account</h1>
+    <p class="sub" id="d-email"></p>
+
+    <div class="card">
+      <div class="row"><h3>Plan</h3><span class="badge b-free" id="d-plan">Free</span></div>
+      <p class="muted" id="d-renew"></p>
+      <div class="actions" id="d-billing"></div>
+    </div>
+
+    <div class="card">
+      <div class="row"><h3>Widget views this month</h3><strong id="d-views">—</strong></div>
+      <div class="meter"><span id="d-meter" style="width:0%"></span></div>
+      <p class="muted" id="d-limit"></p>
+    </div>
+
+    <div class="card">
+      <h3>Profile</h3>
+      <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
+      <p class="muted">To change your email or password, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
+      <div class="err" id="dash-err"></div>
+      <div class="actions">
+        <button class="btn btn-line" id="d-signout">Sign out</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
+// Stripe price ids — leave empty to use the backend defaults.
+const PRICE_PRO = "", PRICE_ULTRA = "";
+const TKEY = "vanssay.token";
+let registerMode = false;
+
+const $ = (id) => document.getElementById(id);
+const api = async (path, opts = {}) => {
+  const headers = { ...(opts.body ? { "Content-Type": "application/json" } : {}) };
+  const t = localStorage.getItem(TKEY);
+  if (t) headers.Authorization = "Bearer " + t;
+  const res = await fetch(API + path, { method: opts.method || "GET", headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Something went wrong");
+  return data;
+};
+const showErr = (id, msg) => { const el = $(id); el.textContent = msg; el.style.display = msg ? "block" : "none"; };
+
+$("auth-switch").onclick = () => {
+  registerMode = !registerMode;
+  $("auth-title").textContent = registerMode ? "Create your account" : "Welcome back";
+  $("auth-btn").textContent = registerMode ? "Create account" : "Sign in";
+  $("auth-switch").innerHTML = registerMode ? "Already have an account? <a>Sign in</a>" : "New to Vanssay? <a>Create an account</a>";
+};
+
+$("auth-btn").onclick = async () => {
+  showErr("auth-err", "");
+  try {
+    const r = await api(registerMode ? "/auth/register" : "/auth/login", { method: "POST", body: { email: $("email").value.trim(), password: $("password").value } });
+    localStorage.setItem(TKEY, r.token);
+    load();
+  } catch (e) { showErr("auth-err", e.message); }
+};
+$("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-btn").click());
+
+async function load() {
+  if (!localStorage.getItem(TKEY)) { $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
+  try {
+    const me = await api("/auth/me");
+    $("auth").style.display = "none"; $("dash").style.display = "block";
+    $("d-email").textContent = me.user.email; $("d-email2").textContent = me.user.email;
+    const plan = me.subscription.plan;
+    const badge = $("d-plan");
+    badge.textContent = plan[0].toUpperCase() + plan.slice(1);
+    badge.className = "badge b-" + plan;
+    $("d-renew").textContent = me.subscription.currentPeriodEnd ? "Renews " + new Date(me.subscription.currentPeriodEnd).toLocaleDateString() : (plan === "free" ? "Free forever — upgrade anytime." : "Active subscription.");
+
+    const actions = $("d-billing"); actions.innerHTML = "";
+    const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
+    const checkout = (priceId) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: priceId ? { priceId } : {} }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
+    const portal = async () => { try { const r = await api("/billing/portal", { method: "POST" }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
+    if (plan === "free") { mk("Upgrade to Pro — $15/mo", "btn-line", checkout(PRICE_PRO)); mk("Go Ultra — $39/mo", "btn-blue", checkout(PRICE_ULTRA)); }
+    else if (plan === "pro") { mk("Upgrade to Ultra — $39/mo", "btn-blue", checkout(PRICE_ULTRA)); mk("Manage / cancel billing", "btn-line", portal); }
+    else { mk("Manage / cancel billing", "btn-line", portal); }
+
+    try {
+      const u = await api("/track/usage");
+      $("d-views").textContent = u.views.toLocaleString();
+      $("d-limit").textContent = "Included in your plan: " + u.limit.toLocaleString() + " views / month";
+      const pct = Math.min(100, (u.views / u.limit) * 100);
+      const m = $("d-meter"); m.style.width = pct + "%";
+      m.style.background = pct > 90 ? "var(--error)" : pct > 70 ? "#d97706" : "var(--accent)";
+    } catch (e) { $("d-limit").textContent = "Usage unavailable right now."; }
+  } catch (e) {
+    localStorage.removeItem(TKEY); $("auth").style.display = "block"; $("dash").style.display = "none";
+  }
+}
+$("d-signout").onclick = () => { localStorage.removeItem(TKEY); load(); };
+load();
+</script>
+</body>
+</html>

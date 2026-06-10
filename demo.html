@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live demo — Vanssay widgets for Framer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#fafafa; --surface:#fff; --surface-2:#f4f4f5; --border:#e4e4e7; --text:#18181b;
+      --text-2:#52525b; --muted:#a1a1aa; --accent:#0e7afe; --pro:#7c5cff; --star:#fbbc04;
+      --google:#4285f4; --tp:#00b67a; --shadow:0 1px 2px rgba(0,0,0,.05); --shadow-md:0 8px 30px rgba(0,0,0,.08);
+    }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; -webkit-font-smoothing:antialiased; }
+    a { color:inherit; text-decoration:none; }
+    .wrap { max-width:1140px; margin:0 auto; padding:0 28px; }
+    nav { position:sticky; top:0; z-index:100; background:rgba(250,250,250,.85); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
+    .nav-in { display:flex; align-items:center; justify-content:space-between; height:64px; }
+    .logo { display:flex; align-items:center; gap:9px; font-weight:800; font-size:17px; }
+    .logo-dot { width:22px; height:22px; border-radius:7px; background:linear-gradient(135deg,var(--accent),var(--pro)); }
+    .nav-links { display:flex; gap:28px; font-size:14px; font-weight:500; color:var(--text-2); }
+    .nav-links a:hover { color:var(--text); }
+    .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:11px; font-weight:700; font-size:14px; border:1px solid transparent; cursor:pointer; }
+    .btn-blue { background:linear-gradient(120deg,var(--accent),var(--pro)); color:#fff; box-shadow:0 8px 24px rgba(14,122,254,.3); }
+    header { text-align:center; padding:72px 0 36px; }
+    h1 { font-size:clamp(32px,5vw,52px); font-weight:900; letter-spacing:-.03em; line-height:1.08; }
+    .sub { color:var(--text-2); font-size:17px; max-width:560px; margin:16px auto 0; }
+    .tabs { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin:36px 0 28px; }
+    .tabs button {
+      font:inherit; font-size:13.5px; font-weight:700; padding:9px 20px; border-radius:99px; cursor:pointer;
+      border:1px solid var(--border); background:var(--surface); color:var(--text-2); transition:all .15s;
+    }
+    .tabs button.on { background:var(--text); border-color:var(--text); color:#fff; }
+    .stage {
+      background:var(--surface); border:1px solid var(--border); border-radius:24px; box-shadow:var(--shadow-md);
+      padding:40px; margin-bottom:80px; overflow:hidden;
+    }
+    /* widget look (mirrors the real widget) */
+    .v-head { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:24px; }
+    .v-rating { font-size:32px; font-weight:800; line-height:1; }
+    .v-count { font-size:13px; color:var(--muted); }
+    .stars { color:var(--star); letter-spacing:2px; }
+    .chip { display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 12px; border:1px solid var(--border); border-radius:99px; font-size:12px; color:var(--text-2); }
+    .g { color:var(--google); font-weight:800; } .t { color:var(--tp); font-weight:800; }
+    .card {
+      display:flex; flex-direction:column; background:var(--surface); border:1px solid var(--border); border-radius:14px;
+      padding:20px; box-shadow:var(--shadow); text-align:left;
+    }
+    .c-id { display:flex; align-items:center; gap:10px; }
+    .av { width:32px; height:32px; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:700; color:#3f3f46; flex:none; }
+    .c-name { font-size:14px; font-weight:700; }
+    .c-mark { margin-left:auto; font-size:15px; }
+    .c-meta { display:flex; gap:8px; align-items:center; margin:8px 0 0 42px; font-size:12px; color:var(--muted); }
+    .c-body { font-size:14px; color:var(--text-2); margin-top:12px; }
+    /* layouts */
+    .lay-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+    .lay-carousel { display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:6px; }
+    .lay-carousel .card { flex:0 0 320px; scroll-snap-align:start; }
+    .lay-ticker { overflow:hidden; -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent); mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent); }
+    .lay-ticker .row { display:flex; gap:16px; width:max-content; animation:tick 36s linear infinite; }
+    .lay-ticker:hover .row { animation-play-state:paused; }
+    .lay-ticker .card { width:320px; flex:none; }
+    @keyframes tick { to { transform:translateX(-50%); } }
+    .lay-wall { display:flex; gap:16px; overflow:hidden; max-height:480px; -webkit-mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent); mask-image:linear-gradient(180deg,transparent,#000 8%,#000 92%,transparent); }
+    .lay-wall .col { display:flex; flex-direction:column; gap:16px; flex:1; animation:wall 26s linear infinite; }
+    .lay-wall .col:nth-child(2) { animation-duration:34s; }
+    .lay-wall .col:nth-child(3) { animation-duration:42s; }
+    .lay-wall:hover .col { animation-play-state:paused; }
+    @keyframes wall { to { transform:translateY(-50%); } }
+    .cta { text-align:center; padding-bottom:90px; }
+    .cta p { color:var(--text-2); margin-bottom:18px; }
+    @media (prefers-reduced-motion:reduce){ .lay-ticker .row,.lay-wall .col{animation:none;} }
+    @media (max-width:760px){ .nav-links{display:none;} .stage{padding:22px;} }
+  </style>
+</head>
+<body>
+<nav><div class="wrap nav-in">
+  <a class="logo" href="index.html"><span class="logo-dot"></span>Vanssay</a>
+  <div class="nav-links"><a href="index.html#widgets">Widgets</a><a href="index.html#pricing">Pricing</a><a href="account.html">Account</a></div>
+  <a class="btn btn-blue" href="index.html#pricing">Add to Framer</a>
+</div></nav>
+
+<header class="wrap">
+  <h1>Play with the widgets</h1>
+  <p class="sub">This is the real thing — same cards, same animations your visitors will see. Switch layouts below.</p>
+  <div class="tabs" id="tabs">
+    <button data-l="grid" class="on">Foundation grid</button>
+    <button data-l="carousel">Carousel</button>
+    <button data-l="ticker">Ticker</button>
+    <button data-l="wall">Living Wall</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="stage">
+    <div class="v-head">
+      <span class="v-rating">4.8</span><span class="stars">★★★★★</span>
+      <span class="v-count">Based on 1,626 reviews</span>
+      <span class="chip"><span class="g">G</span> Google</span><span class="chip"><span class="t">★</span> Trustpilot</span>
+    </div>
+    <div id="body"></div>
+  </div>
+  <div class="cta">
+    <p>Now imagine it with <strong>your</strong> reviews, matched to <strong>your</strong> fonts and colors — automatically.</p>
+    <a class="btn btn-blue" href="index.html#pricing">Add Vanssay to Framer — free</a>
+  </div>
+</div>
+
+<script>
+const R = [
+  ["Sofia Marchetti","g",5,"2 days ago","Honestly the best coffee in the neighborhood. The flat white is perfect every time and the staff remembers your order after two visits.","#fde68a"],
+  ["James Okafor","g",5,"1 week ago","Came for a quick espresso, stayed two hours. Beautiful interior, fast wifi, and the almond croissant deserves its own review.","#bfdbfe"],
+  ["Marion D.","t",5,"3 weeks ago","Ordered the coffee subscription online — arrived in two days, beautifully packaged. Customer service answered within the hour.","#fbcfe8"],
+  ["Lucas Fernandez","g",4,"1 month ago","Great atmosphere and excellent pastries. It gets busy on weekends so come early. The cold brew is top tier.","#bbf7d0"],
+  ["Anna Kowalska","t",5,"1 month ago","Third order and the quality is incredibly consistent. The Ethiopia single origin is the best I've had this year.","#c7d2fe"],
+  ["Émile Rousseau","g",5,"2 months ago","A neighborhood gem. The team walked me through three brewing methods before I picked my beans. You can taste the passion.","#fed7aa"]
+];
+const init = n => n.trim().split(/\s+/).map(p=>p[0]).slice(0,2).join("").toUpperCase();
+const card = r => `<div class="card"><div class="c-id"><span class="av" style="background:${r[5]}">${init(r[0])}</span><span class="c-name">${r[0]}</span><span class="c-mark ${r[1]==="g"?"g":"t"}">${r[1]==="g"?"G":"★"}</span></div><div class="c-meta"><span class="stars">${"★".repeat(r[2])}${"☆".repeat(5-r[2])}</span>${r[3]}</div><p class="c-body">${r[4]}</p></div>`;
+const cards = R.map(card).join("");
+const layouts = {
+  grid: `<div class="lay-grid">${cards}</div>`,
+  carousel: `<div class="lay-carousel">${cards}</div>`,
+  ticker: `<div class="lay-ticker"><div class="row">${cards}${cards}</div></div>`,
+  wall: (() => { const c=[[],[],[]]; R.forEach((r,i)=>c[i%3].push(card(r))); return `<div class="lay-wall">${c.map(g=>`<div class="col">${g.join("")}${g.join("")}</div>`).join("")}</div>`; })(),
+};
+const body = document.getElementById("body");
+body.innerHTML = layouts.grid;
+document.getElementById("tabs").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("on", x===b));
+  body.innerHTML = layouts[b.dataset.l];
+});
+</script>
+</body>
+</html>
