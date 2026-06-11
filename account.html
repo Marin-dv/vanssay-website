@@ -192,8 +192,8 @@ async function load() {
     try {
       const u = await api("/track/usage");
       $("d-views").textContent = u.views.toLocaleString();
-      $("d-limit").textContent = "Included in your plan: " + u.limit.toLocaleString() + " views / month";
-      const pct = Math.min(100, (u.views / u.limit) * 100);
+      $("d-limit").textContent = "Included in your plan: " + (u.limit > 0 ? u.limit.toLocaleString() + " views / month" : "Unlimited views");
+      const pct = u.limit > 0 ? Math.min(100, (u.views / u.limit) * 100) : 0;
       const m = $("d-meter"); m.style.width = pct + "%";
       m.style.background = pct > 90 ? "var(--error)" : pct > 70 ? "#d97706" : "var(--accent)";
     } catch (e) { $("d-limit").textContent = "Usage unavailable right now."; }
