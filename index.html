@@ -7,7 +7,7 @@
 <meta name="description" content="The Framer plugin that turns your Google & Trustpilot reviews into stunning, theme-matched widgets. 8 layouts, one click, zero tweaking." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -136,8 +136,15 @@ h2{font-size:clamp(32px,4.6vw,56px);font-weight:900;letter-spacing:-.035em;line-
 .scene-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start}
 .scene-grid .rcard:nth-child(n+5){display:none}
 @media(max-width:560px){.scene-grid{grid-template-columns:1fr}.scene-grid .rcard:nth-child(n+3){display:none}}
-.scene-carousel{display:flex;gap:14px;align-items:center}
-.scene-carousel .rcard{flex:0 0 260px}
+/* step 2: same grid, but the widget has re-skinned itself to a loud retro site */
+.scene-retro{inset:0 !important;padding:24px;background:#efeada;display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start}
+.scene-retro .rcard{background:#fffdf4;border:2px solid #16150e;border-radius:0;box-shadow:5px 5px 0 #16150e}
+.scene-retro .rname,.scene-retro .rtext,.scene-retro .rdate{font-family:'DM Mono',monospace}
+.scene-retro .rname{color:#16150e}
+.scene-retro .rtext{color:#5f5c49}
+.scene-retro .rstars{color:#e8742c}
+.scene-retro .rcard:nth-child(n+5){display:none}
+@media(max-width:560px){.scene-retro{grid-template-columns:1fr}.scene-retro .rcard:nth-child(n+3){display:none}}
 .scene-wall{display:flex;gap:14px;-webkit-mask-image:linear-gradient(180deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(180deg,transparent,#000 10%,#000 90%,transparent)}
 .scene-wall .col{display:flex;flex-direction:column;gap:14px;flex:1;animation:wall 22s linear infinite}
 .scene-wall .col:nth-child(2){animation-duration:30s}
@@ -253,7 +260,8 @@ footer{padding:48px 0 64px;font-size:13.5px;color:var(--muted);display:flex;just
     </div>
   </div>
 
-  <div class="marquee" aria-hidden="true"><div class="m-row" id="m-row"></div></div>
+  <p style="position:relative;z-index:2;margin-top:60px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Live widget preview · sample data</p>
+  <div class="marquee" aria-hidden="true" style="margin-top:14px"><div class="m-row" id="m-row"></div></div>
 </header>
 
 <!-- pinned showcase -->
@@ -275,7 +283,7 @@ footer{padding:48px 0 64px;font-size:13.5px;color:var(--muted);display:flex;just
         <div class="b-bar"><i></i><i></i><i></i><span class="b-url">yoursite.framer.website</span></div>
         <div class="b-stage" id="stage">
           <div class="scene scene-grid" data-scene="0"></div>
-          <div class="scene scene-carousel" data-scene="1"></div>
+          <div class="scene scene-retro" data-scene="1"></div>
           <div class="scene scene-wall" data-scene="2"></div>
           <div class="scene scene-badge" data-scene="3">
             <div class="badge-big"><span class="num">4.8</span>
@@ -388,20 +396,22 @@ footer{padding:48px 0 64px;font-size:13.5px;color:var(--muted);display:flex;just
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script>
 /* ── data + card builder (marquee, hero floats, showcase scenes) ── */
+/* Sample reviews for a fictional business — this is a preview of the widget,
+   not testimonials about Vanssay. */
 const REVIEWS=[
- ["Sofia M.","g",5,"2 days ago","Honestly the best purchase for our studio this year. The widget matched our brand fonts instantly.","#fde68a"],
- ["James T.","t",5,"1 week ago","Setup took 90 seconds. Conversion on our pricing page jumped 14% in two weeks.","#bfdbfe"],
- ["Amélie L.","g",5,"3 weeks ago","Clients keep asking who built our testimonial section. It's just Vanssay doing its thing.","#fbcfe8"],
- ["Ravi K.","t",5,"1 month ago","The Living Wall layout is mesmerizing. Visitors literally stop scrolling to read our reviews.","#bbf7d0"],
- ["Emma W.","g",5,"1 month ago","Combined Google + Trustpilot rating in one badge. That little strip does heavy lifting.","#c7d2fe"],
- ["Léo P.","g",4,"2 months ago","Auto-sync means I literally never think about it. New reviews just… appear.","#fed7aa"]];
+ ["Sofia M.","g",5,"2 days ago","Impeccable service from start to finish. You can tell this team genuinely cares about the details.","#fde68a"],
+ ["James T.","t",5,"1 week ago","Quick to respond, fair prices, and the result exceeded what we hoped for. Highly recommend.","#bfdbfe"],
+ ["Amélie L.","g",5,"3 weeks ago","Warm welcome, great advice, and a follow-up most companies forget. We'll be back.","#fbcfe8"],
+ ["Ravi K.","t",5,"1 month ago","Five stars without hesitation — professional, friendly and right on schedule.","#bbf7d0"],
+ ["Emma W.","g",5,"1 month ago","The kind of place you end up recommending to friends without thinking twice.","#c7d2fe"],
+ ["Léo P.","g",4,"2 months ago","Solid experience overall. A short wait at peak hours, but the quality makes up for it.","#fed7aa"]];
 const init=n=>n.trim().split(/\s+/).map(p=>p[0]).slice(0,2).join("").toUpperCase();
 const card=(r,small)=>`<div class="rcard"${small?' style="width:240px;padding:16px"':''}><div class="rhead"><span class="avatar" style="background:${r[5]}">${init(r[0])}</span><div><div class="rname">${r[0]}</div><div class="rdate">${r[3]}</div></div><span class="${r[1]==="g"?"gmark":"tmark"}">${r[1]==="g"?"G":"★"}</span></div><div class="rstars">${"★".repeat(r[2])}${"☆".repeat(5-r[2])}</div><p class="rtext">${r[4]}</p></div>`;
 const all=REVIEWS.map(r=>card(r)).join("");
 document.getElementById("m-row").innerHTML=all+all;
 document.querySelectorAll(".float-card").forEach((el,i)=>{el.innerHTML=card(REVIEWS[i%REVIEWS.length],true)});
 document.querySelector(".scene-grid").innerHTML=REVIEWS.slice(0,4).map(r=>card(r)).join("");
-document.querySelector(".scene-carousel").innerHTML=REVIEWS.slice(0,3).map(r=>card(r)).join("");
+document.querySelector(".scene-retro").innerHTML=REVIEWS.slice(0,4).map(r=>card(r)).join("");
 document.querySelector(".scene-wall").innerHTML=[0,1].map(c=>{const g=REVIEWS.filter((_,i)=>i%2===c).map(r=>card(r)).join("");return `<div class="col">${g}${g}</div>`}).join("");
 
 /* ── GSAP ── */
