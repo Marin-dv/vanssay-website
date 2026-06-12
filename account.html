@@ -104,7 +104,7 @@
 <script>
 const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
 // Stripe price ids — leave empty to use the backend defaults.
-const PRICE_PRO = "", PRICE_ULTRA = "";
+const PRICE_PRO = "price_1Thb0oBpwaWVnRXM3q4tzl3I", PRICE_ULTRA = "price_1Thb1MBpwaWVnRXMZm3nbNYo";
 const TKEY = "vanssay.token";
 let registerMode = false;
 
@@ -119,6 +119,12 @@ const api = async (path, opts = {}) => {
   return data;
 };
 const showErr = (id, msg) => { const el = $(id); el.textContent = msg; el.style.display = msg ? "block" : "none"; };
+
+// Auto sign-in when arriving from the plugin (#token=<jwt>)
+if (location.hash.startsWith("#token=")) {
+  localStorage.setItem(TKEY, decodeURIComponent(location.hash.slice(7)));
+  history.replaceState(null, "", location.pathname);
+}
 
 // Modes: login | register | forgot | reset (arriving from the email link)
 let mode = location.hash.startsWith("#reset=") ? "reset" : "login";
@@ -186,7 +192,7 @@ async function load() {
     const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
     const checkout = (priceId) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: priceId ? { priceId } : {} }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
     const portal = async () => { try { const r = await api("/billing/portal", { method: "POST" }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
-    if (plan === "free") { mk("Upgrade to Pro — $15/mo", "btn-line", checkout(PRICE_PRO)); mk("Go Ultra — $39/mo", "btn-blue", checkout(PRICE_ULTRA)); }
+    if (plan === "free") { mk("Upgrade to Pro — $9/mo", "btn-line", checkout(PRICE_PRO)); mk("Go Ultra — $39/mo", "btn-blue", checkout(PRICE_ULTRA)); }
     else if (plan === "pro") { mk("Upgrade to Ultra — $39/mo", "btn-blue", checkout(PRICE_ULTRA)); mk("Manage / cancel billing", "btn-line", portal); }
     else { mk("Manage / cancel billing", "btn-line", portal); }
 

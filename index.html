@@ -336,23 +336,24 @@ footer{padding:48px 0 64px;font-size:13.5px;color:var(--muted);display:flex;just
       <div class="plan rv">
         <div class="plan-name">Free</div><div class="plan-price">$0</div><div class="plan-for">Test the waters</div>
         <ul>
-          <li><span><strong>250 views</strong>/month</span></li>
-          <li><span>1 platform (Google <em>or</em> Trustpilot)</span></li>
+          <li><span><strong>300 views</strong>/month</span></li>
+          <li><span><strong>Google + Trustpilot combined</strong></span></li>
           <li><span>5 Google / 3 Trustpilot reviews</span></li>
           <li><span><strong>6 widgets</strong> — incl. Carousel, Masonry, Ticker</span></li>
-          <li><span>Theme matching + SEO stars</span></li>
+          <li><span>Smart theme matching</span></li>
           <li class="no"><span>“Powered by Vanssay” watermark</span></li>
         </ul>
         <a class="btn btn-line" href="account.html">Start free</a>
       </div>
       <div class="plan featured rv">
         <span class="plan-flag">Most popular</span>
-        <div class="plan-name">Pro</div><div class="plan-price">$15<span>/mo</span></div><div class="plan-for">For serious sites</div>
+        <div class="plan-name">Pro</div><div class="plan-price">$9<span>/mo</span></div><div class="plan-for">For serious sites</div>
         <ul>
           <li><span><strong>50,000 views</strong>/month</span></li>
           <li><span><strong>All 10 widgets</strong> + all future widgets</span></li>
-          <li><span><strong>Google + Trustpilot combined</strong> · up to 25 reviews each</span></li>
+          <li><span>Up to <strong>25 reviews</strong> per platform</span></li>
           <li><span><strong>Real-time auto-sync</strong> + pin &amp; hide reviews</span></li>
+          <li><span><strong>SEO stars</strong> in Google search results</span></li>
           <li><span>Up to <strong>5 connected businesses</strong></span></li>
           <li><span>Watermark <strong>removed</strong> · AI summaries <em>(soon)</em></span></li>
         </ul>
@@ -408,6 +409,12 @@ footer{padding:48px 0 64px;font-size:13.5px;color:var(--muted);display:flex;just
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script>
+/* Auto sign-in when arriving from the plugin (#token=<jwt>) */
+if (location.hash.startsWith("#token=")) {
+  localStorage.setItem("vanssay.token", decodeURIComponent(location.hash.slice(7)));
+  history.replaceState(null, "", location.pathname + location.search);
+}
+
 /* ── data + card builder (marquee, hero floats, showcase scenes) ── */
 /* Sample reviews for a fictional business — this is a preview of the widget,
    not testimonials about Vanssay. */
