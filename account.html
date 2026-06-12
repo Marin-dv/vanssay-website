@@ -225,10 +225,21 @@ async function load() {
 }
 $("d-signout").onclick = () => { localStorage.removeItem(TKEY); load(); };
 $("d-changepass").onclick = async () => {
+  const btn = $("d-changepass");
+  if (btn.disabled) return;
   showErr("dash-err", ""); showErr("dash-ok", "");
   try {
     await api("/auth/forgot-password", { method: "POST", body: { email: $("d-email2").textContent.trim() } });
     showErr("dash-ok", "Check your inbox — a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
+    // 60s cooldown so the button can't be spammed.
+    btn.disabled = true; btn.style.opacity = ".55";
+    let left = 60;
+    btn.textContent = "Email sent (" + left + "s)";
+    const t = setInterval(() => {
+      left--;
+      if (left <= 0) { clearInterval(t); btn.disabled = false; btn.style.opacity = ""; btn.textContent = "Change password"; }
+      else btn.textContent = "Email sent (" + left + "s)";
+    }, 1000);
   } catch (e) { showErr("dash-err", e.message); }
 };
 load();
