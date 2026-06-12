@@ -45,6 +45,11 @@
     .actions .btn { width:auto; flex:1; margin-top:0; }
     #dash { display:none; }
     h3 { font-size:15px; font-weight:800; margin-bottom:4px; }
+    /* Loading state while the session is verified (e.g. arriving from the plugin) */
+    #loading { display:none; text-align:center; padding:80px 0; }
+    .spinner { width:34px; height:34px; margin:0 auto 16px; border-radius:50%;
+      border:3px solid var(--surface-2); border-top-color:var(--accent); animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -54,6 +59,9 @@
 </div></nav>
 
 <main>
+  <!-- Loading (session check) -->
+  <div id="loading"><div class="spinner"></div><p class="sub">Signing you in…</p></div>
+
   <!-- Auth -->
   <div id="auth">
     <h1 id="auth-title">Welcome back</h1>
@@ -177,10 +185,12 @@ render();
 $("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-btn").click());
 
 async function load() {
-  if (!localStorage.getItem(TKEY)) { $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
+  if (!localStorage.getItem(TKEY)) { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
+  // Token present (e.g. arriving from the plugin) — spinner instead of the login form.
+  $("auth").style.display = "none"; $("dash").style.display = "none"; $("loading").style.display = "block";
   try {
     const me = await api("/auth/me");
-    $("auth").style.display = "none"; $("dash").style.display = "block";
+    $("loading").style.display = "none"; $("dash").style.display = "block";
     $("d-email").textContent = me.user.email; $("d-email2").textContent = me.user.email;
     const plan = me.subscription.plan;
     const badge = $("d-plan");
@@ -205,7 +215,7 @@ async function load() {
       m.style.background = pct > 90 ? "var(--error)" : pct > 70 ? "#d97706" : "var(--accent)";
     } catch (e) { $("d-limit").textContent = "Usage unavailable right now."; }
   } catch (e) {
-    localStorage.removeItem(TKEY); $("auth").style.display = "block"; $("dash").style.display = "none";
+    localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
   }
 }
 $("d-signout").onclick = () => { localStorage.removeItem(TKEY); load(); };
