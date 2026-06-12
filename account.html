@@ -100,9 +100,11 @@
     <div class="card">
       <h3>Profile</h3>
       <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
-      <p class="muted">To change your email or password, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
+      <p class="muted">To change your email, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
       <div class="err" id="dash-err"></div>
+      <div class="err" id="dash-ok" style="background:#e9f7ef;color:#16a34a"></div>
       <div class="actions">
+        <button class="btn btn-line" id="d-changepass">Change password</button>
         <button class="btn btn-line" id="d-signout">Sign out</button>
       </div>
     </div>
@@ -219,6 +221,13 @@ async function load() {
   }
 }
 $("d-signout").onclick = () => { localStorage.removeItem(TKEY); load(); };
+$("d-changepass").onclick = async () => {
+  showErr("dash-err", ""); showErr("dash-ok", "");
+  try {
+    await api("/auth/forgot-password", { method: "POST", body: { email: $("d-email2").textContent.trim() } });
+    showErr("dash-ok", "Check your inbox — a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
+  } catch (e) { showErr("dash-err", e.message); }
+};
 load();
 </script>
 </body>
