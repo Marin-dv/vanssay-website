@@ -187,6 +187,9 @@ render();
 $("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-btn").click());
 
 async function load() {
+  // Arriving from a reset-password email: always show the reset form, even
+  // when a session already exists in this browser.
+  if (mode === "reset") { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
   if (!localStorage.getItem(TKEY)) { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
   // Token present (e.g. arriving from the plugin) — spinner instead of the login form.
   $("auth").style.display = "none"; $("dash").style.display = "none"; $("loading").style.display = "block";
