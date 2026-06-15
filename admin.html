@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin — Vanssay</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%230e7afe'/><path d='M34,4H25L13,36H22Z' fill='%237c5cff'/></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#f6f7f9; --surface:#fff; --surface-2:#f4f4f5; --border:#e4e4e7; --text:#18181b;
+      --text-2:#52525b; --muted:#a1a1aa; --accent:#0e7afe; --pro:#7c5cff; --error:#dc2626;
+      --green:#16a34a; --amber:#d97706; --shadow:0 1px 2px rgba(0,0,0,.05); --shadow-md:0 8px 30px rgba(0,0,0,.07);
+    }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.55; min-height:100vh; -webkit-font-smoothing:antialiased; font-size:14px; }
+    a { color:var(--accent); text-decoration:none; }
+    button { font:inherit; cursor:pointer; }
+    .hidden { display:none !important; }
+
+    /* ── Auth gate ── */
+    .gate { max-width:400px; margin:0 auto; padding:80px 24px; }
+    .gate h1 { font-size:26px; font-weight:900; letter-spacing:-.02em; margin-bottom:6px; }
+    .gate p { color:var(--text-2); margin-bottom:22px; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow-md); }
+    .gate .card { padding:26px; }
+    label { display:block; font-size:12.5px; font-weight:600; margin:14px 0 5px; }
+    input, select { width:100%; padding:10px 13px; border:1px solid var(--border); border-radius:9px; font:inherit; font-size:14px; outline:none; background:#fff; }
+    input:focus, select:focus { border-color:var(--accent); box-shadow:0 0 0 3px #eaf3ff; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:10px 16px; border-radius:10px; font-size:13.5px; font-weight:700; border:1px solid transparent; background:var(--surface-2); color:var(--text); }
+    .btn:hover { filter:brightness(.98); }
+    .btn-blue { background:linear-gradient(120deg,var(--accent),var(--pro)); color:#fff; }
+    .btn-line { background:#fff; border-color:var(--border); }
+    .btn-danger { background:var(--error); color:#fff; }
+    .btn-full { width:100%; margin-top:18px; }
+    .btn-sm { padding:7px 12px; font-size:12.5px; }
+    .err { background:#fdecec; color:var(--error); border-radius:9px; padding:9px 13px; font-size:12.5px; margin-top:12px; display:none; }
+    .ok { background:#e9f7ef; color:var(--green); border-radius:9px; padding:9px 13px; font-size:12.5px; margin-top:12px; display:none; }
+
+    /* ── Shell ── */
+    .shell { display:none; min-height:100vh; grid-template-columns:230px 1fr; }
+    aside { background:var(--surface); border-right:1px solid var(--border); padding:22px 16px; position:sticky; top:0; height:100vh; display:flex; flex-direction:column; gap:4px; }
+    .brand { display:flex; align-items:center; gap:9px; font-weight:800; font-size:16px; padding:0 8px 18px; }
+    .navlink { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:9px; color:var(--text-2); font-weight:600; font-size:13.5px; border:none; background:none; width:100%; text-align:left; }
+    .navlink:hover { background:var(--surface-2); color:var(--text); }
+    .navlink.active { background:#eaf3ff; color:var(--accent); }
+    .navlink .ic { width:18px; text-align:center; }
+    .aside-foot { margin-top:auto; font-size:12px; color:var(--muted); padding:12px 8px 0; border-top:1px solid var(--border); }
+    main { padding:30px 34px 70px; max-width:1240px; }
+    .page-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; gap:16px; flex-wrap:wrap; }
+    h2 { font-size:22px; font-weight:900; letter-spacing:-.02em; }
+    .page-head p { color:var(--text-2); font-size:13px; }
+
+    /* ── KPI cards ── */
+    .kpis { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:14px; margin-bottom:24px; }
+    .kpi { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px; box-shadow:var(--shadow); }
+    .kpi .k-label { font-size:12px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.03em; }
+    .kpi .k-val { font-size:26px; font-weight:900; letter-spacing:-.02em; margin-top:4px; }
+    .kpi .k-sub { font-size:12px; color:var(--text-2); margin-top:2px; }
+    .kpi.hero { background:linear-gradient(120deg,#0e7afe,#7c5cff); color:#fff; border:none; }
+    .kpi.hero .k-label, .kpi.hero .k-sub { color:rgba(255,255,255,.85); }
+
+    .grid-2 { display:grid; grid-template-columns:1.4fr 1fr; gap:16px; }
+    @media (max-width:900px){ .grid-2 { grid-template-columns:1fr; } .shell { grid-template-columns:1fr; } aside { position:static; height:auto; flex-direction:row; flex-wrap:wrap; } }
+    .panel { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 20px; box-shadow:var(--shadow); }
+    .panel h3 { font-size:14px; font-weight:800; margin-bottom:14px; }
+
+    /* ── Bar chart ── */
+    .chart { display:flex; align-items:flex-end; gap:6px; height:140px; }
+    .bar { flex:1; background:linear-gradient(180deg,#5aa6ff,#7c5cff); border-radius:5px 5px 0 0; min-height:3px; position:relative; }
+    .bar:hover::after { content:attr(data-tip); position:absolute; bottom:100%; left:50%; transform:translateX(-50%); background:#18181b; color:#fff; font-size:11px; padding:4px 8px; border-radius:6px; white-space:nowrap; margin-bottom:5px; }
+    .chart-x { display:flex; gap:6px; margin-top:6px; }
+    .chart-x span { flex:1; text-align:center; font-size:10px; color:var(--muted); }
+
+    /* ── Tables ── */
+    .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+    .toolbar input, .toolbar select { width:auto; }
+    .toolbar input.search { min-width:240px; }
+    .tablewrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow); }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:700; padding:12px 14px; border-bottom:1px solid var(--border); background:#fafafa; }
+    td { padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
+    tr:last-child td { border-bottom:none; }
+    tbody tr.clickable:hover { background:#f8fafc; cursor:pointer; }
+    .mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; color:var(--text-2); }
+    .truncate { max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .right { text-align:right; }
+    .empty { padding:40px; text-align:center; color:var(--muted); }
+
+    .badge { display:inline-flex; padding:2px 10px; border-radius:99px; font-size:11.5px; font-weight:800; }
+    .b-free { background:var(--surface-2); color:var(--text-2); } .b-pro { background:#f1edff; color:var(--pro); } .b-ultra { background:linear-gradient(90deg,var(--accent),var(--pro)); color:#fff; }
+    .b-active { background:#e9f7ef; color:var(--green); } .b-canceled { background:#fdecec; color:var(--error); } .b-other { background:var(--surface-2); color:var(--text-2); }
+    .pager { display:flex; align-items:center; gap:12px; justify-content:flex-end; margin-top:14px; font-size:13px; color:var(--text-2); }
+
+    /* ── Modal ── */
+    .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; justify-content:flex-end; z-index:50; }
+    .modal { width:560px; max-width:100%; background:var(--bg); height:100%; overflow-y:auto; padding:26px 28px; box-shadow:-10px 0 40px rgba(0,0,0,.2); animation:slidein .18s ease; }
+    @keyframes slidein { from { transform:translateX(30px); opacity:.6; } to { transform:none; opacity:1; } }
+    .modal-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:18px; }
+    .modal-head h3 { font-size:18px; font-weight:900; word-break:break-all; }
+    .x { background:none; border:none; font-size:22px; color:var(--muted); line-height:1; }
+    .modal .card { padding:18px; margin-bottom:14px; }
+    .field-row { display:flex; gap:10px; align-items:flex-end; }
+    .field-row > div { flex:1; }
+    .kv { display:flex; justify-content:space-between; gap:12px; padding:5px 0; font-size:13px; border-bottom:1px dashed var(--border); }
+    .kv:last-child { border-bottom:none; }
+    .kv span:first-child { color:var(--text-2); }
+    .sec-title { font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:700; margin:18px 0 8px; }
+    .ministat { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .ministat .kpi { padding:12px 14px; } .ministat .k-val { font-size:20px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Login gate ── -->
+<div class="gate" id="gate">
+  <h1>Admin</h1>
+  <p>Sign in with an admin account.</p>
+  <div class="card">
+    <label>Email</label>
+    <input id="g-email" type="email" placeholder="you@vanssay.net" autocomplete="email" />
+    <label style="display:flex;justify-content:space-between">Password <a id="g-toggle" style="cursor:pointer">Show</a></label>
+    <input id="g-pass" type="password" placeholder="Your password" autocomplete="current-password" />
+    <div class="err" id="g-err"></div>
+    <button class="btn btn-blue btn-full" id="g-btn">Sign in</button>
+  </div>
+</div>
+
+<!-- ── App shell ── -->
+<div class="shell" id="shell">
+  <aside>
+    <div class="brand"><svg width="20" height="20" viewBox="0 0 40 40"><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg> Admin</div>
+    <button class="navlink active" data-tab="overview"><span class="ic">📊</span> Overview</button>
+    <button class="navlink" data-tab="users"><span class="ic">👤</span> Users</button>
+    <button class="navlink" data-tab="subs"><span class="ic">💳</span> Subscriptions</button>
+    <button class="navlink" data-tab="pages"><span class="ic">🔗</span> Pages &amp; clicks</button>
+    <button class="navlink" data-tab="businesses"><span class="ic">🏢</span> Businesses</button>
+    <button class="navlink" data-tab="cache"><span class="ic">🗄️</span> Cache</button>
+    <div class="aside-foot">
+      <div id="admin-email" style="margin-bottom:8px;color:var(--text-2);font-weight:600"></div>
+      <button class="btn btn-line btn-sm" id="signout">Sign out</button>
+    </div>
+  </aside>
+
+  <main id="view"></main>
+</div>
+
+<div id="modal-root"></div>
+
+<script>
+const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
+const TKEY = "vanssay.token";
+const $ = (id) => document.getElementById(id);
+const el = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; };
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
+const fmt = (n) => Number(n || 0).toLocaleString();
+const money = (n) => "$" + Number(n || 0).toLocaleString();
+const date = (d) => d ? new Date(d).toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" }) : "—";
+const planBadge = (p) => `<span class="badge b-${esc(p)}">${esc(p[0].toUpperCase()+p.slice(1))}</span>`;
+const statusBadge = (s) => { const k = s==="active"||s==="trialing"?"b-active":s==="canceled"?"b-canceled":"b-other"; return `<span class="badge ${k}">${esc(s||"—")}</span>`; };
+
+async function api(path, opts = {}) {
+  const headers = { ...(opts.body ? { "Content-Type": "application/json" } : {}) };
+  const t = localStorage.getItem(TKEY);
+  if (t) headers.Authorization = "Bearer " + t;
+  const res = await fetch(API + path, { method: opts.method || "GET", headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Request failed");
+  return data;
+}
+
+/* ── Auth gate ── */
+const showErr = (id, m) => { const e = $(id); e.textContent = m; e.style.display = m ? "block" : "none"; };
+$("g-toggle").onclick = () => { const p = $("g-pass"); p.type = p.type === "password" ? "text" : "password"; $("g-toggle").textContent = p.type === "password" ? "Show" : "Hide"; };
+$("g-btn").onclick = doLogin;
+$("g-pass").addEventListener("keydown", (e) => e.key === "Enter" && doLogin());
+async function doLogin() {
+  showErr("g-err", "");
+  try {
+    const r = await api("/auth/login", { method: "POST", body: { email: $("g-email").value.trim(), password: $("g-pass").value } });
+    localStorage.setItem(TKEY, r.token);
+    await boot();
+  } catch (e) { showErr("g-err", e.message); }
+}
+$("signout").onclick = () => { localStorage.removeItem(TKEY); location.reload(); };
+
+async function boot() {
+  if (!localStorage.getItem(TKEY)) { $("gate").classList.remove("hidden"); $("shell").style.display = "none"; return; }
+  try {
+    const me = await api("/admin/check");
+    $("gate").classList.add("hidden");
+    $("shell").style.display = "grid";
+    $("admin-email").textContent = me.email;
+    switchTab("overview");
+  } catch (e) {
+    $("shell").style.display = "none";
+    $("gate").classList.remove("hidden");
+    showErr("g-err", e.message.includes("Admin") ? "This account doesn't have admin access." : e.message);
+  }
+}
+
+/* ── Tabs ── */
+document.querySelectorAll(".navlink").forEach((b) => b.onclick = () => switchTab(b.dataset.tab));
+function switchTab(tab) {
+  document.querySelectorAll(".navlink").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+  const v = $("view");
+  v.innerHTML = `<div class="empty">Loading…</div>`;
+  ({ overview: renderOverview, users: renderUsers, subs: renderSubs, pages: renderPages, businesses: renderBusinesses, cache: renderCache }[tab])();
+}
+
+/* ── Overview ── */
+async function renderOverview() {
+  const d = await api("/admin/overview");
+  const v = $("view");
+  const maxSign = Math.max(1, ...d.signups.map((s) => s.count));
+  v.innerHTML = `
+    <div class="page-head"><div><h2>Overview</h2><p>Live snapshot of accounts, revenue and widget reach.</p></div></div>
+    <div class="kpis">
+      <div class="kpi hero"><div class="k-label">Monthly recurring revenue</div><div class="k-val">${money(d.revenue.mrr)}</div><div class="k-sub">${money(d.revenue.arr)} / year</div></div>
+      <div class="kpi"><div class="k-label">Users</div><div class="k-val">${fmt(d.users.total)}</div><div class="k-sub">+${fmt(d.users.newThisMonth)} this month</div></div>
+      <div class="kpi"><div class="k-label">Paying customers</div><div class="k-val">${fmt(d.plans.paid)}</div><div class="k-sub">${fmt(d.plans.pro)} Pro · ${fmt(d.plans.ultra)} Ultra</div></div>
+      <div class="kpi"><div class="k-label">Free accounts</div><div class="k-val">${fmt(d.plans.free)}</div></div>
+      <div class="kpi"><div class="k-label">Widget views (month)</div><div class="k-val">${fmt(d.usage.viewsThisMonth)}</div><div class="k-sub">${fmt(d.usage.viewsAllTime)} all-time</div></div>
+      <div class="kpi"><div class="k-label">Businesses connected</div><div class="k-val">${fmt(d.usage.businesses)}</div></div>
+      <div class="kpi"><div class="k-label">"Powered by" clicks</div><div class="k-val">${fmt(d.powered.clicks)}</div><div class="k-sub">${fmt(d.powered.trackedPages)} pages tracked</div></div>
+      <div class="kpi"><div class="k-label">Widget page views</div><div class="k-val">${fmt(d.powered.widgetPageViews)}</div><div class="k-sub">across all embeds</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>New signups · last 12 months</h3>
+        <div class="chart">${d.signups.map((s) => `<div class="bar" style="height:${Math.round((s.count/maxSign)*100)}%" data-tip="${s.month}: ${s.count}"></div>`).join("")}</div>
+        <div class="chart-x">${d.signups.map((s) => `<span>${s.month.slice(5)}</span>`).join("")}</div>
+      </div>
+      <div class="panel">
+        <h3>Plan distribution</h3>
+        ${planRow("Free", d.plans.free, d.users.total)}
+        ${planRow("Pro", d.plans.pro, d.users.total)}
+        ${planRow("Ultra", d.plans.ultra, d.users.total)}
+        <div class="kv" style="margin-top:10px"><span>Active paid subscriptions</span><strong>${fmt(d.plans.paid)}</strong></div>
+        <div class="kv"><span>Conversion rate</span><strong>${d.users.total ? ((d.plans.paid/d.users.total)*100).toFixed(1) : "0"}%</strong></div>
+      </div>
+    </div>`;
+}
+function planRow(label, n, total) {
+  const pct = total ? Math.round((n/total)*100) : 0;
+  return `<div style="margin-bottom:10px"><div class="kv" style="border:none;padding-bottom:3px"><span>${label}</span><strong>${fmt(n)} · ${pct}%</strong></div>
+    <div class="meter" style="height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden"><span style="display:block;height:100%;width:${pct}%;background:linear-gradient(90deg,#0e7afe,#7c5cff)"></span></div></div>`;
+}
+
+/* ── Users ── */
+let usersState = { search: "", plan: "", page: 1, pageSize: 25 };
+async function renderUsers() {
+  const v = $("view");
+  v.innerHTML = `
+    <div class="page-head"><div><h2>Users</h2><p>Search, inspect and manage every account.</p></div></div>
+    <div class="toolbar">
+      <input class="search" id="u-search" placeholder="Search by email…" value="${esc(usersState.search)}" />
+      <select id="u-plan">
+        <option value="">All plans</option>
+        <option value="free">Free</option><option value="pro">Pro</option><option value="ultra">Ultra</option>
+      </select>
+      <button class="btn btn-line btn-sm" id="u-refresh">Refresh</button>
+    </div>
+    <div class="tablewrap" id="u-table"></div>
+    <div class="pager" id="u-pager"></div>`;
+  $("u-plan").value = usersState.plan;
+  let timer;
+  $("u-search").oninput = (e) => { clearTimeout(timer); timer = setTimeout(() => { usersState.search = e.target.value.trim(); usersState.page = 1; loadUsers(); }, 300); };
+  $("u-plan").onchange = (e) => { usersState.plan = e.target.value; usersState.page = 1; loadUsers(); };
+  $("u-refresh").onclick = loadUsers;
+  loadUsers();
+}
+async function loadUsers() {
+  const wrap = $("u-table");
+  const qs = new URLSearchParams({ page: usersState.page, pageSize: usersState.pageSize });
+  if (usersState.search) qs.set("search", usersState.search);
+  if (usersState.plan) qs.set("plan", usersState.plan);
+  const d = await api("/admin/users?" + qs);
+  if (!d.users.length) { wrap.innerHTML = `<div class="empty">No users found.</div>`; $("u-pager").innerHTML = ""; return; }
+  wrap.innerHTML = `<table><thead><tr>
+      <th>Email</th><th>Plan</th><th>Status</th><th class="right">Views / quota</th><th class="right">Businesses</th><th>Joined</th>
+    </tr></thead><tbody>${d.users.map((u) => `
+      <tr class="clickable" data-id="${u.id}">
+        <td>${esc(u.email)}</td>
+        <td>${planBadge(u.plan)}</td>
+        <td>${u.plan==="free" && !u.status ? '<span class="badge b-other">—</span>' : statusBadge(u.status)}</td>
+        <td class="right">${fmt(u.viewsThisMonth)}${u.quota>0?" / "+fmt(u.quota):" / ∞"}</td>
+        <td class="right">${fmt(u.businesses)}</td>
+        <td>${date(u.createdAt)}</td>
+      </tr>`).join("")}</tbody></table>`;
+  wrap.querySelectorAll("tr.clickable").forEach((r) => r.onclick = () => openUser(r.dataset.id));
+  const pages = Math.max(1, Math.ceil(d.total / d.pageSize));
+  $("u-pager").innerHTML = `<span>${d.total} user(s) · page ${d.page}/${pages}</span>
+    <button class="btn btn-line btn-sm" ${d.page<=1?"disabled":""} id="u-prev">← Prev</button>
+    <button class="btn btn-line btn-sm" ${d.page>=pages?"disabled":""} id="u-next">Next →</button>`;
+  if ($("u-prev")) $("u-prev").onclick = () => { usersState.page--; loadUsers(); };
+  if ($("u-next")) $("u-next").onclick = () => { usersState.page++; loadUsers(); };
+}
+
+/* ── User detail modal ── */
+async function openUser(id) {
+  const root = $("modal-root");
+  root.innerHTML = `<div class="modal-bg"><div class="modal"><div class="empty">Loading…</div></div></div>`;
+  root.querySelector(".modal-bg").onclick = (e) => { if (e.target.classList.contains("modal-bg")) root.innerHTML = ""; };
+  let d;
+  try { d = await api("/admin/users/" + id); }
+  catch (e) { root.querySelector(".modal").innerHTML = `<div class="err" style="display:block">${esc(e.message)}</div>`; return; }
+  const u = d.user;
+  const totalViews = d.views.reduce((s, v) => s + v.views, 0);
+  const totalClicks = d.pages.reduce((s, p) => s + p.poweredClicks, 0);
+  root.querySelector(".modal").innerHTML = `
+    <div class="modal-head"><h3>${esc(u.email)}</h3><button class="x" id="m-close">×</button></div>
+
+    <div class="card">
+      <div class="ministat" style="margin-bottom:14px">
+        <div class="kpi"><div class="k-label">Plan</div><div class="k-val" style="font-size:18px">${planBadge(d.plan)}</div></div>
+        <div class="kpi"><div class="k-label">Views (all months)</div><div class="k-val">${fmt(totalViews)}</div></div>
+      </div>
+      <div class="kv"><span>User ID</span><span class="mono">${esc(u.id)}</span></div>
+      <div class="kv"><span>Joined</span><span>${date(u.createdAt)}</span></div>
+      <div class="kv"><span>Stripe customer</span><span class="mono">${esc(u.stripeCustomerId || "—")}</span></div>
+      <div class="kv"><span>Monthly quota</span><span>${d.quota>0?fmt(d.quota):"Unlimited"}</span></div>
+      <div class="kv"><span>"Powered by" clicks</span><span>${fmt(totalClicks)}</span></div>
+    </div>
+
+    <div class="card">
+      <div class="field-row">
+        <div><label>Email</label><input id="m-email" value="${esc(u.email)}" /></div>
+      </div>
+      <div class="field-row" style="margin-top:10px">
+        <div><label>Plan (manual override — no Stripe charge)</label>
+          <select id="m-plan">
+            <option value="free" ${d.plan==="free"?"selected":""}>Free</option>
+            <option value="pro" ${d.plan==="pro"?"selected":""}>Pro</option>
+            <option value="ultra" ${d.plan==="ultra"?"selected":""}>Ultra</option>
+          </select>
+        </div>
+        <button class="btn btn-blue" id="m-save">Save</button>
+      </div>
+      <div class="err" id="m-err"></div><div class="ok" id="m-ok"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+        <button class="btn btn-line btn-sm" id="m-resetviews">Reset month views</button>
+        <button class="btn btn-line btn-sm" id="m-sendreset">Send password reset</button>
+        <button class="btn btn-danger btn-sm" id="m-delete" style="margin-left:auto">Delete user</button>
+      </div>
+    </div>
+
+    <div class="sec-title">Subscriptions (${d.subscriptions.length})</div>
+    <div class="card" style="padding:0;overflow:hidden">${d.subscriptions.length ? `<table><thead><tr><th>Plan</th><th>Status</th><th>Period end</th><th>Created</th></tr></thead><tbody>
+      ${d.subscriptions.map((s)=>`<tr><td>${planBadge(s.plan)}</td><td>${statusBadge(s.status)}</td><td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No subscriptions.</div>`}</div>
+
+    <div class="sec-title">Businesses (${d.configs.length})</div>
+    <div class="card" style="padding:0;overflow:hidden">${d.configs.length ? `<table><thead><tr><th>Google</th><th>Trustpilot</th><th>Min ★</th></tr></thead><tbody>
+      ${d.configs.map((c)=>`<tr><td>${esc(c.googleBusinessName||c.googlePlaceId||"—")}</td><td class="truncate">${esc(c.trustpilotUrl||"—")}</td><td>${c.minStars}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No businesses connected.</div>`}</div>
+
+    <div class="sec-title">Embed pages (${d.pages.length})</div>
+    <div class="card" style="padding:0;overflow:hidden">${d.pages.length ? `<table><thead><tr><th>Page</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
+      ${d.pages.map((p)=>`<tr><td class="truncate"><a href="${esc(p.pageUrl)}" target="_blank">${esc(p.pageUrl)}</a></td><td class="right">${fmt(p.views)}</td><td class="right">${fmt(p.poweredClicks)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No embeds recorded yet.</div>`}</div>
+
+    <div class="sec-title">View history</div>
+    <div class="card" style="padding:0;overflow:hidden">${d.views.length ? `<table><thead><tr><th>Month</th><th class="right">Views</th></tr></thead><tbody>
+      ${d.views.map((vw)=>`<tr><td>${esc(vw.month)}</td><td class="right">${fmt(vw.views)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No views recorded.</div>`}</div>
+  `;
+  const close = () => { root.innerHTML = ""; };
+  $("m-close").onclick = close;
+  $("m-save").onclick = async () => {
+    showErr("m-err",""); $("m-ok").style.display="none";
+    try {
+      await api("/admin/users/"+id, { method:"PATCH", body:{ email: $("m-email").value.trim(), plan: $("m-plan").value } });
+      $("m-ok").textContent = "Saved."; $("m-ok").style.display="block";
+      loadUsers();
+    } catch(e){ showErr("m-err", e.message); }
+  };
+  $("m-resetviews").onclick = async () => { try { await api("/admin/users/"+id+"/reset-views",{method:"POST"}); $("m-ok").textContent="Views reset to 0."; $("m-ok").style.display="block"; } catch(e){ showErr("m-err",e.message);} };
+  $("m-sendreset").onclick = async () => { try { await api("/admin/users/"+id+"/send-reset",{method:"POST"}); $("m-ok").textContent="Password-reset email sent."; $("m-ok").style.display="block"; } catch(e){ showErr("m-err",e.message);} };
+  $("m-delete").onclick = async () => {
+    if (!confirm("Permanently delete "+u.email+" and ALL their data? This cannot be undone.")) return;
+    try { await api("/admin/users/"+id,{method:"DELETE"}); close(); loadUsers(); } catch(e){ showErr("m-err",e.message);} };
+}
+
+/* ── Subscriptions ── */
+async function renderSubs() {
+  const d = await api("/admin/subscriptions");
+  const live = d.subscriptions.filter((s)=>s.live);
+  const mrr = live.reduce((s,x)=>s+x.monthlyValue,0);
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Subscriptions</h2><p>Every subscription record, live and historical.</p></div></div>
+    <div class="kpis">
+      <div class="kpi hero"><div class="k-label">MRR (live subs)</div><div class="k-val">${money(mrr)}</div><div class="k-sub">${money(mrr*12)} / year</div></div>
+      <div class="kpi"><div class="k-label">Live subscriptions</div><div class="k-val">${fmt(live.length)}</div></div>
+      <div class="kpi"><div class="k-label">Total records</div><div class="k-val">${fmt(d.subscriptions.length)}</div></div>
+    </div>
+    <div class="tablewrap">${d.subscriptions.length?`<table><thead><tr>
+      <th>Email</th><th>Plan</th><th>Status</th><th>Live</th><th class="right">MRR</th><th>Period end</th><th>Created</th><th>Stripe sub</th>
+    </tr></thead><tbody>${d.subscriptions.map((s)=>`<tr>
+      <td>${esc(s.email)}</td><td>${planBadge(s.plan)}</td><td>${statusBadge(s.status)}</td>
+      <td>${s.live?"✅":"—"}</td><td class="right">${s.monthlyValue?money(s.monthlyValue):"—"}</td>
+      <td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td>
+      <td class="mono truncate">${esc(s.stripeSubscriptionId||"manual")}</td>
+    </tr>`).join("")}</tbody></table>`:`<div class="empty">No subscriptions yet.</div>`}</div>`;
+}
+
+/* ── Pages & clicks ── */
+let pagesSort = "poweredClicks";
+async function renderPages() {
+  const d = await api("/admin/pages?sort="+pagesSort);
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Pages &amp; "Powered by Vanssay" clicks</h2><p>Where widgets are embedded, their views and outbound clicks.</p></div>
+      <select id="p-sort" style="width:auto"><option value="poweredClicks" ${pagesSort==="poweredClicks"?"selected":""}>Sort by clicks</option><option value="views" ${pagesSort==="views"?"selected":""}>Sort by views</option></select></div>
+    <div class="grid-2" style="align-items:start">
+      <div>
+        <div class="sec-title">By page</div>
+        <div class="tablewrap">${d.pages.length?`<table><thead><tr><th>Page</th><th>Owner</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
+          ${d.pages.map((p)=>`<tr><td class="truncate"><a href="${esc(p.pageUrl)}" target="_blank">${esc(p.pageUrl)}</a></td><td class="truncate">${esc(p.email)}</td><td class="right">${fmt(p.views)}</td><td class="right">${fmt(p.clicks)}</td></tr>`).join("")}
+        </tbody></table>`:`<div class="empty">No embeds tracked yet. Data appears once widgets load on published sites.</div>`}</div>
+      </div>
+      <div>
+        <div class="sec-title">By host</div>
+        <div class="tablewrap">${d.hosts.length?`<table><thead><tr><th>Host</th><th class="right">Pages</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
+          ${d.hosts.map((h)=>`<tr><td class="truncate">${esc(h.host)}</td><td class="right">${fmt(h.pages)}</td><td class="right">${fmt(h.views)}</td><td class="right">${fmt(h.clicks)}</td></tr>`).join("")}
+        </tbody></table>`:`<div class="empty">—</div>`}</div>
+      </div>
+    </div>`;
+  $("p-sort").onchange = (e) => { pagesSort = e.target.value; renderPages(); };
+}
+
+/* ── Businesses ── */
+async function renderBusinesses() {
+  const d = await api("/admin/businesses");
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Businesses</h2><p>Every connected Google / Trustpilot source.</p></div></div>
+    <div class="tablewrap">${d.businesses.length?`<table><thead><tr>
+      <th>Owner</th><th>Google business</th><th>Place ID</th><th>Trustpilot</th><th class="right">Min ★</th><th>Connected</th>
+    </tr></thead><tbody>${d.businesses.map((b)=>`<tr>
+      <td>${esc(b.email)}</td><td>${esc(b.googleBusinessName||"—")}</td><td class="mono truncate">${esc(b.googlePlaceId||"—")}</td>
+      <td class="truncate">${b.trustpilotUrl?`<a href="${esc(b.trustpilotUrl)}" target="_blank">${esc(b.trustpilotUrl.replace(/^https?:\/\/(www\.)?/,""))}</a>`:"—"}</td>
+      <td class="right">${b.minStars}</td><td>${date(b.createdAt)}</td>
+    </tr>`).join("")}</tbody></table>`:`<div class="empty">No businesses connected yet.</div>`}</div>`;
+}
+
+/* ── Cache ── */
+async function renderCache() {
+  const d = await api("/admin/cache");
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Review cache</h2><p>Cached Google/Trustpilot payloads that serve widgets fast.</p></div></div>
+    <div class="kpis">
+      <div class="kpi"><div class="k-label">Cached entries</div><div class="k-val">${fmt(d.total)}</div></div>
+      <div class="kpi"><div class="k-label">Expired</div><div class="k-val">${fmt(d.expired)}</div></div>
+      ${d.byPlatform.map((p)=>`<div class="kpi"><div class="k-label">${esc(p.platform)}</div><div class="k-val">${fmt(p.count)}</div></div>`).join("")}
+    </div>
+    <div class="panel" style="max-width:520px">
+      <h3>Maintenance</h3>
+      <div class="ok" id="c-ok"></div><div class="err" id="c-err"></div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button class="btn btn-line btn-sm" id="c-expired">Purge expired (${fmt(d.expired)})</button>
+        <button class="btn btn-danger btn-sm" id="c-all">Purge ALL</button>
+      </div>
+    </div>`;
+  $("c-expired").onclick = () => purge(false);
+  $("c-all").onclick = () => { if (confirm("Delete the entire review cache? Widgets will refetch on next load.")) purge(true); };
+  async function purge(all) {
+    try { const r = await api("/admin/cache/purge"+(all?"?all=1":""),{method:"POST"}); $("c-ok").textContent = `Deleted ${r.deleted} entr${r.deleted===1?"y":"ies"}.`; $("c-ok").style.display="block"; setTimeout(renderCache, 900); }
+    catch(e){ $("c-err").textContent=e.message; $("c-err").style.display="block"; }
+  }
+}
+
+boot();
+</script>
+</body>
+</html>
