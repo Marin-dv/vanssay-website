@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account — Geoblock</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5l8-3z' fill='%2316a34a'/></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafafa;--surface:#fff;--surface-2:#f4f4f5;--border:#e4e4e7;--text:#18181b;
+      --text-2:#52525b;--muted:#a1a1aa;--accent:#16a34a;--accent-2:#22c55e;--error:#dc2626;
+      --shadow:0 1px 2px rgba(0,0,0,.05);--shadow-md:0 8px 30px rgba(0,0,0,.08)}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    nav{position:sticky;top:0;background:rgba(250,250,250,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+    .nav-in{max-width:1140px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px}
+    .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px}
+    .logo b{color:var(--accent)}
+    .nav-links{display:flex;gap:28px;font-size:14px;font-weight:500;color:var(--text-2)}
+    main{max-width:520px;margin:0 auto;padding:64px 28px 96px}
+    h1{font-size:30px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+    .sub{color:var(--text-2);margin-bottom:28px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;box-shadow:var(--shadow-md);margin-bottom:18px}
+    label{display:block;font-size:13px;font-weight:600;margin:14px 0 5px}
+    input{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:10px;font:inherit;font-size:14px;outline:none}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #e7f7ee}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 20px;margin-top:18px;
+      border-radius:11px;font:inherit;font-size:14.5px;font-weight:700;border:1px solid transparent;cursor:pointer}
+    .btn-blue{background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#fff}
+    .btn-line{background:var(--surface);border-color:var(--border);color:var(--text)}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .muted{color:var(--muted);font-size:13px}
+    .err{background:#fdecec;color:var(--error);border-radius:10px;padding:10px 14px;font-size:13px;margin-top:14px;display:none}
+    .switch{text-align:center;font-size:13.5px;color:var(--text-2);margin-top:18px}
+    .switch a{color:var(--accent);font-weight:600;cursor:pointer}
+    .badge{display:inline-flex;padding:3px 12px;border-radius:99px;font-size:12px;font-weight:800}
+    .b-free{background:var(--surface-2);color:var(--text-2)}.b-pro{background:#e7f7ee;color:var(--accent)}
+    .b-ultra{background:linear-gradient(90deg,var(--accent),#a3e635);color:#06310f}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .actions .btn{width:auto;flex:1;margin-top:0}
+    #dash{display:none}
+    h3{font-size:15px;font-weight:800;margin-bottom:4px}
+    #loading{display:none;text-align:center;padding:80px 0}
+    .spinner{width:34px;height:34px;margin:0 auto 16px;border-radius:50%;border:3px solid var(--surface-2);border-top-color:var(--accent);animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .feats{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:7px;font-size:13.5px;color:var(--text-2)}
+    .feats li::before{content:"🛡 ";}
+  </style>
+</head>
+<body>
+<nav><div class="nav-in">
+  <a class="logo" href="index.html"><svg width="22" height="22" viewBox="0 0 40 40"><path d="M6,4H15L27,36H18Z" fill="rgba(34,197,94,.55)"/><path d="M34,4H25L13,36H22Z" fill="#22c55e"/></svg>Geo<b>block</b></a>
+  <div class="nav-links"><a href="geoblock.html#features">Features</a><a href="geoblock.html#pricing">Pricing</a><a href="index.html">All plugins</a></div>
+</div></nav>
+
+<main>
+  <div id="loading"><div class="spinner"></div><p class="sub">Signing you in…</p></div>
+
+  <!-- Auth -->
+  <div id="auth">
+    <h1 id="auth-title">Welcome back</h1>
+    <p class="sub">Same account as the Geoblock Framer plugin.</p>
+    <div class="card">
+      <div id="f-email"><label>Email</label><input id="email" type="email" placeholder="you@company.com" autocomplete="email" /></div>
+      <div id="f-pass">
+        <label style="display:flex;justify-content:space-between">Password <a id="toggle-pass" style="color:var(--accent);cursor:pointer;font-weight:600">Show</a></label>
+        <input id="password" type="password" placeholder="Your password" autocomplete="current-password" />
+        <div style="text-align:right;margin-top:6px"><a id="forgot-link" style="font-size:12.5px;color:var(--accent);cursor:pointer">Forgot password?</a></div>
+      </div>
+      <div class="err" id="auth-err"></div>
+      <div class="err" id="auth-ok" style="background:#e9f7ef;color:#16a34a"></div>
+      <button class="btn btn-blue" id="auth-btn">Sign in</button>
+      <div class="switch" id="auth-switch">New to Geoblock? <a>Create an account</a></div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dash">
+    <h1>Your account</h1>
+    <p class="sub" id="d-email"></p>
+
+    <div class="card">
+      <div class="row"><h3>Plan</h3><span class="badge b-free" id="d-plan">Free</span></div>
+      <p class="muted" id="d-renew"></p>
+      <div class="actions" id="d-billing"></div>
+    </div>
+
+    <div class="card">
+      <h3>Your protection</h3>
+      <ul class="feats" id="d-feats"></ul>
+      <p class="muted" style="margin-top:12px">Set your blocked countries, VPN detection and block screen right inside the <strong>Geoblock</strong> plugin in Framer.</p>
+    </div>
+
+    <div class="card">
+      <h3>Profile</h3>
+      <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
+      <p class="muted">To change your email, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
+      <div class="err" id="dash-err"></div>
+      <div class="err" id="dash-ok" style="background:#e9f7ef;color:#16a34a"></div>
+      <div class="actions">
+        <button class="btn btn-line" id="d-changepass">Change password</button>
+        <button class="btn btn-line" id="d-signout">Sign out</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = localStorage.getItem("geoblock.apiBase") || "https://api.vanssay.net/geoblock";
+const TKEY = "geoblock.token";
+
+const $ = (id) => document.getElementById(id);
+const api = async (path, opts = {}) => {
+  const headers = { ...(opts.body ? { "Content-Type": "application/json" } : {}) };
+  const t = localStorage.getItem(TKEY);
+  if (t) headers.Authorization = "Bearer " + t;
+  const res = await fetch(API + path, { method: opts.method || "GET", headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Something went wrong");
+  return data;
+};
+const showErr = (id, msg) => { const el = $(id); el.textContent = msg; el.style.display = msg ? "block" : "none"; };
+
+// Auto sign-in when arriving from the plugin (#token=<jwt>)
+if (location.hash.startsWith("#token=")) {
+  localStorage.setItem(TKEY, decodeURIComponent(location.hash.slice(7)));
+  history.replaceState(null, "", location.pathname);
+}
+
+let mode = location.hash.startsWith("#reset=") ? "reset" : "login";
+const resetToken = mode === "reset" ? location.hash.slice(7) : "";
+const COPY = {
+  login: ["Welcome back", "Sign in", 'New to Geoblock? <a>Create an account</a>'],
+  register: ["Create your account", "Create account", 'Already have an account? <a>Sign in</a>'],
+  forgot: ["Reset your password", "Send reset link", '<a>Back to sign in</a>'],
+  reset: ["Choose a new password", "Set new password", '<a>Back to sign in</a>'],
+};
+function render() {
+  $("auth-title").textContent = COPY[mode][0];
+  $("auth-btn").textContent = COPY[mode][1];
+  $("auth-switch").innerHTML = COPY[mode][2];
+  $("f-email").style.display = mode === "reset" ? "none" : "block";
+  $("f-pass").style.display = mode === "forgot" ? "none" : "block";
+  $("forgot-link").style.display = mode === "login" ? "inline" : "none";
+  $("password").placeholder = mode === "reset" || mode === "register" ? "At least 8 characters" : "Your password";
+  showErr("auth-err", ""); showErr("auth-ok", "");
+}
+$("auth-switch").onclick = () => { mode = mode === "login" ? "register" : "login"; render(); };
+$("forgot-link").onclick = () => { mode = "forgot"; render(); };
+$("toggle-pass").onclick = () => {
+  const p = $("password");
+  p.type = p.type === "password" ? "text" : "password";
+  $("toggle-pass").textContent = p.type === "password" ? "Show" : "Hide";
+};
+$("auth-btn").onclick = async () => {
+  showErr("auth-err", ""); showErr("auth-ok", "");
+  try {
+    if (mode === "forgot") {
+      await api("/auth/forgot-password", { method: "POST", body: { email: $("email").value.trim() } });
+      showErr("auth-ok", "If an account exists for that email, a reset link from no-reply@vanssay.net is on its way.");
+      return;
+    }
+    if (mode === "reset") {
+      await api("/auth/reset-password", { method: "POST", body: { token: resetToken, password: $("password").value } });
+      history.replaceState(null, "", location.pathname);
+      mode = "login"; render();
+      showErr("auth-ok", "Password updated — sign in with your new password.");
+      return;
+    }
+    const r = await api(mode === "register" ? "/auth/register" : "/auth/login", { method: "POST", body: { email: $("email").value.trim(), password: $("password").value } });
+    localStorage.setItem(TKEY, r.token);
+    load();
+  } catch (e) { showErr("auth-err", e.message); }
+};
+render();
+$("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-btn").click());
+
+const FEATS = {
+  free: ["Blacklist up to 3 countries", "Basic block message", "Whole-page block"],
+  pro: ["Unlimited countries + whitelist", "VPN / proxy detection", "Custom block screen, redirect & hide", "Per-component blocking"],
+  ultra: ["Everything in Pro", "Conditional rules", "Scheduled blocks", "Analytics — blocked by country"],
+};
+
+async function load() {
+  if (mode === "reset") { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
+  if (!localStorage.getItem(TKEY)) { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
+  $("auth").style.display = "none"; $("dash").style.display = "none"; $("loading").style.display = "block";
+  try {
+    const me = await api("/auth/me");
+    $("loading").style.display = "none"; $("dash").style.display = "block";
+    $("d-email").textContent = me.user.email; $("d-email2").textContent = me.user.email;
+    const plan = me.subscription.plan;
+    const badge = $("d-plan");
+    badge.textContent = plan[0].toUpperCase() + plan.slice(1);
+    badge.className = "badge b-" + plan;
+    $("d-renew").textContent = me.subscription.currentPeriodEnd ? "Renews " + new Date(me.subscription.currentPeriodEnd).toLocaleDateString() : (plan === "free" ? "Free forever — upgrade anytime." : "Active subscription.");
+    $("d-feats").innerHTML = (FEATS[plan] || FEATS.free).map((f) => "<li>" + f + "</li>").join("");
+
+    const actions = $("d-billing"); actions.innerHTML = "";
+    const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
+    const checkout = (plan) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: { plan } }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
+    const portal = async () => { try { const r = await api("/billing/portal", { method: "POST" }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
+    if (plan === "free") { mk("Upgrade to Pro — $6/mo", "btn-line", checkout("pro")); mk("Go Ultra — $14/mo", "btn-blue", checkout("ultra")); }
+    else if (plan === "pro") { mk("Upgrade to Ultra — $14/mo", "btn-blue", checkout("ultra")); mk("Manage / cancel billing", "btn-line", portal); }
+    else { mk("Manage / cancel billing", "btn-line", portal); }
+  } catch (e) {
+    localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
+  }
+}
+$("d-signout").onclick = () => { localStorage.removeItem(TKEY); load(); };
+$("d-changepass").onclick = async () => {
+  const btn = $("d-changepass");
+  if (btn.disabled) return;
+  showErr("dash-err", ""); showErr("dash-ok", "");
+  try {
+    await api("/auth/forgot-password", { method: "POST", body: { email: $("d-email2").textContent.trim() } });
+    showErr("dash-ok", "Check your inbox — a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
+    btn.disabled = true; btn.style.opacity = ".55";
+    let left = 60; btn.textContent = "Email sent (" + left + "s)";
+    const t = setInterval(() => { left--; if (left <= 0) { clearInterval(t); btn.disabled = false; btn.style.opacity = ""; btn.textContent = "Change password"; } else btn.textContent = "Email sent (" + left + "s)"; }, 1000);
+  } catch (e) { showErr("dash-err", e.message); }
+};
+load();
+</script>
+</body>
+</html>
