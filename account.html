@@ -20,7 +20,12 @@
     .logo { display:flex; align-items:center; gap:9px; font-weight:800; font-size:17px; }
     .logo-dot { width:22px; height:22px; border-radius:7px; background:linear-gradient(135deg,var(--accent),var(--pro)); }
     .nav-links { display:flex; gap:28px; font-size:14px; font-weight:500; color:var(--text-2); }
-    main { max-width:520px; margin:0 auto; padding:64px 28px 96px; }
+    main { max-width:920px; margin:0 auto; padding:44px 28px 80px; }
+    #auth, #loading { max-width:460px; margin-inline:auto; }
+    .dash-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start; }
+    .dash-grid .col { display:flex; flex-direction:column; gap:18px; }
+    .dash-grid .card { margin-bottom:0; }
+    @media (max-width:760px) { main { max-width:520px; } .dash-grid { grid-template-columns:1fr; } }
     h1 { font-size:30px; font-weight:900; letter-spacing:-.02em; margin-bottom:6px; }
     .sub { color:var(--text-2); margin-bottom:28px; }
     .card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:28px; box-shadow:var(--shadow-md); margin-bottom:18px; }
@@ -85,33 +90,39 @@
     <h1>Your account</h1>
     <p class="sub" id="d-email"></p>
 
-    <div class="card">
-      <div class="row"><h3>Plan</h3><span class="badge b-free" id="d-plan">Free</span></div>
-      <p class="muted" id="d-renew"></p>
-      <div class="actions" id="d-billing"></div>
-    </div>
+    <div class="dash-grid">
+      <div class="col">
+        <div class="card">
+          <div class="row"><h3>Plan</h3><span class="badge b-free" id="d-plan">Free</span></div>
+          <p class="muted" id="d-renew"></p>
+          <div class="actions" id="d-billing"></div>
+        </div>
 
-    <div class="card">
-      <div class="row"><h3>Widget views this month</h3><strong id="d-views">—</strong></div>
-      <div class="meter"><span id="d-meter" style="width:0%"></span></div>
-      <p class="muted" id="d-limit"></p>
-    </div>
+        <div class="card">
+          <div class="row"><h3>Widget views this month</h3><strong id="d-views">—</strong></div>
+          <div class="meter"><span id="d-meter" style="width:0%"></span></div>
+          <p class="muted" id="d-limit"></p>
+        </div>
+      </div>
 
-    <div class="card">
-      <div class="row"><h3>Reviews live on your site</h3></div>
-      <p class="muted">See the exact reviews your widget is showing right now, and when they last synced.</p>
-      <div class="actions"><a class="btn btn-line" href="reviews-live.html">View live reviews →</a></div>
-    </div>
+      <div class="col">
+        <div class="card">
+          <div class="row"><h3>Reviews live on your site</h3></div>
+          <p class="muted">See the exact reviews your widget is showing right now, and when they last synced.</p>
+          <div class="actions"><a class="btn btn-line" href="reviews-live.html">View live reviews →</a></div>
+        </div>
 
-    <div class="card">
-      <h3>Profile</h3>
-      <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
-      <p class="muted">To change your email, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
-      <div class="err" id="dash-err"></div>
-      <div class="err" id="dash-ok" style="background:#e9f7ef;color:#16a34a"></div>
-      <div class="actions">
-        <button class="btn btn-line" id="d-changepass">Change password</button>
-        <button class="btn btn-line" id="d-signout">Sign out</button>
+        <div class="card">
+          <h3>Profile</h3>
+          <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
+          <p class="muted">To change your email, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
+          <div class="err" id="dash-err"></div>
+          <div class="err" id="dash-ok" style="background:#e9f7ef;color:#16a34a"></div>
+          <div class="actions">
+            <button class="btn btn-line" id="d-changepass">Change password</button>
+            <button class="btn btn-line" id="d-signout">Sign out</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
