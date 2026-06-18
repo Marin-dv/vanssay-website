@@ -299,15 +299,16 @@ const R=[
  ["Émile Rousseau","g",5,"2 months ago","A neighborhood gem. The team walked me through three brewing methods before I picked my beans. You can taste the passion.","#fed7aa"]
 ];
 const init=n=>n.trim().split(/\s+/).map(p=>p[0]).slice(0,2).join("").toUpperCase();
+const GLOGO=`<svg width="16" height="16" viewBox="0 0 48 48" style="vertical-align:middle"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
 const stars=n=>`<span class="stars">${"★".repeat(n)}${"☆".repeat(5-n)}</span>`;
-const card=r=>`<div class="card"><div class="c-id"><span class="av" style="background:${r[5]}">${init(r[0])}</span><span class="c-name">${r[0]}</span><span class="c-mark ${r[1]==="g"?"g":"t"}">${r[1]==="g"?"G":"★"}</span></div><div class="c-meta">${stars(r[2])}${r[3]}</div><p class="c-body">${r[4]}</p></div>`;
+const card=r=>`<div class="card"><div class="c-id"><span class="av" style="background:${r[5]}">${init(r[0])}</span><span class="c-name">${r[0]}</span><span class="c-mark ${r[1]==="g"?"g":"t"}">${r[1]==="g"?GLOGO:"★"}</span></div><div class="c-meta">${stars(r[2])}${r[3]}</div><p class="c-body">${r[4]}</p></div>`;
 const cards=R.map(card).join("");
-const head=`<div class="v-head"><span class="v-rating">4.8</span><span class="stars">★★★★★</span><span class="v-count">Based on 1,626 reviews</span><span class="chip"><span class="g">G</span> Google</span><span class="chip"><span class="t">★</span> Trustpilot</span></div>`;
+const head=`<div class="v-head"><span class="v-rating">4.8</span><span class="stars">★★★★★</span><span class="v-count">Based on 1,626 reviews</span><span class="chip">${GLOGO} Google</span><span class="chip"><span class="t">★</span> Trustpilot</span></div>`;
 
 const layouts={
  grid:[head+`<div class="lay-grid">${cards}</div>`,"<b>Foundation grid</b> — the clean default. Responsive cards that fill any width."],
  carousel:[head+`<div class="lay-carousel">${cards}</div>`,"<b>Carousel</b> — swipe through reviews horizontally. Great in tight sections."],
- editorial:[head+`<div class="lay-editorial"><div class="card feat-card"><div class="c-id"><span class="av" style="background:${R[0][5]}">${init(R[0][0])}</span><span class="c-name">${R[0][0]}</span><span class="c-mark g">G</span></div><div class="c-meta">${stars(R[0][2])}${R[0][3]}</div><p class="c-body">${R[0][4]}</p></div><div class="side">${R.slice(1,4).map(card).join("")}</div></div>`,"<b>Editorial</b> — one hero quote, supporting reviews alongside."],
+ editorial:[head+`<div class="lay-editorial"><div class="card feat-card"><div class="c-id"><span class="av" style="background:${R[0][5]}">${init(R[0][0])}</span><span class="c-name">${R[0][0]}</span><span class="c-mark">${GLOGO}</span></div><div class="c-meta">${stars(R[0][2])}${R[0][3]}</div><p class="c-body">${R[0][4]}</p></div><div class="side">${R.slice(1,4).map(card).join("")}</div></div>`,"<b>Editorial</b> — one hero quote, supporting reviews alongside."],
  masonry:[head+`<div class="lay-masonry">${cards}</div>`,"<b>Masonry</b> — Pinterest-style columns that pack reviews tightly."],
  ticker:[head+`<div class="lay-ticker"><div class="row">${cards}${cards}</div></div>`,"<b>Ticker</b> — a gentle endless marquee. Pauses on hover."],
  spotlight:[`<div class="lay-spotlight"><div class="quote" id="spot"></div></div>`,"<b>Quote Spotlight</b> — one review at a time, rotating automatically."],
