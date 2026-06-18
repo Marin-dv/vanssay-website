@@ -225,6 +225,23 @@ footer{padding:48px 0 64px;font-size:13.5px;color:var(--muted);display:flex;just
   .rv{opacity:1!important;transform:none!important}
   .m-row,.scene-wall .col,.final::before,.final::after{animation:none!important}
 }
+
+/* ── Direction A polish: sharper, lighter, characterful type ── */
+h1,h2{font-weight:800}
+/* Bricolage on every title/number — kills the leftover "boring" Inter headings */
+h3,.feat h3,.plan-name,.plan-price,.stat b,.badge-big .num,summary,.step-it h3,.ls-item{font-family:'Bricolage Grotesque',-apple-system,sans-serif}
+/* Space Mono on small labels/meta — the gray/black play */
+.stat>span,.ls-label,.guarantee,.plan-flag,.plan-for,.b-url{font-family:'Space Mono',monospace;letter-spacing:.03em}
+/* Sharper edges — rounded corners feel cheap */
+.btn,.btn-sm,.feats li,.feat,.feat .ico,.rcard,.plan,details,.browser,.b-bar,.badge-big,.step-it{border-radius:4px}
+.b-stage{border-radius:0}
+#show,.final{border-radius:14px}
+/* Stronger accent highlight on interactive things (like the homepage rows) */
+.feat:hover{border-color:var(--accent)}
+.plan:hover{border-color:var(--accent)}
+details:hover{border-color:var(--accent)}
+summary::after{color:var(--accent)}
+.m-row .rcard:hover{border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -247,7 +264,7 @@ footer{padding:48px 0 64px;font-size:13.5px;color:var(--muted);display:flex;just
   <div class="float-card fc-4" data-depth="-24"></div>
 
   <div class="wrap">
-    <span class="pill rv"><span class="dot"></span>Framer plugin · Google &amp; Trustpilot</span>
+    <span class="eyebrow" style="margin-bottom:0">Framer plugin · Google &amp; Trustpilot</span>
     <h1 id="headline">Your reviews are your best <span class="serif">salesperson.</span><br/>Put them to work.</h1>
     <p class="sub rv">Vanssay turns your Google &amp; Trustpilot reviews into stunning, theme-matched widgets for Framer. One click to insert — nothing to tweak.</p>
     <div class="cta-row rv">
