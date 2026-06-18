@@ -40,6 +40,10 @@
     .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
     .muted { color:var(--muted); font-size:13px; }
     .err { background:#fdecec; color:var(--error); border-radius:10px; padding:10px 14px; font-size:13px; margin-top:14px; display:none; }
+    .quota-alert { display:none; background:#fdecec; border:1px solid #f5b5b5; color:#b91c1c; border-radius:14px; padding:18px 20px; margin-bottom:18px; }
+    .quota-alert strong { font-size:15px; display:block; margin-bottom:4px; }
+    .quota-alert p { font-size:13.5px; color:#7f1d1d; margin-bottom:12px; }
+    .quota-alert .btn { width:auto; margin-top:0; }
     .switch { text-align:center; font-size:13.5px; color:var(--text-2); margin-top:18px; }
     .switch a { color:var(--accent); font-weight:600; cursor:pointer; }
     .badge { display:inline-flex; padding:3px 12px; border-radius:99px; font-size:12px; font-weight:800; }
@@ -89,6 +93,12 @@
   <div id="dash">
     <h1>Your account</h1>
     <p class="sub" id="d-email"></p>
+
+    <div id="quota-banner" class="quota-alert">
+      <strong>⚠️ Your reviews are hidden</strong>
+      <p>You've used all <span id="qb-limit">300</span> free widget views this month, so your reviews have <b>stopped showing on your site</b>. Upgrade to turn them back on instantly.</p>
+      <button class="btn btn-blue" id="quota-up">Upgrade to Pro — $9/mo</button>
+    </div>
 
     <div class="dash-grid">
       <div class="col">
@@ -235,6 +245,14 @@ async function load() {
       const pct = u.limit > 0 ? Math.min(100, (u.views / u.limit) * 100) : 0;
       const m = $("d-meter"); m.style.width = pct + "%";
       m.style.background = pct > 90 ? "var(--error)" : pct > 70 ? "#d97706" : "var(--accent)";
+      // Quota hit → reviews are hidden on the live site. Make it loud + offer upgrade.
+      const over = u.limit > 0 && u.views >= u.limit;
+      $("quota-banner").style.display = over ? "block" : "none";
+      if (over) {
+        $("qb-limit").textContent = u.limit.toLocaleString();
+        $("quota-up").textContent = plan === "free" ? "Upgrade to Pro — $9/mo" : "Upgrade to Ultra — $39/mo";
+        $("quota-up").onclick = checkout(plan === "free" ? PRICE_PRO : PRICE_ULTRA);
+      }
     } catch (e) { $("d-limit").textContent = "Usage unavailable right now."; }
   } catch (e) {
     localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
