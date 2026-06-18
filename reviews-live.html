@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live reviews — Vanssay</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%230e7afe'/><path d='M34,4H25L13,36H22Z' fill='%237c5cff'/></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#fafafa; --surface:#fff; --surface-2:#f4f4f5; --border:#e4e4e7; --text:#18181b;
+      --text-2:#52525b; --muted:#a1a1aa; --accent:#0e7afe; --pro:#7c5cff; --star:#fbbc04;
+      --shadow:0 1px 2px rgba(0,0,0,.05); --shadow-md:0 8px 30px rgba(0,0,0,.08);
+    }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; min-height:100vh; -webkit-font-smoothing:antialiased; }
+    a { color:inherit; text-decoration:none; }
+    nav { position:sticky; top:0; background:rgba(250,250,250,.85); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); z-index:5; }
+    .nav-in { max-width:1140px; margin:0 auto; padding:0 28px; display:flex; align-items:center; justify-content:space-between; height:64px; }
+    .logo { display:flex; align-items:center; gap:9px; font-weight:800; font-size:17px; }
+    .nav-links { display:flex; gap:28px; font-size:14px; font-weight:500; color:var(--text-2); }
+    main { max-width:720px; margin:0 auto; padding:48px 28px 96px; }
+    h1 { font-size:30px; font-weight:900; letter-spacing:-.02em; margin-bottom:6px; }
+    .sub { color:var(--text-2); margin-bottom:24px; }
+    .back { font-size:13.5px; font-weight:600; color:var(--accent); display:inline-block; margin-bottom:18px; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:24px; box-shadow:var(--shadow-md); margin-bottom:20px; }
+    .biz-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:6px; }
+    h3 { font-size:18px; font-weight:800; }
+    .agg { display:flex; align-items:center; gap:10px; color:var(--text-2); font-size:14px; margin-bottom:4px; }
+    .agg b { color:var(--text); font-size:18px; }
+    .synced { font-size:12.5px; color:var(--muted); }
+    .synced.stale { color:#d97706; }
+    .chip { display:inline-flex; align-items:center; gap:5px; padding:2px 9px; border:1px solid var(--border); border-radius:99px; font-size:11.5px; font-weight:700; color:var(--text-2); text-transform:capitalize; }
+    .stars { color:var(--star); letter-spacing:1px; font-size:13px; }
+    .stars .off { color:var(--border); }
+    .rev-list { display:flex; flex-direction:column; gap:14px; margin-top:18px; }
+    .rev { border:1px solid var(--border); border-radius:12px; padding:14px 16px; background:var(--surface); }
+    .rev-top { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+    .rev-name { font-weight:700; font-size:14px; }
+    .rev-date { font-size:12px; color:var(--muted); margin-left:auto; }
+    .rev-text { font-size:13.5px; color:var(--text-2); white-space:pre-line; }
+    .empty { text-align:center; color:var(--muted); padding:22px; border:1px dashed var(--border); border-radius:12px; font-size:13.5px; }
+    .muted { color:var(--muted); font-size:13px; }
+    .spinner { width:34px; height:34px; margin:60px auto; border-radius:50%; border:3px solid var(--surface-2); border-top-color:var(--accent); animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .platforms { display:flex; gap:6px; }
+  </style>
+</head>
+<body>
+<nav><div class="nav-in">
+  <a class="logo" href="index.html"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a>
+  <div class="nav-links"><a href="account.html">Account</a><a href="index.html#widgets">Widgets</a><a href="demo.html">Live demo</a></div>
+</div></nav>
+
+<main>
+  <a class="back" href="account.html">← Back to account</a>
+  <h1>Reviews live on your site</h1>
+  <p class="sub">Exactly what your published widget is serving right now, per connected business.</p>
+  <div id="spinner" class="spinner"></div>
+  <div id="content"></div>
+</main>
+
+<script>
+const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
+const TKEY = "vanssay.token";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+
+if (!localStorage.getItem(TKEY)) location.href = "account.html";
+
+function relTime(iso) {
+  if (!iso) return null;
+  const ms = Date.now() - new Date(iso).getTime();
+  if (isNaN(ms)) return null;
+  const m = Math.floor(ms / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return m + " min ago";
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + (h > 1 ? " hours ago" : " hour ago");
+  const d = Math.floor(h / 24);
+  return d + (d > 1 ? " days ago" : " day ago");
+}
+function starRow(n) {
+  n = Math.max(0, Math.min(5, Math.round(n)));
+  return '<span class="stars">' + "★".repeat(n) + '<span class="off">' + "★".repeat(5 - n) + "</span></span>";
+}
+
+function renderBusiness(b) {
+  const synced = relTime(b.syncedAt);
+  // >26h old = stale (widget cache TTL is 24h).
+  const stale = b.syncedAt && (Date.now() - new Date(b.syncedAt).getTime() > 26 * 3600 * 1000);
+  const platforms = (b.aggregate.platforms || []).filter((p, i, a) => a.indexOf(p) === i);
+  const head =
+    '<div class="biz-head"><div><h3>' + esc(b.name) + "</h3>" +
+    '<div class="agg">' + starRow(b.aggregate.rating) + "<b>" + (b.aggregate.rating || 0).toFixed(1) + "</b>" +
+    "<span>· " + (b.aggregate.count || 0).toLocaleString() + " reviews</span></div>" +
+    '<div class="platforms">' + platforms.map((p) => '<span class="chip">' + esc(p) + "</span>").join("") + "</div></div>" +
+    '<div class="synced' + (stale ? " stale" : "") + '">' +
+      (synced ? "Last synced " + synced + (stale ? " — may be out of date" : "") : "Not synced yet") +
+    "</div></div>";
+
+  if (!b.syncedAt) {
+    return '<div class="card">' + head + '<div class="empty">No reviews synced yet. Open the Vanssay plugin in Framer and sync, or publish your site once.</div></div>';
+  }
+  if (!b.reviews.length) {
+    return '<div class="card">' + head + '<div class="empty">No reviews match your current filters (minimum rating / hidden). Adjust them in the plugin.</div></div>';
+  }
+  const list = b.reviews.map((r) =>
+    '<div class="rev"><div class="rev-top">' + starRow(r.rating) +
+    '<span class="rev-name">' + esc(r.authorName) + "</span>" +
+    '<span class="chip">' + esc(r.platform) + "</span>" +
+    '<span class="rev-date">' + (relTime(r.date) || "") + "</span></div>" +
+    '<div class="rev-text">' + esc(r.text) + "</div></div>"
+  ).join("");
+  return '<div class="card">' + head + '<div class="rev-list">' + list + "</div></div>";
+}
+
+(async () => {
+  try {
+    const res = await fetch(API + "/reviews/live", { headers: { Authorization: "Bearer " + localStorage.getItem(TKEY) } });
+    if (res.status === 401) { localStorage.removeItem(TKEY); location.href = "account.html"; return; }
+    const data = await res.json();
+    $("spinner").style.display = "none";
+    const list = data.businesses || [];
+    if (!list.length) {
+      $("content").innerHTML = '<div class="empty">No businesses connected yet. Connect Google or Trustpilot in the Vanssay plugin inside Framer.</div>';
+      return;
+    }
+    $("content").innerHTML = list.map(renderBusiness).join("");
+  } catch (e) {
+    $("spinner").style.display = "none";
+    $("content").innerHTML = '<div class="empty">Couldn\'t load your live reviews right now. Try again shortly.</div>';
+  }
+})();
+</script>
+</body>
+</html>
