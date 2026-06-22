@@ -137,6 +137,8 @@
     <button class="navlink" data-tab="pages"><span class="ic">🔗</span> Pages &amp; clicks</button>
     <button class="navlink" data-tab="businesses"><span class="ic">🏢</span> Businesses</button>
     <button class="navlink" data-tab="cache"><span class="ic">🗄️</span> Cache</button>
+    <div style="margin:10px 12px 4px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-2);font-weight:700">Geoblock</div>
+    <button class="navlink" data-tab="geoblock"><span class="ic">🛡️</span> Geoblock</button>
     <div class="aside-foot">
       <div id="admin-email" style="margin-bottom:8px;color:var(--text-2);font-weight:600"></div>
       <button class="btn btn-line btn-sm" id="signout">Sign out</button>
@@ -206,7 +208,7 @@ function switchTab(tab) {
   document.querySelectorAll(".navlink").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
   const v = $("view");
   v.innerHTML = `<div class="empty">Loading…</div>`;
-  ({ overview: renderOverview, users: renderUsers, subs: renderSubs, pages: renderPages, businesses: renderBusinesses, cache: renderCache }[tab])();
+  ({ overview: renderOverview, users: renderUsers, subs: renderSubs, pages: renderPages, businesses: renderBusinesses, cache: renderCache, geoblock: renderGeoblock }[tab])();
 }
 
 /* ── Overview ── */
@@ -246,6 +248,66 @@ function planRow(label, n, total) {
   const pct = total ? Math.round((n/total)*100) : 0;
   return `<div style="margin-bottom:10px"><div class="kv" style="border:none;padding-bottom:3px"><span>${label}</span><strong>${fmt(n)} · ${pct}%</strong></div>
     <div class="meter" style="height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden"><span style="display:block;height:100%;width:${pct}%;background:linear-gradient(90deg,#0e7afe,#7c5cff)"></span></div></div>`;
+}
+
+/* ── Geoblock (separate product, separate backend under /geoblock) ── */
+const flag = (cc) => (cc && cc.length === 2 ? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0))) : "🏳️");
+async function renderGeoblock() {
+  const v = $("view");
+  let d, trend, countries, sites;
+  try {
+    [d, trend, countries, sites] = await Promise.all([
+      api("/geoblock/admin/overview"),
+      api("/geoblock/admin/trend"),
+      api("/geoblock/admin/countries"),
+      api("/geoblock/admin/sites"),
+    ]);
+  } catch (e) {
+    v.innerHTML = `<div class="page-head"><div><h2>Geoblock</h2></div></div><div class="empty">Couldn't load Geoblock data — ${esc(e.message)}</div>`;
+    return;
+  }
+  const maxBlk = Math.max(1, ...trend.trend.map((t) => t.blocked));
+  const maxC = Math.max(1, ...countries.countries.map((c) => c.blocked || c.visits));
+  v.innerHTML = `
+    <div class="page-head"><div><h2>🛡️ Geoblock</h2><p>Country &amp; VPN blocking — accounts, revenue and protection activity.</p></div></div>
+    <div class="kpis">
+      <div class="kpi hero"><div class="k-label">Geoblock MRR</div><div class="k-val">${money(d.revenue.mrr)}</div><div class="k-sub">${money(d.revenue.arr)} / year</div></div>
+      <div class="kpi"><div class="k-label">Users</div><div class="k-val">${fmt(d.users.total)}</div><div class="k-sub">+${fmt(d.users.newThisMonth)} this month</div></div>
+      <div class="kpi"><div class="k-label">Paying customers</div><div class="k-val">${fmt(d.plans.paid)}</div><div class="k-sub">${fmt(d.plans.pro)} Pro · ${fmt(d.plans.ultra)} Ultra</div></div>
+      <div class="kpi"><div class="k-label">Protected sites</div><div class="k-val">${fmt(d.configs.total)}</div><div class="k-sub">${fmt(d.configs.vpnEnabled)} with VPN block</div></div>
+      <div class="kpi"><div class="k-label">Blocked (this month)</div><div class="k-val">${fmt(d.thisMonth.blocked)}</div><div class="k-sub">${fmt(d.thisMonth.vpnBlocked)} via VPN/proxy</div></div>
+      <div class="kpi"><div class="k-label">Blocked (all-time)</div><div class="k-val">${fmt(d.allTime.blocked)}</div><div class="k-sub">${fmt(d.allTime.vpnBlocked)} via VPN/proxy</div></div>
+      <div class="kpi"><div class="k-label">Visits checked (month)</div><div class="k-val">${fmt(d.thisMonth.visits)}</div><div class="k-sub">${fmt(d.allTime.visits)} all-time</div></div>
+      <div class="kpi"><div class="k-label">Conversion</div><div class="k-val">${d.users.total ? ((d.plans.paid/d.users.total)*100).toFixed(1) : "0"}%</div><div class="k-sub">free → paid</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Blocked visitors · last 12 months</h3>
+        <div class="chart">${trend.trend.map((t) => `<div class="bar" style="height:${Math.round((t.blocked/maxBlk)*100)}%" data-tip="${t.month}: ${fmt(t.blocked)} blocked"></div>`).join("")}</div>
+        <div class="chart-x">${trend.trend.map((t) => `<span>${t.month.slice(5)}</span>`).join("")}</div>
+      </div>
+      <div class="panel">
+        <h3>Plan distribution</h3>
+        ${planRow("Free", d.plans.free, d.users.total)}
+        ${planRow("Pro", d.plans.pro, d.users.total)}
+        ${planRow("Ultra", d.plans.ultra, d.users.total)}
+        <div class="kv" style="margin-top:10px"><span>Active paid subscriptions</span><strong>${fmt(d.plans.paid)}</strong></div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:16px">
+      <div class="panel">
+        <h3>Top blocked countries · all-time</h3>
+        ${countries.countries.length ? countries.countries.slice(0, 12).map((c) => `
+          <div style="margin-bottom:9px"><div class="kv" style="border:none;padding-bottom:3px"><span>${flag(c.countryCode)} ${esc(c.countryCode)}</span><strong>${fmt(c.blocked)}</strong></div>
+          <div class="meter" style="height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden"><span style="display:block;height:100%;width:${Math.round(((c.blocked||c.visits)/maxC)*100)}%;background:linear-gradient(90deg,#0e7afe,#7c5cff)"></span></div></div>`).join("") : `<div class="empty">No blocks recorded yet.</div>`}
+      </div>
+      <div class="panel" style="padding:0;overflow:hidden">
+        <h3 style="padding:18px 18px 10px">Protected sites · ${fmt(sites.sites.length)}</h3>
+        <div style="max-height:360px;overflow:auto">${sites.sites.length ? `<table><thead><tr><th>Owner</th><th>Mode</th><th class="right">Countries</th><th>VPN</th><th>Action</th></tr></thead><tbody>
+          ${sites.sites.map((s) => `<tr><td class="truncate">${esc(s.email)}</td><td>${esc(s.mode)}</td><td class="right">${fmt(s.countries)}</td><td>${s.vpnBlock ? "✓" : "—"}</td><td>${esc(s.action)}</td></tr>`).join("")}
+        </tbody></table>` : `<div class="empty">No protected sites yet.</div>`}</div>
+      </div>
+    </div>`;
 }
 
 /* ── Users ── */
