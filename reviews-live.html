@@ -48,12 +48,12 @@
 </head>
 <body>
 <nav><div class="nav-in">
-  <a class="logo" href="index.html"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a>
-  <div class="nav-links"><a href="account.html">Account</a><a href="index.html#widgets">Widgets</a><a href="demo.html">Live demo</a></div>
+  <a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a>
+  <div class="nav-links"><a href="account">Account</a><a href="/#widgets">Widgets</a><a href="demo">Live demo</a></div>
 </div></nav>
 
 <main>
-  <a class="back" href="account.html">← Back to account</a>
+  <a class="back" href="account">← Back to account</a>
   <h1>Reviews live on your site</h1>
   <p class="sub">Exactly what your published widget is serving right now, per connected business.</p>
   <div id="spinner" class="spinner"></div>
@@ -66,7 +66,7 @@ const TKEY = "vanssay.token";
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
 
-if (!localStorage.getItem(TKEY)) location.href = "account.html";
+if (!localStorage.getItem(TKEY)) location.href = "account";
 
 function relTime(iso) {
   if (!iso) return null;
@@ -118,7 +118,7 @@ function renderBusiness(b) {
 (async () => {
   try {
     const res = await fetch(API + "/reviews/live", { headers: { Authorization: "Bearer " + localStorage.getItem(TKEY) } });
-    if (res.status === 401) { localStorage.removeItem(TKEY); location.href = "account.html"; return; }
+    if (res.status === 401) { localStorage.removeItem(TKEY); location.href = "account"; return; }
     const data = await res.json();
     $("spinner").style.display = "none";
     const list = data.businesses || [];
