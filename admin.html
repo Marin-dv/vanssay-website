@@ -46,6 +46,10 @@
     .navlink:hover { background:var(--surface-2); color:var(--text); }
     .navlink.active { background:#eaf3ff; color:var(--accent); }
     .navlink .ic { width:18px; text-align:center; }
+    .prodbar { display:inline-flex; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:3px; gap:2px; }
+    .prodbar .pb { border:0; background:none; padding:6px 13px; border-radius:7px; font:inherit; font-size:13px; font-weight:600; color:var(--text-2); cursor:pointer; }
+    .prodbar .pb.on { background:var(--surface); color:var(--accent); box-shadow:0 1px 2px rgba(0,0,0,.08); }
+    .page-head { align-items:flex-start; }
     .aside-foot { margin-top:auto; font-size:12px; color:var(--muted); padding:12px 8px 0; border-top:1px solid var(--border); }
     main { padding:30px 34px 70px; max-width:1240px; }
     .page-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; gap:16px; flex-wrap:wrap; }
@@ -137,8 +141,6 @@
     <button class="navlink" data-tab="pages"><span class="ic">🔗</span> Pages &amp; clicks</button>
     <button class="navlink" data-tab="businesses"><span class="ic">🏢</span> Businesses</button>
     <button class="navlink" data-tab="cache"><span class="ic">🗄️</span> Cache</button>
-    <div style="margin:10px 12px 4px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-2);font-weight:700">Geoblock</div>
-    <button class="navlink" data-tab="geoblock"><span class="ic">🛡️</span> Geoblock</button>
     <div class="aside-foot">
       <div id="admin-email" style="margin-bottom:8px;color:var(--text-2);font-weight:600"></div>
       <button class="btn btn-line btn-sm" id="signout">Sign out</button>
@@ -202,22 +204,63 @@ async function boot() {
   }
 }
 
-/* ── Tabs ── */
+/* ── Tabs + product (plugin) switcher ── */
+// Each page can be viewed per-product; Overview also offers a combined "All".
+let curTab = "overview";
+let product = "all"; // 'all' | 'reviews' | 'geoblock'
+const GEO = "/geoblock";
+// Product-aware admin call: reviews → /admin/…, geoblock → /geoblock/admin/…
+const padmin = (suffix, opts) => api((product === "geoblock" ? GEO : "") + "/admin" + suffix, opts);
+
+const PROD_LABEL = { all: "All", reviews: "Reviews", geoblock: "Geoblock" };
+function prodBar(tab) {
+  const opts = tab === "overview" ? ["all", "reviews", "geoblock"] : ["reviews", "geoblock"];
+  return `<div class="prodbar">${opts.map((o) => `<button class="pb ${product === o ? "on" : ""}" data-prod="${o}">${PROD_LABEL[o]}</button>`).join("")}</div>`;
+}
+function bindProdBar() {
+  document.querySelectorAll(".prodbar .pb").forEach((b) => (b.onclick = () => { product = b.dataset.prod; switchTab(curTab); }));
+}
+const flag = (cc) => (cc && cc.length === 2 ? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0))) : "🏳️");
+
 document.querySelectorAll(".navlink").forEach((b) => b.onclick = () => switchTab(b.dataset.tab));
 function switchTab(tab) {
+  curTab = tab;
+  if (tab !== "overview" && product === "all") product = "reviews"; // "All" is Overview-only
   document.querySelectorAll(".navlink").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
   const v = $("view");
   v.innerHTML = `<div class="empty">Loading…</div>`;
-  ({ overview: renderOverview, users: renderUsers, subs: renderSubs, pages: renderPages, businesses: renderBusinesses, cache: renderCache, geoblock: renderGeoblock }[tab])();
+  ({ overview: renderOverview, users: renderUsers, subs: renderSubs, pages: renderPages, businesses: renderBusinesses, cache: renderCache }[tab])();
 }
 
-/* ── Overview ── */
+/* ── Overview (product-aware: All / Reviews / Geoblock) ── */
 async function renderOverview() {
-  const d = await api("/admin/overview");
   const v = $("view");
+  v.innerHTML = `<div class="page-head"><div><h2>Overview</h2><p>Live snapshot of accounts, revenue and activity.</p></div>${prodBar("overview")}</div><div id="ov"><div class="empty">Loading…</div></div>`;
+  bindProdBar();
+  const ov = $("ov");
+  try {
+    if (product === "reviews") {
+      ov.innerHTML = reviewsOverview(await api("/admin/overview"));
+    } else if (product === "geoblock") {
+      const [d, trend, countries, sites] = await Promise.all([
+        api("/geoblock/admin/overview"), api("/geoblock/admin/trend"),
+        api("/geoblock/admin/countries"), api("/geoblock/admin/sites"),
+      ]);
+      ov.innerHTML = geoblockOverview(d, trend, countries, sites);
+    } else {
+      const [rev, geo] = await Promise.all([api("/admin/overview"), api("/geoblock/admin/overview")]);
+      ov.innerHTML = allOverview(rev, geo);
+    }
+  } catch (e) { ov.innerHTML = `<div class="empty">Couldn't load — ${esc(e.message)}</div>`; }
+}
+function planRow(label, n, total) {
+  const pct = total ? Math.round((n/total)*100) : 0;
+  return `<div style="margin-bottom:10px"><div class="kv" style="border:none;padding-bottom:3px"><span>${label}</span><strong>${fmt(n)} · ${pct}%</strong></div>
+    <div class="meter" style="height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden"><span style="display:block;height:100%;width:${pct}%;background:linear-gradient(90deg,#0e7afe,#7c5cff)"></span></div></div>`;
+}
+function reviewsOverview(d) {
   const maxSign = Math.max(1, ...d.signups.map((s) => s.count));
-  v.innerHTML = `
-    <div class="page-head"><div><h2>Overview</h2><p>Live snapshot of accounts, revenue and widget reach.</p></div></div>
+  return `
     <div class="kpis">
       <div class="kpi hero"><div class="k-label">Monthly recurring revenue</div><div class="k-val">${money(d.revenue.mrr)}</div><div class="k-sub">${money(d.revenue.arr)} / year</div></div>
       <div class="kpi"><div class="k-label">Users</div><div class="k-val">${fmt(d.users.total)}</div><div class="k-sub">+${fmt(d.users.newThisMonth)} this month</div></div>
@@ -236,42 +279,18 @@ async function renderOverview() {
       </div>
       <div class="panel">
         <h3>Plan distribution</h3>
-        ${planRow("Free", d.plans.free, d.users.total)}
-        ${planRow("Pro", d.plans.pro, d.users.total)}
-        ${planRow("Ultra", d.plans.ultra, d.users.total)}
+        ${planRow("Free", d.plans.free, d.users.total)}${planRow("Pro", d.plans.pro, d.users.total)}${planRow("Ultra", d.plans.ultra, d.users.total)}
         <div class="kv" style="margin-top:10px"><span>Active paid subscriptions</span><strong>${fmt(d.plans.paid)}</strong></div>
         <div class="kv"><span>Conversion rate</span><strong>${d.users.total ? ((d.plans.paid/d.users.total)*100).toFixed(1) : "0"}%</strong></div>
       </div>
     </div>`;
 }
-function planRow(label, n, total) {
-  const pct = total ? Math.round((n/total)*100) : 0;
-  return `<div style="margin-bottom:10px"><div class="kv" style="border:none;padding-bottom:3px"><span>${label}</span><strong>${fmt(n)} · ${pct}%</strong></div>
-    <div class="meter" style="height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden"><span style="display:block;height:100%;width:${pct}%;background:linear-gradient(90deg,#0e7afe,#7c5cff)"></span></div></div>`;
-}
-
-/* ── Geoblock (separate product, separate backend under /geoblock) ── */
-const flag = (cc) => (cc && cc.length === 2 ? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0))) : "🏳️");
-async function renderGeoblock() {
-  const v = $("view");
-  let d, trend, countries, sites;
-  try {
-    [d, trend, countries, sites] = await Promise.all([
-      api("/geoblock/admin/overview"),
-      api("/geoblock/admin/trend"),
-      api("/geoblock/admin/countries"),
-      api("/geoblock/admin/sites"),
-    ]);
-  } catch (e) {
-    v.innerHTML = `<div class="page-head"><div><h2>Geoblock</h2></div></div><div class="empty">Couldn't load Geoblock data — ${esc(e.message)}</div>`;
-    return;
-  }
+function geoblockOverview(d, trend, countries, sites) {
   const maxBlk = Math.max(1, ...trend.trend.map((t) => t.blocked));
   const maxC = Math.max(1, ...countries.countries.map((c) => c.blocked || c.visits));
-  v.innerHTML = `
-    <div class="page-head"><div><h2>🛡️ Geoblock</h2><p>Country &amp; VPN blocking — accounts, revenue and protection activity.</p></div></div>
+  return `
     <div class="kpis">
-      <div class="kpi hero"><div class="k-label">Geoblock MRR</div><div class="k-val">${money(d.revenue.mrr)}</div><div class="k-sub">${money(d.revenue.arr)} / year</div></div>
+      <div class="kpi hero"><div class="k-label">Monthly recurring revenue</div><div class="k-val">${money(d.revenue.mrr)}</div><div class="k-sub">${money(d.revenue.arr)} / year</div></div>
       <div class="kpi"><div class="k-label">Users</div><div class="k-val">${fmt(d.users.total)}</div><div class="k-sub">+${fmt(d.users.newThisMonth)} this month</div></div>
       <div class="kpi"><div class="k-label">Paying customers</div><div class="k-val">${fmt(d.plans.paid)}</div><div class="k-sub">${fmt(d.plans.pro)} Pro · ${fmt(d.plans.ultra)} Ultra</div></div>
       <div class="kpi"><div class="k-label">Protected sites</div><div class="k-val">${fmt(d.configs.total)}</div><div class="k-sub">${fmt(d.configs.vpnEnabled)} with VPN block</div></div>
@@ -288,9 +307,7 @@ async function renderGeoblock() {
       </div>
       <div class="panel">
         <h3>Plan distribution</h3>
-        ${planRow("Free", d.plans.free, d.users.total)}
-        ${planRow("Pro", d.plans.pro, d.users.total)}
-        ${planRow("Ultra", d.plans.ultra, d.users.total)}
+        ${planRow("Free", d.plans.free, d.users.total)}${planRow("Pro", d.plans.pro, d.users.total)}${planRow("Ultra", d.plans.ultra, d.users.total)}
         <div class="kv" style="margin-top:10px"><span>Active paid subscriptions</span><strong>${fmt(d.plans.paid)}</strong></div>
       </div>
     </div>
@@ -309,13 +326,37 @@ async function renderGeoblock() {
       </div>
     </div>`;
 }
+function allOverview(rev, geo) {
+  const mrr = rev.revenue.mrr + geo.revenue.mrr;
+  return `
+    <div class="kpis">
+      <div class="kpi hero"><div class="k-label">Total MRR · both plugins</div><div class="k-val">${money(mrr)}</div><div class="k-sub">${money(mrr*12)} / year</div></div>
+      <div class="kpi"><div class="k-label">Reviews MRR</div><div class="k-val">${money(rev.revenue.mrr)}</div><div class="k-sub">${fmt(rev.plans.paid)} paying</div></div>
+      <div class="kpi"><div class="k-label">Geoblock MRR</div><div class="k-val">${money(geo.revenue.mrr)}</div><div class="k-sub">${fmt(geo.plans.paid)} paying</div></div>
+      <div class="kpi"><div class="k-label">Reviews users</div><div class="k-val">${fmt(rev.users.total)}</div><div class="k-sub">+${fmt(rev.users.newThisMonth)} this month</div></div>
+      <div class="kpi"><div class="k-label">Geoblock users</div><div class="k-val">${fmt(geo.users.total)}</div><div class="k-sub">+${fmt(geo.users.newThisMonth)} this month</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Reviews · plan split</h3>
+        ${planRow("Free", rev.plans.free, rev.users.total)}${planRow("Pro", rev.plans.pro, rev.users.total)}${planRow("Ultra", rev.plans.ultra, rev.users.total)}
+        <div class="kv" style="margin-top:10px"><span>Widget views (month)</span><strong>${fmt(rev.usage.viewsThisMonth)}</strong></div>
+      </div>
+      <div class="panel">
+        <h3>Geoblock · plan split</h3>
+        ${planRow("Free", geo.plans.free, geo.users.total)}${planRow("Pro", geo.plans.pro, geo.users.total)}${planRow("Ultra", geo.plans.ultra, geo.users.total)}
+        <div class="kv" style="margin-top:10px"><span>Visitors blocked (month)</span><strong>${fmt(geo.thisMonth.blocked)}</strong></div>
+      </div>
+    </div>
+    <p class="empty" style="border:none;text-align:left;padding:10px 2px 0;font-size:12px">Users are counted per product (a person using both is counted in each). MRR is additive across plugins.</p>`;
+}
 
 /* ── Users ── */
 let usersState = { search: "", plan: "", page: 1, pageSize: 25 };
 async function renderUsers() {
   const v = $("view");
   v.innerHTML = `
-    <div class="page-head"><div><h2>Users</h2><p>Search, inspect and manage every account.</p></div></div>
+    <div class="page-head"><div><h2>Users</h2><p>Search, inspect and manage every account.</p></div>${prodBar("users")}</div>
     <div class="toolbar">
       <input class="search" id="u-search" placeholder="Search by email…" value="${esc(usersState.search)}" />
       <select id="u-plan">
@@ -326,6 +367,7 @@ async function renderUsers() {
     </div>
     <div class="tablewrap" id="u-table"></div>
     <div class="pager" id="u-pager"></div>`;
+  bindProdBar();
   $("u-plan").value = usersState.plan;
   let timer;
   $("u-search").oninput = (e) => { clearTimeout(timer); timer = setTimeout(() => { usersState.search = e.target.value.trim(); usersState.page = 1; loadUsers(); }, 300); };
@@ -335,23 +377,29 @@ async function renderUsers() {
 }
 async function loadUsers() {
   const wrap = $("u-table");
+  const geo = product === "geoblock";
   const qs = new URLSearchParams({ page: usersState.page, pageSize: usersState.pageSize });
   if (usersState.search) qs.set("search", usersState.search);
   if (usersState.plan) qs.set("plan", usersState.plan);
-  const d = await api("/admin/users?" + qs);
+  const d = await padmin("/users?" + qs);
   if (!d.users.length) { wrap.innerHTML = `<div class="empty">No users found.</div>`; $("u-pager").innerHTML = ""; return; }
+  // Reviews users open a detail modal; geoblock has no per-user detail endpoint.
+  const col = geo
+    ? `<th class="right">Blocked (month)</th><th class="right">Sites</th>`
+    : `<th class="right">Views / quota</th><th class="right">Businesses</th>`;
   wrap.innerHTML = `<table><thead><tr>
-      <th>Email</th><th>Plan</th><th>Status</th><th class="right">Views / quota</th><th class="right">Businesses</th><th>Joined</th>
+      <th>Email</th><th>Plan</th><th>Status</th>${col}<th>Joined</th>
     </tr></thead><tbody>${d.users.map((u) => `
-      <tr class="clickable" data-id="${u.id}">
+      <tr class="${geo ? "" : "clickable"}" data-id="${u.id}">
         <td>${esc(u.email)}</td>
         <td>${planBadge(u.plan)}</td>
         <td>${u.plan==="free" && !u.status ? '<span class="badge b-other">—</span>' : statusBadge(u.status)}</td>
-        <td class="right">${fmt(u.viewsThisMonth)}${u.quota>0?" / "+fmt(u.quota):" / ∞"}</td>
-        <td class="right">${fmt(u.businesses)}</td>
+        ${geo
+          ? `<td class="right">${fmt(u.blockedThisMonth)}</td><td class="right">${fmt(u.sites)}</td>`
+          : `<td class="right">${fmt(u.viewsThisMonth)}${u.quota>0?" / "+fmt(u.quota):" / ∞"}</td><td class="right">${fmt(u.businesses)}</td>`}
         <td>${date(u.createdAt)}</td>
       </tr>`).join("")}</tbody></table>`;
-  wrap.querySelectorAll("tr.clickable").forEach((r) => r.onclick = () => openUser(r.dataset.id));
+  if (!geo) wrap.querySelectorAll("tr.clickable").forEach((r) => r.onclick = () => openUser(r.dataset.id));
   const pages = Math.max(1, Math.ceil(d.total / d.pageSize));
   $("u-pager").innerHTML = `<span>${d.total} user(s) · page ${d.page}/${pages}</span>
     <button class="btn btn-line btn-sm" ${d.page<=1?"disabled":""} id="u-prev">← Prev</button>
@@ -443,11 +491,11 @@ async function openUser(id) {
 
 /* ── Subscriptions ── */
 async function renderSubs() {
-  const d = await api("/admin/subscriptions");
+  const d = await padmin("/subscriptions");
   const live = d.subscriptions.filter((s)=>s.live);
   const mrr = live.reduce((s,x)=>s+x.monthlyValue,0);
   $("view").innerHTML = `
-    <div class="page-head"><div><h2>Subscriptions</h2><p>Every subscription record, live and historical.</p></div></div>
+    <div class="page-head"><div><h2>Subscriptions</h2><p>Every ${PROD_LABEL[product]} subscription record, live and historical.</p></div>${prodBar("subs")}</div>
     <div class="kpis">
       <div class="kpi hero"><div class="k-label">MRR (live subs)</div><div class="k-val">${money(mrr)}</div><div class="k-sub">${money(mrr*12)} / year</div></div>
       <div class="kpi"><div class="k-label">Live subscriptions</div><div class="k-val">${fmt(live.length)}</div></div>
@@ -461,15 +509,17 @@ async function renderSubs() {
       <td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td>
       <td class="mono truncate">${esc(s.stripeSubscriptionId||"manual")}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No subscriptions yet.</div>`}</div>`;
+  bindProdBar();
 }
 
-/* ── Pages & clicks ── */
+/* ── Activity: Reviews → embed pages & clicks · Geoblock → blocks by country ── */
 let pagesSort = "poweredClicks";
 async function renderPages() {
+  if (product === "geoblock") return renderGeoActivity();
   const d = await api("/admin/pages?sort="+pagesSort);
   $("view").innerHTML = `
     <div class="page-head"><div><h2>Pages &amp; "Powered by Vanssay" clicks</h2><p>Where widgets are embedded, their views and outbound clicks.</p></div>
-      <select id="p-sort" style="width:auto"><option value="poweredClicks" ${pagesSort==="poweredClicks"?"selected":""}>Sort by clicks</option><option value="views" ${pagesSort==="views"?"selected":""}>Sort by views</option></select></div>
+      <div style="display:flex;gap:10px;align-items:center">${prodBar("pages")}<select id="p-sort" style="width:auto"><option value="poweredClicks" ${pagesSort==="poweredClicks"?"selected":""}>Sort by clicks</option><option value="views" ${pagesSort==="views"?"selected":""}>Sort by views</option></select></div></div>
     <div class="grid-2" style="align-items:start">
       <div>
         <div class="sec-title">By page</div>
@@ -484,14 +534,36 @@ async function renderPages() {
         </tbody></table>`:`<div class="empty">—</div>`}</div>
       </div>
     </div>`;
+  bindProdBar();
   $("p-sort").onchange = (e) => { pagesSort = e.target.value; renderPages(); };
 }
+// Geoblock has no embed pages — show the block activity (by country + monthly trend) instead.
+async function renderGeoActivity() {
+  const [countries, trend] = await Promise.all([api("/geoblock/admin/countries"), api("/geoblock/admin/trend")]);
+  const maxC = Math.max(1, ...countries.countries.map((c) => c.blocked || c.visits));
+  const maxB = Math.max(1, ...trend.trend.map((t) => t.blocked));
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Block activity</h2><p>Where Geoblock is stopping visitors — by country and over time.</p></div>${prodBar("pages")}</div>
+    <div class="panel" style="margin-bottom:16px">
+      <h3>Blocked visitors · last 12 months</h3>
+      <div class="chart">${trend.trend.map((t)=>`<div class="bar" style="height:${Math.round((t.blocked/maxB)*100)}%" data-tip="${t.month}: ${fmt(t.blocked)} blocked"></div>`).join("")}</div>
+      <div class="chart-x">${trend.trend.map((t)=>`<span>${t.month.slice(5)}</span>`).join("")}</div>
+    </div>
+    <div class="sec-title">By country · all-time</div>
+    <div class="tablewrap">${countries.countries.length?`<table><thead><tr><th>Country</th><th class="right">Blocked</th><th class="right">VPN/proxy</th><th class="right">Visits</th><th style="width:30%">Share</th></tr></thead><tbody>
+      ${countries.countries.map((c)=>`<tr><td>${flag(c.countryCode)} ${esc(c.countryCode)}</td><td class="right">${fmt(c.blocked)}</td><td class="right">${fmt(c.vpnBlocked)}</td><td class="right">${fmt(c.visits)}</td>
+        <td><div class="meter" style="height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden"><span style="display:block;height:100%;width:${Math.round(((c.blocked||c.visits)/maxC)*100)}%;background:linear-gradient(90deg,#0e7afe,#7c5cff)"></span></div></td></tr>`).join("")}
+    </tbody></table>`:`<div class="empty">No blocks recorded yet.</div>`}</div>`;
+  bindProdBar();
+}
+}
 
-/* ── Businesses ── */
+/* ── Businesses (Reviews) / Protected sites (Geoblock) ── */
 async function renderBusinesses() {
+  if (product === "geoblock") return renderGeoSites();
   const d = await api("/admin/businesses");
   $("view").innerHTML = `
-    <div class="page-head"><div><h2>Businesses</h2><p>Every connected Google / Trustpilot source.</p></div></div>
+    <div class="page-head"><div><h2>Businesses</h2><p>Every connected Google / Trustpilot source.</p></div>${prodBar("businesses")}</div>
     <div class="tablewrap">${d.businesses.length?`<table><thead><tr>
       <th>Owner</th><th>Google business</th><th>Place ID</th><th>Trustpilot</th><th class="right">Min ★</th><th>Connected</th>
     </tr></thead><tbody>${d.businesses.map((b)=>`<tr>
@@ -499,13 +571,27 @@ async function renderBusinesses() {
       <td class="truncate">${b.trustpilotUrl?`<a href="${esc(b.trustpilotUrl)}" target="_blank">${esc(b.trustpilotUrl.replace(/^https?:\/\/(www\.)?/,""))}</a>`:"—"}</td>
       <td class="right">${b.minStars}</td><td>${date(b.createdAt)}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No businesses connected yet.</div>`}</div>`;
+  bindProdBar();
+}
+async function renderGeoSites() {
+  const d = await api("/geoblock/admin/sites");
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Protected sites</h2><p>Every Geoblock rule — mode, countries, VPN and action.</p></div>${prodBar("businesses")}</div>
+    <div class="tablewrap">${d.sites.length?`<table><thead><tr>
+      <th>Owner</th><th>Label</th><th>Mode</th><th class="right">Countries</th><th>VPN</th><th>Action</th><th>Scope</th><th>Strict</th><th>Created</th>
+    </tr></thead><tbody>${d.sites.map((s)=>`<tr>
+      <td class="truncate">${esc(s.email)}</td><td>${esc(s.label||"—")}</td><td>${esc(s.mode)}</td><td class="right">${fmt(s.countries)}</td>
+      <td>${s.vpnBlock?"✓":"—"}</td><td>${esc(s.action)}</td><td>${esc(s.scope)}</td><td>${s.strictMode?"✓":"—"}</td><td>${date(s.createdAt)}</td>
+    </tr>`).join("")}</tbody></table>`:`<div class="empty">No protected sites yet.</div>`}</div>`;
+  bindProdBar();
 }
 
-/* ── Cache ── */
+/* ── Cache (Reviews → review payloads · Geoblock → IP geo lookups) ── */
 async function renderCache() {
-  const d = await api("/admin/cache");
+  const geo = product === "geoblock";
+  const d = await padmin("/cache");
   $("view").innerHTML = `
-    <div class="page-head"><div><h2>Review cache</h2><p>Cached Google/Trustpilot payloads that serve widgets fast.</p></div></div>
+    <div class="page-head"><div><h2>${geo ? "IP geolocation cache" : "Review cache"}</h2><p>${geo ? "Cached ip-api lookups that keep block checks fast and under the rate limit." : "Cached Google/Trustpilot payloads that serve widgets fast."}</p></div>${prodBar("cache")}</div>
     <div class="kpis">
       <div class="kpi"><div class="k-label">Cached entries</div><div class="k-val">${fmt(d.total)}</div></div>
       <div class="kpi"><div class="k-label">Expired</div><div class="k-val">${fmt(d.expired)}</div></div>
@@ -519,10 +605,11 @@ async function renderCache() {
         <button class="btn btn-danger btn-sm" id="c-all">Purge ALL</button>
       </div>
     </div>`;
+  bindProdBar();
   $("c-expired").onclick = () => purge(false);
-  $("c-all").onclick = () => { if (confirm("Delete the entire review cache? Widgets will refetch on next load.")) purge(true); };
+  $("c-all").onclick = () => { if (confirm(`Delete the entire ${geo ? "IP geo" : "review"} cache?`)) purge(true); };
   async function purge(all) {
-    try { const r = await api("/admin/cache/purge"+(all?"?all=1":""),{method:"POST"}); $("c-ok").textContent = `Deleted ${r.deleted} entr${r.deleted===1?"y":"ies"}.`; $("c-ok").style.display="block"; setTimeout(renderCache, 900); }
+    try { const r = await padmin("/cache/purge"+(all?"?all=1":""),{method:"POST"}); $("c-ok").textContent = `Deleted ${r.deleted} entr${r.deleted===1?"y":"ies"}.`; $("c-ok").style.display="block"; setTimeout(renderCache, 900); }
     catch(e){ $("c-err").textContent=e.message; $("c-err").style.display="block"; }
   }
 }
