@@ -209,8 +209,16 @@ async function boot() {
 let curTab = "overview";
 let product = "all"; // 'all' | 'reviews' | 'geoblock'
 const GEO = "/geoblock";
-// Product-aware admin call: reviews → /admin/…, geoblock → /geoblock/admin/…
+// Domain data (sites, blocks, IP cache) lives in each plugin backend:
+// reviews → /admin/…, geoblock → /geoblock/admin/…
 const padmin = (suffix, opts) => api((product === "geoblock" ? GEO : "") + "/admin" + suffix, opts);
+// Identity + billing (users, subscriptions, plans, revenue) are owned by the
+// central Accounts service and are product-scoped via ?product=.
+const acct = (suffix, opts, prod = product) => {
+  const sep = suffix.includes("?") ? "&" : "?";
+  const scoped = prod && prod !== "reviews" ? suffix + sep + "product=" + prod : suffix;
+  return api("/admin" + scoped, opts);
+};
 
 const PROD_LABEL = { all: "All", reviews: "Reviews", geoblock: "Geoblock" };
 function prodBar(tab) {
@@ -240,16 +248,24 @@ async function renderOverview() {
   const ov = $("ov");
   try {
     if (product === "reviews") {
-      ov.innerHTML = reviewsOverview(await api("/admin/overview"));
+      ov.innerHTML = reviewsOverview(await acct("/overview", null, "reviews"));
     } else if (product === "geoblock") {
-      const [d, trend, countries, sites] = await Promise.all([
-        api("/geoblock/admin/overview"), api("/geoblock/admin/trend"),
-        api("/geoblock/admin/countries"), api("/geoblock/admin/sites"),
+      // Billing (plans/revenue) from Accounts; domain (users/configs/blocks) from the plugin.
+      const [bill, dom, trend, countries, sites] = await Promise.all([
+        acct("/overview", null, "geoblock"), api("/geoblock/admin/overview"),
+        api("/geoblock/admin/trend"), api("/geoblock/admin/countries"), api("/geoblock/admin/sites"),
       ]);
-      ov.innerHTML = geoblockOverview(d, trend, countries, sites);
+      ov.innerHTML = geoblockOverview(
+        { ...bill, users: dom.users, configs: dom.configs, thisMonth: dom.thisMonth, allTime: dom.allTime },
+        trend, countries, sites,
+      );
     } else {
-      const [rev, geo] = await Promise.all([api("/admin/overview"), api("/geoblock/admin/overview")]);
-      ov.innerHTML = allOverview(rev, geo);
+      const [rev, geoBill, geoDom] = await Promise.all([
+        acct("/overview", null, "reviews"), acct("/overview", null, "geoblock"), api("/geoblock/admin/overview"),
+      ]);
+      ov.innerHTML = allOverview(rev, {
+        ...geoBill, users: geoDom.users, configs: geoDom.configs, thisMonth: geoDom.thisMonth, allTime: geoDom.allTime,
+      });
     }
   } catch (e) { ov.innerHTML = `<div class="empty">Couldn't load — ${esc(e.message)}</div>`; }
 }
@@ -381,12 +397,12 @@ async function loadUsers() {
   const qs = new URLSearchParams({ page: usersState.page, pageSize: usersState.pageSize });
   if (usersState.search) qs.set("search", usersState.search);
   if (usersState.plan) qs.set("plan", usersState.plan);
-  const d = await padmin("/users?" + qs);
+  // Users + their per-product plan come from the Accounts service.
+  const d = await acct("/users?" + qs);
   if (!d.users.length) { wrap.innerHTML = `<div class="empty">No users found.</div>`; $("u-pager").innerHTML = ""; return; }
-  // Reviews users open a detail modal; geoblock has no per-user detail endpoint.
-  const col = geo
-    ? `<th class="right">Blocked (month)</th><th class="right">Sites</th>`
-    : `<th class="right">Views / quota</th><th class="right">Businesses</th>`;
+  // Reviews users open a detail modal + show reviews-domain columns; geoblock
+  // shows the shared plan only (its per-user domain stats live in the plugin).
+  const col = geo ? `` : `<th class="right">Views / quota</th><th class="right">Businesses</th>`;
   wrap.innerHTML = `<table><thead><tr>
       <th>Email</th><th>Plan</th><th>Status</th>${col}<th>Joined</th>
     </tr></thead><tbody>${d.users.map((u) => `
@@ -394,9 +410,7 @@ async function loadUsers() {
         <td>${esc(u.email)}</td>
         <td>${planBadge(u.plan)}</td>
         <td>${u.plan==="free" && !u.status ? '<span class="badge b-other">—</span>' : statusBadge(u.status)}</td>
-        ${geo
-          ? `<td class="right">${fmt(u.blockedThisMonth)}</td><td class="right">${fmt(u.sites)}</td>`
-          : `<td class="right">${fmt(u.viewsThisMonth)}${u.quota>0?" / "+fmt(u.quota):" / ∞"}</td><td class="right">${fmt(u.businesses)}</td>`}
+        ${geo ? `` : `<td class="right">${fmt(u.viewsThisMonth)}${u.quota>0?" / "+fmt(u.quota):" / ∞"}</td><td class="right">${fmt(u.businesses)}</td>`}
         <td>${date(u.createdAt)}</td>
       </tr>`).join("")}</tbody></table>`;
   if (!geo) wrap.querySelectorAll("tr.clickable").forEach((r) => r.onclick = () => openUser(r.dataset.id));
@@ -491,7 +505,7 @@ async function openUser(id) {
 
 /* ── Subscriptions ── */
 async function renderSubs() {
-  const d = await padmin("/subscriptions");
+  const d = await acct("/subscriptions");
   const live = d.subscriptions.filter((s)=>s.live);
   const mrr = live.reduce((s,x)=>s+x.monthlyValue,0);
   $("view").innerHTML = `
