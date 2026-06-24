@@ -18,7 +18,12 @@
     .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px}
     .logo b{color:var(--accent)}
     .nav-links{display:flex;gap:28px;font-size:14px;font-weight:500;color:var(--text-2)}
-    main{max-width:520px;margin:0 auto;padding:64px 28px 96px}
+    main{max-width:920px;margin:0 auto;padding:44px 28px 80px}
+    #auth,#loading{max-width:460px;margin-inline:auto}
+    .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+    .dash-grid .col{display:flex;flex-direction:column;gap:18px}
+    .dash-grid .card{margin-bottom:0}
+    @media (max-width:760px){main{max-width:520px}.dash-grid{grid-template-columns:1fr}}
     h1{font-size:30px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
     .sub{color:var(--text-2);margin-bottom:28px}
     .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;box-shadow:var(--shadow-md);margin-bottom:18px}
@@ -80,42 +85,55 @@
     <h1>Your account</h1>
     <p class="sub" id="d-email"></p>
 
-    <div class="card">
-      <div class="row"><h3>Plan</h3><span class="badge b-free" id="d-plan">Free</span></div>
-      <p class="muted" id="d-renew"></p>
-      <div class="actions" id="d-billing"></div>
-    </div>
+    <div class="dash-grid">
+      <div class="col">
+        <div class="card">
+          <div class="row"><h3>Plan</h3><span class="badge b-free" id="d-plan">Free</span></div>
+          <p class="muted" id="d-renew"></p>
+          <div class="actions" id="d-billing"></div>
+        </div>
 
-    <div class="card">
-      <h3>Your protection</h3>
-      <ul class="feats" id="d-feats"></ul>
-      <p class="muted" style="margin-top:12px">Set your blocked countries, VPN detection and block screen right inside the <strong>Geoblock</strong> plugin in Framer.</p>
-    </div>
+        <div class="card">
+          <h3>Your protection</h3>
+          <ul class="feats" id="d-feats"></ul>
+          <p class="muted" style="margin-top:12px">Set your blocked countries, VPN detection and block screen right inside the <strong>Geoblock</strong> plugin in Framer.</p>
+        </div>
+      </div>
 
-    <div class="card">
-      <h3>Profile</h3>
-      <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
-      <p class="muted">To change your email, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
-      <div class="err" id="dash-err"></div>
-      <div class="err" id="dash-ok" style="background:#e9f7ef;color:#16a34a"></div>
-      <div class="actions">
-        <button class="btn btn-line" id="d-changepass">Change password</button>
-        <button class="btn btn-line" id="d-signout">Sign out</button>
+      <div class="col">
+        <div class="card">
+          <h3>Profile</h3>
+          <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
+          <p class="muted">To change your email, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
+          <div class="err" id="dash-err"></div>
+          <div class="err" id="dash-ok" style="background:#e9f7ef;color:#16a34a"></div>
+          <div class="actions">
+            <button class="btn btn-line" id="d-changepass">Change password</button>
+            <button class="btn btn-line" id="d-signout">Sign out</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </main>
 
 <script>
-const API = localStorage.getItem("geoblock.apiBase") || "https://api.vanssay.net/geoblock";
+// Identity AND billing are owned by the central Accounts service (the reviews
+// backend). Auth, /auth/me and /billing all run there; billing is scoped to this
+// plugin with product=geoblock. The geoblock backend only serves domain data
+// (rules/stats) and isn't needed by this account page.
+const API = localStorage.getItem("geoblock.apiBase") || "https://api.vanssay.net";
+const AUTH_API = API;
+const PRODUCT = "geoblock";
 const TKEY = "geoblock.token";
 
 const $ = (id) => document.getElementById(id);
 const api = async (path, opts = {}) => {
+  const base = opts.base || API;
   const headers = { ...(opts.body ? { "Content-Type": "application/json" } : {}) };
   const t = localStorage.getItem(TKEY);
   if (t) headers.Authorization = "Bearer " + t;
-  const res = await fetch(API + path, { method: opts.method || "GET", headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+  const res = await fetch(base + path, { method: opts.method || "GET", headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || "Something went wrong");
   return data;
@@ -157,18 +175,18 @@ $("auth-btn").onclick = async () => {
   showErr("auth-err", ""); showErr("auth-ok", "");
   try {
     if (mode === "forgot") {
-      await api("/auth/forgot-password", { method: "POST", body: { email: $("email").value.trim() } });
+      await api("/auth/forgot-password", { method: "POST", base: AUTH_API, body: { email: $("email").value.trim() } });
       showErr("auth-ok", "If an account exists for that email, a reset link from no-reply@vanssay.net is on its way.");
       return;
     }
     if (mode === "reset") {
-      await api("/auth/reset-password", { method: "POST", body: { token: resetToken, password: $("password").value } });
+      await api("/auth/reset-password", { method: "POST", base: AUTH_API, body: { token: resetToken, password: $("password").value } });
       history.replaceState(null, "", location.pathname);
       mode = "login"; render();
       showErr("auth-ok", "Password updated — sign in with your new password.");
       return;
     }
-    const r = await api(mode === "register" ? "/auth/register" : "/auth/login", { method: "POST", body: { email: $("email").value.trim(), password: $("password").value } });
+    const r = await api(mode === "register" ? "/auth/register" : "/auth/login", { method: "POST", base: AUTH_API, body: { email: $("email").value.trim(), password: $("password").value } });
     localStorage.setItem(TKEY, r.token);
     load();
   } catch (e) { showErr("auth-err", e.message); }
@@ -187,20 +205,23 @@ async function load() {
   if (!localStorage.getItem(TKEY)) { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
   $("auth").style.display = "none"; $("dash").style.display = "none"; $("loading").style.display = "block";
   try {
+    // Identity from Accounts; the *geoblock* plan from Accounts entitlements
+    // (its /auth/me defaults to the reviews product, so scope explicitly).
     const me = await api("/auth/me");
+    const ent = await api("/billing/entitlements?product=" + PRODUCT);
     $("loading").style.display = "none"; $("dash").style.display = "block";
     $("d-email").textContent = me.user.email; $("d-email2").textContent = me.user.email;
-    const plan = me.subscription.plan;
+    const plan = ent.plan;
     const badge = $("d-plan");
     badge.textContent = plan[0].toUpperCase() + plan.slice(1);
     badge.className = "badge b-" + plan;
-    $("d-renew").textContent = me.subscription.currentPeriodEnd ? "Renews " + new Date(me.subscription.currentPeriodEnd).toLocaleDateString() : (plan === "free" ? "Free forever — upgrade anytime." : "Active subscription.");
+    $("d-renew").textContent = plan === "free" ? "Free forever — upgrade anytime." : "Active subscription.";
     $("d-feats").innerHTML = (FEATS[plan] || FEATS.free).map((f) => "<li>" + f + "</li>").join("");
 
     const actions = $("d-billing"); actions.innerHTML = "";
     const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
-    const checkout = (plan) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: { plan } }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
-    const portal = async () => { try { const r = await api("/billing/portal", { method: "POST" }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
+    const checkout = (plan) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: { product: PRODUCT, plan } }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
+    const portal = async () => { try { const r = await api("/billing/portal", { method: "POST", body: { product: PRODUCT } }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
     if (plan === "free") { mk("Upgrade to Pro — $6/mo", "btn-line", checkout("pro")); mk("Go Ultra — $14/mo", "btn-blue", checkout("ultra")); }
     else if (plan === "pro") { mk("Upgrade to Ultra — $14/mo", "btn-blue", checkout("ultra")); mk("Manage / cancel billing", "btn-line", portal); }
     else { mk("Manage / cancel billing", "btn-line", portal); }
@@ -214,7 +235,7 @@ $("d-changepass").onclick = async () => {
   if (btn.disabled) return;
   showErr("dash-err", ""); showErr("dash-ok", "");
   try {
-    await api("/auth/forgot-password", { method: "POST", body: { email: $("d-email2").textContent.trim() } });
+    await api("/auth/forgot-password", { method: "POST", base: AUTH_API, body: { email: $("d-email2").textContent.trim() } });
     showErr("dash-ok", "Check your inbox — a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
     btn.disabled = true; btn.style.opacity = ".55";
     let left = 60; btn.textContent = "Email sent (" + left + "s)";
