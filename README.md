@@ -10,8 +10,8 @@ plus each plugin's presentation page and client space.
 | `index.html` | **Store hub** — lists every Vanssay plugin | `vanssay.net` |
 | `reviews.html` | Reviews plugin presentation (the old `index.html`) | `reviews.vanssay.net` |
 | `account.html` | Reviews client space (talks to `api.vanssay.net`) | `reviews.vanssay.net/account` |
-| `geoblock.html` | Geoblock plugin presentation | `geoblock.vanssay.net` |
-| `geoblock-account.html` | Geoblock client space (talks to `api.vanssay.net/geoblock`) | `geoblock.vanssay.net/account` |
+| `geoblock.html` | Bouncer plugin presentation | `geoblock.vanssay.net` |
+| `geoblock-account.html` | Bouncer client space (talks to `api.vanssay.net/geoblock`) | `geoblock.vanssay.net/account` |
 | `privacy.html` · `terms.html` · `demo.html` · `admin.html` | shared | — |
 
 All cross-page links are **relative**, so the whole site works as-is on
@@ -27,10 +27,10 @@ Each needs a DNS `CNAME` to GitHub Pages and a `CNAME` file with the subdomain.
 
 Both plugins share one API host on the VPS:
 - Reviews → `https://api.vanssay.net`
-- Geoblock → `https://api.vanssay.net/geoblock` (nginx routes the `/geoblock` prefix)
+- Bouncer → `https://api.vanssay.net/geoblock` (nginx routes the `/geoblock` prefix)
 
 ## Branding
 
 Logo glyph in `/branding` (the "V"). Vanssay brand = blue→purple
-(`#0e7afe`→`#7c5cff`); the **Geoblock** product uses a green variant
+(`#0e7afe`→`#7c5cff`); the **Bouncer** product uses a green variant
 (`#16a34a` / `#22c55e`).

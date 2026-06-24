@@ -220,7 +220,7 @@ const acct = (suffix, opts, prod = product) => {
   return api("/admin" + scoped, opts);
 };
 
-const PROD_LABEL = { all: "All", reviews: "Reviews", geoblock: "Geoblock" };
+const PROD_LABEL = { all: "All", reviews: "Reviews", geoblock: "Bouncer" };
 function prodBar(tab) {
   const opts = tab === "overview" ? ["all", "reviews", "geoblock"] : ["reviews", "geoblock"];
   return `<div class="prodbar">${opts.map((o) => `<button class="pb ${product === o ? "on" : ""}" data-prod="${o}">${PROD_LABEL[o]}</button>`).join("")}</div>`;
@@ -348,9 +348,9 @@ function allOverview(rev, geo) {
     <div class="kpis">
       <div class="kpi hero"><div class="k-label">Total MRR · both plugins</div><div class="k-val">${money(mrr)}</div><div class="k-sub">${money(mrr*12)} / year</div></div>
       <div class="kpi"><div class="k-label">Reviews MRR</div><div class="k-val">${money(rev.revenue.mrr)}</div><div class="k-sub">${fmt(rev.plans.paid)} paying</div></div>
-      <div class="kpi"><div class="k-label">Geoblock MRR</div><div class="k-val">${money(geo.revenue.mrr)}</div><div class="k-sub">${fmt(geo.plans.paid)} paying</div></div>
+      <div class="kpi"><div class="k-label">Bouncer MRR</div><div class="k-val">${money(geo.revenue.mrr)}</div><div class="k-sub">${fmt(geo.plans.paid)} paying</div></div>
       <div class="kpi"><div class="k-label">Reviews users</div><div class="k-val">${fmt(rev.users.total)}</div><div class="k-sub">+${fmt(rev.users.newThisMonth)} this month</div></div>
-      <div class="kpi"><div class="k-label">Geoblock users</div><div class="k-val">${fmt(geo.users.total)}</div><div class="k-sub">+${fmt(geo.users.newThisMonth)} this month</div></div>
+      <div class="kpi"><div class="k-label">Bouncer users</div><div class="k-val">${fmt(geo.users.total)}</div><div class="k-sub">+${fmt(geo.users.newThisMonth)} this month</div></div>
     </div>
     <div class="grid-2">
       <div class="panel">
@@ -359,7 +359,7 @@ function allOverview(rev, geo) {
         <div class="kv" style="margin-top:10px"><span>Widget views (month)</span><strong>${fmt(rev.usage.viewsThisMonth)}</strong></div>
       </div>
       <div class="panel">
-        <h3>Geoblock · plan split</h3>
+        <h3>Bouncer · plan split</h3>
         ${planRow("Free", geo.plans.free, geo.users.total)}${planRow("Pro", geo.plans.pro, geo.users.total)}${planRow("Ultra", geo.plans.ultra, geo.users.total)}
         <div class="kv" style="margin-top:10px"><span>Visitors blocked (month)</span><strong>${fmt(geo.thisMonth.blocked)}</strong></div>
       </div>
@@ -557,7 +557,7 @@ async function renderGeoActivity() {
   const maxC = Math.max(1, ...countries.countries.map((c) => c.blocked || c.visits));
   const maxB = Math.max(1, ...trend.trend.map((t) => t.blocked));
   $("view").innerHTML = `
-    <div class="page-head"><div><h2>Block activity</h2><p>Where Geoblock is stopping visitors — by country and over time.</p></div>${prodBar("pages")}</div>
+    <div class="page-head"><div><h2>Block activity</h2><p>Where Bouncer is stopping visitors — by country and over time.</p></div>${prodBar("pages")}</div>
     <div class="panel" style="margin-bottom:16px">
       <h3>Blocked visitors · last 12 months</h3>
       <div class="chart">${trend.trend.map((t)=>`<div class="bar" style="height:${Math.round((t.blocked/maxB)*100)}%" data-tip="${t.month}: ${fmt(t.blocked)} blocked"></div>`).join("")}</div>
@@ -589,7 +589,7 @@ async function renderBusinesses() {
 async function renderGeoSites() {
   const d = await api("/geoblock/admin/sites");
   $("view").innerHTML = `
-    <div class="page-head"><div><h2>Protected sites</h2><p>Every Geoblock rule — mode, countries, VPN and action.</p></div>${prodBar("businesses")}</div>
+    <div class="page-head"><div><h2>Protected sites</h2><p>Every Bouncer rule — mode, countries, VPN and action.</p></div>${prodBar("businesses")}</div>
     <div class="tablewrap">${d.sites.length?`<table><thead><tr>
       <th>Owner</th><th>Label</th><th>Mode</th><th class="right">Countries</th><th>VPN</th><th>Action</th><th>Scope</th><th>Strict</th><th>Created</th>
     </tr></thead><tbody>${d.sites.map((s)=>`<tr>

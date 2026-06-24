@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Account — Geoblock</title>
+  <title>Account — Bouncer</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5l8-3z' fill='%2316a34a'/></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
@@ -65,7 +65,7 @@
   <!-- Auth -->
   <div id="auth">
     <h1 id="auth-title">Welcome back</h1>
-    <p class="sub">Same account as the Geoblock Framer plugin.</p>
+    <p class="sub">Same account as the Bouncer Framer plugin.</p>
     <div class="card">
       <div id="f-email"><label>Email</label><input id="email" type="email" placeholder="you@company.com" autocomplete="email" /></div>
       <div id="f-pass">
@@ -76,7 +76,7 @@
       <div class="err" id="auth-err"></div>
       <div class="err" id="auth-ok" style="background:#e9f7ef;color:#16a34a"></div>
       <button class="btn btn-blue" id="auth-btn">Sign in</button>
-      <div class="switch" id="auth-switch">New to Geoblock? <a>Create an account</a></div>
+      <div class="switch" id="auth-switch">New to Bouncer? <a>Create an account</a></div>
     </div>
   </div>
 
@@ -96,7 +96,7 @@
         <div class="card">
           <h3>Your protection</h3>
           <ul class="feats" id="d-feats"></ul>
-          <p class="muted" style="margin-top:12px">Set your blocked countries, VPN detection and block screen right inside the <strong>Geoblock</strong> plugin in Framer.</p>
+          <p class="muted" style="margin-top:12px">Set your blocked countries, VPN detection and block screen right inside the <strong>Bouncer</strong> plugin in Framer.</p>
         </div>
       </div>
 
@@ -149,7 +149,7 @@ if (location.hash.startsWith("#token=")) {
 let mode = location.hash.startsWith("#reset=") ? "reset" : "login";
 const resetToken = mode === "reset" ? location.hash.slice(7) : "";
 const COPY = {
-  login: ["Welcome back", "Sign in", 'New to Geoblock? <a>Create an account</a>'],
+  login: ["Welcome back", "Sign in", 'New to Bouncer? <a>Create an account</a>'],
   register: ["Create your account", "Create account", 'Already have an account? <a>Sign in</a>'],
   forgot: ["Reset your password", "Send reset link", '<a>Back to sign in</a>'],
   reset: ["Choose a new password", "Set new password", '<a>Back to sign in</a>'],
