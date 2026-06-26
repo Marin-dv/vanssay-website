@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Account — Vanssay</title>
+  <title>Your account — Vanssay</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%230e7afe'/><path d='M34,4H25L13,36H22Z' fill='%237c5cff'/></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
@@ -18,14 +18,9 @@
     nav { position:sticky; top:0; background:rgba(250,250,250,.85); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
     .nav-in { max-width:1140px; margin:0 auto; padding:0 28px; display:flex; align-items:center; justify-content:space-between; height:64px; }
     .logo { display:flex; align-items:center; gap:9px; font-weight:800; font-size:17px; }
-    .logo-dot { width:22px; height:22px; border-radius:7px; background:linear-gradient(135deg,var(--accent),var(--pro)); }
     .nav-links { display:flex; gap:28px; font-size:14px; font-weight:500; color:var(--text-2); }
-    main { max-width:920px; margin:0 auto; padding:44px 28px 80px; }
+    main { max-width:680px; margin:0 auto; padding:44px 28px 80px; }
     #auth, #loading { max-width:460px; margin-inline:auto; }
-    .dash-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start; }
-    .dash-grid .col { display:flex; flex-direction:column; gap:18px; }
-    .dash-grid .card { margin-bottom:0; }
-    @media (max-width:760px) { main { max-width:520px; } .dash-grid { grid-template-columns:1fr; } }
     h1 { font-size:30px; font-weight:900; letter-spacing:-.02em; margin-bottom:6px; }
     .sub { color:var(--text-2); margin-bottom:28px; }
     .card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:28px; box-shadow:var(--shadow-md); margin-bottom:18px; }
@@ -36,25 +31,25 @@
       border-radius:11px; font:inherit; font-size:14.5px; font-weight:700; border:1px solid transparent; cursor:pointer; }
     .btn-blue { background:linear-gradient(120deg,var(--accent),var(--pro)); color:#fff; }
     .btn-line { background:var(--surface); border-color:var(--border); color:var(--text); }
-    .btn-sm { width:auto; padding:8px 16px; font-size:13px; margin-top:0; }
-    .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
     .muted { color:var(--muted); font-size:13px; }
     .err { background:#fdecec; color:var(--error); border-radius:10px; padding:10px 14px; font-size:13px; margin-top:14px; display:none; }
-    .quota-alert { display:none; background:#fdecec; border:1px solid #f5b5b5; color:#b91c1c; border-radius:14px; padding:18px 20px; margin-bottom:18px; }
-    .quota-alert strong { font-size:15px; display:block; margin-bottom:4px; }
-    .quota-alert p { font-size:13.5px; color:#7f1d1d; margin-bottom:12px; }
-    .quota-alert .btn { width:auto; margin-top:0; }
     .switch { text-align:center; font-size:13.5px; color:var(--text-2); margin-top:18px; }
     .switch a { color:var(--accent); font-weight:600; cursor:pointer; }
     .badge { display:inline-flex; padding:3px 12px; border-radius:99px; font-size:12px; font-weight:800; }
     .b-free { background:var(--surface-2); color:var(--text-2); } .b-pro { background:#f1edff; color:var(--pro); } .b-ultra { background:linear-gradient(90deg,var(--accent),var(--pro)); color:#fff; }
-    .meter { height:8px; border-radius:99px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden; margin-top:8px; }
-    .meter span { display:block; height:100%; background:var(--accent); border-radius:99px; }
     .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
     .actions .btn { width:auto; flex:1; margin-top:0; }
     #dash { display:none; }
     h3 { font-size:15px; font-weight:800; margin-bottom:4px; }
-    /* Loading state while the session is verified (e.g. arriving from the plugin) */
+    /* Per-plugin rows */
+    .plugins { display:flex; flex-direction:column; }
+    .plug { display:flex; align-items:center; gap:14px; padding:16px 0; border-top:1px solid var(--border); }
+    .plug:first-child { border-top:0; padding-top:4px; }
+    .plug .ico { width:34px; height:34px; border-radius:9px; flex:none; display:flex; align-items:center; justify-content:center; }
+    .plug .name { font-weight:700; font-size:14.5px; }
+    .plug .grow { flex:1; min-width:0; }
+    .plug .open { font-size:13px; font-weight:700; color:var(--accent); white-space:nowrap; }
+    .plug .right { display:flex; align-items:center; gap:14px; }
     #loading { display:none; text-align:center; padding:80px 0; }
     .spinner { width:34px; height:34px; margin:0 auto 16px; border-radius:50%;
       border:3px solid var(--surface-2); border-top-color:var(--accent); animation:spin .8s linear infinite; }
@@ -64,7 +59,7 @@
 <body>
 <nav><div class="nav-in">
   <a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a>
-  <div class="nav-links"><a href="/#widgets">Widgets</a><a href="demo">Live demo</a><a href="/#pricing">Pricing</a></div>
+  <div class="nav-links"><a href="/#plugins">Plugins</a><a href="reviews">Reviews</a><a href="geoblock">Bouncer</a><a href="maintenance">Maintenance</a></div>
 </div></nav>
 
 <main>
@@ -74,7 +69,7 @@
   <!-- Auth -->
   <div id="auth">
     <h1 id="auth-title">Welcome back</h1>
-    <p class="sub">Same account as the Framer plugin.</p>
+    <p class="sub">One Vanssay account for every plugin.</p>
     <div class="card">
       <div id="f-email"><label>Email</label><input id="email" type="email" placeholder="you@company.com" autocomplete="email" /></div>
       <div id="f-pass">
@@ -93,47 +88,22 @@
   <div id="dash">
     <h1>Your account</h1>
     <p class="sub" id="d-email"></p>
-    <p style="margin:-22px 0 26px"><a href="accounts" style="color:var(--accent);font-weight:600;font-size:13.5px">← Your Vanssay account &amp; all plugins</a></p>
 
-    <div id="quota-banner" class="quota-alert">
-      <strong>⚠️ Your reviews are hidden</strong>
-      <p>You've used all <span id="qb-limit">300</span> free widget views this month, so your reviews have <b>stopped showing on your site</b>. Upgrade to turn them back on instantly.</p>
-      <button class="btn btn-blue" id="quota-up">Upgrade to Pro — $9/mo</button>
+    <div class="card">
+      <h3>Your plugins</h3>
+      <p class="muted" style="margin-bottom:6px">Your plan on each Vanssay plugin. One sign-in covers them all.</p>
+      <div class="plugins" id="d-plugins"></div>
     </div>
 
-    <div class="dash-grid">
-      <div class="col">
-        <div class="card">
-          <div class="row"><h3>Plan</h3><span class="badge b-free" id="d-plan">Free</span></div>
-          <p class="muted" id="d-renew"></p>
-          <div class="actions" id="d-billing"></div>
-        </div>
-
-        <div class="card">
-          <div class="row"><h3>Widget views this month</h3><strong id="d-views">—</strong></div>
-          <div class="meter"><span id="d-meter" style="width:0%"></span></div>
-          <p class="muted" id="d-limit"></p>
-        </div>
-      </div>
-
-      <div class="col">
-        <div class="card">
-          <div class="row"><h3>Reviews live on your site</h3></div>
-          <p class="muted">See the exact reviews your widget is showing right now, and when they last synced.</p>
-          <div class="actions"><a class="btn btn-line" href="reviews-live">View live reviews →</a></div>
-        </div>
-
-        <div class="card">
-          <h3>Profile</h3>
-          <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
-          <p class="muted">To change your email, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
-          <div class="err" id="dash-err"></div>
-          <div class="err" id="dash-ok" style="background:#e9f7ef;color:#16a34a"></div>
-          <div class="actions">
-            <button class="btn btn-line" id="d-changepass">Change password</button>
-            <button class="btn btn-line" id="d-signout">Sign out</button>
-          </div>
-        </div>
+    <div class="card">
+      <h3>Profile</h3>
+      <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
+      <p class="muted">To change your email, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
+      <div class="err" id="dash-err"></div>
+      <div class="err" id="dash-ok" style="background:#e9f7ef;color:#16a34a"></div>
+      <div class="actions">
+        <button class="btn btn-line" id="d-changepass">Change password</button>
+        <button class="btn btn-line" id="d-signout">Sign out</button>
       </div>
     </div>
   </div>
@@ -141,10 +111,16 @@
 
 <script>
 const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
-// Stripe price ids — leave empty to use the backend defaults.
-const PRICE_PRO = "price_1TjlQZB3xYzGNURHgqEBd8xT", PRICE_ULTRA = "price_1TlZEbB3xYzGNURHcZ8uytId";
+// Shared token: this is the same Accounts identity used by every plugin account
+// page, so reuse the reviews token key if it's already present in this browser.
 const TKEY = "vanssay.token";
-let registerMode = false;
+
+// Plugins shown in the overview. `acct` = the plugin's own account page.
+const PLUGINS = [
+  { product: "reviews",     name: "Reviews",          acct: "account",             color: "#2b50ff" },
+  { product: "geoblock",    name: "Bouncer",          acct: "geoblock-account",    color: "#22c55e" },
+  { product: "maintenance", name: "Maintenance Mode", acct: "maintenance-account", color: "#0891b2" },
+];
 
 const $ = (id) => document.getElementById(id);
 const api = async (path, opts = {}) => {
@@ -158,7 +134,7 @@ const api = async (path, opts = {}) => {
 };
 const showErr = (id, msg) => { const el = $(id); el.textContent = msg; el.style.display = msg ? "block" : "none"; };
 
-// Auto sign-in when arriving from the plugin (#token=<jwt>)
+// Auto sign-in when arriving from a plugin (#token=<jwt>)
 if (location.hash.startsWith("#token=")) {
   localStorage.setItem(TKEY, decodeURIComponent(location.hash.slice(7)));
   history.replaceState(null, "", location.pathname);
@@ -214,47 +190,40 @@ $("auth-btn").onclick = async () => {
 render();
 $("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-btn").click());
 
+function planBadge(plan) {
+  const label = plan[0].toUpperCase() + plan.slice(1);
+  return '<span class="badge b-' + plan + '">' + label + '</span>';
+}
+function vIcon(color) {
+  return '<svg width="20" height="20" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="' + color + '" fill-opacity=".5"/><path d="M34,4H25L13,36H22Z" fill="' + color + '"/></svg>';
+}
+
 async function load() {
-  // Arriving from a reset-password email: always show the reset form, even
-  // when a session already exists in this browser.
+  // Arriving from a reset-password email: always show the reset form, even when
+  // a session already exists in this browser.
   if (mode === "reset") { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
   if (!localStorage.getItem(TKEY)) { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
-  // Token present (e.g. arriving from the plugin) — spinner instead of the login form.
   $("auth").style.display = "none"; $("dash").style.display = "none"; $("loading").style.display = "block";
   try {
     const me = await api("/auth/me");
     $("loading").style.display = "none"; $("dash").style.display = "block";
     $("d-email").textContent = me.user.email; $("d-email2").textContent = me.user.email;
-    const plan = me.subscription.plan;
-    const badge = $("d-plan");
-    badge.textContent = plan[0].toUpperCase() + plan.slice(1);
-    badge.className = "badge b-" + plan;
-    $("d-renew").textContent = me.subscription.currentPeriodEnd ? "Renews " + new Date(me.subscription.currentPeriodEnd).toLocaleDateString() : (plan === "free" ? "Free forever — upgrade anytime." : "Active subscription.");
 
-    const actions = $("d-billing"); actions.innerHTML = "";
-    const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
-    const checkout = (priceId) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: priceId ? { priceId } : {} }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
-    const portal = async () => { try { const r = await api("/billing/portal", { method: "POST" }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
-    if (plan === "free") { mk("Upgrade to Pro — $9/mo", "btn-line", checkout(PRICE_PRO)); mk("Go Ultra — $39/mo", "btn-blue", checkout(PRICE_ULTRA)); }
-    else if (plan === "pro") { mk("Upgrade to Ultra — $39/mo", "btn-blue", checkout(PRICE_ULTRA)); mk("Manage / cancel billing", "btn-line", portal); }
-    else { mk("Manage / cancel billing", "btn-line", portal); }
-
-    try {
-      const u = await api("/track/usage");
-      $("d-views").textContent = u.views.toLocaleString();
-      $("d-limit").textContent = "Included in your plan: " + (u.limit > 0 ? u.limit.toLocaleString() + " views / month" : "Unlimited views");
-      const pct = u.limit > 0 ? Math.min(100, (u.views / u.limit) * 100) : 0;
-      const m = $("d-meter"); m.style.width = pct + "%";
-      m.style.background = pct > 90 ? "var(--error)" : pct > 70 ? "#d97706" : "var(--accent)";
-      // Quota hit → reviews are hidden on the live site. Make it loud + offer upgrade.
-      const over = u.limit > 0 && u.views >= u.limit;
-      $("quota-banner").style.display = over ? "block" : "none";
-      if (over) {
-        $("qb-limit").textContent = u.limit.toLocaleString();
-        $("quota-up").textContent = plan === "free" ? "Upgrade to Pro — $9/mo" : "Upgrade to Ultra — $39/mo";
-        $("quota-up").onclick = checkout(plan === "free" ? PRICE_PRO : PRICE_ULTRA);
-      }
-    } catch (e) { $("d-limit").textContent = "Usage unavailable right now."; }
+    // Per-plugin plan, each scoped via Accounts entitlements. allSettled so one
+    // failing product can't blank the whole list.
+    const results = await Promise.allSettled(PLUGINS.map((p) => api("/billing/entitlements?product=" + p.product)));
+    const wrap = $("d-plugins"); wrap.innerHTML = "";
+    PLUGINS.forEach((p, i) => {
+      const r = results[i];
+      const plan = r.status === "fulfilled" ? r.value.plan : "free";
+      const row = document.createElement("a");
+      row.className = "plug"; row.href = p.acct;
+      row.innerHTML =
+        '<span class="ico" style="background:' + p.color + '1a">' + vIcon(p.color) + '</span>' +
+        '<span class="grow"><span class="name">' + p.name + '</span></span>' +
+        '<span class="right">' + planBadge(plan) + '<span class="open">Manage →</span></span>';
+      wrap.appendChild(row);
+    });
   } catch (e) {
     localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
   }
@@ -267,7 +236,6 @@ $("d-changepass").onclick = async () => {
   try {
     await api("/auth/forgot-password", { method: "POST", body: { email: $("d-email2").textContent.trim() } });
     showErr("dash-ok", "Check your inbox — a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
-    // 60s cooldown so the button can't be spammed.
     btn.disabled = true; btn.style.opacity = ".55";
     let left = 60;
     btn.textContent = "Email sent (" + left + "s)";

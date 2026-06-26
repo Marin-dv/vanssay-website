@@ -83,6 +83,7 @@
   <div id="dash">
     <h1>Your account</h1>
     <p class="sub" id="d-email"></p>
+    <p style="margin:-22px 0 26px"><a href="accounts" style="color:var(--accent);font-weight:600;font-size:13.5px">← Your Vanssay account &amp; all plugins</a></p>
 
     <div class="dash-grid">
       <div class="col">
@@ -217,8 +218,11 @@ async function load() {
     const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
     const checkout = (plan) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: { product: PRODUCT, plan } }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
     const portal = async () => { try { const r = await api("/billing/portal", { method: "POST", body: { product: PRODUCT } }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
-    if (plan === "free") { mk("Upgrade to Pro — $3/mo", "btn-blue", checkout("pro")); }
-    else { mk("Manage / cancel billing", "btn-line", portal); }
+    if (plan === "free") {
+      mk("Pro — $3/mo", "btn-blue", checkout("pro"));
+      mk("Pro yearly — $30/yr", "btn-line", checkout("proYearly"));
+      mk("Lifetime — $59 once", "btn-line", checkout("lifetime"));
+    } else { mk("Manage / cancel billing", "btn-line", portal); }
   } catch (e) {
     localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
   }
