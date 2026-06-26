@@ -81,8 +81,11 @@ section{padding:56px 0}
 .index-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,3fr) auto;gap:32px;align-items:center;
   padding:30px 0;border-bottom:1px solid var(--line-soft);transition:.2s}
 .index-row:hover{padding-left:10px}
-.index-row:hover .num{color:var(--accent)}
-.index-row .num{font-family:var(--disp);font-size:clamp(40px,5vw,60px);font-weight:800;letter-spacing:-.04em;color:#cdccc6;line-height:1}
+.index-row:hover .num{color:var(--row-accent,var(--accent))}
+.index-row .num{font-family:var(--disp);font-size:clamp(40px,5vw,60px);font-weight:800;letter-spacing:-.04em;color:#cdccc6;line-height:1;transition:color .25s ease}
+.index-row .num svg{display:block}
+.index-row .num svg path{fill:currentColor;transition:fill .25s ease}
+.index-row .num svg path.v-soft{fill-opacity:.5}
 .index-row h3{font-size:clamp(22px,2.4vw,28px);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
 .index-row p{color:var(--ink-2);font-size:15px;margin-top:6px;max-width:620px}
 .index-row .end{font-family:var(--mono);font-size:12px;text-align:right;color:var(--ink)}
