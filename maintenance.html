@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Maintenance Mode — Put your Framer site on pause, gracefully</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%230e7490'/><path d='M34,4H25L13,36H22Z' fill='%230891b2'/></svg>" />
+<meta name="description" content="Maintenance Mode for Framer — put your site behind a clean maintenance page with an IP whitelist so you still see it. Countdown, redirect, custom page. One click, toggles live with no republish." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f6f6f4;--surface:#fffefb;--border:#dedcd6;--line:#16151b;--text:#16151b;--text-2:#56545f;--muted:#8f8d86;
+  --green:#0891b2;--green-2:#06b6d4;--green-soft:#e0f7fb;--ink:#0b1016;--accent:#0891b2;--accent-soft:#e0f7fb;
+  --shadow:0 1px 0 rgba(0,0,0,.02);--shadow-md:0 2px 0 rgba(0,0,0,.03);--shadow-lg:0 16px 50px rgba(22,21,27,.10);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+h1,h2,.serif{font-family:'Bricolage Grotesque',-apple-system,sans-serif}
+.serif{font-weight:800;font-style:normal;letter-spacing:-.03em;color:var(--green);
+  text-decoration:underline;text-decoration-thickness:5px;text-underline-offset:7px;background:none;-webkit-text-fill-color:currentColor}
+nav{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:64px;margin:0 auto;max-width:1080px;padding:0 28px}
+.logo{display:flex;align-items:center;gap:9px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.03em}
+.logo b{color:var(--green)}
+.nav-links{display:flex;gap:24px;font-family:'Space Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2)}
+.nav-links a:hover{color:var(--green)}
+@media(max-width:720px){.nav-links{display:none}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:8px;
+  font-weight:600;font-size:14.5px;border:1px solid transparent;cursor:pointer;transition:.18s}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{filter:brightness(1.08)}
+.btn-dark{background:var(--text);color:#fff}.btn-dark:hover{background:var(--green)}
+.btn-line{background:transparent;border-color:var(--line);color:var(--text)}.btn-line:hover{border-color:var(--green);color:var(--green)}
+.btn-soon{background:var(--green-soft);color:var(--green);cursor:default}
+
+.soon-pill{display:inline-flex;align-items:center;gap:7px;padding:5px 13px;border-radius:99px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);background:var(--green-soft);border:1px solid var(--green)}
+.soon-pill .d{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.8s ease-in-out infinite}
+
+.hero{padding:72px 0 40px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;position:relative;z-index:2}
+@media(max-width:880px){.hero-grid{grid-template-columns:1fr;gap:36px}}
+h1{font-size:clamp(38px,6vw,66px);font-weight:800;letter-spacing:-.04em;line-height:1.02;margin:18px 0 18px}
+.sub{font-size:clamp(16px,2vw,19px);color:var(--text-2);max-width:520px}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.tiny{margin-top:14px;font-size:12.5px;color:var(--muted)}
+
+/* maintenance-page mock (white page + cyan) */
+.mock{background:#fff;border-radius:22px;box-shadow:var(--shadow-lg);overflow:hidden;border:1px solid var(--border)}
+.mock .bar{display:flex;align-items:center;gap:6px;padding:11px 14px;border-bottom:1px solid #eee}
+.mock .bar i{width:9px;height:9px;border-radius:50%;background:#ddd}
+.mock .bar i:nth-child(1){background:#fb7185}.mock .bar i:nth-child(2){background:#fbbf24}.mock .bar i:nth-child(3){background:#34d399}
+.mock .bar .u{flex:1;text-align:center;font-size:11px;color:#9aa;font-family:ui-monospace,monospace}
+.mock .screen{padding:40px 26px;text-align:center;color:#082530;min-height:300px;display:grid;place-items:center}
+.mock .ill{color:var(--green);margin-bottom:14px;line-height:0}
+.mock h3{font-size:23px;font-weight:800;margin-bottom:8px}
+.mock p{font-size:13.5px;color:#5b6a72;max-width:320px;margin:0 auto}
+.mock .cd{display:flex;gap:8px;justify-content:center;margin-top:20px}
+.mock .cd b{display:block;font-size:20px;font-weight:800;color:var(--green)}
+.mock .cd span{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#9aa}
+.mock .cd div{min-width:48px;padding:8px 4px;border-radius:9px;background:var(--green-soft);border:1px solid var(--green)}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+section{padding:80px 0}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:14px}
+.eyebrow::before{content:"";width:22px;height:1px;background:var(--green)}
+h2{font-size:clamp(28px,4.4vw,48px);font-weight:800;letter-spacing:-.03em;line-height:1.06}
+.lead{font-size:17px;color:var(--text-2);margin-top:14px;max-width:560px}
+.center{text-align:center}.center .lead{margin-inline:auto}.center .eyebrow::after{content:"";width:22px;height:1px;background:var(--green)}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+@media(max-width:880px){.feat-grid{grid-template-columns:1fr}}
+.feat{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 26px;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
+.feat:hover{transform:translateY(-5px);box-shadow:var(--shadow-md)}
+.feat .ico{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:20px;margin-bottom:16px;background:var(--green-soft)}
+.feat h3{font-size:17px;font-weight:800;margin-bottom:6px}
+.feat p{font-size:14px;color:var(--text-2)}
+
+#pricing{background:var(--bg)}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:52px;align-items:stretch}
+@media(max-width:900px){.plans{grid-template-columns:1fr;max-width:440px;margin-inline:auto}}
+.plan{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px 28px;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
+.plan:hover{transform:translateY(-5px);box-shadow:var(--shadow-md)}
+.plan.featured{border:2px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(135deg,var(--green),var(--green-2)) border-box;box-shadow:var(--shadow-lg)}
+@media(min-width:901px){.plan.featured{transform:scale(1.04)}.plan.featured:hover{transform:scale(1.04) translateY(-5px)}}
+.flag{position:absolute;top:-14px;left:50%;transform:translateX(-50%);padding:5px 16px;border-radius:99px;font-size:11.5px;font-weight:800;color:#fff;background:linear-gradient(90deg,var(--green),var(--green-2));white-space:nowrap}
+.plan-name{font-weight:800;font-size:16px}
+.plan-price{font-size:46px;font-weight:900;letter-spacing:-.04em;margin:10px 0 2px}
+.plan-price span{font-size:14px;font-weight:600;color:var(--muted)}
+.plan-for{font-size:13px;color:var(--text-2);margin-bottom:22px}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:11px;font-size:13.5px;margin-bottom:26px;text-align:left}
+.plan li{display:flex;gap:9px;align-items:flex-start;color:var(--text-2)}
+.plan li strong{color:var(--text);font-weight:700}
+.plan li::before{content:"✓";font-weight:900;color:var(--green);flex-shrink:0}
+.plan li.no{opacity:.45}.plan li.no::before{content:"—";color:var(--muted)}
+.plan .btn{margin-top:auto;width:100%}
+.faq{max-width:720px;margin:46px auto 0;display:flex;flex-direction:column;gap:12px;text-align:left}
+details{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 24px;box-shadow:var(--shadow)}
+summary{font-weight:700;font-size:15px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:22px;font-weight:300;color:var(--green)}
+details[open] summary::after{content:"–"}
+details p{margin-top:10px;font-size:14px;color:var(--text-2)}
+h1,h2{font-weight:800}
+h3,.feat h3,.plan-name,.plan-price,.mock h3,summary{font-family:'Bricolage Grotesque',-apple-system,sans-serif}
+.plan-for,.tiny,.flag,.mock .u{font-family:'Space Mono',monospace;letter-spacing:.03em}
+.btn,.feat,.feat .ico,.plan,details,.mock{border-radius:4px}
+.feat:hover,.plan:hover,details:hover{border-color:var(--green)}
+.site-foot{background:#0b1016;color:#fff;padding:84px 0 40px;margin-top:70px}
+.site-foot .foot-logo{display:flex;align-items:center;gap:9px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.03em;margin-bottom:30px}
+.site-foot h2{color:#fff;max-width:760px}
+.site-foot h2 .serif{color:#22d3ee;text-decoration-color:#22d3ee}
+.site-foot p{color:rgba(255,255,255,.6);max-width:470px;margin:18px 0 30px;font-size:16px}
+.site-foot .foot-links{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:54px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14);font-family:'Space Mono',monospace;font-size:12px;color:rgba(255,255,255,.5)}
+.site-foot .foot-links a{color:rgba(255,255,255,.7)}.site-foot .foot-links a:hover{color:#fff}
+</style>
+</head>
+<body>
+
+<nav><div class="nav-in">
+  <a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40"><path d="M6,4H15L27,36H18Z" fill="rgba(8,145,178,.55)"/><path d="M34,4H25L13,36H22Z" fill="#0891b2"/></svg><span>Mainten<b>ance</b></span></a>
+  <div class="nav-links"><a href="/">All plugins</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="maintenance-account">Account</a></div>
+  <a class="btn btn-soon">Coming soon</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="hero-grid">
+    <div>
+      <span class="soon-pill"><span class="d"></span>Coming soon</span>
+      <h1>Down for <span class="serif">maintenance.</span><br/>Not down for <span class="serif">you.</span></h1>
+      <p class="sub">Put your Framer site behind a clean maintenance page in one click — while your own IP stays whitelisted so you keep seeing the real site. Flip it on and off instantly, with no republish.</p>
+      <div class="cta-row">
+        <a class="btn btn-green" href="mailto:support@vanssay.net?subject=Notify%20me%20when%20Maintenance%20Mode%20launches">Notify me at launch</a>
+        <a class="btn btn-line" href="#pricing">See pricing</a>
+      </div>
+      <p class="tiny">No API keys. The whitelist check runs server-side, so the on/off toggle and page edits go live without republishing.</p>
+    </div>
+    <div class="mock" aria-hidden="true">
+      <div class="bar"><i></i><i></i><i></i><span class="u">yoursite.framer.website</span></div>
+      <div class="screen">
+        <div>
+          <div class="ill"><svg viewBox="0 0 120 120" width="86" height="86"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M30 104h60"/><path d="M44 104V40l16-18"/><path d="M60 22h44"/><path d="M104 22v14"/><path d="M44 40h60"/><path d="M44 40l14 20h-28z" fill="currentColor" fill-opacity="0.14"/><path d="M104 36v22"/><rect x="92" y="58" width="24" height="18" rx="2" fill="currentColor" fill-opacity="0.14"/></g></svg></div>
+          <h3>We'll be right back</h3>
+          <p>Our site is undergoing scheduled maintenance and will be back online shortly.</p>
+          <div class="cd"><div><b>0</b><span>Days</span></div><div><b>02</b><span>Hrs</span></div><div><b>14</b><span>Min</span></div><div><b>36</b><span>Sec</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></header>
+
+<section id="features"><div class="wrap center">
+  <div class="eyebrow">What it does</div>
+  <h2>A maintenance page<br/>that <span class="serif">respects</span> everyone.</h2>
+  <p class="lead">Visitors get a polished "back soon" page. You and your team get the real site — because your IP is on the list.</p>
+  <div class="feat-grid">
+    <div class="feat"><div class="ico">🔑</div><h3>IP whitelist</h3><p>Whitelisted IPs (you, your team, your client) bypass maintenance and see the live site. One click adds your current IP.</p></div>
+    <div class="feat"><div class="ico">⚡</div><h3>Instant on / off</h3><p>The decision is server-side, so flipping maintenance on or off — and editing the page — goes live with no republish.</p></div>
+    <div class="feat"><div class="ico">⏱️</div><h3>Countdown timer</h3><p>Show visitors an estimated "back at" countdown so they know when to return.</p></div>
+    <div class="feat"><div class="ico">🎨</div><h3>Custom page</h3><p>Pick from 10 clean illustrations and edit the text — or, on Pro, fully restyle colors, fonts, logo and a button.</p></div>
+    <div class="feat"><div class="ico">↪️</div><h3>Redirect</h3><p>Prefer to send visitors elsewhere? Redirect everyone (except whitelisted IPs) to a status or landing page.</p></div>
+    <div class="feat"><div class="ico">📊</div><h3>Schedule &amp; analytics</h3><p>Auto-schedule a maintenance window, and (Pro) see how much traffic hit the page and who got through.</p></div>
+  </div>
+</div></section>
+
+<section id="pricing"><div class="wrap center">
+  <div class="eyebrow">Pricing</div>
+  <h2>Free to use.<br/>Pro when you <span class="serif">mean it.</span></h2>
+  <p class="lead">One plan covers every Framer project you own.</p>
+  <div class="plans">
+    <div class="plan">
+      <div class="plan-name">Free</div><div class="plan-price">$0</div><div class="plan-for">The essentials</div>
+      <ul>
+        <li>Maintenance <strong>on / off</strong></li>
+        <li><strong>1</strong> whitelisted IP</li>
+        <li>Countdown timer</li>
+        <li>Redirect visitors</li>
+        <li>Pick an illustration + edit text</li>
+        <li class="no">Full page editor</li>
+        <li class="no">Analytics &amp; auto-schedule</li>
+      </ul>
+      <a class="btn btn-line" href="maintenance-account">Start free</a>
+    </div>
+    <div class="plan featured">
+      <span class="flag">Most popular</span>
+      <div class="plan-name">Pro</div><div class="plan-price">$3<span>/mo</span></div><div class="plan-for">$30/yr · save 17%</div>
+      <ul>
+        <li><strong>Unlimited</strong> whitelisted IPs</li>
+        <li><strong>Full page editor</strong> — colors, font, logo, button</li>
+        <li><strong>Auto on/off</strong> schedule</li>
+        <li><strong>Analytics</strong></li>
+        <li>Remove Vanssay branding</li>
+        <li>Everything in Free</li>
+      </ul>
+      <a class="btn btn-green" href="maintenance-account">Go Pro</a>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Lifetime</div><div class="plan-price">$59<span> once</span></div><div class="plan-for">Pay once, keep forever</div>
+      <ul>
+        <li>Everything in <strong>Pro</strong></li>
+        <li><strong>One-time</strong> payment</li>
+        <li>All future updates</li>
+        <li>Every project you own</li>
+      </ul>
+      <a class="btn btn-dark" href="maintenance-account">Get Lifetime</a>
+    </div>
+  </div>
+  <p class="tiny center" style="margin-top:26px">Launching soon — prices may be refined before release. Cancel anytime, in two clicks.</p>
+</div></section>
+
+<section id="faq" style="padding-top:20px"><div class="wrap center">
+  <div class="eyebrow">FAQ</div>
+  <h2>Questions, <span class="serif">answered.</span></h2>
+  <div class="faq">
+    <details><summary>How do I still see my site during maintenance?</summary><p>Add your IP to the whitelist (one click grabs your current IP). Whitelisted visitors bypass the maintenance page and load the real site, so you can keep working while everyone else sees "back soon".</p></details>
+    <details><summary>Do I have to republish every time I toggle it?</summary><p>No. You install the script once (one publish). After that, turning maintenance on/off, editing the page, changing the whitelist or the redirect all take effect live — the decision is made server-side on each visit.</p></details>
+    <details><summary>What if my IP changes and I get locked out?</summary><p>Add a CIDR range (e.g. your office network) instead of a single IP, or just re-open the plugin and re-add your current IP. The whitelist updates instantly.</p></details>
+    <details><summary>Will it break my published site?</summary><p>No. It only adds a fixed overlay when maintenance is on and fails open if the backend is ever unreachable, so visitors are never stuck on a broken page.</p></details>
+    <details><summary>Does one plan cover multiple sites?</summary><p>Yes — your plan is tied to your Vanssay account, not a single project.</p></details>
+  </div>
+</div></section>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-logo"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#fff"/><path d="M34,4H25L13,36H22Z" fill="#0891b2"/></svg>Vanssay</div>
+    <h2>Pause your site<br/>without <span class="serif">disappearing.</span></h2>
+    <p>Maintenance Mode is launching soon. Leave your email and we'll tell you the moment it's live.</p>
+    <a class="btn btn-green" href="mailto:support@vanssay.net?subject=Notify%20me%20when%20Maintenance%20Mode%20launches">Notify me at launch</a>
+    <div class="foot-links">
+      <span>© 2026 Vanssay · <a href="privacy">Privacy</a> · <a href="terms">Terms</a></span>
+      <span>A <a href="/">Vanssay</a> plugin for <a href="https://www.framer.com" target="_blank" rel="noopener">Framer</a> · <a href="mailto:support@vanssay.net">support@vanssay.net</a></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
