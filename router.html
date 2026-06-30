@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Router — Geo-redirect for your Framer site</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%237c3aed'/><path d='M34,4H25L13,36H22Z' fill='%238b5cf6'/></svg>" />
+<meta name="description" content="Router for Framer — redirect visitors by country, region, language or device, or suggest the right page with a non-forced banner. No-code, UTM-safe, VPN-aware." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f6f6f4;--surface:#fffefb;--border:#dedcd6;--line:#16151b;--text:#16151b;--text-2:#56545f;--muted:#8f8d86;
+  --green:#7c3aed;--green-2:#8b5cf6;--green-soft:#ede9fe;--ink:#13111b;--accent:#7c3aed;--accent-soft:#ede9fe;
+  --shadow:0 1px 0 rgba(0,0,0,.02);--shadow-md:0 2px 0 rgba(0,0,0,.03);--shadow-lg:0 16px 50px rgba(22,21,27,.10);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+h1,h2,.serif{font-family:'Bricolage Grotesque',-apple-system,sans-serif}
+.serif{font-weight:800;font-style:normal;letter-spacing:-.03em;color:var(--green);
+  text-decoration:underline;text-decoration-thickness:5px;text-underline-offset:7px;background:none;-webkit-text-fill-color:currentColor}
+nav{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:64px;margin:0 auto;max-width:1080px;padding:0 28px}
+.logo{display:flex;align-items:center;gap:9px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.03em}
+.logo b{color:var(--green)}
+.nav-links{display:flex;gap:24px;font-family:'Space Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2)}
+.nav-links a:hover{color:var(--green)}
+@media(max-width:720px){.nav-links{display:none}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:8px;
+  font-weight:600;font-size:14.5px;border:1px solid transparent;cursor:pointer;transition:.18s}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{filter:brightness(1.08)}
+.btn-dark{background:var(--text);color:#fff}.btn-dark:hover{background:var(--green)}
+.btn-line{background:transparent;border-color:var(--line);color:var(--text)}.btn-line:hover{border-color:var(--green);color:var(--green)}
+
+.soon-pill{display:inline-flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);background:var(--green-soft);border-radius:99px;padding:6px 14px;margin-bottom:18px}
+.soon-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green)}
+
+.hero{padding:80px 0 40px;position:relative;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;position:relative;z-index:2}
+@media(max-width:880px){.hero-grid{grid-template-columns:1fr;gap:36px}}
+h1{font-size:clamp(38px,6vw,66px);font-weight:800;letter-spacing:-.04em;line-height:1.02;margin:14px 0 18px}
+.sub{font-size:clamp(16px,2vw,19px);color:var(--text-2);max-width:520px}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.tiny{margin-top:14px;font-size:12.5px;color:var(--muted)}
+
+/* browser + suggestion-banner mock */
+.mock{background:#fff;border-radius:14px;box-shadow:var(--shadow-lg);overflow:hidden;border:1px solid var(--border)}
+.mock .bar{display:flex;align-items:center;gap:6px;padding:11px 14px;border-bottom:1px solid var(--border);background:#faf9f7}
+.mock .bar i{width:9px;height:9px;border-radius:50%;background:#dcdcdc}
+.mock .bar i:nth-child(1){background:#fb7185}.mock .bar i:nth-child(2){background:#fbbf24}.mock .bar i:nth-child(3){background:#34d399}
+.mock .bar .u{flex:1;text-align:center;font-size:11px;color:#a7a5a0;font-family:ui-monospace,monospace}
+.mock .screen{position:relative;min-height:280px;background:linear-gradient(180deg,#fbfbfa,#f1f0ed);padding:26px}
+.mock .skel{height:12px;border-radius:6px;background:#e7e6e2;margin-bottom:12px}
+.mock .skel.w1{width:50%;height:20px}.mock .skel.w2{width:78%}.mock .skel.w3{width:64%}
+.mock .banner{position:absolute;left:18px;right:18px;bottom:18px;display:flex;gap:12px;align-items:center;
+  background:var(--ink);color:#f4f4f6;border-radius:12px;padding:14px 16px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.mock .banner .bt{flex:1;min-width:0}
+.mock .banner .bt b{display:block;font-size:13.5px}
+.mock .banner .bt span{font-size:12px;color:rgba(255,255,255,.65)}
+.mock .banner .ba{background:var(--green);color:#fff;font-size:12px;font-weight:700;border-radius:8px;padding:8px 12px;white-space:nowrap}
+.mock .banner .bd{border:1px solid rgba(255,255,255,.25);color:#f4f4f6;font-size:12px;border-radius:8px;padding:8px 10px;white-space:nowrap}
+
+section{padding:80px 0}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:14px}
+.eyebrow::before{content:"";width:22px;height:1px;background:var(--green)}
+h2{font-size:clamp(28px,4.4vw,48px);font-weight:800;letter-spacing:-.03em;line-height:1.06}
+.lead{font-size:17px;color:var(--text-2);margin-top:14px;max-width:560px}
+.center{text-align:center}.center .lead{margin-inline:auto}.center .eyebrow::after{content:"";width:22px;height:1px;background:var(--green)}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+@media(max-width:880px){.feat-grid{grid-template-columns:1fr}}
+.feat{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 26px;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
+.feat:hover{transform:translateY(-5px);box-shadow:var(--shadow-md)}
+.feat .ico{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:20px;margin-bottom:16px;background:var(--green-soft)}
+.feat h3{font-size:17px;font-weight:800;margin-bottom:6px}
+.feat p{font-size:14px;color:var(--text-2)}
+
+#pricing{background:var(--bg)}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:52px;align-items:stretch}
+@media(max-width:900px){.plans{grid-template-columns:1fr;max-width:440px;margin-inline:auto}}
+.plan{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:32px 28px;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
+.plan:hover{transform:translateY(-5px);box-shadow:var(--shadow-md)}
+.plan.featured{border:2px solid transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(135deg,var(--green),var(--green-2)) border-box;box-shadow:var(--shadow-lg)}
+@media(min-width:901px){.plan.featured{transform:scale(1.04)}.plan.featured:hover{transform:scale(1.04) translateY(-5px)}}
+.flag{position:absolute;top:-14px;left:50%;transform:translateX(-50%);padding:5px 16px;border-radius:99px;font-size:11.5px;font-weight:800;color:#fff;background:linear-gradient(90deg,var(--green),var(--green-2));white-space:nowrap}
+.plan-name{font-weight:800;font-size:16px}
+.plan-price{font-size:46px;font-weight:900;letter-spacing:-.04em;margin:10px 0 2px}
+.plan-price span{font-size:14px;font-weight:600;color:var(--muted)}
+.plan-for{font-size:13px;color:var(--text-2);margin-bottom:22px}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:11px;font-size:13.5px;margin-bottom:26px;text-align:left}
+.plan li{display:flex;gap:9px;align-items:flex-start;color:var(--text-2)}
+.plan li strong{color:var(--text);font-weight:700}
+.plan li::before{content:"✓";font-weight:900;color:var(--green);flex-shrink:0}
+.plan li.no{opacity:.45}.plan li.no::before{content:"—";color:var(--muted)}
+.plan .btn{margin-top:auto;width:100%}
+.faq{max-width:720px;margin:46px auto 0;display:flex;flex-direction:column;gap:12px;text-align:left}
+details{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 24px;box-shadow:var(--shadow)}
+summary{font-weight:700;font-size:15px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:22px;font-weight:300;color:var(--green)}
+details[open] summary::after{content:"–"}
+details p{margin-top:10px;font-size:14px;color:var(--text-2)}
+h1,h2{font-weight:800}
+h3,.feat h3,.plan-name,.plan-price,summary{font-family:'Bricolage Grotesque',-apple-system,sans-serif}
+.plan-for,.tiny,.flag,.mock .u{font-family:'Space Mono',monospace;letter-spacing:.03em}
+.btn,.feat,.feat .ico,.plan,details{border-radius:4px}
+.feat:hover,.plan:hover,details:hover{border-color:var(--green)}
+.site-foot{background:#13111b;color:#fff;padding:84px 0 40px;margin-top:70px}
+.site-foot .foot-logo{display:flex;align-items:center;gap:9px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.03em;margin-bottom:30px}
+.site-foot h2{color:#fff;max-width:760px}
+.site-foot h2 .serif{color:#c4b5fd;text-decoration-color:#c4b5fd}
+.site-foot p{color:rgba(255,255,255,.6);max-width:470px;margin:18px 0 30px;font-size:16px}
+.site-foot .foot-links{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:54px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14);font-family:'Space Mono',monospace;font-size:12px;color:rgba(255,255,255,.5)}
+.site-foot .foot-links a{color:rgba(255,255,255,.7)}.site-foot .foot-links a:hover{color:#fff}
+</style>
+</head>
+<body>
+
+<nav><div class="nav-in">
+  <a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40"><path d="M6,4H15L27,36H18Z" fill="rgba(124,58,237,.55)"/><path d="M34,4H25L13,36H22Z" fill="#7c3aed"/></svg><span>Rou<b>ter</b></span></a>
+  <div class="nav-links"><a href="/">All plugins</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="router-account">Account</a></div>
+  <a class="btn btn-line" href="router-account">Get early access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="hero-grid">
+    <div>
+      <span class="soon-pill">Coming soon</span>
+      <h1>Send every visitor<br/>the <span class="serif">right way.</span></h1>
+      <p class="sub">Redirect by country, region, language or device — or suggest the better page with a soft, non-forced banner. No Cloudflare Workers, no JS to paste. UTM-safe, VPN-aware, all no-code inside Framer.</p>
+      <div class="cta-row">
+        <a class="btn btn-green" href="router-account">Get early access</a>
+        <a class="btn btn-line" href="#pricing">See pricing</a>
+      </div>
+      <p class="tiny">Launching soon. Create your Vanssay account now — it's the same login across every plugin.</p>
+    </div>
+    <div class="mock" aria-hidden="true">
+      <div class="bar"><i></i><i></i><i></i><span class="u">yoursite.framer.website</span></div>
+      <div class="screen">
+        <div class="skel w1"></div><div class="skel w2"></div><div class="skel w3"></div><div class="skel" style="width:40%"></div>
+        <div class="banner">
+          <div class="bt"><b>Continue in your region?</b><span>We have a version better suited to your location.</span></div>
+          <span class="ba">Take me there</span>
+          <span class="bd">Stay</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></header>
+
+<section id="features"><div class="wrap center">
+  <div class="eyebrow">What it does</div>
+  <h2>Routing that<br/>respects the <span class="serif">visitor.</span></h2>
+  <p class="lead">Every redirect decision is made on the server from the visitor's real IP — so it can't be spoofed, and it works the moment the page loads.</p>
+  <div class="feat-grid">
+    <div class="feat"><div class="ico">🌍</div><h3>Geo redirect</h3><p>Route by country out of the box; add region, city, postal code or continent on Pro. Group many countries into one rule.</p></div>
+    <div class="feat"><div class="ico">🗣️</div><h3>Language &amp; device</h3><p>Combine country with browser language (US + EN → /us-en), or send mobile and desktop visitors to different pages.</p></div>
+    <div class="feat"><div class="ico">🪧</div><h3>Suggestion banner</h3><p>Instead of a hard redirect, show an Airbnb-style banner suggesting the better page. Far less bounce — the visitor chooses.</p></div>
+    <div class="feat"><div class="ico">🔗</div><h3>UTM-safe</h3><p>Carry query strings and UTM params onto the destination, so your ad &amp; campaign tracking survives the redirect.</p></div>
+    <div class="feat"><div class="ico">🛰️</div><h3>VPN-aware</h3><p>Reuses the Vanssay Bouncer engine to spot VPN/proxy traffic, so visitors can't dodge your geo rules with a VPN.</p></div>
+    <div class="feat"><div class="ico">🧪</div><h3>Test console</h3><p>Preview exactly which rule fires for a visitor from any country, language or device — without a VPN. Plus memory so no one is redirected twice.</p></div>
+  </div>
+</div></section>
+
+<section id="pricing"><div class="wrap center">
+  <div class="eyebrow">Pricing</div>
+  <h2>Start free.<br/>Upgrade when you <span class="serif">scale.</span></h2>
+  <p class="lead">One subscription covers every Framer project you own.</p>
+  <div class="plans">
+    <div class="plan">
+      <div class="plan-name">Free</div><div class="plan-price">$0</div><div class="plan-for">Try it out</div>
+      <ul>
+        <li>Redirect by <strong>country</strong></li>
+        <li><strong>Whitelist</strong> + global fallback</li>
+        <li>Internal paths · <strong>visitor memory</strong></li>
+        <li><strong>Test console</strong></li>
+        <li class="no">External URLs &amp; blacklist</li>
+        <li class="no">Suggestion banner</li>
+      </ul>
+      <a class="btn btn-line" href="router-account">Start free</a>
+    </div>
+    <div class="plan featured">
+      <span class="flag">Most popular</span>
+      <div class="plan-name">Pro</div><div class="plan-price">$9<span>/mo</span></div><div class="plan-for">For real sites</div>
+      <ul>
+        <li><strong>Unlimited</strong> grouped rules</li>
+        <li><strong>External URLs</strong> + blacklist</li>
+        <li>Region / city / language / <strong>VPN</strong></li>
+        <li><strong>Suggestion banner</strong> + i18n</li>
+        <li><strong>UTM preservation</strong>, delay, stay</li>
+        <li><strong>Analytics</strong> breakdown</li>
+      </ul>
+      <a class="btn btn-green" href="router-account">Upgrade to Pro</a>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Agency</div><div class="plan-price">$29<span>/mo</span></div><div class="plan-for">Power &amp; scale</div>
+      <ul>
+        <li>Everything in Pro</li>
+        <li><strong>Per-device</strong> rules</li>
+        <li><strong>Scheduling</strong></li>
+        <li><strong>Webhooks</strong> (Slack / backend)</li>
+        <li><strong>CSV</strong> log export</li>
+        <li>Priority support &amp; SLA</li>
+      </ul>
+      <a class="btn btn-dark" href="router-account">Go Agency</a>
+    </div>
+  </div>
+  <p class="tiny center" style="margin-top:26px">Cancel anytime, in two clicks.</p>
+</div></section>
+
+<section id="faq" style="padding-top:20px"><div class="wrap center">
+  <div class="eyebrow">FAQ</div>
+  <h2>Questions, <span class="serif">answered.</span></h2>
+  <div class="faq">
+    <details><summary>How is this different from a Cloudflare redirect?</summary><p>No Workers, no DNS, no JS to paste. Router is a no-code dashboard inside Framer: pick a country, choose a destination, activate. The geo lookup runs on the Vanssay backend from the visitor's real IP — you never touch code or API keys.</p></details>
+    <details><summary>What's a "suggestion banner"?</summary><p>Instead of forcing a redirect, Router can show a small, dismissible banner suggesting the better-matched page (like Airbnb). The visitor decides — which bounces far fewer people — and their choice is remembered so they're never asked twice.</p></details>
+    <details><summary>Will my UTM / campaign tracking survive?</summary><p>Yes. Turn on "Preserve query / UTM params" and Router carries the visitor's query string onto the destination URL, so your analytics and ad attribution keep working through the redirect.</p></details>
+    <details><summary>Can people dodge it with a VPN?</summary><p>On Pro and up, enable VPN-aware rules: the backend flags anonymising proxies and datacenter IPs (the same engine as Vanssay Bouncer), so geo rules can't be bypassed with a VPN.</p></details>
+    <details><summary>Does one subscription cover multiple sites?</summary><p>Yes — your plan is tied to your Vanssay account, not a project, and it's the same login as every other Vanssay plugin.</p></details>
+  </div>
+</div></section>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-logo"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#fff"/><path d="M34,4H25L13,36H22Z" fill="#7c3aed"/></svg>Vanssay</div>
+    <h2>Route your visitors<br/>the moment it <span class="serif">launches.</span></h2>
+    <p>Router is coming soon. Create your Vanssay account now so you're ready on day one.</p>
+    <a class="btn btn-green" href="router-account">Get early access</a>
+    <div class="foot-links">
+      <span>© 2026 Vanssay · <a href="privacy">Privacy</a> · <a href="terms">Terms</a></span>
+      <span>A <a href="/">Vanssay</a> plugin for <a href="https://www.framer.com" target="_blank" rel="noopener">Framer</a> · <a href="mailto:support@vanssay.net">support@vanssay.net</a></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

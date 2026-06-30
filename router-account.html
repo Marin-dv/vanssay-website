@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account — Router</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%237c3aed'/><path d='M34,4H25L13,36H22Z' fill='%238b5cf6'/></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafafa;--surface:#fff;--surface-2:#f4f4f5;--border:#e4e4e7;--text:#18181b;
+      --text-2:#52525b;--muted:#a1a1aa;--accent:#7c3aed;--accent-2:#8b5cf6;--error:#dc2626;
+      --shadow:0 1px 2px rgba(0,0,0,.05);--shadow-md:0 8px 30px rgba(0,0,0,.08)}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    nav{position:sticky;top:0;background:rgba(250,250,250,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+    .nav-in{max-width:1140px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px}
+    .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px}
+    .logo b{color:var(--accent)}
+    .nav-links{display:flex;gap:28px;font-size:14px;font-weight:500;color:var(--text-2)}
+    main{max-width:920px;margin:0 auto;padding:44px 28px 80px}
+    #auth,#loading{max-width:460px;margin-inline:auto}
+    .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+    .dash-grid .col{display:flex;flex-direction:column;gap:18px}
+    .dash-grid .card{margin-bottom:0}
+    @media (max-width:760px){main{max-width:520px}.dash-grid{grid-template-columns:1fr}}
+    h1{font-size:30px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+    .sub{color:var(--text-2);margin-bottom:28px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;box-shadow:var(--shadow-md);margin-bottom:18px}
+    label{display:block;font-size:13px;font-weight:600;margin:14px 0 5px}
+    input{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:10px;font:inherit;font-size:14px;outline:none}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #ede9fe}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 20px;margin-top:18px;
+      border-radius:11px;font:inherit;font-size:14.5px;font-weight:700;border:1px solid transparent;cursor:pointer}
+    .btn-blue{background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#fff}
+    .btn-line{background:var(--surface);border-color:var(--border);color:var(--text)}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .muted{color:var(--muted);font-size:13px}
+    .err{background:#fdecec;color:var(--error);border-radius:10px;padding:10px 14px;font-size:13px;margin-top:14px;display:none}
+    .switch{text-align:center;font-size:13.5px;color:var(--text-2);margin-top:18px}
+    .switch a{color:var(--accent);font-weight:600;cursor:pointer}
+    .badge{display:inline-flex;padding:3px 12px;border-radius:99px;font-size:12px;font-weight:800}
+    .b-free{background:var(--surface-2);color:var(--text-2)}.b-pro{background:#ede9fe;color:var(--accent)}
+    .b-ultra{background:linear-gradient(90deg,var(--accent),#c4b5fd);color:#2b0a63}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .actions .btn{width:auto;flex:1;margin-top:0}
+    #dash{display:none}
+    h3{font-size:15px;font-weight:800;margin-bottom:4px}
+    #loading{display:none;text-align:center;padding:80px 0}
+    .spinner{width:34px;height:34px;margin:0 auto 16px;border-radius:50%;border:3px solid var(--surface-2);border-top-color:var(--accent);animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .feats{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:7px;font-size:13.5px;color:var(--text-2)}
+    .feats li::before{content:"⤳ ";}
+    .soon{background:#ede9fe;color:var(--accent);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;margin-bottom:18px}
+  </style>
+</head>
+<body>
+<nav><div class="nav-in">
+  <a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40"><path d="M6,4H15L27,36H18Z" fill="rgba(124,58,237,.55)"/><path d="M34,4H25L13,36H22Z" fill="#7c3aed"/></svg><span>Rou<b>ter</b></span></a>
+  <div class="nav-links"><a href="router#features">Features</a><a href="router#pricing">Pricing</a><a href="/">All plugins</a></div>
+</div></nav>
+
+<main>
+  <div id="loading"><div class="spinner"></div><p class="sub">Signing you in…</p></div>
+
+  <!-- Auth -->
+  <div id="auth">
+    <h1 id="auth-title">Welcome back</h1>
+    <p class="sub">Same account as the Router Framer plugin — and every other Vanssay plugin.</p>
+    <div class="soon">🚀 Router is launching soon. Create your account now to be ready on day one.</div>
+    <div class="card">
+      <div id="f-email"><label>Email</label><input id="email" type="email" placeholder="you@company.com" autocomplete="email" /></div>
+      <div id="f-pass">
+        <label style="display:flex;justify-content:space-between">Password <a id="toggle-pass" style="color:var(--accent);cursor:pointer;font-weight:600">Show</a></label>
+        <input id="password" type="password" placeholder="Your password" autocomplete="current-password" />
+        <div style="text-align:right;margin-top:6px"><a id="forgot-link" style="font-size:12.5px;color:var(--accent);cursor:pointer">Forgot password?</a></div>
+      </div>
+      <div class="err" id="auth-err"></div>
+      <div class="err" id="auth-ok" style="background:#f0ecfe;color:#7c3aed"></div>
+      <button class="btn btn-blue" id="auth-btn">Sign in</button>
+      <div class="switch" id="auth-switch">New to Vanssay? <a>Create an account</a></div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dash">
+    <h1>Your account</h1>
+    <p class="sub" id="d-email"></p>
+    <p style="margin:-22px 0 26px"><a href="accounts" style="color:var(--accent);font-weight:600;font-size:13.5px">← Your Vanssay account &amp; all plugins</a></p>
+
+    <div class="dash-grid">
+      <div class="col">
+        <div class="card">
+          <div class="row"><h3>Plan</h3><span class="badge b-free" id="d-plan">Free</span></div>
+          <p class="muted" id="d-renew"></p>
+          <div class="actions" id="d-billing"></div>
+        </div>
+
+        <div class="card">
+          <h3>Your routing</h3>
+          <ul class="feats" id="d-feats"></ul>
+          <p class="muted" style="margin-top:12px">Set your redirect rules, suggestion banner and visitor behaviour right inside the <strong>Router</strong> plugin in Framer.</p>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card">
+          <h3>Profile</h3>
+          <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
+          <p class="muted">To change your email, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
+          <div class="err" id="dash-err"></div>
+          <div class="err" id="dash-ok" style="background:#f0ecfe;color:#7c3aed"></div>
+          <div class="actions">
+            <button class="btn btn-line" id="d-changepass">Change password</button>
+            <button class="btn btn-line" id="d-signout">Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// Identity AND billing are owned by the central Accounts service (the reviews
+// backend). Auth, /auth/me and /billing all run there; billing is scoped to this
+// plugin with product=router. The router backend only serves domain data
+// (rules/stats) and isn't needed by this account page.
+const API = localStorage.getItem("router.apiBase") || "https://api.vanssay.net";
+const AUTH_API = API;
+const PRODUCT = "router";
+const TKEY = "router.token";
+const PLAN_LABEL = { free: "Free", pro: "Pro", ultra: "Agency" };
+
+const $ = (id) => document.getElementById(id);
+const api = async (path, opts = {}) => {
+  const base = opts.base || API;
+  const headers = { ...(opts.body ? { "Content-Type": "application/json" } : {}) };
+  const t = localStorage.getItem(TKEY);
+  if (t) headers.Authorization = "Bearer " + t;
+  const res = await fetch(base + path, { method: opts.method || "GET", headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Something went wrong");
+  return data;
+};
+const showErr = (id, msg) => { const el = $(id); el.textContent = msg; el.style.display = msg ? "block" : "none"; };
+
+// Auto sign-in when arriving from the plugin (#token=<jwt>)
+if (location.hash.startsWith("#token=")) {
+  localStorage.setItem(TKEY, decodeURIComponent(location.hash.slice(7).split("&")[0]));
+  history.replaceState(null, "", location.pathname);
+}
+
+let mode = location.hash.startsWith("#reset=") ? "reset" : "login";
+const resetToken = mode === "reset" ? location.hash.slice(7) : "";
+const COPY = {
+  login: ["Welcome back", "Sign in", 'New to Vanssay? <a>Create an account</a>'],
+  register: ["Create your account", "Create account", 'Already have an account? <a>Sign in</a>'],
+  forgot: ["Reset your password", "Send reset link", '<a>Back to sign in</a>'],
+  reset: ["Choose a new password", "Set new password", '<a>Back to sign in</a>'],
+};
+function render() {
+  $("auth-title").textContent = COPY[mode][0];
+  $("auth-btn").textContent = COPY[mode][1];
+  $("auth-switch").innerHTML = COPY[mode][2];
+  $("f-email").style.display = mode === "reset" ? "none" : "block";
+  $("f-pass").style.display = mode === "forgot" ? "none" : "block";
+  $("forgot-link").style.display = mode === "login" ? "inline" : "none";
+  $("password").placeholder = mode === "reset" || mode === "register" ? "At least 8 characters" : "Your password";
+  showErr("auth-err", ""); showErr("auth-ok", "");
+}
+$("auth-switch").onclick = () => { mode = mode === "login" ? "register" : "login"; render(); };
+$("forgot-link").onclick = () => { mode = "forgot"; render(); };
+$("toggle-pass").onclick = () => {
+  const p = $("password");
+  p.type = p.type === "password" ? "text" : "password";
+  $("toggle-pass").textContent = p.type === "password" ? "Show" : "Hide";
+};
+$("auth-btn").onclick = async () => {
+  showErr("auth-err", ""); showErr("auth-ok", "");
+  try {
+    if (mode === "forgot") {
+      await api("/auth/forgot-password", { method: "POST", base: AUTH_API, body: { email: $("email").value.trim() } });
+      showErr("auth-ok", "If an account exists for that email, a reset link from no-reply@vanssay.net is on its way.");
+      return;
+    }
+    if (mode === "reset") {
+      await api("/auth/reset-password", { method: "POST", base: AUTH_API, body: { token: resetToken, password: $("password").value } });
+      history.replaceState(null, "", location.pathname);
+      mode = "login"; render();
+      showErr("auth-ok", "Password updated — sign in with your new password.");
+      return;
+    }
+    const r = await api(mode === "register" ? "/auth/register" : "/auth/login", { method: "POST", base: AUTH_API, body: { email: $("email").value.trim(), password: $("password").value } });
+    localStorage.setItem(TKEY, r.token);
+    load();
+  } catch (e) { showErr("auth-err", e.message); }
+};
+render();
+$("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-btn").click());
+
+const FEATS = {
+  free: ["Country redirect", "Whitelist + global fallback", "Visitor memory", "Test console — 1 rule"],
+  pro: ["Unlimited grouped rules", "External URLs + blacklist", "Region / city / language / VPN", "Suggestion banner + i18n", "UTM preservation, delay, stay", "Analytics breakdown"],
+  ultra: ["Everything in Pro", "Per-device rules", "Scheduling", "Webhooks (Slack / backend)", "CSV log export"],
+};
+
+async function load() {
+  if (mode === "reset") { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
+  if (!localStorage.getItem(TKEY)) { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
+  $("auth").style.display = "none"; $("dash").style.display = "none"; $("loading").style.display = "block";
+  try {
+    const me = await api("/auth/me");
+    const ent = await api("/billing/entitlements?product=" + PRODUCT);
+    $("loading").style.display = "none"; $("dash").style.display = "block";
+    $("d-email").textContent = me.user.email; $("d-email2").textContent = me.user.email;
+    const plan = ent.plan;
+    const badge = $("d-plan");
+    badge.textContent = PLAN_LABEL[plan] || (plan[0].toUpperCase() + plan.slice(1));
+    badge.className = "badge b-" + plan;
+    $("d-renew").textContent = plan === "free" ? "Free forever — upgrade anytime." : "Active subscription.";
+    $("d-feats").innerHTML = (FEATS[plan] || FEATS.free).map((f) => "<li>" + f + "</li>").join("");
+
+    const actions = $("d-billing"); actions.innerHTML = "";
+    const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
+    const checkout = (plan) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: { product: PRODUCT, plan } }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
+    const portal = async () => { try { const r = await api("/billing/portal", { method: "POST", body: { product: PRODUCT } }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
+    if (plan === "free") { mk("Upgrade to Pro — $9/mo", "btn-line", checkout("pro")); mk("Go Agency — $29/mo", "btn-blue", checkout("ultra")); }
+    else if (plan === "pro") { mk("Upgrade to Agency — $29/mo", "btn-blue", checkout("ultra")); mk("Manage / cancel billing", "btn-line", portal); }
+    else { mk("Manage / cancel billing", "btn-line", portal); }
+  } catch (e) {
+    localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
+  }
+}
+$("d-signout").onclick = () => { localStorage.removeItem(TKEY); load(); };
+$("d-changepass").onclick = async () => {
+  const btn = $("d-changepass");
+  if (btn.disabled) return;
+  showErr("dash-err", ""); showErr("dash-ok", "");
+  try {
+    await api("/auth/forgot-password", { method: "POST", base: AUTH_API, body: { email: $("d-email2").textContent.trim() } });
+    showErr("dash-ok", "Check your inbox — a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
+    btn.disabled = true; btn.style.opacity = ".55";
+    let left = 60; btn.textContent = "Email sent (" + left + "s)";
+    const t = setInterval(() => { left--; if (left <= 0) { clearInterval(t); btn.disabled = false; btn.style.opacity = ""; btn.textContent = "Change password"; } else btn.textContent = "Email sent (" + left + "s)"; }, 1000);
+  } catch (e) { showErr("dash-err", e.message); }
+};
+load();
+</script>
+</body>
+</html>
