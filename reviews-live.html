@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Live reviews — Vanssay</title>
+  <title>Live reviews | Vanssay</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%230e7afe'/><path d='M34,4H25L13,36H22Z' fill='%237c5cff'/></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
@@ -96,7 +96,7 @@ function renderBusiness(b) {
     "<span>· " + (b.aggregate.count || 0).toLocaleString() + " reviews</span></div>" +
     '<div class="platforms">' + platforms.map((p) => '<span class="chip">' + esc(p) + "</span>").join("") + "</div></div>" +
     '<div class="synced' + (stale ? " stale" : "") + '">' +
-      (synced ? "Last synced " + synced + (stale ? " — may be out of date" : "") : "Not synced yet") +
+      (synced ? "Last synced " + synced + (stale ? ", may be out of date" : "") : "Not synced yet") +
     "</div></div>";
 
   if (!b.syncedAt) {

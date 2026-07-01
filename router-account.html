@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Account — Router</title>
+  <title>Account | Router</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%237c3aed'/><path d='M34,4H25L13,36H22Z' fill='%238b5cf6'/></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
@@ -66,7 +66,7 @@
   <!-- Auth -->
   <div id="auth">
     <h1 id="auth-title">Welcome back</h1>
-    <p class="sub">Same account as the Router Framer plugin — and every other Vanssay plugin.</p>
+    <p class="sub">Same account as the Router Framer plugin, and every other Vanssay plugin.</p>
     <div class="soon">🚀 Router is launching soon. Create your account now to be ready on day one.</div>
     <div class="card">
       <div id="f-email"><label>Email</label><input id="email" type="email" placeholder="you@company.com" autocomplete="email" /></div>
@@ -187,7 +187,7 @@ $("auth-btn").onclick = async () => {
       await api("/auth/reset-password", { method: "POST", base: AUTH_API, body: { token: resetToken, password: $("password").value } });
       history.replaceState(null, "", location.pathname);
       mode = "login"; render();
-      showErr("auth-ok", "Password updated — sign in with your new password.");
+      showErr("auth-ok", "Password updated. Sign in with your new password.");
       return;
     }
     const r = await api(mode === "register" ? "/auth/register" : "/auth/login", { method: "POST", base: AUTH_API, body: { email: $("email").value.trim(), password: $("password").value } });
@@ -199,7 +199,7 @@ render();
 $("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-btn").click());
 
 const FEATS = {
-  free: ["Country redirect", "Whitelist + global fallback", "Visitor memory", "Test console — 1 rule"],
+  free: ["Country redirect", "Whitelist + global fallback", "Visitor memory", "Test console: 1 rule"],
   pro: ["Unlimited grouped rules", "External URLs + blacklist", "Region / city / language / VPN", "Suggestion banner + i18n", "UTM preservation, delay, stay", "Analytics breakdown"],
   ultra: ["Everything in Pro", "Per-device rules", "Scheduling", "Webhooks (Slack / backend)", "CSV log export"],
 };
@@ -217,15 +217,15 @@ async function load() {
     const badge = $("d-plan");
     badge.textContent = PLAN_LABEL[plan] || (plan[0].toUpperCase() + plan.slice(1));
     badge.className = "badge b-" + plan;
-    $("d-renew").textContent = plan === "free" ? "Free forever — upgrade anytime." : "Active subscription.";
+    $("d-renew").textContent = plan === "free" ? "Free forever. Upgrade anytime." : "Active subscription.";
     $("d-feats").innerHTML = (FEATS[plan] || FEATS.free).map((f) => "<li>" + f + "</li>").join("");
 
     const actions = $("d-billing"); actions.innerHTML = "";
     const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
     const checkout = (plan) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: { product: PRODUCT, plan } }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
     const portal = async () => { try { const r = await api("/billing/portal", { method: "POST", body: { product: PRODUCT } }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
-    if (plan === "free") { mk("Upgrade to Pro — $9/mo", "btn-line", checkout("pro")); mk("Go Agency — $29/mo", "btn-blue", checkout("ultra")); }
-    else if (plan === "pro") { mk("Upgrade to Agency — $29/mo", "btn-blue", checkout("ultra")); mk("Manage / cancel billing", "btn-line", portal); }
+    if (plan === "free") { mk("Upgrade to Pro ($9/mo)", "btn-line", checkout("pro")); mk("Go Agency ($29/mo)", "btn-blue", checkout("ultra")); }
+    else if (plan === "pro") { mk("Upgrade to Agency ($29/mo)", "btn-blue", checkout("ultra")); mk("Manage / cancel billing", "btn-line", portal); }
     else { mk("Manage / cancel billing", "btn-line", portal); }
   } catch (e) {
     localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
@@ -238,7 +238,7 @@ $("d-changepass").onclick = async () => {
   showErr("dash-err", ""); showErr("dash-ok", "");
   try {
     await api("/auth/forgot-password", { method: "POST", base: AUTH_API, body: { email: $("d-email2").textContent.trim() } });
-    showErr("dash-ok", "Check your inbox — a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
+    showErr("dash-ok", "Check your inbox: a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
     btn.disabled = true; btn.style.opacity = ".55";
     let left = 60; btn.textContent = "Email sent (" + left + "s)";
     const t = setInterval(() => { left--; if (left <= 0) { clearInterval(t); btn.disabled = false; btn.style.opacity = ""; btn.textContent = "Change password"; } else btn.textContent = "Email sent (" + left + "s)"; }, 1000);

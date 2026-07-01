@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Bouncer — Access control for your Framer site</title>
+<title>Bouncer: Access control for your Framer site</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%2316a34a'/><path d='M34,4H25L13,36H22Z' fill='%2322c55e'/></svg>" />
-<meta name="description" content="Bouncer for Framer — block visitors by country and detect VPN/proxy traffic, with a styled access-denied screen that matches your site. One click, never breaks." />
+<meta name="description" content="Bouncer for Framer: block visitors by country and detect VPN/proxy traffic, with a styled access-denied screen that matches your site. One click, never breaks." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
@@ -133,12 +133,12 @@ summary::after{color:var(--green)}
     <div>
       <span class="eyebrow">Framer plugin · country &amp; VPN blocking</span>
       <h1>Decide who gets <span class="serif">in.</span></h1>
-      <p class="sub">Block visitors by country and shut out VPN &amp; proxy traffic on your Framer site — with an access-denied screen that matches your brand. One click, server-side, and it never breaks your page.</p>
+      <p class="sub">Block visitors by country and shut out VPN &amp; proxy traffic on your Framer site, with an access-denied screen that matches your brand. One click, server-side, and it never breaks your page.</p>
       <div class="cta-row">
-        <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener">Add to Framer — free</a>
+        <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener">Add to Framer (free)</a>
         <a class="btn btn-line" href="#pricing">See pricing</a>
       </div>
-      <p class="tiny">No API keys. IP &amp; VPN lookup stays server-side. Fails open by default — an outage never locks your visitors out.</p>
+      <p class="tiny">No API keys. IP &amp; VPN lookup stays server-side. Fails open by default: an outage never locks your visitors out.</p>
     </div>
     <div class="mock" aria-hidden="true">
       <div class="bar"><i></i><i></i><i></i><span class="u">yoursite.framer.website</span></div>
@@ -156,11 +156,11 @@ summary::after{color:var(--green)}
 <section id="features"><div class="wrap center">
   <div class="eyebrow">What it does</div>
   <h2>Real protection,<br/>that <span class="serif">feels</span> real.</h2>
-  <p class="lead">Every block decision is made on the server from the visitor's real IP — it can't be spoofed by editing the page.</p>
+  <p class="lead">Every block decision is made on the server from the visitor's real IP. It can't be spoofed by editing the page.</p>
   <div class="feat-grid">
     <div class="feat"><div class="ico">🌍</div><h3>Country blocking</h3><p>Blacklist countries, or flip to whitelist mode to allow only the ones you choose. Pick from every country, with flags.</p></div>
-    <div class="feat"><div class="ico">🛰️</div><h3>VPN &amp; proxy detection</h3><p>Catch visitors hiding behind VPNs, proxies and datacenter IPs — detected server-side, so country rules can't be dodged.</p></div>
-    <div class="feat"><div class="ico">🎨</div><h3>Branded block screen</h3><p>Scan your site's fonts &amp; colors and generate a matching access-denied screen — or redirect, or hide the element entirely.</p></div>
+    <div class="feat"><div class="ico">🛰️</div><h3>VPN &amp; proxy detection</h3><p>Catch visitors hiding behind VPNs, proxies and datacenter IPs, detected server-side, so country rules can't be dodged.</p></div>
+    <div class="feat"><div class="ico">🎨</div><h3>Branded block screen</h3><p>Scan your site's fonts &amp; colors and generate a matching access-denied screen, or redirect, or hide the element entirely.</p></div>
     <div class="feat"><div class="ico">🧩</div><h3>Page or component</h3><p>Protect a whole page, or just one section. Drop it where you need it; the overlay covers exactly that area.</p></div>
     <div class="feat"><div class="ico">🛡️</div><h3>Never breaks your site</h3><p>Preview-safe in the editor, covers content before the check resolves, and fails open on an outage. Strict mode fails closed.</p></div>
     <div class="feat"><div class="ico">📊</div><h3>Analytics &amp; schedules</h3><p>See who's being blocked by country, schedule temporary blocks, and add conditional rules (e.g. country + mobile).</p></div>
@@ -202,7 +202,7 @@ summary::after{color:var(--green)}
         <li>Everything in Pro</li>
         <li><strong>Conditional rules</strong></li>
         <li><strong>Scheduled blocks</strong></li>
-        <li><strong>Analytics</strong> — blocked by country</li>
+        <li><strong>Analytics</strong>: blocked by country</li>
         <li><strong>Maintenance mode</strong> (coming soon)</li>
       </ul>
       <a class="btn btn-dark" href="geoblock-account">Go Ultra</a>
@@ -216,10 +216,10 @@ summary::after{color:var(--green)}
   <h2>Questions, <span class="serif">answered.</span></h2>
   <div class="faq">
     <details><summary>How does the country detection work?</summary><p>When someone loads your page, the widget asks the Vanssay backend, which looks up the visitor's IP server-side via ip-api.com and returns a block / allow verdict. No API keys or rate-limit budget are ever exposed to the browser.</p></details>
-    <details><summary>Will it ever break my published site?</summary><p>No. In the Framer editor it never blocks (preview-safe). On your live site it covers the page before the check resolves, so blocked visitors never glimpse content — and if the backend is ever unreachable it fails open by default, so legitimate visitors are never locked out. Strict mode flips that to fail-closed if you prefer.</p></details>
+    <details><summary>Will it ever break my published site?</summary><p>No. In the Framer editor it never blocks (preview-safe). On your live site it covers the page before the check resolves, so blocked visitors never glimpse content, and if the backend is ever unreachable it fails open by default, so legitimate visitors are never locked out. Strict mode flips that to fail-closed if you prefer.</p></details>
     <details><summary>Can people bypass it with a VPN?</summary><p>On Pro and up, enable VPN/proxy detection: the backend flags anonymising proxies and datacenter IPs, so country rules can't be dodged with a VPN.</p></details>
-    <details><summary>Do I need to code anything?</summary><p>No. Install the plugin, pick your countries, click Activate — the protection component is added to your page automatically.</p></details>
-    <details><summary>Does one subscription cover multiple sites?</summary><p>Yes — your plan is tied to your account, not a project.</p></details>
+    <details><summary>Do I need to code anything?</summary><p>No. Install the plugin, pick your countries, click Activate: the protection component is added to your page automatically.</p></details>
+    <details><summary>Does one subscription cover multiple sites?</summary><p>Yes, your plan is tied to your account, not a project.</p></details>
   </div>
 </div></section>
 
@@ -228,7 +228,7 @@ summary::after{color:var(--green)}
     <div class="foot-logo"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#fff"/><path d="M34,4H25L13,36H22Z" fill="#16a34a"/></svg>Vanssay</div>
     <h2>Lock down your site<br/>in the next <span class="serif">two minutes.</span></h2>
     <p>Add Bouncer to your Framer project and choose exactly who gets in.</p>
-    <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener">Add to Framer — free</a>
+    <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener">Add to Framer (free)</a>
     <div class="foot-links">
       <span>© 2026 Vanssay · <a href="privacy">Privacy</a> · <a href="terms">Terms</a></span>
       <span>A <a href="/">Vanssay</a> plugin for <a href="https://www.framer.com" target="_blank" rel="noopener">Framer</a> · <a href="mailto:support@vanssay.net">support@vanssay.net</a></span>

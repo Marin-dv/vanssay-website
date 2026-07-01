@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Account — Bouncer</title>
+  <title>Account | Bouncer</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%2316a34a'/><path d='M34,4H25L13,36H22Z' fill='%2322c55e'/></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
@@ -184,7 +184,7 @@ $("auth-btn").onclick = async () => {
       await api("/auth/reset-password", { method: "POST", base: AUTH_API, body: { token: resetToken, password: $("password").value } });
       history.replaceState(null, "", location.pathname);
       mode = "login"; render();
-      showErr("auth-ok", "Password updated — sign in with your new password.");
+      showErr("auth-ok", "Password updated. Sign in with your new password.");
       return;
     }
     const r = await api(mode === "register" ? "/auth/register" : "/auth/login", { method: "POST", base: AUTH_API, body: { email: $("email").value.trim(), password: $("password").value } });
@@ -198,7 +198,7 @@ $("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-bt
 const FEATS = {
   free: ["Blacklist up to 3 countries", "Basic block message", "Whole-page block"],
   pro: ["Unlimited countries + whitelist", "VPN / proxy detection", "Custom block screen, redirect & hide", "Per-component blocking"],
-  ultra: ["Everything in Pro", "Conditional rules", "Scheduled blocks", "Analytics — blocked by country"],
+  ultra: ["Everything in Pro", "Conditional rules", "Scheduled blocks", "Analytics: blocked by country"],
 };
 
 async function load() {
@@ -216,15 +216,15 @@ async function load() {
     const badge = $("d-plan");
     badge.textContent = plan[0].toUpperCase() + plan.slice(1);
     badge.className = "badge b-" + plan;
-    $("d-renew").textContent = plan === "free" ? "Free forever — upgrade anytime." : "Active subscription.";
+    $("d-renew").textContent = plan === "free" ? "Free forever. Upgrade anytime." : "Active subscription.";
     $("d-feats").innerHTML = (FEATS[plan] || FEATS.free).map((f) => "<li>" + f + "</li>").join("");
 
     const actions = $("d-billing"); actions.innerHTML = "";
     const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
     const checkout = (plan) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: { product: PRODUCT, plan } }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
     const portal = async () => { try { const r = await api("/billing/portal", { method: "POST", body: { product: PRODUCT } }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
-    if (plan === "free") { mk("Upgrade to Pro — $6/mo", "btn-line", checkout("pro")); mk("Go Ultra — $14/mo", "btn-blue", checkout("ultra")); }
-    else if (plan === "pro") { mk("Upgrade to Ultra — $14/mo", "btn-blue", checkout("ultra")); mk("Manage / cancel billing", "btn-line", portal); }
+    if (plan === "free") { mk("Upgrade to Pro ($6/mo)", "btn-line", checkout("pro")); mk("Go Ultra ($14/mo)", "btn-blue", checkout("ultra")); }
+    else if (plan === "pro") { mk("Upgrade to Ultra ($14/mo)", "btn-blue", checkout("ultra")); mk("Manage / cancel billing", "btn-line", portal); }
     else { mk("Manage / cancel billing", "btn-line", portal); }
   } catch (e) {
     localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
@@ -237,7 +237,7 @@ $("d-changepass").onclick = async () => {
   showErr("dash-err", ""); showErr("dash-ok", "");
   try {
     await api("/auth/forgot-password", { method: "POST", base: AUTH_API, body: { email: $("d-email2").textContent.trim() } });
-    showErr("dash-ok", "Check your inbox — a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
+    showErr("dash-ok", "Check your inbox: a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
     btn.disabled = true; btn.style.opacity = ".55";
     let left = 60; btn.textContent = "Email sent (" + left + "s)";
     const t = setInterval(() => { left--; if (left <= 0) { clearInterval(t); btn.disabled = false; btn.style.opacity = ""; btn.textContent = "Change password"; } else btn.textContent = "Email sent (" + left + "s)"; }, 1000);

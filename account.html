@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Account — Vanssay</title>
+  <title>Account | Vanssay</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%230e7afe'/><path d='M34,4H25L13,36H22Z' fill='%237c5cff'/></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
@@ -98,7 +98,7 @@
     <div id="quota-banner" class="quota-alert">
       <strong>⚠️ Your reviews are hidden</strong>
       <p>You've used all <span id="qb-limit">300</span> free widget views this month, so your reviews have <b>stopped showing on your site</b>. Upgrade to turn them back on instantly.</p>
-      <button class="btn btn-blue" id="quota-up">Upgrade to Pro — $9/mo</button>
+      <button class="btn btn-blue" id="quota-up">Upgrade to Pro ($9/mo)</button>
     </div>
 
     <div class="dash-grid">
@@ -141,7 +141,7 @@
 
 <script>
 const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
-// Stripe price ids — leave empty to use the backend defaults.
+// Stripe price ids: leave empty to use the backend defaults.
 const PRICE_PRO = "price_1TjlQZB3xYzGNURHgqEBd8xT", PRICE_ULTRA = "price_1TlZEbB3xYzGNURHcZ8uytId";
 const TKEY = "vanssay.token";
 let registerMode = false;
@@ -203,7 +203,7 @@ $("auth-btn").onclick = async () => {
       await api("/auth/reset-password", { method: "POST", body: { token: resetToken, password: $("password").value } });
       history.replaceState(null, "", location.pathname);
       mode = "login"; render();
-      showErr("auth-ok", "Password updated — sign in with your new password.");
+      showErr("auth-ok", "Password updated. Sign in with your new password.");
       return;
     }
     const r = await api(mode === "register" ? "/auth/register" : "/auth/login", { method: "POST", body: { email: $("email").value.trim(), password: $("password").value } });
@@ -219,7 +219,7 @@ async function load() {
   // when a session already exists in this browser.
   if (mode === "reset") { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
   if (!localStorage.getItem(TKEY)) { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
-  // Token present (e.g. arriving from the plugin) — spinner instead of the login form.
+  // Token present (e.g. arriving from the plugin), spinner instead of the login form.
   $("auth").style.display = "none"; $("dash").style.display = "none"; $("loading").style.display = "block";
   try {
     const me = await api("/auth/me");
@@ -229,14 +229,14 @@ async function load() {
     const badge = $("d-plan");
     badge.textContent = plan[0].toUpperCase() + plan.slice(1);
     badge.className = "badge b-" + plan;
-    $("d-renew").textContent = me.subscription.currentPeriodEnd ? "Renews " + new Date(me.subscription.currentPeriodEnd).toLocaleDateString() : (plan === "free" ? "Free forever — upgrade anytime." : "Active subscription.");
+    $("d-renew").textContent = me.subscription.currentPeriodEnd ? "Renews " + new Date(me.subscription.currentPeriodEnd).toLocaleDateString() : (plan === "free" ? "Free forever. Upgrade anytime." : "Active subscription.");
 
     const actions = $("d-billing"); actions.innerHTML = "";
     const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
     const checkout = (priceId) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: priceId ? { priceId } : {} }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
     const portal = async () => { try { const r = await api("/billing/portal", { method: "POST" }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
-    if (plan === "free") { mk("Upgrade to Pro — $9/mo", "btn-line", checkout(PRICE_PRO)); mk("Go Ultra — $39/mo", "btn-blue", checkout(PRICE_ULTRA)); }
-    else if (plan === "pro") { mk("Upgrade to Ultra — $39/mo", "btn-blue", checkout(PRICE_ULTRA)); mk("Manage / cancel billing", "btn-line", portal); }
+    if (plan === "free") { mk("Upgrade to Pro ($9/mo)", "btn-line", checkout(PRICE_PRO)); mk("Go Ultra ($39/mo)", "btn-blue", checkout(PRICE_ULTRA)); }
+    else if (plan === "pro") { mk("Upgrade to Ultra ($39/mo)", "btn-blue", checkout(PRICE_ULTRA)); mk("Manage / cancel billing", "btn-line", portal); }
     else { mk("Manage / cancel billing", "btn-line", portal); }
 
     try {
@@ -251,7 +251,7 @@ async function load() {
       $("quota-banner").style.display = over ? "block" : "none";
       if (over) {
         $("qb-limit").textContent = u.limit.toLocaleString();
-        $("quota-up").textContent = plan === "free" ? "Upgrade to Pro — $9/mo" : "Upgrade to Ultra — $39/mo";
+        $("quota-up").textContent = plan === "free" ? "Upgrade to Pro ($9/mo)" : "Upgrade to Ultra ($39/mo)";
         $("quota-up").onclick = checkout(plan === "free" ? PRICE_PRO : PRICE_ULTRA);
       }
     } catch (e) { $("d-limit").textContent = "Usage unavailable right now."; }
@@ -266,7 +266,7 @@ $("d-changepass").onclick = async () => {
   showErr("dash-err", ""); showErr("dash-ok", "");
   try {
     await api("/auth/forgot-password", { method: "POST", body: { email: $("d-email2").textContent.trim() } });
-    showErr("dash-ok", "Check your inbox — a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
+    showErr("dash-ok", "Check your inbox: a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
     // 60s cooldown so the button can't be spammed.
     btn.disabled = true; btn.style.opacity = ".55";
     let left = 60;
