@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -18,8 +18,18 @@ main{max-width:760px;margin:0 auto;padding:64px 28px 96px}
 h1{font-size:36px;font-weight:900;letter-spacing:-.02em}
 .date{color:#a1a1aa;font-size:14px;margin:8px 0 40px}
 h2{font-size:20px;font-weight:800;margin:36px 0 10px}
+h3{font-size:16px;font-weight:700;margin:20px 0 6px}
 p,li{color:#52525b;font-size:15px}
 ul{padding-left:22px;margin:8px 0}
+.toc{background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:18px 22px;margin:0 0 40px}
+.toc b{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#a1a1aa}
+.toc ol{margin:10px 0 0;padding-left:20px;columns:2;font-size:14px}
+.toc a{color:#52525b}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+th,td{border:1px solid #e4e4e7;padding:9px 11px;text-align:left;vertical-align:top}
+th{background:#f4f4f5;font-weight:700;color:#3f3f46}
+td{color:#52525b}
+.callout{background:#fff;border:1px solid #e4e4e7;border-left:3px solid #0e7afe;border-radius:8px;padding:14px 18px;margin:14px 0}
 footer{max-width:760px;margin:0 auto;padding:0 28px 60px;font-size:13.5px;color:#a1a1aa}
 </style>
 </head>
@@ -27,54 +37,94 @@ footer{max-width:760px;margin:0 auto;padding:0 28px 60px;font-size:13.5px;color:
 <nav><div class="nav-in"><a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a><a href="terms" style="font-size:14px;font-weight:600">Terms of Service →</a></div></nav>
 <main>
   <h1>Privacy Policy</h1>
-  <p class="date">Last updated: June 25, 2026</p>
+  <p class="date">Last updated: July 3, 2026</p>
 
-  <p>Vanssay ("we", "us") provides Framer plugins and related services. This currently includes <b>Google &amp; Trustpilot Reviews</b> (which displays public reviews on your site) and <b>Bouncer</b> (which controls site access by visitor country and VPN/proxy). This policy explains what data we collect, why, and how we handle it.</p>
+  <p>This policy explains what personal data Vanssay collects, why, on what legal basis, and your rights. It applies to our website (vanssay.net) and our Framer plugins: <b>Google &amp; Trustpilot Reviews</b>, <b>Bouncer</b>, <b>Router</b> and <b>Maintenance Mode</b>.</p>
 
-  <h2>1. Data we collect</h2>
+  <div class="callout">
+    <b>Data controller.</b> Marin de Vanssay (sole trader), operating vanssay.net, is the controller of the account data described here. Contact for any privacy request: <a href="mailto:support@vanssay.net">support@vanssay.net</a>.<br>
+    <b>Two roles.</b> For your account and billing, <b>we are the controller</b>. For the processing of <b>your site visitors'</b> data by Bouncer, Router or Maintenance Mode, <b>you are the controller and we act as your processor</b> (see §3).
+  </div>
+
+  <div class="toc">
+    <b>Contents</b>
+    <ol>
+      <li><a href="#s1">Data we collect</a></li>
+      <li><a href="#s2">Legal bases</a></li>
+      <li><a href="#s3">Your site visitors (Bouncer &amp; Router)</a></li>
+      <li><a href="#s4">Maintenance Mode</a></li>
+      <li><a href="#s5">How we use data</a></li>
+      <li><a href="#s6">Processors &amp; transfers</a></li>
+      <li><a href="#s7">Retention &amp; deletion</a></li>
+      <li><a href="#s8">Your rights</a></li>
+      <li><a href="#s9">Cookies</a></li>
+      <li><a href="#s10">Security</a></li>
+      <li><a href="#s11">Changes &amp; contact</a></li>
+    </ol>
+  </div>
+
+  <h2 id="s1">1. Data we collect</h2>
   <ul>
-    <li><b>Account data</b>: your email address and a securely hashed password (we never store your password in plain text).</li>
-    <li><b>Plugin configuration</b>: your settings for each plugin: for Reviews, the Google Business Profile and/or Trustpilot page you connect plus your widget settings; for Bouncer, your blocking rules (countries, VPN/proxy options, protected pages) and screen styling.</li>
+    <li><b>Account data</b>: your email address and a securely hashed password (we never store your password in plain text). Optionally the plugin you signed up from.</li>
+    <li><b>Plugin configuration</b>: your settings per plugin — for Reviews, the profiles/pages you connect plus widget settings; for Bouncer, your blocking rules and screen styling; for Router, your redirect/suggestion rules (countries, regions, languages, devices, VPN options, destinations, UTM settings); for Maintenance Mode, your whitelist, page content and schedule.</li>
     <li><b>Review data</b>: publicly available reviews fetched from Google Places and Trustpilot, cached temporarily to serve your widgets quickly.</li>
-    <li><b>Usage data</b>: anonymous, aggregated counts per account (e.g. widget views, or for Bouncer the number of blocked visits) used for plan limits and analytics. We do not profile your site's visitors; our plugins set no cookies on them.</li>
-    <li><b>Billing data</b>: payments are processed by <b>Stripe</b>; we never see or store your card details.</li>
+    <li><b>Usage data</b>: anonymous, aggregated counts per account (e.g. widget views, blocked or redirected visits) used for plan limits and analytics. We do not build profiles of you or your visitors.</li>
+    <li><b>Billing data</b>: payments are processed by <b>Stripe</b>; we receive your plan, status and country/tax info but <b>never see or store your card details</b>.</li>
+    <li><b>Support data</b>: emails you send us and their content.</li>
   </ul>
 
-  <h2>2. Bouncer: how we handle your site visitors</h2>
-  <p>When you enable Bouncer, each visit triggers a real-time, server-side check from the visitor's IP address, before your page is shown, to determine:</p>
+  <h2 id="s2">2. Legal bases (GDPR Art. 6)</h2>
+  <table>
+    <tr><th>Purpose</th><th>Legal basis</th></tr>
+    <tr><td>Creating and running your account, delivering the plugins you configured</td><td>Performance of a contract</td></tr>
+    <tr><td>Processing payments, preventing fraud, meeting tax/accounting obligations</td><td>Contract &amp; legal obligation</td></tr>
+    <tr><td>Aggregated analytics, plan-limit enforcement, securing the Service</td><td>Legitimate interest</td></tr>
+    <tr><td>Transactional emails (password reset, welcome, subscription notices)</td><td>Contract &amp; legitimate interest</td></tr>
+    <tr><td>Responding to your requests and support</td><td>Legitimate interest</td></tr>
+  </table>
+
+  <h2 id="s3">3. Your site visitors: Bouncer &amp; Router</h2>
+  <p>When you enable Bouncer or Router, each visit triggers a real-time, server-side check from the visitor's IP address, before your page is shown, to determine:</p>
   <ul>
-    <li>the visitor's <b>approximate country</b>, using a local geolocation database with <b>ip-api.com</b> as a fallback lookup; and</li>
+    <li>the visitor's <b>approximate country</b> (and, on higher tiers, region/city), using a local geolocation database with <b>ip-api.com</b> as a fallback lookup; and</li>
     <li>whether the connection appears to be a <b>VPN, proxy or datacenter IP</b>.</li>
   </ul>
-  <p>We use the IP address only to make this allow/block decision. We do <b>not</b> store visitors' IP addresses and do not build profiles of them. On the Ultra plan we keep <b>aggregated, non-identifying</b> analytics (such as blocked visits by country and VPN attempts), never individual IP addresses.</p>
-  <p>For your site's visitors, <b>you are the data controller</b> and Vanssay acts as your processor, carrying out the geolocation and VPN check on your behalf. You are responsible for providing any notice and lawful basis your jurisdiction requires when filtering visitors.</p>
+  <p>We use the IP address only to make the allow/block (Bouncer) or redirect/suggest (Router) decision. We do <b>not</b> store visitors' IP addresses and do not build profiles of them. There is <b>no automated decision producing legal or similarly significant effects</b> on an individual — the decision only determines which page a browser sees. Where a plan keeps analytics, they are <b>aggregated and non-identifying</b> (e.g. blocked/redirected visits by country), never individual IP addresses.</p>
+  <p>Router may store a small <b>functional</b> value in the visitor's own browser (e.g. to remember a dismissed suggestion banner or a chosen region so they are not redirected twice). This is strictly for functionality, is not used for tracking or advertising, and is not shared with us.</p>
+  <p><b>You are the data controller</b> for this visitor processing and Vanssay acts as your <b>processor</b>, carrying out the geolocation and VPN check on your behalf and on your documented instructions (your rules). You are responsible for providing any privacy notice and lawful basis your jurisdiction requires when filtering or redirecting visitors. A data-processing addendum is available at <a href="mailto:support@vanssay.net">support@vanssay.net</a>.</p>
 
-  <h2>3. How we use it</h2>
-  <p>Exclusively to operate the service: authenticating you, fetching and displaying your reviews, enforcing your Bouncer rules, applying plan limits, processing subscriptions, and sending essential transactional emails (e.g. password resets from no-reply@vanssay.net via Resend). We do not sell or rent personal data, ever.</p>
+  <h2 id="s4">4. Maintenance Mode</h2>
+  <p>Maintenance Mode compares a visitor's IP against the whitelist you configure, server-side, to decide whether they see the maintenance page or the live site. The IP is used only for that check and is not stored. As above, you are the controller and Vanssay is your processor for this processing.</p>
 
-  <h2>4. Third-party processors</h2>
-  <ul>
-    <li><b>Google Places API</b>: review retrieval (subject to Google's terms).</li>
-    <li><b>Trustpilot</b>: review retrieval (subject to Trustpilot's terms).</li>
-    <li><b>ip-api.com</b>: fallback IP geolocation lookup for Bouncer.</li>
-    <li><b>Stripe</b>: payments and billing.</li>
-    <li><b>Resend</b>: transactional email delivery.</li>
-  </ul>
+  <h2 id="s5">5. How we use data</h2>
+  <p>Exclusively to operate the Service: authenticating you, fetching and displaying your reviews, enforcing your Bouncer/Router/Maintenance rules, applying plan limits, processing subscriptions, and sending essential transactional emails (from no-reply@vanssay.net via Resend). <b>We never sell or rent personal data, and we do not use it for third-party advertising.</b></p>
 
-  <h2>5. Data retention &amp; deletion</h2>
-  <p>Review caches expire automatically. Bouncer visitor checks are transient and are not logged with IP addresses; aggregated Bouncer analytics are kept while your account is active. Account and configuration data are kept while your account is active. To delete your account and all associated data, email <a href="mailto:support@vanssay.net">support@vanssay.net</a>; we process deletion requests within 30 days.</p>
+  <h2 id="s6">6. Third-party processors &amp; international transfers</h2>
+  <table>
+    <tr><th>Processor</th><th>Purpose</th><th>Location</th></tr>
+    <tr><td>Google Places API</td><td>Review retrieval</td><td>USA</td></tr>
+    <tr><td>Trustpilot</td><td>Review retrieval</td><td>EU / USA</td></tr>
+    <tr><td>ip-api.com</td><td>Fallback IP geolocation (Bouncer &amp; Router)</td><td>EU</td></tr>
+    <tr><td>Stripe</td><td>Payments &amp; billing</td><td>EU / USA</td></tr>
+    <tr><td>Resend</td><td>Transactional email delivery</td><td>USA</td></tr>
+    <tr><td>Hosting provider (VPS)</td><td>Running the backend &amp; database</td><td>EU</td></tr>
+  </table>
+  <p>Where a processor is outside the EU/EEA, transfers are covered by appropriate safeguards under the GDPR (Standard Contractual Clauses and/or an adequacy decision). We use processors only for the purposes above and under contract.</p>
 
-  <h2>6. Your rights</h2>
-  <p>Depending on your location (including under GDPR), you may have the right to access, correct, export, or delete your personal data, and to object to its processing. Contact us at <a href="mailto:support@vanssay.net">support@vanssay.net</a> to exercise any of these rights.</p>
+  <h2 id="s7">7. Data retention &amp; deletion</h2>
+  <p>Review caches expire automatically (short TTL). Visitor IP checks are transient and are not logged with IP addresses. Aggregated analytics and your account and configuration data are kept while your account is active. Billing records are kept as long as required by law (typically up to 10 years for accounting). To delete your account and all associated personal data, email <a href="mailto:support@vanssay.net">support@vanssay.net</a>; we process deletion requests within 30 days, except records we must retain by law.</p>
 
-  <h2>7. Security</h2>
-  <p>Data is transmitted over HTTPS, passwords are hashed, and access tokens are signed and time-limited. No system is perfectly secure; we will notify affected users of any breach as required by law.</p>
+  <h2 id="s8">8. Your rights</h2>
+  <p>Under the GDPR and similar laws you have the right to: <b>access</b>, <b>rectify</b>, <b>erase</b>, <b>restrict</b> or <b>object</b> to processing, <b>data portability</b>, and to <b>withdraw consent</b> where processing relies on it. Exercise any of these by emailing <a href="mailto:support@vanssay.net">support@vanssay.net</a>. You also have the right to <b>lodge a complaint with a supervisory authority</b> — in France, the <a href="https://www.cnil.fr" target="_blank" rel="noopener">CNIL</a>. If your data is processed by a Vanssay plugin on a site you visited, direct your request to that site's owner (the controller), who can instruct us as their processor.</p>
 
-  <h2>8. Changes</h2>
-  <p>We may update this policy as the service evolves. Material changes will be announced on this page with an updated date.</p>
+  <h2 id="s9">9. Cookies</h2>
+  <p>Our website and account pages use only <b>strictly necessary</b> cookies/local storage (e.g. your login session). We set <b>no advertising or third-party tracking cookies</b>. On your published site, our widgets and checks set no tracking cookies on your visitors; Router may set a single functional value as described in §3.</p>
 
-  <h2>9. Contact</h2>
-  <p>Questions? <a href="mailto:support@vanssay.net">support@vanssay.net</a></p>
+  <h2 id="s10">10. Security</h2>
+  <p>Data is transmitted over HTTPS, passwords are hashed, and access tokens are signed and time-limited. Access to production systems is restricted. No system is perfectly secure; we will notify affected users and the relevant authority of any breach as required by law.</p>
+
+  <h2 id="s11">11. Changes &amp; contact</h2>
+  <p>We may update this policy as the Service evolves; material changes are announced here with an updated date. Questions or requests: <a href="mailto:support@vanssay.net">support@vanssay.net</a>.</p>
 </main>
 <footer>© 2026 Vanssay · <a href="/">Home</a> · <a href="terms">Terms of Service</a></footer>
 </body>
