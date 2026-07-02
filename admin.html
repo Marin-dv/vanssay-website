@@ -46,15 +46,15 @@
     .navlink:hover { background:var(--surface-2); color:var(--text); }
     .navlink.active { background:#eaf3ff; color:var(--accent); }
     .navlink .ic { width:18px; text-align:center; }
+    .navsep { font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:700; margin:14px 8px 4px; }
+    .aside-foot { margin-top:auto; font-size:12px; color:var(--muted); padding:12px 8px 0; border-top:1px solid var(--border); }
+    main { padding:30px 34px 70px; max-width:1240px; }
+    .page-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:22px; gap:16px; flex-wrap:wrap; }
+    h2 { font-size:22px; font-weight:900; letter-spacing:-.02em; }
+    .page-head p { color:var(--text-2); font-size:13px; }
     .prodbar { display:inline-flex; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:3px; gap:2px; }
     .prodbar .pb { border:0; background:none; padding:6px 13px; border-radius:7px; font:inherit; font-size:13px; font-weight:600; color:var(--text-2); cursor:pointer; }
     .prodbar .pb.on { background:var(--surface); color:var(--accent); box-shadow:0 1px 2px rgba(0,0,0,.08); }
-    .page-head { align-items:flex-start; }
-    .aside-foot { margin-top:auto; font-size:12px; color:var(--muted); padding:12px 8px 0; border-top:1px solid var(--border); }
-    main { padding:30px 34px 70px; max-width:1240px; }
-    .page-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; gap:16px; flex-wrap:wrap; }
-    h2 { font-size:22px; font-weight:900; letter-spacing:-.02em; }
-    .page-head p { color:var(--text-2); font-size:13px; }
 
     /* ── KPI cards ── */
     .kpis { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:14px; margin-bottom:24px; }
@@ -66,16 +66,21 @@
     .kpi.hero .k-label, .kpi.hero .k-sub { color:rgba(255,255,255,.85); }
 
     .grid-2 { display:grid; grid-template-columns:1.4fr 1fr; gap:16px; }
-    @media (max-width:900px){ .grid-2 { grid-template-columns:1fr; } .shell { grid-template-columns:1fr; } aside { position:static; height:auto; flex-direction:row; flex-wrap:wrap; } }
+    .grid-eq { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media (max-width:900px){ .grid-2, .grid-eq { grid-template-columns:1fr; } .shell { grid-template-columns:1fr; } aside { position:static; height:auto; flex-direction:row; flex-wrap:wrap; } }
     .panel { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 20px; box-shadow:var(--shadow); }
     .panel h3 { font-size:14px; font-weight:800; margin-bottom:14px; }
+    .panel h3 .open { float:right; font-size:12px; font-weight:600; }
+    .prodgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; margin-bottom:24px; }
+    .prodgrid .mrr { font-size:24px; font-weight:900; letter-spacing:-.02em; margin:2px 0 10px; }
+    .prodgrid .mrr small { font-size:12px; color:var(--muted); font-weight:600; }
 
     /* ── Bar chart ── */
     .chart { display:flex; align-items:flex-end; gap:6px; height:140px; }
     .bar { flex:1; background:linear-gradient(180deg,#5aa6ff,#7c5cff); border-radius:5px 5px 0 0; min-height:3px; position:relative; }
-    .bar:hover::after { content:attr(data-tip); position:absolute; bottom:100%; left:50%; transform:translateX(-50%); background:#18181b; color:#fff; font-size:11px; padding:4px 8px; border-radius:6px; white-space:nowrap; margin-bottom:5px; }
+    .bar:hover::after { content:attr(data-tip); position:absolute; bottom:100%; left:50%; transform:translateX(-50%); background:#18181b; color:#fff; font-size:11px; padding:4px 8px; border-radius:6px; white-space:nowrap; margin-bottom:5px; z-index:5; }
     .chart-x { display:flex; gap:6px; margin-top:6px; }
-    .chart-x span { flex:1; text-align:center; font-size:10px; color:var(--muted); }
+    .chart-x span { flex:1; text-align:center; font-size:10px; color:var(--muted); overflow:hidden; }
 
     /* ── Tables ── */
     .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
@@ -91,11 +96,15 @@
     .truncate { max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .right { text-align:right; }
     .empty { padding:40px; text-align:center; color:var(--muted); }
+    .note { font-size:12px; color:var(--muted); padding:8px 2px; }
 
-    .badge { display:inline-flex; padding:2px 10px; border-radius:99px; font-size:11.5px; font-weight:800; }
+    .badge { display:inline-flex; padding:2px 10px; border-radius:99px; font-size:11.5px; font-weight:800; white-space:nowrap; }
     .b-free { background:var(--surface-2); color:var(--text-2); } .b-pro { background:#f1edff; color:var(--pro); } .b-ultra { background:linear-gradient(90deg,var(--accent),var(--pro)); color:#fff; }
     .b-active { background:#e9f7ef; color:var(--green); } .b-canceled { background:#fdecec; color:var(--error); } .b-other { background:var(--surface-2); color:var(--text-2); }
+    .badges { display:flex; gap:5px; flex-wrap:wrap; }
     .pager { display:flex; align-items:center; gap:12px; justify-content:flex-end; margin-top:14px; font-size:13px; color:var(--text-2); }
+    .meter { height:7px; border-radius:99px; background:var(--surface-2); overflow:hidden; }
+    .meter span { display:block; height:100%; background:linear-gradient(90deg,#0e7afe,#7c5cff); }
 
     /* ── Modal ── */
     .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; justify-content:flex-end; z-index:50; }
@@ -111,6 +120,8 @@
     .kv:last-child { border-bottom:none; }
     .kv span:first-child { color:var(--text-2); }
     .sec-title { font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:700; margin:18px 0 8px; }
+    .planrow { display:grid; grid-template-columns:110px 1fr auto; gap:10px; align-items:center; margin-bottom:8px; }
+    .planrow .pname { font-weight:700; font-size:13px; }
     .ministat { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .ministat .kpi { padding:12px 14px; } .ministat .k-val { font-size:20px; }
   </style>
@@ -138,9 +149,8 @@
     <button class="navlink active" data-tab="overview"><span class="ic">📊</span> Overview</button>
     <button class="navlink" data-tab="users"><span class="ic">👤</span> Users</button>
     <button class="navlink" data-tab="subs"><span class="ic">💳</span> Subscriptions</button>
-    <button class="navlink" data-tab="pages"><span class="ic">🔗</span> Pages &amp; clicks</button>
-    <button class="navlink" data-tab="businesses"><span class="ic">🏢</span> Businesses</button>
-    <button class="navlink" data-tab="cache"><span class="ic">🗄️</span> Cache</button>
+    <div class="navsep">Plugins</div>
+    <div id="prod-nav"></div>
     <div class="aside-foot">
       <div id="admin-email" style="margin-bottom:8px;color:var(--text-2);font-weight:600"></div>
       <button class="btn btn-line btn-sm" id="signout">Sign out</button>
@@ -155,24 +165,50 @@
 <script>
 const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
 const TKEY = "vanssay.token";
+
+/* ── Product registry ─────────────────────────────────────────────────────────
+   One entry per plugin. `base` = the plugin backend's path prefix on the API
+   host ("" = the Accounts/Reviews service itself). Adding a future plugin =
+   add a row here + (if it has its own backend) it gets a sidebar page free. */
+const PRODUCTS = [
+  { key: "reviews",     label: "Reviews",     icon: "⭐", base: "",             cache: true  },
+  { key: "geoblock",    label: "Bouncer",     icon: "🛡️", base: "/geoblock",    cache: true  },
+  { key: "router",      label: "Router",      icon: "🧭", base: "/router",      cache: true  },
+  { key: "maintenance", label: "Maintenance", icon: "🚧", base: "/maintenance", cache: false },
+];
+const PROD = Object.fromEntries(PRODUCTS.map((p) => [p.key, p]));
+
 const $ = (id) => document.getElementById(id);
-const el = (html) => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; };
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
 const fmt = (n) => Number(n || 0).toLocaleString();
 const money = (n) => "$" + Number(n || 0).toLocaleString();
 const date = (d) => d ? new Date(d).toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" }) : "—";
-const planBadge = (p) => `<span class="badge b-${esc(p)}">${esc(p[0].toUpperCase()+p.slice(1))}</span>`;
+const planBadge = (p) => { p = p || "free"; return `<span class="badge b-${esc(p)}">${esc(p[0].toUpperCase()+p.slice(1))}</span>`; };
 const statusBadge = (s) => { const k = s==="active"||s==="trialing"?"b-active":s==="canceled"?"b-canceled":"b-other"; return `<span class="badge ${k}">${esc(s||"—")}</span>`; };
+const flag = (cc) => (cc && cc.length === 2 ? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0))) : "🏳️");
+const shortId = (id) => `<span class="mono" title="${esc(id)}">${esc(String(id||"").slice(0,8))}…</span>`;
+const val = (r) => (r && r.status === "fulfilled" ? r.value : null);
+const why = (r) => (r && r.status === "rejected" ? (r.reason && r.reason.message) || "request failed" : "");
+const unavailable = (label, r) => `<div class="empty">${esc(label)} unavailable — ${esc(why(r) || "no data")}</div>`;
 
-async function api(path, opts = {}) {
+async function api(path, opts) {
+  opts = opts || {}; // guard: null must not crash on opts.body
   const headers = { ...(opts.body ? { "Content-Type": "application/json" } : {}) };
   const t = localStorage.getItem(TKEY);
   if (t) headers.Authorization = "Bearer " + t;
   const res = await fetch(API + path, { method: opts.method || "GET", headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || "Request failed");
+  if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
   return data;
 }
+// Identity + billing (users, subs, plans, revenue) live in the central Accounts
+// service, product-scoped via ?product=. Domain data lives in each plugin
+// backend at <base>/admin/….
+const acct = (suffix, opts, prod) => {
+  const sep = suffix.includes("?") ? "&" : "?";
+  const scoped = prod && prod !== "reviews" ? suffix + sep + "product=" + prod : suffix;
+  return api("/admin" + scoped, opts);
+};
 
 /* ── Auth gate ── */
 const showErr = (id, m) => { const e = $(id); e.textContent = m; e.style.display = m ? "block" : "none"; };
@@ -204,312 +240,278 @@ async function boot() {
   }
 }
 
-/* ── Tabs + product (plugin) switcher ── */
-// Each page can be viewed per-product; Overview also offers a combined "All".
+/* ── Navigation ── */
+$("prod-nav").innerHTML = PRODUCTS.map((p) =>
+  `<button class="navlink" data-tab="prod:${p.key}"><span class="ic">${p.icon}</span> ${esc(p.label)}</button>`).join("");
 let curTab = "overview";
-let product = "all"; // 'all' | 'reviews' | 'geoblock'
-const GEO = "/geoblock";
-// Domain data (sites, blocks, IP cache) lives in each plugin backend:
-// reviews → /admin/…, geoblock → /geoblock/admin/…
-const padmin = (suffix, opts) => api((product === "geoblock" ? GEO : "") + "/admin" + suffix, opts);
-// Identity + billing (users, subscriptions, plans, revenue) are owned by the
-// central Accounts service and are product-scoped via ?product=.
-const acct = (suffix, opts, prod = product) => {
-  const sep = suffix.includes("?") ? "&" : "?";
-  const scoped = prod && prod !== "reviews" ? suffix + sep + "product=" + prod : suffix;
-  return api("/admin" + scoped, opts);
-};
-
-const PROD_LABEL = { all: "All", reviews: "Reviews", geoblock: "Bouncer" };
-function prodBar(tab) {
-  const opts = tab === "overview" ? ["all", "reviews", "geoblock"] : ["reviews", "geoblock"];
-  return `<div class="prodbar">${opts.map((o) => `<button class="pb ${product === o ? "on" : ""}" data-prod="${o}">${PROD_LABEL[o]}</button>`).join("")}</div>`;
-}
-function bindProdBar() {
-  document.querySelectorAll(".prodbar .pb").forEach((b) => (b.onclick = () => { product = b.dataset.prod; switchTab(curTab); }));
-}
-const flag = (cc) => (cc && cc.length === 2 ? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0))) : "🏳️");
-
 document.querySelectorAll(".navlink").forEach((b) => b.onclick = () => switchTab(b.dataset.tab));
 function switchTab(tab) {
   curTab = tab;
-  if (tab !== "overview" && product === "all") product = "reviews"; // "All" is Overview-only
   document.querySelectorAll(".navlink").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
-  const v = $("view");
-  v.innerHTML = `<div class="empty">Loading…</div>`;
-  ({ overview: renderOverview, users: renderUsers, subs: renderSubs, pages: renderPages, businesses: renderBusinesses, cache: renderCache }[tab])();
+  $("view").innerHTML = `<div class="empty">Loading…</div>`;
+  if (tab.startsWith("prod:")) return renderProduct(tab.slice(5));
+  ({ overview: renderOverview, users: renderUsers, subs: renderSubs }[tab])();
 }
 
-/* ── Overview (product-aware: All / Reviews / Geoblock) ── */
-async function renderOverview() {
-  const v = $("view");
-  v.innerHTML = `<div class="page-head"><div><h2>Overview</h2><p>Live snapshot of accounts, revenue and activity.</p></div>${prodBar("overview")}</div><div id="ov"><div class="empty">Loading…</div></div>`;
-  bindProdBar();
-  const ov = $("ov");
-  try {
-    if (product === "reviews") {
-      ov.innerHTML = reviewsOverview(await acct("/overview", null, "reviews"));
-    } else if (product === "geoblock") {
-      // Billing (plans/revenue) from Accounts; domain (users/configs/blocks) from the plugin.
-      const [bill, dom, trend, countries, sites] = await Promise.all([
-        acct("/overview", null, "geoblock"), api("/geoblock/admin/overview"),
-        api("/geoblock/admin/trend"), api("/geoblock/admin/countries"), api("/geoblock/admin/sites"),
-      ]);
-      ov.innerHTML = geoblockOverview(
-        { ...bill, users: dom.users, configs: dom.configs, thisMonth: dom.thisMonth, allTime: dom.allTime },
-        trend, countries, sites,
-      );
-    } else {
-      const [rev, geoBill, geoDom] = await Promise.all([
-        acct("/overview", null, "reviews"), acct("/overview", null, "geoblock"), api("/geoblock/admin/overview"),
-      ]);
-      ov.innerHTML = allOverview(rev, {
-        ...geoBill, users: geoDom.users, configs: geoDom.configs, thisMonth: geoDom.thisMonth, allTime: geoDom.allTime,
-      });
-    }
-  } catch (e) { ov.innerHTML = `<div class="empty">Couldn't load: ${esc(e.message)}</div>`; }
+/* ── Shared pieces ── */
+function barChart(items) { // [{v, tip, label}]
+  const max = Math.max(1, ...items.map((i) => i.v));
+  return `<div class="chart">${items.map((i) => `<div class="bar" style="height:${Math.round((i.v/max)*100)}%" data-tip="${esc(i.tip)}"></div>`).join("")}</div>
+    <div class="chart-x">${items.map((i) => `<span>${esc(i.label)}</span>`).join("")}</div>`;
 }
 function planRow(label, n, total) {
   const pct = total ? Math.round((n/total)*100) : 0;
-  return `<div style="margin-bottom:10px"><div class="kv" style="border:none;padding-bottom:3px"><span>${label}</span><strong>${fmt(n)} · ${pct}%</strong></div>
-    <div class="meter" style="height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden"><span style="display:block;height:100%;width:${pct}%;background:linear-gradient(90deg,#0e7afe,#7c5cff)"></span></div></div>`;
+  return `<div style="margin-bottom:10px"><div class="kv" style="border:none;padding-bottom:3px"><span>${esc(label)}</span><strong>${fmt(n)} · ${pct}%</strong></div>
+    <div class="meter"><span style="width:${pct}%"></span></div></div>`;
 }
-function reviewsOverview(d) {
-  const maxSign = Math.max(1, ...d.signups.map((s) => s.count));
-  return `
-    <div class="kpis">
-      <div class="kpi hero"><div class="k-label">Monthly recurring revenue</div><div class="k-val">${money(d.revenue.mrr)}</div><div class="k-sub">${money(d.revenue.arr)} / year</div></div>
-      <div class="kpi"><div class="k-label">Users</div><div class="k-val">${fmt(d.users.total)}</div><div class="k-sub">+${fmt(d.users.newThisMonth)} this month</div></div>
-      <div class="kpi"><div class="k-label">Paying customers</div><div class="k-val">${fmt(d.plans.paid)}</div><div class="k-sub">${fmt(d.plans.pro)} Pro · ${fmt(d.plans.ultra)} Ultra</div></div>
-      <div class="kpi"><div class="k-label">Free accounts</div><div class="k-val">${fmt(d.plans.free)}</div></div>
-      <div class="kpi"><div class="k-label">Widget views (month)</div><div class="k-val">${fmt(d.usage.viewsThisMonth)}</div><div class="k-sub">${fmt(d.usage.viewsAllTime)} all-time</div></div>
-      <div class="kpi"><div class="k-label">Businesses connected</div><div class="k-val">${fmt(d.usage.businesses)}</div></div>
-      <div class="kpi"><div class="k-label">"Powered by" clicks</div><div class="k-val">${fmt(d.powered.clicks)}</div><div class="k-sub">${fmt(d.powered.trackedPages)} pages tracked</div></div>
-      <div class="kpi"><div class="k-label">Widget page views</div><div class="k-val">${fmt(d.powered.widgetPageViews)}</div><div class="k-sub">across all embeds</div></div>
-    </div>
-    <div class="grid-2">
-      <div class="panel">
-        <h3>New signups · last 12 months</h3>
-        <div class="chart">${d.signups.map((s) => `<div class="bar" style="height:${Math.round((s.count/maxSign)*100)}%" data-tip="${s.month}: ${s.count}"></div>`).join("")}</div>
-        <div class="chart-x">${d.signups.map((s) => `<span>${s.month.slice(5)}</span>`).join("")}</div>
-      </div>
-      <div class="panel">
-        <h3>Plan distribution</h3>
-        ${planRow("Free", d.plans.free, d.users.total)}${planRow("Pro", d.plans.pro, d.users.total)}${planRow("Ultra", d.plans.ultra, d.users.total)}
-        <div class="kv" style="margin-top:10px"><span>Active paid subscriptions</span><strong>${fmt(d.plans.paid)}</strong></div>
-        <div class="kv"><span>Conversion rate</span><strong>${d.users.total ? ((d.plans.paid/d.users.total)*100).toFixed(1) : "0"}%</strong></div>
-      </div>
-    </div>`;
-}
-function geoblockOverview(d, trend, countries, sites) {
-  const maxBlk = Math.max(1, ...trend.trend.map((t) => t.blocked));
-  const maxC = Math.max(1, ...countries.countries.map((c) => c.blocked || c.visits));
-  return `
-    <div class="kpis">
-      <div class="kpi hero"><div class="k-label">Monthly recurring revenue</div><div class="k-val">${money(d.revenue.mrr)}</div><div class="k-sub">${money(d.revenue.arr)} / year</div></div>
-      <div class="kpi"><div class="k-label">Users</div><div class="k-val">${fmt(d.users.total)}</div><div class="k-sub">+${fmt(d.users.newThisMonth)} this month</div></div>
-      <div class="kpi"><div class="k-label">Paying customers</div><div class="k-val">${fmt(d.plans.paid)}</div><div class="k-sub">${fmt(d.plans.pro)} Pro · ${fmt(d.plans.ultra)} Ultra</div></div>
-      <div class="kpi"><div class="k-label">Protected sites</div><div class="k-val">${fmt(d.configs.total)}</div><div class="k-sub">${fmt(d.configs.vpnEnabled)} with VPN block</div></div>
-      <div class="kpi"><div class="k-label">Blocked (this month)</div><div class="k-val">${fmt(d.thisMonth.blocked)}</div><div class="k-sub">${fmt(d.thisMonth.vpnBlocked)} via VPN/proxy</div></div>
-      <div class="kpi"><div class="k-label">Blocked (all-time)</div><div class="k-val">${fmt(d.allTime.blocked)}</div><div class="k-sub">${fmt(d.allTime.vpnBlocked)} via VPN/proxy</div></div>
-      <div class="kpi"><div class="k-label">Visits checked (month)</div><div class="k-val">${fmt(d.thisMonth.visits)}</div><div class="k-sub">${fmt(d.allTime.visits)} all-time</div></div>
-      <div class="kpi"><div class="k-label">Conversion</div><div class="k-val">${d.users.total ? ((d.plans.paid/d.users.total)*100).toFixed(1) : "0"}%</div><div class="k-sub">free → paid</div></div>
-    </div>
-    <div class="grid-2">
-      <div class="panel">
-        <h3>Blocked visitors · last 12 months</h3>
-        <div class="chart">${trend.trend.map((t) => `<div class="bar" style="height:${Math.round((t.blocked/maxBlk)*100)}%" data-tip="${t.month}: ${fmt(t.blocked)} blocked"></div>`).join("")}</div>
-        <div class="chart-x">${trend.trend.map((t) => `<span>${t.month.slice(5)}</span>`).join("")}</div>
-      </div>
-      <div class="panel">
-        <h3>Plan distribution</h3>
-        ${planRow("Free", d.plans.free, d.users.total)}${planRow("Pro", d.plans.pro, d.users.total)}${planRow("Ultra", d.plans.ultra, d.users.total)}
-        <div class="kv" style="margin-top:10px"><span>Active paid subscriptions</span><strong>${fmt(d.plans.paid)}</strong></div>
-      </div>
-    </div>
-    <div class="grid-2" style="margin-top:16px">
-      <div class="panel">
-        <h3>Top blocked countries · all-time</h3>
-        ${countries.countries.length ? countries.countries.slice(0, 12).map((c) => `
-          <div style="margin-bottom:9px"><div class="kv" style="border:none;padding-bottom:3px"><span>${flag(c.countryCode)} ${esc(c.countryCode)}</span><strong>${fmt(c.blocked)}</strong></div>
-          <div class="meter" style="height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden"><span style="display:block;height:100%;width:${Math.round(((c.blocked||c.visits)/maxC)*100)}%;background:linear-gradient(90deg,#0e7afe,#7c5cff)"></span></div></div>`).join("") : `<div class="empty">No blocks recorded yet.</div>`}
-      </div>
-      <div class="panel" style="padding:0;overflow:hidden">
-        <h3 style="padding:18px 18px 10px">Protected sites · ${fmt(sites.sites.length)}</h3>
-        <div style="max-height:360px;overflow:auto">${sites.sites.length ? `<table><thead><tr><th>Owner</th><th>Mode</th><th class="right">Countries</th><th>VPN</th><th>Action</th></tr></thead><tbody>
-          ${sites.sites.map((s) => `<tr><td class="truncate">${esc(s.email)}</td><td>${esc(s.mode)}</td><td class="right">${fmt(s.countries)}</td><td>${s.vpnBlock ? "✓" : "—"}</td><td>${esc(s.action)}</td></tr>`).join("")}
-        </tbody></table>` : `<div class="empty">No protected sites yet.</div>`}</div>
-      </div>
-    </div>`;
-}
-function allOverview(rev, geo) {
-  const mrr = rev.revenue.mrr + geo.revenue.mrr;
-  return `
-    <div class="kpis">
-      <div class="kpi hero"><div class="k-label">Total MRR · both plugins</div><div class="k-val">${money(mrr)}</div><div class="k-sub">${money(mrr*12)} / year</div></div>
-      <div class="kpi"><div class="k-label">Reviews MRR</div><div class="k-val">${money(rev.revenue.mrr)}</div><div class="k-sub">${fmt(rev.plans.paid)} paying</div></div>
-      <div class="kpi"><div class="k-label">Bouncer MRR</div><div class="k-val">${money(geo.revenue.mrr)}</div><div class="k-sub">${fmt(geo.plans.paid)} paying</div></div>
-      <div class="kpi"><div class="k-label">Reviews users</div><div class="k-val">${fmt(rev.users.total)}</div><div class="k-sub">+${fmt(rev.users.newThisMonth)} this month</div></div>
-      <div class="kpi"><div class="k-label">Bouncer users</div><div class="k-val">${fmt(geo.users.total)}</div><div class="k-sub">+${fmt(geo.users.newThisMonth)} this month</div></div>
-    </div>
-    <div class="grid-2">
-      <div class="panel">
-        <h3>Reviews · plan split</h3>
-        ${planRow("Free", rev.plans.free, rev.users.total)}${planRow("Pro", rev.plans.pro, rev.users.total)}${planRow("Ultra", rev.plans.ultra, rev.users.total)}
-        <div class="kv" style="margin-top:10px"><span>Widget views (month)</span><strong>${fmt(rev.usage.viewsThisMonth)}</strong></div>
-      </div>
-      <div class="panel">
-        <h3>Bouncer · plan split</h3>
-        ${planRow("Free", geo.plans.free, geo.users.total)}${planRow("Pro", geo.plans.pro, geo.users.total)}${planRow("Ultra", geo.plans.ultra, geo.users.total)}
-        <div class="kv" style="margin-top:10px"><span>Visitors blocked (month)</span><strong>${fmt(geo.thisMonth.blocked)}</strong></div>
-      </div>
-    </div>
-    <p class="empty" style="border:none;text-align:left;padding:10px 2px 0;font-size:12px">Users are counted per product (a person using both is counted in each). MRR is additive across plugins.</p>`;
+function planSplitPanel(bill) {
+  if (!bill) return "";
+  const t = bill.users.total;
+  return `<div class="panel"><h3>Plan distribution</h3>
+    ${planRow("Free", bill.plans.free, t)}${planRow("Pro", bill.plans.pro, t)}${planRow("Ultra", bill.plans.ultra, t)}
+    <div class="kv" style="margin-top:10px"><span>Active paid subscriptions</span><strong>${fmt(bill.plans.paid)}</strong></div>
+    <div class="kv"><span>Conversion (of all accounts)</span><strong>${t ? ((bill.plans.paid/t)*100).toFixed(1) : "0"}%</strong></div></div>`;
 }
 
-/* ── Users ── */
-let usersState = { search: "", plan: "", page: 1, pageSize: 25 };
-async function renderUsers() {
+/* ── Overview — every plugin on one screen ── */
+async function renderOverview() {
   const v = $("view");
-  v.innerHTML = `
-    <div class="page-head"><div><h2>Users</h2><p>Search, inspect and manage every account.</p></div>${prodBar("users")}</div>
+  v.innerHTML = `<div class="page-head"><div><h2>Overview</h2><p>All plugins — revenue, accounts and live activity.</p></div></div><div id="ov"><div class="empty">Loading…</div></div>`;
+  const ov = $("ov");
+
+  // Billing per product (Accounts) + domain overview per plugin backend.
+  const rs = await Promise.allSettled([
+    ...PRODUCTS.map((p) => acct("/overview", null, p.key)),
+    ...PRODUCTS.map((p) => p.base ? api(p.base + "/admin/overview") : Promise.resolve(null)),
+  ]);
+  const bills = {}, doms = {};
+  PRODUCTS.forEach((p, i) => { bills[p.key] = val(rs[i]); doms[p.key] = val(rs[PRODUCTS.length + i]); });
+
+  const okBills = PRODUCTS.map((p) => bills[p.key]).filter(Boolean);
+  if (!okBills.length) { ov.innerHTML = unavailable("Accounts service", rs[0]); return; }
+  const anyBill = okBills[0]; // users are global to the Accounts service
+  const totMRR = okBills.reduce((s, b) => s + b.revenue.mrr, 0);
+  const totPaid = okBills.reduce((s, b) => s + b.plans.paid, 0);
+
+  // Per-product domain highlights.
+  const domainKv = (p) => {
+    const b = bills[p.key], d = doms[p.key];
+    if (p.key === "reviews") return b && b.usage ? [
+      ["Businesses connected", fmt(b.usage.businesses)],
+      ["Widget views (month)", fmt(b.usage.viewsThisMonth)],
+      ["“Powered by” clicks", fmt(b.powered.clicks)],
+    ] : [];
+    if (!d) return [["Domain data", "unavailable"]];
+    if (p.key === "geoblock") return [
+      ["Protected sites", `${fmt(d.configs.total)} (${fmt(d.configs.vpnEnabled)} VPN)`],
+      ["Blocked (month)", fmt(d.thisMonth.blocked)],
+      ["Visits checked (month)", fmt(d.thisMonth.visits)],
+    ];
+    if (p.key === "router") return [
+      ["Routed sites", `${fmt(d.configs.enabled)} on / ${fmt(d.configs.total)}`],
+      ["Redirects (month)", fmt(d.thisMonth.redirected)],
+      ["Visits checked (month)", fmt(d.thisMonth.visits)],
+    ];
+    if (p.key === "maintenance") return [
+      ["Sites", fmt(d.configs.total)],
+      ["In maintenance now", fmt(d.configs.maintenanceOn)],
+      ["Blocked (all-time)", fmt(d.allTime.blocked)],
+    ];
+    return [];
+  };
+
+  ov.innerHTML = `
+    <div class="kpis">
+      <div class="kpi hero"><div class="k-label">Total MRR · all plugins</div><div class="k-val">${money(totMRR)}</div><div class="k-sub">${money(totMRR*12)} / year</div></div>
+      <div class="kpi"><div class="k-label">Accounts</div><div class="k-val">${fmt(anyBill.users.total)}</div><div class="k-sub">+${fmt(anyBill.users.newThisMonth)} this month · shared across plugins</div></div>
+      <div class="kpi"><div class="k-label">Paying subscriptions</div><div class="k-val">${fmt(totPaid)}</div><div class="k-sub">across all plugins</div></div>
+      <div class="kpi"><div class="k-label">Conversion</div><div class="k-val">${anyBill.users.total ? ((totPaid/anyBill.users.total)*100).toFixed(1) : "0"}%</div><div class="k-sub">paid subs / accounts</div></div>
+    </div>
+
+    <div class="prodgrid">
+      ${PRODUCTS.map((p) => {
+        const b = bills[p.key];
+        return `<div class="panel"><h3>${p.icon} ${esc(p.label)} <a class="open" href="#" data-open="${p.key}">Open →</a></h3>
+          ${b ? `<div class="mrr">${money(b.revenue.mrr)} <small>MRR</small></div>
+          <div class="kv"><span>Paying</span><strong>${fmt(b.plans.paid)} · ${fmt(b.plans.pro)} Pro / ${fmt(b.plans.ultra)} Ultra</strong></div>`
+          : `<div class="note">Billing unavailable.</div>`}
+          ${domainKv(p).map(([k, x]) => `<div class="kv"><span>${k}</span><strong>${x}</strong></div>`).join("")}
+        </div>`;
+      }).join("")}
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3>New signups · last 12 months (all plugins share one account base)</h3>
+        ${barChart(anyBill.signups.map((s) => ({ v: s.count, tip: `${s.month}: ${s.count}`, label: s.month.slice(5) })))}
+      </div>
+      <div class="panel">
+        <h3>MRR by plugin</h3>
+        ${PRODUCTS.map((p) => bills[p.key] ? planRow(`${p.icon} ${p.label}`, bills[p.key].revenue.mrr, totMRR) : "").join("")}
+        <div class="kv" style="margin-top:10px"><span>Total</span><strong>${money(totMRR)} / mo</strong></div>
+      </div>
+    </div>
+    <p class="note">MRR is additive across plugins; one account can pay for several. Plan splits & activity live on each plugin's page.</p>`;
+  ov.querySelectorAll("[data-open]").forEach((a) => a.onclick = (e) => { e.preventDefault(); switchTab("prod:" + a.dataset.open); });
+}
+
+/* ── Users — one global list, per-plugin plans ── */
+let usersState = { search: "", page: 1, pageSize: 25 };
+async function renderUsers() {
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Users</h2><p>Every account, with its plan on each plugin. Click a row for details & overrides.</p></div></div>
     <div class="toolbar">
       <input class="search" id="u-search" placeholder="Search by email…" value="${esc(usersState.search)}" />
-      <select id="u-plan">
-        <option value="">All plans</option>
-        <option value="free">Free</option><option value="pro">Pro</option><option value="ultra">Ultra</option>
-      </select>
       <button class="btn btn-line btn-sm" id="u-refresh">Refresh</button>
     </div>
-    <div class="tablewrap" id="u-table"></div>
+    <div class="tablewrap" id="u-table"><div class="empty">Loading…</div></div>
     <div class="pager" id="u-pager"></div>`;
-  bindProdBar();
-  $("u-plan").value = usersState.plan;
   let timer;
   $("u-search").oninput = (e) => { clearTimeout(timer); timer = setTimeout(() => { usersState.search = e.target.value.trim(); usersState.page = 1; loadUsers(); }, 300); };
-  $("u-plan").onchange = (e) => { usersState.plan = e.target.value; usersState.page = 1; loadUsers(); };
   $("u-refresh").onclick = loadUsers;
   loadUsers();
 }
 async function loadUsers() {
   const wrap = $("u-table");
-  const geo = product === "geoblock";
   const qs = new URLSearchParams({ page: usersState.page, pageSize: usersState.pageSize });
   if (usersState.search) qs.set("search", usersState.search);
-  if (usersState.plan) qs.set("plan", usersState.plan);
-  // Users + their per-product plan come from the Accounts service.
-  const d = await acct("/users?" + qs);
-  if (!d.users.length) { wrap.innerHTML = `<div class="empty">No users found.</div>`; $("u-pager").innerHTML = ""; return; }
-  // Reviews users open a detail modal + show reviews-domain columns; geoblock
-  // shows the shared plan only (its per-user domain stats live in the plugin).
-  const col = geo ? `` : `<th class="right">Views / quota</th><th class="right">Businesses</th>`;
+  // Same page of the same (global) user list, once per product → merge plans by id.
+  const rs = await Promise.allSettled(PRODUCTS.map((p) => acct("/users?" + qs, null, p.key)));
+  const base = val(rs[0]);
+  if (!base) { wrap.innerHTML = unavailable("Users", rs[0]); $("u-pager").innerHTML = ""; return; }
+  const planOf = {};
+  PRODUCTS.forEach((p, i) => { const d = val(rs[i]); planOf[p.key] = new Map((d ? d.users : []).map((u) => [u.id, u.plan])); });
+
+  if (!base.users.length) { wrap.innerHTML = `<div class="empty">No users found.</div>`; $("u-pager").innerHTML = ""; return; }
   wrap.innerHTML = `<table><thead><tr>
-      <th>Email</th><th>Plan</th><th>Status</th>${col}<th>Joined</th>
-    </tr></thead><tbody>${d.users.map((u) => `
-      <tr class="${geo ? "" : "clickable"}" data-id="${u.id}">
+      <th>Email</th><th>Plans</th><th class="right">Views / quota</th><th class="right">Businesses</th><th>Joined</th>
+    </tr></thead><tbody>${base.users.map((u) => {
+      const badges = PRODUCTS.map((p) => {
+        const pl = planOf[p.key].get(u.id) || "free";
+        return pl !== "free" ? `<span class="badge b-${pl}" title="${esc(p.label)} · ${pl}">${p.icon} ${esc(p.label)} ${pl[0].toUpperCase()+pl.slice(1)}</span>` : "";
+      }).filter(Boolean).join("") || `<span class="badge b-free">Free</span>`;
+      return `<tr class="clickable" data-id="${u.id}">
         <td>${esc(u.email)}</td>
-        <td>${planBadge(u.plan)}</td>
-        <td>${u.plan==="free" && !u.status ? '<span class="badge b-other">—</span>' : statusBadge(u.status)}</td>
-        ${geo ? `` : `<td class="right">${fmt(u.viewsThisMonth)}${u.quota>0?" / "+fmt(u.quota):" / ∞"}</td><td class="right">${fmt(u.businesses)}</td>`}
+        <td><div class="badges">${badges}</div></td>
+        <td class="right">${fmt(u.viewsThisMonth)}${u.quota>0?" / "+fmt(u.quota):" / ∞"}</td>
+        <td class="right">${fmt(u.businesses)}</td>
         <td>${date(u.createdAt)}</td>
-      </tr>`).join("")}</tbody></table>`;
-  if (!geo) wrap.querySelectorAll("tr.clickable").forEach((r) => r.onclick = () => openUser(r.dataset.id));
-  const pages = Math.max(1, Math.ceil(d.total / d.pageSize));
-  $("u-pager").innerHTML = `<span>${d.total} user(s) · page ${d.page}/${pages}</span>
-    <button class="btn btn-line btn-sm" ${d.page<=1?"disabled":""} id="u-prev">← Prev</button>
-    <button class="btn btn-line btn-sm" ${d.page>=pages?"disabled":""} id="u-next">Next →</button>`;
+      </tr>`;
+    }).join("")}</tbody></table>`;
+  wrap.querySelectorAll("tr.clickable").forEach((r) => r.onclick = () => openUser(r.dataset.id));
+  const pages = Math.max(1, Math.ceil(base.total / base.pageSize));
+  $("u-pager").innerHTML = `<span>${base.total} user(s) · page ${base.page}/${pages}</span>
+    <button class="btn btn-line btn-sm" ${base.page<=1?"disabled":""} id="u-prev">← Prev</button>
+    <button class="btn btn-line btn-sm" ${base.page>=pages?"disabled":""} id="u-next">Next →</button>`;
   if ($("u-prev")) $("u-prev").onclick = () => { usersState.page--; loadUsers(); };
   if ($("u-next")) $("u-next").onclick = () => { usersState.page++; loadUsers(); };
 }
 
-/* ── User detail modal ── */
+/* ── User detail modal — cross-plugin ── */
 async function openUser(id) {
   const root = $("modal-root");
   root.innerHTML = `<div class="modal-bg"><div class="modal"><div class="empty">Loading…</div></div></div>`;
   root.querySelector(".modal-bg").onclick = (e) => { if (e.target.classList.contains("modal-bg")) root.innerHTML = ""; };
-  let d;
-  try { d = await api("/admin/users/" + id); }
-  catch (e) { root.querySelector(".modal").innerHTML = `<div class="err" style="display:block">${esc(e.message)}</div>`; return; }
-  const u = d.user;
-  const totalViews = d.views.reduce((s, v) => s + v.views, 0);
-  const totalClicks = d.pages.reduce((s, p) => s + p.poweredClicks, 0);
+  // One detail call per product: plan + that product's subscriptions. The
+  // reviews-domain payload (configs/views/pages) is identical in each response.
+  const rs = await Promise.allSettled(PRODUCTS.map((p) => acct("/users/" + id, null, p.key)));
+  const dets = {};
+  PRODUCTS.forEach((p, i) => dets[p.key] = val(rs[i]));
+  const base = PRODUCTS.map((p) => dets[p.key]).find(Boolean);
+  if (!base) { root.querySelector(".modal").innerHTML = `<div class="err" style="display:block">${esc(why(rs[0]))}</div>`; return; }
+  const u = base.user;
+  const totalViews = base.views.reduce((s, v) => s + v.views, 0);
+  const totalClicks = base.pages.reduce((s, p) => s + p.poweredClicks, 0);
+  const allSubs = PRODUCTS.flatMap((p) => (dets[p.key] ? dets[p.key].subscriptions : []).map((s) => ({ ...s, product: p })));
+
   root.querySelector(".modal").innerHTML = `
     <div class="modal-head"><h3>${esc(u.email)}</h3><button class="x" id="m-close">×</button></div>
 
     <div class="card">
       <div class="ministat" style="margin-bottom:14px">
-        <div class="kpi"><div class="k-label">Plan</div><div class="k-val" style="font-size:18px">${planBadge(d.plan)}</div></div>
-        <div class="kpi"><div class="k-label">Views (all months)</div><div class="k-val">${fmt(totalViews)}</div></div>
+        <div class="kpi"><div class="k-label">Widget views (all months)</div><div class="k-val">${fmt(totalViews)}</div></div>
+        <div class="kpi"><div class="k-label">“Powered by” clicks</div><div class="k-val">${fmt(totalClicks)}</div></div>
       </div>
       <div class="kv"><span>User ID</span><span class="mono">${esc(u.id)}</span></div>
       <div class="kv"><span>Joined</span><span>${date(u.createdAt)}</span></div>
       <div class="kv"><span>Stripe customer</span><span class="mono">${esc(u.stripeCustomerId || "—")}</span></div>
-      <div class="kv"><span>Monthly quota</span><span>${d.quota>0?fmt(d.quota):"Unlimited"}</span></div>
-      <div class="kv"><span>"Powered by" clicks</span><span>${fmt(totalClicks)}</span></div>
+      <div class="kv"><span>Reviews monthly quota</span><span>${base.quota>0?fmt(base.quota):"Unlimited"}</span></div>
     </div>
 
     <div class="card">
       <div class="field-row">
         <div><label>Email</label><input id="m-email" value="${esc(u.email)}" /></div>
+        <button class="btn btn-blue" id="m-save-email">Save</button>
       </div>
-      <div class="field-row" style="margin-top:10px">
-        <div><label>Plan (manual override, no Stripe charge)</label>
-          <select id="m-plan">
+      <label style="margin-top:14px">Plan per plugin (manual override, no Stripe charge)</label>
+      ${PRODUCTS.map((p) => {
+        const d = dets[p.key];
+        return `<div class="planrow"><span class="pname">${p.icon} ${esc(p.label)}</span>
+          ${d ? `<select id="m-plan-${p.key}">
             <option value="free" ${d.plan==="free"?"selected":""}>Free</option>
             <option value="pro" ${d.plan==="pro"?"selected":""}>Pro</option>
             <option value="ultra" ${d.plan==="ultra"?"selected":""}>Ultra</option>
-          </select>
-        </div>
-        <button class="btn btn-blue" id="m-save">Save</button>
-      </div>
+          </select><button class="btn btn-line btn-sm" data-saveplan="${p.key}">Save</button>` : `<span class="note">unavailable</span><span></span>`}
+        </div>`;
+      }).join("")}
       <div class="err" id="m-err"></div><div class="ok" id="m-ok"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
-        <button class="btn btn-line btn-sm" id="m-resetviews">Reset month views</button>
+        <button class="btn btn-line btn-sm" id="m-resetviews">Reset month views (Reviews)</button>
         <button class="btn btn-line btn-sm" id="m-sendreset">Send password reset</button>
-        <button class="btn btn-danger btn-sm" id="m-delete" style="margin-left:auto">Delete user</button>
+        <button class="btn btn-danger btn-sm" id="m-delete" style="margin-left:auto">Delete account</button>
       </div>
+      <p class="note">Deleting removes the shared account — it affects every plugin.</p>
     </div>
 
-    <div class="sec-title">Subscriptions (${d.subscriptions.length})</div>
-    <div class="card" style="padding:0;overflow:hidden">${d.subscriptions.length ? `<table><thead><tr><th>Plan</th><th>Status</th><th>Period end</th><th>Created</th></tr></thead><tbody>
-      ${d.subscriptions.map((s)=>`<tr><td>${planBadge(s.plan)}</td><td>${statusBadge(s.status)}</td><td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No subscriptions.</div>`}</div>
+    <div class="sec-title">Subscriptions · all plugins (${allSubs.length})</div>
+    <div class="card" style="padding:0;overflow:hidden">${allSubs.length ? `<table><thead><tr><th>Plugin</th><th>Plan</th><th>Status</th><th>Period end</th><th>Created</th></tr></thead><tbody>
+      ${allSubs.map((s)=>`<tr><td>${s.product.icon} ${esc(s.product.label)}</td><td>${planBadge(s.plan)}</td><td>${statusBadge(s.status)}</td><td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No subscriptions.</div>`}</div>
 
-    <div class="sec-title">Businesses (${d.configs.length})</div>
-    <div class="card" style="padding:0;overflow:hidden">${d.configs.length ? `<table><thead><tr><th>Google</th><th>Trustpilot</th><th>Min ★</th></tr></thead><tbody>
-      ${d.configs.map((c)=>`<tr><td>${esc(c.googleBusinessName||c.googlePlaceId||"—")}</td><td class="truncate">${esc(c.trustpilotUrl||"—")}</td><td>${c.minStars}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No businesses connected.</div>`}</div>
+    <div class="sec-title">Reviews · businesses (${base.configs.length})</div>
+    <div class="card" style="padding:0;overflow:hidden">${base.configs.length ? `<table><thead><tr><th>Google</th><th>Trustpilot</th><th>Min ★</th></tr></thead><tbody>
+      ${base.configs.map((c)=>`<tr><td>${esc(c.googleBusinessName||c.googlePlaceId||"—")}</td><td class="truncate">${esc(c.trustpilotUrl||"—")}</td><td>${c.minStars}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No businesses connected.</div>`}</div>
 
-    <div class="sec-title">Embed pages (${d.pages.length})</div>
-    <div class="card" style="padding:0;overflow:hidden">${d.pages.length ? `<table><thead><tr><th>Page</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
-      ${d.pages.map((p)=>`<tr><td class="truncate"><a href="${esc(p.pageUrl)}" target="_blank">${esc(p.pageUrl)}</a></td><td class="right">${fmt(p.views)}</td><td class="right">${fmt(p.poweredClicks)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No embeds recorded yet.</div>`}</div>
+    <div class="sec-title">Reviews · embed pages (${base.pages.length})</div>
+    <div class="card" style="padding:0;overflow:hidden">${base.pages.length ? `<table><thead><tr><th>Page</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
+      ${base.pages.map((p)=>`<tr><td class="truncate"><a href="${esc(p.pageUrl)}" target="_blank">${esc(p.pageUrl)}</a></td><td class="right">${fmt(p.views)}</td><td class="right">${fmt(p.poweredClicks)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No embeds recorded yet.</div>`}</div>
 
-    <div class="sec-title">View history</div>
-    <div class="card" style="padding:0;overflow:hidden">${d.views.length ? `<table><thead><tr><th>Month</th><th class="right">Views</th></tr></thead><tbody>
-      ${d.views.map((vw)=>`<tr><td>${esc(vw.month)}</td><td class="right">${fmt(vw.views)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No views recorded.</div>`}</div>
+    <div class="sec-title">Reviews · view history</div>
+    <div class="card" style="padding:0;overflow:hidden">${base.views.length ? `<table><thead><tr><th>Month</th><th class="right">Views</th></tr></thead><tbody>
+      ${base.views.map((vw)=>`<tr><td>${esc(vw.month)}</td><td class="right">${fmt(vw.views)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No views recorded.</div>`}</div>
   `;
   const close = () => { root.innerHTML = ""; };
+  const flash = (msg) => { showErr("m-err",""); $("m-ok").textContent = msg; $("m-ok").style.display = "block"; };
   $("m-close").onclick = close;
-  $("m-save").onclick = async () => {
-    showErr("m-err",""); $("m-ok").style.display="none";
-    try {
-      await api("/admin/users/"+id, { method:"PATCH", body:{ email: $("m-email").value.trim(), plan: $("m-plan").value } });
-      $("m-ok").textContent = "Saved."; $("m-ok").style.display="block";
-      loadUsers();
-    } catch(e){ showErr("m-err", e.message); }
+  $("m-save-email").onclick = async () => {
+    try { await api("/admin/users/"+id, { method:"PATCH", body:{ email: $("m-email").value.trim() } }); flash("Email saved."); loadUsers(); }
+    catch(e){ showErr("m-err", e.message); }
   };
-  $("m-resetviews").onclick = async () => { try { await api("/admin/users/"+id+"/reset-views",{method:"POST"}); $("m-ok").textContent="Views reset to 0."; $("m-ok").style.display="block"; } catch(e){ showErr("m-err",e.message);} };
-  $("m-sendreset").onclick = async () => { try { await api("/admin/users/"+id+"/send-reset",{method:"POST"}); $("m-ok").textContent="Password-reset email sent."; $("m-ok").style.display="block"; } catch(e){ showErr("m-err",e.message);} };
+  root.querySelectorAll("[data-saveplan]").forEach((b) => b.onclick = async () => {
+    const k = b.dataset.saveplan;
+    try { await api("/admin/users/"+id, { method:"PATCH", body:{ plan: $("m-plan-"+k).value, product: k } }); flash(PROD[k].label + " plan saved."); loadUsers(); }
+    catch(e){ showErr("m-err", e.message); }
+  });
+  $("m-resetviews").onclick = async () => { try { await api("/admin/users/"+id+"/reset-views",{method:"POST"}); flash("Views reset to 0."); } catch(e){ showErr("m-err",e.message);} };
+  $("m-sendreset").onclick = async () => { try { await api("/admin/users/"+id+"/send-reset",{method:"POST"}); flash("Password-reset email sent."); } catch(e){ showErr("m-err",e.message);} };
   $("m-delete").onclick = async () => {
-    if (!confirm("Permanently delete "+u.email+" and ALL their data? This cannot be undone.")) return;
+    if (!confirm("Permanently delete "+u.email+" and ALL their data across every plugin? This cannot be undone.")) return;
     try { await api("/admin/users/"+id,{method:"DELETE"}); close(); loadUsers(); } catch(e){ showErr("m-err",e.message);} };
 }
 
-/* ── Subscriptions ── */
+/* ── Subscriptions — per plugin ── */
+let subsProd = "reviews";
 async function renderSubs() {
-  const d = await acct("/subscriptions");
+  const bar = `<div class="prodbar">${PRODUCTS.map((p) => `<button class="pb ${subsProd===p.key?"on":""}" data-prod="${p.key}">${p.icon} ${esc(p.label)}</button>`).join("")}</div>`;
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Subscriptions</h2><p>Every ${esc(PROD[subsProd].label)} subscription record, live and historical.</p></div>${bar}</div>
+    <div id="s-body"><div class="empty">Loading…</div></div>`;
+  document.querySelectorAll(".prodbar .pb").forEach((b) => b.onclick = () => { subsProd = b.dataset.prod; renderSubs(); });
+  let d;
+  try { d = await acct("/subscriptions", null, subsProd); }
+  catch (e) { $("s-body").innerHTML = `<div class="empty">Couldn't load: ${esc(e.message)}</div>`; return; }
   const live = d.subscriptions.filter((s)=>s.live);
   const mrr = live.reduce((s,x)=>s+x.monthlyValue,0);
-  $("view").innerHTML = `
-    <div class="page-head"><div><h2>Subscriptions</h2><p>Every ${PROD_LABEL[product]} subscription record, live and historical.</p></div>${prodBar("subs")}</div>
+  $("s-body").innerHTML = `
     <div class="kpis">
       <div class="kpi hero"><div class="k-label">MRR (live subs)</div><div class="k-val">${money(mrr)}</div><div class="k-sub">${money(mrr*12)} / year</div></div>
       <div class="kpi"><div class="k-label">Live subscriptions</div><div class="k-val">${fmt(live.length)}</div></div>
@@ -523,108 +525,207 @@ async function renderSubs() {
       <td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td>
       <td class="mono truncate">${esc(s.stripeSubscriptionId||"manual")}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No subscriptions yet.</div>`}</div>`;
-  bindProdBar();
 }
 
-/* ── Activity: Reviews → embed pages & clicks · Geoblock → blocks by country ── */
-let pagesSort = "poweredClicks";
-async function renderPages() {
-  if (product === "geoblock") return renderGeoActivity();
-  const d = await api("/admin/pages?sort="+pagesSort);
-  $("view").innerHTML = `
-    <div class="page-head"><div><h2>Pages &amp; "Powered by Vanssay" clicks</h2><p>Where widgets are embedded, their views and outbound clicks.</p></div>
-      <div style="display:flex;gap:10px;align-items:center">${prodBar("pages")}<select id="p-sort" style="width:auto"><option value="poweredClicks" ${pagesSort==="poweredClicks"?"selected":""}>Sort by clicks</option><option value="views" ${pagesSort==="views"?"selected":""}>Sort by views</option></select></div></div>
-    <div class="grid-2" style="align-items:start">
-      <div>
-        <div class="sec-title">By page</div>
-        <div class="tablewrap">${d.pages.length?`<table><thead><tr><th>Page</th><th>Owner</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
-          ${d.pages.map((p)=>`<tr><td class="truncate"><a href="${esc(p.pageUrl)}" target="_blank">${esc(p.pageUrl)}</a></td><td class="truncate">${esc(p.email)}</td><td class="right">${fmt(p.views)}</td><td class="right">${fmt(p.clicks)}</td></tr>`).join("")}
-        </tbody></table>`:`<div class="empty">No embeds tracked yet. Data appears once widgets load on published sites.</div>`}</div>
-      </div>
-      <div>
-        <div class="sec-title">By host</div>
-        <div class="tablewrap">${d.hosts.length?`<table><thead><tr><th>Host</th><th class="right">Pages</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
-          ${d.hosts.map((h)=>`<tr><td class="truncate">${esc(h.host)}</td><td class="right">${fmt(h.pages)}</td><td class="right">${fmt(h.views)}</td><td class="right">${fmt(h.clicks)}</td></tr>`).join("")}
-        </tbody></table>`:`<div class="empty">—</div>`}</div>
-      </div>
-    </div>`;
-  bindProdBar();
-  $("p-sort").onchange = (e) => { pagesSort = e.target.value; renderPages(); };
+/* ── Plugin pages ── */
+async function renderProduct(key) {
+  const p = PROD[key];
+  const head = (sub) => `<div class="page-head"><div><h2>${p.icon} ${esc(p.label)}</h2><p>${esc(sub)}</p></div></div>`;
+  if (key === "reviews") return renderReviews(head);
+  if (key === "geoblock") return renderGeoblock(head);
+  if (key === "router") return renderRouterP(head);
+  if (key === "maintenance") return renderMaintenance(head);
 }
-// Geoblock has no embed pages; show the block activity (by country + monthly trend) instead.
-async function renderGeoActivity() {
-  const [countries, trend] = await Promise.all([api("/geoblock/admin/countries"), api("/geoblock/admin/trend")]);
-  const maxC = Math.max(1, ...countries.countries.map((c) => c.blocked || c.visits));
-  const maxB = Math.max(1, ...trend.trend.map((t) => t.blocked));
-  $("view").innerHTML = `
-    <div class="page-head"><div><h2>Block activity</h2><p>Where Bouncer is stopping visitors, by country and over time.</p></div>${prodBar("pages")}</div>
-    <div class="panel" style="margin-bottom:16px">
-      <h3>Blocked visitors · last 12 months</h3>
-      <div class="chart">${trend.trend.map((t)=>`<div class="bar" style="height:${Math.round((t.blocked/maxB)*100)}%" data-tip="${t.month}: ${fmt(t.blocked)} blocked"></div>`).join("")}</div>
-      <div class="chart-x">${trend.trend.map((t)=>`<span>${t.month.slice(5)}</span>`).join("")}</div>
+
+/* Cache panel (shared) */
+function cachePanel(d, r, p, label) {
+  if (!d) return `<div class="panel">${unavailable("Cache", r)}</div>`;
+  return `<div class="panel" style="max-width:520px">
+    <h3>${esc(label)}</h3>
+    <div class="kpis" style="margin-bottom:10px">
+      <div class="kpi"><div class="k-label">Cached entries</div><div class="k-val">${fmt(d.total)}</div></div>
+      <div class="kpi"><div class="k-label">Expired</div><div class="k-val">${fmt(d.expired)}</div></div>
+      ${(d.byPlatform||[]).map((x)=>`<div class="kpi"><div class="k-label">${esc(x.platform)}</div><div class="k-val">${fmt(x.count)}</div></div>`).join("")}
     </div>
-    <div class="sec-title">By country · all-time</div>
-    <div class="tablewrap">${countries.countries.length?`<table><thead><tr><th>Country</th><th class="right">Blocked</th><th class="right">VPN/proxy</th><th class="right">Visits</th><th style="width:30%">Share</th></tr></thead><tbody>
-      ${countries.countries.map((c)=>`<tr><td>${flag(c.countryCode)} ${esc(c.countryCode)}</td><td class="right">${fmt(c.blocked)}</td><td class="right">${fmt(c.vpnBlocked)}</td><td class="right">${fmt(c.visits)}</td>
-        <td><div class="meter" style="height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden"><span style="display:block;height:100%;width:${Math.round(((c.blocked||c.visits)/maxC)*100)}%;background:linear-gradient(90deg,#0e7afe,#7c5cff)"></span></div></td></tr>`).join("")}
-    </tbody></table>`:`<div class="empty">No blocks recorded yet.</div>`}</div>`;
-  bindProdBar();
+    <div class="ok" id="c-ok"></div><div class="err" id="c-err"></div>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button class="btn btn-line btn-sm" id="c-expired">Purge expired (${fmt(d.expired)})</button>
+      <button class="btn btn-danger btn-sm" id="c-all">Purge ALL</button>
+    </div>
+  </div>`;
+}
+function bindCache(p) {
+  const purge = async (all) => {
+    try { const r = await api(p.base + "/admin/cache/purge" + (all?"?all=1":""), { method:"POST" });
+      $("c-ok").textContent = `Deleted ${r.deleted} entr${r.deleted===1?"y":"ies"}.`; $("c-ok").style.display = "block";
+      setTimeout(() => switchTab("prod:" + p.key), 900); }
+    catch(e){ $("c-err").textContent = e.message; $("c-err").style.display = "block"; }
+  };
+  if ($("c-expired")) $("c-expired").onclick = () => purge(false);
+  if ($("c-all")) $("c-all").onclick = () => { if (confirm("Delete the entire cache?")) purge(true); };
 }
 
-/* ── Businesses (Reviews) / Protected sites (Geoblock) ── */
-async function renderBusinesses() {
-  if (product === "geoblock") return renderGeoSites();
-  const d = await api("/admin/businesses");
+/* Reviews */
+let pagesSort = "poweredClicks";
+async function renderReviews(head) {
+  const p = PROD.reviews;
+  const rs = await Promise.allSettled([
+    acct("/overview", null, "reviews"), api("/admin/pages?sort=" + pagesSort), api("/admin/businesses"), api("/admin/cache"),
+  ]);
+  const [bill, pages, biz, cache] = rs.map(val);
   $("view").innerHTML = `
-    <div class="page-head"><div><h2>Businesses</h2><p>Every connected Google / Trustpilot source.</p></div>${prodBar("businesses")}</div>
-    <div class="tablewrap">${d.businesses.length?`<table><thead><tr>
+    ${head("Google + Trustpilot reviews widget — usage, embeds and sources.")}
+    ${bill ? `<div class="kpis">
+      <div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
+      <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${fmt(bill.plans.pro)} Pro · ${fmt(bill.plans.ultra)} Ultra</div></div>
+      <div class="kpi"><div class="k-label">Widget views (month)</div><div class="k-val">${fmt(bill.usage.viewsThisMonth)}</div><div class="k-sub">${fmt(bill.usage.viewsAllTime)} all-time</div></div>
+      <div class="kpi"><div class="k-label">Businesses connected</div><div class="k-val">${fmt(bill.usage.businesses)}</div></div>
+      <div class="kpi"><div class="k-label">“Powered by” clicks</div><div class="k-val">${fmt(bill.powered.clicks)}</div><div class="k-sub">${fmt(bill.powered.trackedPages)} pages tracked</div></div>
+      <div class="kpi"><div class="k-label">Widget page views</div><div class="k-val">${fmt(bill.powered.widgetPageViews)}</div><div class="k-sub">across all embeds</div></div>
+    </div>` : unavailable("Billing", rs[0])}
+    <div class="grid-2" style="margin-bottom:16px">
+      ${bill ? `<div class="panel"><h3>New signups · last 12 months</h3>
+        ${barChart(bill.signups.map((s) => ({ v: s.count, tip: `${s.month}: ${s.count}`, label: s.month.slice(5) })))}</div>` : ""}
+      ${planSplitPanel(bill)}
+    </div>
+
+    <div class="toolbar"><div class="sec-title" style="margin:0">Embeds & “Powered by” clicks</div>
+      <select id="p-sort" style="width:auto;margin-left:auto"><option value="poweredClicks" ${pagesSort==="poweredClicks"?"selected":""}>Sort by clicks</option><option value="views" ${pagesSort==="views"?"selected":""}>Sort by views</option></select></div>
+    ${pages ? `<div class="grid-eq" style="align-items:start;margin-bottom:16px">
+      <div class="tablewrap">${pages.pages.length?`<table><thead><tr><th>Page</th><th>Owner</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
+        ${pages.pages.map((x)=>`<tr><td class="truncate"><a href="${esc(x.pageUrl)}" target="_blank">${esc(x.pageUrl)}</a></td><td class="truncate">${esc(x.email)}</td><td class="right">${fmt(x.views)}</td><td class="right">${fmt(x.clicks)}</td></tr>`).join("")}
+      </tbody></table>`:`<div class="empty">No embeds tracked yet.</div>`}</div>
+      <div class="tablewrap">${pages.hosts.length?`<table><thead><tr><th>Host</th><th class="right">Pages</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
+        ${pages.hosts.map((h)=>`<tr><td class="truncate">${esc(h.host)}</td><td class="right">${fmt(h.pages)}</td><td class="right">${fmt(h.views)}</td><td class="right">${fmt(h.clicks)}</td></tr>`).join("")}
+      </tbody></table>`:`<div class="empty">—</div>`}</div>
+    </div>` : unavailable("Pages", rs[1])}
+
+    <div class="sec-title">Businesses (connected sources)</div>
+    ${biz ? `<div class="tablewrap" style="margin-bottom:16px">${biz.businesses.length?`<table><thead><tr>
       <th>Owner</th><th>Google business</th><th>Place ID</th><th>Trustpilot</th><th class="right">Min ★</th><th>Connected</th>
-    </tr></thead><tbody>${d.businesses.map((b)=>`<tr>
+    </tr></thead><tbody>${biz.businesses.map((b)=>`<tr>
       <td>${esc(b.email)}</td><td>${esc(b.googleBusinessName||"—")}</td><td class="mono truncate">${esc(b.googlePlaceId||"—")}</td>
       <td class="truncate">${b.trustpilotUrl?`<a href="${esc(b.trustpilotUrl)}" target="_blank">${esc(b.trustpilotUrl.replace(/^https?:\/\/(www\.)?/,""))}</a>`:"—"}</td>
       <td class="right">${b.minStars}</td><td>${date(b.createdAt)}</td>
-    </tr>`).join("")}</tbody></table>`:`<div class="empty">No businesses connected yet.</div>`}</div>`;
-  bindProdBar();
-}
-async function renderGeoSites() {
-  const d = await api("/geoblock/admin/sites");
-  $("view").innerHTML = `
-    <div class="page-head"><div><h2>Protected sites</h2><p>Every Bouncer rule: mode, countries, VPN and action.</p></div>${prodBar("businesses")}</div>
-    <div class="tablewrap">${d.sites.length?`<table><thead><tr>
-      <th>Owner</th><th>Label</th><th>Mode</th><th class="right">Countries</th><th>VPN</th><th>Action</th><th>Scope</th><th>Strict</th><th>Created</th>
-    </tr></thead><tbody>${d.sites.map((s)=>`<tr>
-      <td class="truncate">${esc(s.email)}</td><td>${esc(s.label||"—")}</td><td>${esc(s.mode)}</td><td class="right">${fmt(s.countries)}</td>
-      <td>${s.vpnBlock?"✓":"—"}</td><td>${esc(s.action)}</td><td>${esc(s.scope)}</td><td>${s.strictMode?"✓":"—"}</td><td>${date(s.createdAt)}</td>
-    </tr>`).join("")}</tbody></table>`:`<div class="empty">No protected sites yet.</div>`}</div>`;
-  bindProdBar();
+    </tr>`).join("")}</tbody></table>`:`<div class="empty">No businesses connected yet.</div>`}</div>` : unavailable("Businesses", rs[2])}
+
+    ${cachePanel(cache, rs[3], p, "Review cache (Google/Trustpilot payloads)")}`;
+  bindCache(p);
+  if ($("p-sort")) $("p-sort").onchange = (e) => { pagesSort = e.target.value; renderReviews(head); };
 }
 
-/* ── Cache (Reviews → review payloads · Geoblock → IP geo lookups) ── */
-async function renderCache() {
-  const geo = product === "geoblock";
-  const d = await padmin("/cache");
+/* Bouncer (geoblock) */
+async function renderGeoblock(head) {
+  const p = PROD.geoblock;
+  const rs = await Promise.allSettled([
+    acct("/overview", null, "geoblock"), api("/geoblock/admin/overview"), api("/geoblock/admin/trend"),
+    api("/geoblock/admin/countries"), api("/geoblock/admin/sites"), api("/geoblock/admin/cache"),
+  ]);
+  const [bill, dom, trend, countries, sites, cache] = rs.map(val);
+  const maxC = countries ? Math.max(1, ...countries.countries.map((c) => c.blocked || c.visits)) : 1;
   $("view").innerHTML = `
-    <div class="page-head"><div><h2>${geo ? "IP geolocation cache" : "Review cache"}</h2><p>${geo ? "Cached ip-api lookups that keep block checks fast and under the rate limit." : "Cached Google/Trustpilot payloads that serve widgets fast."}</p></div>${prodBar("cache")}</div>
+    ${head("Geo/VPN blocking — protected sites and block activity.")}
     <div class="kpis">
-      <div class="kpi"><div class="k-label">Cached entries</div><div class="k-val">${fmt(d.total)}</div></div>
-      <div class="kpi"><div class="k-label">Expired</div><div class="k-val">${fmt(d.expired)}</div></div>
-      ${d.byPlatform.map((p)=>`<div class="kpi"><div class="k-label">${esc(p.platform)}</div><div class="k-val">${fmt(p.count)}</div></div>`).join("")}
+      ${bill ? `<div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
+      <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${fmt(bill.plans.pro)} Pro · ${fmt(bill.plans.ultra)} Ultra</div></div>` : ""}
+      ${dom ? `<div class="kpi"><div class="k-label">Plugin users</div><div class="k-val">${fmt(dom.users.total)}</div><div class="k-sub">+${fmt(dom.users.newThisMonth)} this month</div></div>
+      <div class="kpi"><div class="k-label">Protected sites</div><div class="k-val">${fmt(dom.configs.total)}</div><div class="k-sub">${fmt(dom.configs.vpnEnabled)} with VPN block</div></div>
+      <div class="kpi"><div class="k-label">Blocked (month)</div><div class="k-val">${fmt(dom.thisMonth.blocked)}</div><div class="k-sub">${fmt(dom.thisMonth.vpnBlocked)} via VPN/proxy</div></div>
+      <div class="kpi"><div class="k-label">Blocked (all-time)</div><div class="k-val">${fmt(dom.allTime.blocked)}</div><div class="k-sub">${fmt(dom.allTime.visits)} visits checked</div></div>` : ""}
     </div>
-    <div class="panel" style="max-width:520px">
-      <h3>Maintenance</h3>
-      <div class="ok" id="c-ok"></div><div class="err" id="c-err"></div>
-      <div style="display:flex;gap:8px;margin-top:6px">
-        <button class="btn btn-line btn-sm" id="c-expired">Purge expired (${fmt(d.expired)})</button>
-        <button class="btn btn-danger btn-sm" id="c-all">Purge ALL</button>
-      </div>
-    </div>`;
-  bindProdBar();
-  $("c-expired").onclick = () => purge(false);
-  $("c-all").onclick = () => { if (confirm(`Delete the entire ${geo ? "IP geo" : "review"} cache?`)) purge(true); };
-  async function purge(all) {
-    try { const r = await padmin("/cache/purge"+(all?"?all=1":""),{method:"POST"}); $("c-ok").textContent = `Deleted ${r.deleted} entr${r.deleted===1?"y":"ies"}.`; $("c-ok").style.display="block"; setTimeout(renderCache, 900); }
-    catch(e){ $("c-err").textContent=e.message; $("c-err").style.display="block"; }
-  }
+    ${!bill && !dom ? unavailable("Bouncer", rs[1]) : ""}
+    <div class="grid-2" style="margin-bottom:16px">
+      ${trend ? `<div class="panel"><h3>Blocked visitors · last 12 months</h3>
+        ${barChart(trend.trend.map((t) => ({ v: t.blocked, tip: `${t.month}: ${fmt(t.blocked)} blocked`, label: t.month.slice(5) })))}</div>` : `<div class="panel">${unavailable("Trend", rs[2])}</div>`}
+      ${planSplitPanel(bill)}
+    </div>
+    <div class="sec-title">Blocks by country · all-time</div>
+    ${countries ? `<div class="tablewrap" style="margin-bottom:16px">${countries.countries.length?`<table><thead><tr><th>Country</th><th class="right">Blocked</th><th class="right">VPN/proxy</th><th class="right">Visits</th><th style="width:30%">Share</th></tr></thead><tbody>
+      ${countries.countries.map((c)=>`<tr><td>${flag(c.countryCode)} ${esc(c.countryCode)}</td><td class="right">${fmt(c.blocked)}</td><td class="right">${fmt(c.vpnBlocked)}</td><td class="right">${fmt(c.visits)}</td>
+        <td><div class="meter"><span style="width:${Math.round(((c.blocked||c.visits)/maxC)*100)}%"></span></div></td></tr>`).join("")}
+    </tbody></table>`:`<div class="empty">No blocks recorded yet.</div>`}</div>` : unavailable("Countries", rs[3])}
+    <div class="sec-title">Protected sites</div>
+    ${sites ? `<div class="tablewrap" style="margin-bottom:16px">${sites.sites.length?`<table><thead><tr>
+      <th>Owner</th><th>Label</th><th>Mode</th><th class="right">Countries</th><th>VPN</th><th>Action</th><th>Scope</th><th>Strict</th><th>Created</th>
+    </tr></thead><tbody>${sites.sites.map((s)=>`<tr>
+      <td>${shortId(s.userId)}</td><td>${esc(s.label||"—")}</td><td>${esc(s.mode)}</td><td class="right">${fmt(s.countries)}</td>
+      <td>${s.vpnBlock?"✓":"—"}</td><td>${esc(s.action)}</td><td>${esc(s.scope)}</td><td>${s.strictMode?"✓":"—"}</td><td>${date(s.createdAt)}</td>
+    </tr>`).join("")}</tbody></table>`:`<div class="empty">No protected sites yet.</div>`}</div>` : unavailable("Sites", rs[4])}
+    ${cachePanel(cache, rs[5], p, "IP geolocation cache (ip-api lookups)")}`;
+  bindCache(p);
+}
+
+/* Router */
+async function renderRouterP(head) {
+  const p = PROD.router;
+  const rs = await Promise.allSettled([
+    acct("/overview", null, "router"), api("/router/admin/overview"), api("/router/admin/trend"),
+    api("/router/admin/countries"), api("/router/admin/sites"), api("/router/admin/cache"),
+  ]);
+  const [bill, dom, trend, countries, sites, cache] = rs.map(val);
+  const maxC = countries ? Math.max(1, ...countries.countries.map((c) => c.redirected || c.visits)) : 1;
+  $("view").innerHTML = `
+    ${head("Geo/language/device redirects — routed sites and redirect activity.")}
+    <div class="kpis">
+      ${bill ? `<div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
+      <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${fmt(bill.plans.pro)} Pro · ${fmt(bill.plans.ultra)} Ultra</div></div>` : ""}
+      ${dom ? `<div class="kpi"><div class="k-label">Plugin users</div><div class="k-val">${fmt(dom.users.total)}</div><div class="k-sub">+${fmt(dom.users.newThisMonth)} this month</div></div>
+      <div class="kpi"><div class="k-label">Routed sites</div><div class="k-val">${fmt(dom.configs.total)}</div><div class="k-sub">${fmt(dom.configs.enabled)} enabled</div></div>
+      <div class="kpi"><div class="k-label">Redirects (month)</div><div class="k-val">${fmt(dom.thisMonth.redirected)}</div><div class="k-sub">${fmt(dom.thisMonth.visits)} visits checked</div></div>
+      <div class="kpi"><div class="k-label">Redirects (all-time)</div><div class="k-val">${fmt(dom.allTime.redirected)}</div><div class="k-sub">${fmt(dom.allTime.visits)} visits checked</div></div>` : ""}
+    </div>
+    ${!bill && !dom ? unavailable("Router", rs[1]) : ""}
+    <div class="grid-2" style="margin-bottom:16px">
+      ${trend ? `<div class="panel"><h3>Redirected visitors · last 12 months</h3>
+        ${barChart(trend.trend.map((t) => ({ v: t.redirected, tip: `${t.month}: ${fmt(t.redirected)} redirected`, label: t.month.slice(5) })))}</div>` : `<div class="panel">${unavailable("Trend", rs[2])}</div>`}
+      ${planSplitPanel(bill)}
+    </div>
+    <div class="sec-title">Redirects by country · all-time</div>
+    ${countries ? `<div class="tablewrap" style="margin-bottom:16px">${countries.countries.length?`<table><thead><tr><th>Country</th><th class="right">Redirected</th><th class="right">Visits</th><th style="width:30%">Share</th></tr></thead><tbody>
+      ${countries.countries.map((c)=>`<tr><td>${flag(c.countryCode)} ${esc(c.countryCode)}</td><td class="right">${fmt(c.redirected)}</td><td class="right">${fmt(c.visits)}</td>
+        <td><div class="meter"><span style="width:${Math.round(((c.redirected||c.visits)/maxC)*100)}%"></span></div></td></tr>`).join("")}
+    </tbody></table>`:`<div class="empty">No redirects recorded yet.</div>`}</div>` : unavailable("Countries", rs[3])}
+    <div class="sec-title">Routed sites</div>
+    ${sites ? `<div class="tablewrap" style="margin-bottom:16px">${sites.sites.length?`<table><thead><tr>
+      <th>Owner</th><th>Label</th><th>Enabled</th><th class="right">Rules</th><th>Default</th><th>Webhook</th><th>Created</th>
+    </tr></thead><tbody>${sites.sites.map((s)=>`<tr>
+      <td>${shortId(s.userId)}</td><td>${esc(s.label||"—")}</td><td>${s.enabled?"✓":"—"}</td><td class="right">${fmt(s.rules)}</td>
+      <td>${s.hasDefault?"✓":"—"}</td><td>${s.webhook?"✓":"—"}</td><td>${date(s.createdAt)}</td>
+    </tr>`).join("")}</tbody></table>`:`<div class="empty">No routed sites yet.</div>`}</div>` : unavailable("Sites", rs[4])}
+    ${cachePanel(cache, rs[5], p, "IP geolocation cache (ip-api lookups)")}`;
+  bindCache(p);
+}
+
+/* Maintenance */
+async function renderMaintenance(head) {
+  const rs = await Promise.allSettled([
+    acct("/overview", null, "maintenance"), api("/maintenance/admin/overview"),
+    api("/maintenance/admin/trend"), api("/maintenance/admin/sites"),
+  ]);
+  const [bill, dom, trend, sites] = rs.map(val);
+  $("view").innerHTML = `
+    ${head("Server-side maintenance mode — protected sites and traffic held back.")}
+    <div class="kpis">
+      ${bill ? `<div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
+      <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${fmt(bill.plans.pro)} Pro · ${fmt(bill.plans.ultra)} Ultra</div></div>` : ""}
+      ${dom ? `<div class="kpi"><div class="k-label">Plugin users</div><div class="k-val">${fmt(dom.users.total)}</div><div class="k-sub">+${fmt(dom.users.newThisMonth)} this month</div></div>
+      <div class="kpi"><div class="k-label">Sites</div><div class="k-val">${fmt(dom.configs.total)}</div><div class="k-sub">${fmt(dom.configs.maintenanceOn)} in maintenance now</div></div>
+      <div class="kpi"><div class="k-label">Blocked (all-time)</div><div class="k-val">${fmt(dom.allTime.blocked)}</div><div class="k-sub">${fmt(dom.allTime.bypassed)} bypassed via whitelist</div></div>
+      <div class="kpi"><div class="k-label">Visits checked</div><div class="k-val">${fmt(dom.allTime.visits)}</div><div class="k-sub">all-time</div></div>` : ""}
+    </div>
+    ${!bill && !dom ? unavailable("Maintenance", rs[1]) : ""}
+    <div class="grid-2" style="margin-bottom:16px">
+      ${trend ? `<div class="panel"><h3>Blocked visitors · last 30 days</h3>
+        ${barChart(trend.trend.map((t, i) => ({ v: t.blocked, tip: `${t.day}: ${fmt(t.blocked)} blocked`, label: i % 5 === 0 ? t.day.slice(8) : "" })))}</div>` : `<div class="panel">${unavailable("Trend", rs[2])}</div>`}
+      ${planSplitPanel(bill)}
+    </div>
+    <div class="sec-title">Sites</div>
+    ${sites ? `<div class="tablewrap">${sites.sites.length?`<table><thead><tr>
+      <th>Owner</th><th>Label</th><th>In maintenance</th><th>Action</th><th class="right">IP whitelist</th><th>Schedule</th><th>Created</th>
+    </tr></thead><tbody>${sites.sites.map((s)=>`<tr>
+      <td>${shortId(s.userId)}</td><td>${esc(s.label||"—")}</td><td>${s.enabled?"🟠 on":"—"}</td><td>${esc(s.action||"—")}</td>
+      <td class="right">${fmt(s.whitelistSize)}</td><td>${s.autoSchedule?"✓":"—"}</td><td>${date(s.createdAt)}</td>
+    </tr>`).join("")}</tbody></table>`:`<div class="empty">No sites yet.</div>`}</div>` : unavailable("Sites", rs[3])}`;
 }
 
 boot();
