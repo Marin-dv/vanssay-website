@@ -149,6 +149,7 @@
     <button class="navlink active" data-tab="overview"><span class="ic">📊</span> Overview</button>
     <button class="navlink" data-tab="users"><span class="ic">👤</span> Users</button>
     <button class="navlink" data-tab="subs"><span class="ic">💳</span> Subscriptions</button>
+    <button class="navlink" data-tab="expenses"><span class="ic">💸</span> Expenses</button>
     <div class="navsep">Plugins</div>
     <div id="prod-nav"></div>
     <div class="aside-foot">
@@ -183,6 +184,9 @@ const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":
 const fmt = (n) => Number(n || 0).toLocaleString();
 const money = (n) => "$" + Number(n || 0).toLocaleString();
 const date = (d) => d ? new Date(d).toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" }) : "—";
+const dt = (d) => d ? new Date(d).toLocaleString(undefined, { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }) : "—";
+// Apify costs are tiny (fractions of a cent → a few $); show enough precision to be useful.
+const usd = (n) => { n = Number(n || 0); return "$" + (n >= 1 ? n.toFixed(2) : n.toFixed(4)); };
 const planBadge = (p) => { p = p || "free"; return `<span class="badge b-${esc(p)}">${esc(p[0].toUpperCase()+p.slice(1))}</span>`; };
 const statusBadge = (s) => { const k = s==="active"||s==="trialing"?"b-active":s==="canceled"?"b-canceled":"b-other"; return `<span class="badge ${k}">${esc(s||"—")}</span>`; };
 const flag = (cc) => (cc && cc.length === 2 ? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0))) : "🏳️");
@@ -250,7 +254,7 @@ function switchTab(tab) {
   document.querySelectorAll(".navlink").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
   $("view").innerHTML = `<div class="empty">Loading…</div>`;
   if (tab.startsWith("prod:")) return renderProduct(tab.slice(5));
-  ({ overview: renderOverview, users: renderUsers, subs: renderSubs }[tab])();
+  ({ overview: renderOverview, users: renderUsers, subs: renderSubs, expenses: renderExpenses }[tab])();
 }
 
 /* ── Shared pieces ── */
@@ -525,6 +529,55 @@ async function renderSubs() {
       <td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td>
       <td class="mono truncate">${esc(s.stripeSubscriptionId||"manual")}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No subscriptions yet.</div>`}</div>`;
+}
+
+/* ── Expenses — Apify scraping costs (Trustpilot + Google) ── */
+async function renderExpenses() {
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Expenses</h2><p>Apify scraping costs — every paid-plan Trustpilot &amp; Google fetch. Exact per-run cost read back from Apify; cached loads are free.</p></div></div>
+    <div id="ex"><div class="empty">Loading…</div></div>`;
+  let d;
+  try { d = await api("/admin/expenses"); }
+  catch (e) { $("ex").innerHTML = `<div class="empty">Couldn't load: ${esc(e.message)}</div>`; return; }
+
+  const bp = Object.fromEntries(d.month.byPlatform.map((x) => [x.platform, x]));
+  const tp = bp.trustpilot || { cost:0, items:0, requests:0 };
+  const gg = bp.google || { cost:0, items:0, requests:0 };
+  const monthReq = tp.requests + gg.requests;
+  const pill = (pl) => pl === "google"
+    ? `<span class="badge b-active">🔵 Google</span>`
+    : `<span class="badge b-pro">⭐ Trustpilot</span>`;
+
+  $("ex").innerHTML = `
+    <div class="kpis">
+      <div class="kpi hero"><div class="k-label">Spend · this month</div><div class="k-val">${usd(d.month.total)}</div><div class="k-sub">${fmt(monthReq)} paid scrape(s) · ${d.month.key}</div></div>
+      <div class="kpi"><div class="k-label">⭐ Trustpilot (month)</div><div class="k-val">${usd(tp.cost)}</div><div class="k-sub">${fmt(tp.requests)} scrapes · ${fmt(tp.items)} reviews</div></div>
+      <div class="kpi"><div class="k-label">🔵 Google (month)</div><div class="k-val">${usd(gg.cost)}</div><div class="k-sub">${fmt(gg.requests)} scrapes · ${fmt(gg.items)} reviews</div></div>
+      <div class="kpi"><div class="k-label">All-time spend</div><div class="k-val">${usd(d.allTime.cost)}</div><div class="k-sub">${fmt(d.allTime.requests)} scrapes total</div></div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="panel"><h3>Monthly spend · last 12 months</h3>
+        ${barChart(d.months.map((m) => ({ v: m.total, tip: `${m.month}: ${usd(m.total)} (TP ${usd(m.trustpilot)} · G ${usd(m.google)})`, label: m.month.slice(5) })))}</div>
+      <div class="panel"><h3>This month by platform</h3>
+        ${planRow("⭐ Trustpilot", tp.cost, d.month.total)}
+        ${planRow("🔵 Google", gg.cost, d.month.total)}
+        <div class="kv" style="margin-top:10px"><span>Total this month</span><strong>${usd(d.month.total)}</strong></div>
+        <p class="note">Cost per scrape is Apify's exact <span class="mono">usageTotalUsd</span> for that run.</p></div>
+    </div>
+
+    <div class="sec-title">Recent scrapes (last ${d.recent.length})</div>
+    <div class="tablewrap">${d.recent.length ? `<table><thead><tr>
+      <th>When</th><th>Platform</th><th>Business</th><th class="right">Reviews</th><th class="right">Cost</th><th>Status</th>
+    </tr></thead><tbody>${d.recent.map((r) => `<tr>
+      <td>${dt(r.createdAt)}</td>
+      <td>${pill(r.platform)}</td>
+      <td class="truncate">${/^https?:\/\//.test(r.sourceId) ? `<a href="${esc(r.sourceId)}" target="_blank">${esc(r.sourceId.replace(/^https?:\/\/(www\.)?/,""))}</a>` : esc(r.sourceId || "—")}</td>
+      <td class="right">${fmt(r.items)}</td>
+      <td class="right">${usd(r.cost)}</td>
+      <td>${r.status === "SUCCEEDED" ? "✅" : statusBadge(r.status)}</td>
+    </tr>`).join("")}</tbody></table>` : `<div class="empty">No scrapes recorded yet. Costs appear here after the first paid-plan Trustpilot or Google fetch (cache misses only).</div>`}</div>
+    <p class="note">Only paid-plan fetches hit Apify: free Trustpilot uses the self-hosted scraper and free Google uses the Places API (Google's $200/mo credit) — both $0.</p>`;
 }
 
 /* ── Plugin pages ── */
