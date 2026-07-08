@@ -49,6 +49,7 @@
 <li><strong>Pick the behavior per rule:</strong> a polite suggestion banner ("It looks like you're in France, switch to the French page?") or an instant redirect where forcing genuinely fits (e.g. legal separation of regional stores).</li>
 <li><strong>Publish.</strong> Detection is server-side, no flash of the wrong page, no API keys in your page source, and rules update without republishing.</li>
 </ol>
+<div class="carousel"><div class="carousel-track">
 <figure>
 <img src="img/router-rules.png" alt="Router for Framer redirect rules: France to /fr, DACH to /de, Spanish language to /es, mobile US to a mobile URL, VPN to /global, evaluated top to bottom" loading="lazy" width="1600" height="1200" />
 <figcaption>Router rules run top to bottom, first match wins. Route by country, region, language, device, or VPN.</figcaption>
@@ -57,6 +58,7 @@
 <img src="img/router-banner.png" alt="Router suggestion banner on a Framer site: a French visitor is offered the French page but can stay, instead of a forced redirect" loading="lazy" width="1600" height="1200" />
 <figcaption>The SEO-safe option: suggest the better page with a dismissible banner instead of forcing a redirect.</figcaption>
 </figure>
+</div></div>
 
 <h2>Redirecting vs. blocking</h2>
 <p>Redirects and blocks solve different problems: redirect when every visitor has <em>some</em> right destination (language and regional versions), block when certain visitors should see <em>nothing</em> (licensing, compliance, spam). If you're after the second, you want <a href="block-countries-framer.html">country blocking with Bouncer</a> instead, or both plugins together: route the markets you serve, block the ones you can't.</p>
@@ -87,5 +89,6 @@
 <span>© 2026 Vanssay</span>
 <span><a href="../router.html">Router</a> · <a href="../index.html">All plugins</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></span>
 </div></footer>
+<script src="carousel.js" defer></script>
 </body>
 </html>

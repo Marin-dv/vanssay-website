@@ -116,6 +116,20 @@ h3,.feat h3,.plan-name,.plan-price,summary{font-family:'Bricolage Grotesque',-ap
 .site-foot p{color:rgba(255,255,255,.6);max-width:470px;margin:18px 0 30px;font-size:16px}
 .site-foot .foot-links{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:54px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14);font-family:'Space Mono',monospace;font-size:12px;color:rgba(255,255,255,.5)}
 .site-foot .foot-links a{color:rgba(255,255,255,.7)}.site-foot .foot-links a:hover{color:#fff}
+/* carousel */
+.carousel{position:relative;max-width:460px;margin:44px auto 0}
+.carousel-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-ms-overflow-style:none;scrollbar-width:none;border-radius:12px}
+.carousel-track::-webkit-scrollbar{display:none}
+.carousel-track figure{flex:0 0 100%;margin:0;scroll-snap-align:center;padding:0 2px}
+.carousel-track figure img{width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--border)}
+.carousel-track figcaption{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5}
+.carousel-btn{position:absolute;top:38%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:18px;line-height:1;display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 12px rgba(22,21,27,.14);z-index:2}
+.carousel-btn:hover{border-color:var(--green);color:var(--green)}
+.carousel-btn:disabled{opacity:.3;cursor:default}
+.carousel-btn.prev{left:-13px}.carousel-btn.next{right:-13px}
+.carousel-dots{display:flex;gap:7px;justify-content:center;margin-top:12px}
+.carousel-dots button{width:7px;height:7px;padding:0;border-radius:50%;border:none;background:var(--border);cursor:pointer;transition:.15s}
+.carousel-dots button.active{background:var(--green);transform:scale(1.25)}
 </style>
 </head>
 <body>
@@ -170,14 +184,16 @@ h3,.feat h3,.plan-name,.plan-price,summary{font-family:'Bricolage Grotesque',-ap
   <div class="eyebrow">How it works</div>
   <h2>Route by <span class="serif">anything.</span></h2>
   <p class="lead">Stack rules by country, region, language, device or VPN status. They run top to bottom and the first match wins, so a French visitor lands on <code>/fr</code>, a mobile US visitor gets your mobile URL, and everyone else stays put. Every decision is made server-side in milliseconds, so there's no flash of the wrong page and nothing for a visitor to bypass.</p>
-  <figure style="margin:44px auto 0;max-width:960px">
-    <img src="guides/img/router-rules.png" alt="Router for Framer redirect rules: France to /fr, DACH to /de, Spanish language to /es, mobile US to a mobile URL, VPN to /global, first match wins, with a test console" loading="lazy" width="1600" height="1200" style="width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--border)" />
-    <figcaption style="font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted);margin-top:10px">Build rules visually and test which one fires for any country, language or device, no VPN needed.</figcaption>
-  </figure>
-  <figure style="margin:26px auto 0;max-width:960px">
-    <img src="guides/img/router-banner.png" alt="Router suggestion banner on a Framer site offering a French visitor the French version while letting them stay" loading="lazy" width="1600" height="1200" style="width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--border)" />
-    <figcaption style="font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted);margin-top:10px">Prefer not to force it? Suggest the better page with a dismissible, auto-translated banner. Kinder to SEO and to visitors.</figcaption>
-  </figure>
+  <div class="carousel"><div class="carousel-track">
+    <figure>
+      <img src="guides/img/router-rules.png" alt="Router for Framer redirect rules: France to /fr, DACH to /de, Spanish language to /es, mobile US to a mobile URL, VPN to /global, first match wins, with a test console" loading="lazy" width="1600" height="1200" />
+      <figcaption>Build rules visually and test which one fires for any country, language or device, no VPN needed.</figcaption>
+    </figure>
+    <figure>
+      <img src="guides/img/router-banner.png" alt="Router suggestion banner on a Framer site offering a French visitor the French version while letting them stay" loading="lazy" width="1600" height="1200" />
+      <figcaption>Prefer not to force it? Suggest the better page with a dismissible, auto-translated banner. Kinder to SEO and to visitors.</figcaption>
+    </figure>
+  </div></div>
 </div></section>
 
 <section id="pricing"><div class="wrap center">
@@ -261,6 +277,6 @@ h3,.feat h3,.plan-name,.plan-price,summary{font-family:'Bricolage Grotesque',-ap
     </div>
   </div>
 </footer>
-
+<script src="guides/carousel.js" defer></script>
 </body>
 </html>
