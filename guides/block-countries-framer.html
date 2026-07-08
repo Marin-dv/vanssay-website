@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How to Block Countries on a Framer Site (2026 Guide)</title>
+<meta name="description" content="Framer has no built-in geoblocking. Here are the 3 ways to block visitors by country on a Framer site — a plugin, Cloudflare, or custom code — and which one to pick." />
+<link rel="canonical" href="https://vanssay.net/guides/block-countries-framer.html" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%2316a34a'/><path d='M34,4H25L13,36H22Z' fill='%2322c55e'/></svg>" />
+<meta property="og:title" content="How to Block Countries on a Framer Site (2026 Guide)" />
+<meta property="og:description" content="Framer has no built-in geoblocking. Compare the 3 ways to block visitors by country on a Framer site and set one up in under 2 minutes." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://vanssay.net/guides/block-countries-framer.html" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="guide.css" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Does Framer have built-in country blocking?","acceptedAnswer":{"@type":"Answer","text":"No. Framer has no native geoblocking feature. To block visitors by country you need a marketplace plugin like Bouncer, a CDN-level rule (Cloudflare), or custom code."}},
+{"@type":"Question","name":"What is the easiest way to block a country in Framer?","acceptedAnswer":{"@type":"Answer","text":"Install the Bouncer plugin from the Framer marketplace, pick the countries to block, choose a block screen, and republish. It takes about two minutes and requires no DNS changes or code."}},
+{"@type":"Question","name":"Can visitors bypass country blocking with a VPN?","acceptedAnswer":{"@type":"Answer","text":"Country blocking is based on the visitor's IP address, so a VPN can route around it. Bouncer's paid plans add VPN and proxy detection to close that gap."}},
+{"@type":"Question","name":"Will geoblocking hurt my Framer site's SEO?","acceptedAnswer":{"@type":"Answer","text":"Not if it's done server-side per visitor. Search engine crawlers mostly crawl from the US, so as long as you don't block the US (or you allowlist crawlers), your pages keep getting indexed."}}]}
+</script>
+</head>
+<body>
+<nav><div class="nav-in">
+  <a class="logo" href="../index.html"><b>V</b>anssay</a>
+  <div class="nav-links"><a href="../geoblock.html">Bouncer</a><a href="../geoblock.html#pricing">Pricing</a><a href="../contact.html">Contact</a></div>
+  <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Get the plugin</a>
+</div></nav>
+
+<article>
+<p class="eyebrow">Framer guide</p>
+<h1>How to block countries on a Framer site</h1>
+<p class="lead">Framer has no built-in geoblocking. If you need to block visitors from specific countries — for licensing, legal, compliance, or spam reasons — you have three real options. Here's how each works and which one to pick.</p>
+<p class="meta">Updated July 2026 · 5 min read</p>
+
+<h2>Why you can't do this in Framer itself</h2>
+<p>Framer controls design, CMS, and hosting, but it exposes no setting for visitor access by location. There is no "restrict by country" toggle anywhere in site settings, and Framer's hosting doesn't let you write server rules. So country blocking has to come from one of three layers: <strong>a plugin that checks the visitor at render time</strong>, <strong>a CDN in front of your domain</strong>, or <strong>custom code you write yourself</strong>.</p>
+
+<h2>Option 1: A geoblocking plugin (2 minutes, no DNS changes)</h2>
+<p><a href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Bouncer</a> is a Framer marketplace plugin built exactly for this. It checks each visitor's country server-side when the page loads and shows blocked visitors an access-denied screen styled to match your site, instead of a raw error page.</p>
+<ol class="steps">
+<li><strong>Install Bouncer</strong> from the Framer marketplace (Insert panel → Plugins → search "block countries").</li>
+<li><strong>Pick countries</strong> to block — or flip to allowlist mode and pick the only countries that may enter.</li>
+<li><strong>Style the block screen</strong>: your logo, your copy, your colors. Blocked visitors see a branded page, not a 403.</li>
+<li><strong>Publish.</strong> The rules apply on your live site immediately, and you can change them without republishing.</li>
+</ol>
+<p>Because detection runs against a server API (not JavaScript guessing the locale), it can't be fooled by changing browser language, and paid plans also flag <a href="block-vpn-framer.html">VPN and proxy traffic</a>. If the service were ever unreachable, the site <strong>fails open</strong> — your page shows normally rather than locking everyone out.</p>
+
+<h2>Option 2: Cloudflare in front of your domain</h2>
+<p>If you move your domain's DNS to Cloudflare and proxy traffic through it, a free WAF custom rule can block by country before requests reach Framer. It works, but it's a heavier setup with real trade-offs on Framer specifically: you must switch nameservers, keep the proxy enabled (which Framer's own custom-domain guidance tells you to turn off to avoid SSL and redirect issues), blocked visitors get an unstyled Cloudflare error page, and rules apply to the whole domain — never a single page or section. Full comparison here: <a href="framer-geoblocking-cloudflare.html">Cloudflare geoblocking on Framer: setup, limits, and an easier alternative</a>.</p>
+
+<h2>Option 3: Custom code (don't)</h2>
+<p>You can paste a script into Framer's custom code that calls a geolocation API and hides the page with JavaScript. In practice this is the worst option: the content still loads (anyone can read it in DevTools or with JS disabled), free geo APIs rate-limit and leak your key, the page flashes before hiding, and you maintain it forever. Client-side hiding is cosmetic — it is not access control.</p>
+
+<h2>Which one should you use?</h2>
+<table>
+<tr><th></th><th>Bouncer plugin</th><th>Cloudflare</th><th>Custom code</th></tr>
+<tr><td>Setup time</td><td>~2 minutes</td><td>~1 hour + DNS propagation</td><td>Hours, ongoing</td></tr>
+<tr><td>DNS changes</td><td class="yes">None</td><td class="no">Move nameservers</td><td class="yes">None</td></tr>
+<tr><td>Branded block screen</td><td class="yes">Yes</td><td class="no">Cloudflare error page</td><td>DIY</td></tr>
+<tr><td>Per-page blocking</td><td class="yes">Yes</td><td class="no">Whole domain</td><td>DIY</td></tr>
+<tr><td>VPN/proxy detection</td><td class="yes">Yes (paid)</td><td class="no">Not on free plan</td><td class="no">No</td></tr>
+<tr><td>Actually hides content</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No (client-side)</td></tr>
+<tr><td>Price</td><td>Free · Pro $6/mo</td><td>Free (+ migration cost)</td><td>Your time</td></tr>
+</table>
+<p>If you already run your DNS on Cloudflare with the proxy on and only need one blunt domain-wide rule, Cloudflare is fine. For everyone else on Framer, a plugin is faster, safer, and looks better to the visitors you block.</p>
+
+<div class="cta-box">
+<h2>Block countries on your Framer site in 2 minutes</h2>
+<p>Bouncer — country blocking, VPN detection, and a branded block screen. Free plan available, from $6/mo for Pro.</p>
+<a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Install Bouncer for Framer</a>
+&nbsp; <a class="btn btn-line" href="../geoblock.html">See features &amp; pricing</a>
+</div>
+
+<h2>FAQ</h2>
+<details><summary>Does Framer have built-in country blocking?</summary><p>No. There is no geoblocking setting in Framer. You need a plugin, a CDN rule, or custom code — see the comparison above.</p></details>
+<details><summary>Can visitors bypass it with a VPN?</summary><p>Country detection is IP-based, so a VPN can route around a plain country block. Bouncer's paid plans detect VPN, proxy, and datacenter traffic and can block it too.</p></details>
+<details><summary>Will blocking countries hurt my SEO?</summary><p>Search engines crawl mostly from US IPs. As long as the US isn't blocked, your pages keep getting crawled and indexed normally. Blocking is per-visitor, not per-search-engine.</p></details>
+<details><summary>Can I block just one page instead of the whole site?</summary><p>Yes — with Bouncer you choose full-page blocking or protect individual pages/sections. CDN-level blocking (Cloudflare) applies to the entire domain.</p></details>
+
+<div class="related">
+<h2>Related guides</h2>
+<ul>
+<li><a href="framer-geoblocking-cloudflare.html">Cloudflare geoblocking on Framer: setup, limits, alternative</a></li>
+<li><a href="block-vpn-framer.html">How to block VPN &amp; proxy traffic on Framer</a></li>
+<li><a href="restrict-framer-site-to-one-country.html">Restrict a Framer site to one country (allowlist)</a></li>
+<li><a href="framer-redirect-by-country.html">Redirect Framer visitors by country instead of blocking</a></li>
+</ul>
+</div>
+</article>
+
+<footer class="site-foot"><div class="wrap">
+<span>© 2026 Vanssay</span>
+<span><a href="../geoblock.html">Bouncer</a> · <a href="../index.html">All plugins</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></span>
+</div></footer>
+</body>
+</html>

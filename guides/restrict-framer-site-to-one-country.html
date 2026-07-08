@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How to Restrict a Framer Site to One Country (Allowlist Mode)</title>
+<meta name="description" content="Make your Framer site available only in the US, UK, or any set of countries — and block everywhere else. Allowlist geoblocking explained, set up in 2 minutes." />
+<link rel="canonical" href="https://vanssay.net/guides/restrict-framer-site-to-one-country.html" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%2316a34a'/><path d='M34,4H25L13,36H22Z' fill='%2322c55e'/></svg>" />
+<meta property="og:title" content="How to Restrict a Framer Site to One Country (Allowlist Mode)" />
+<meta property="og:description" content="Only serve visitors from specific countries on your Framer site — block everyone else with a branded screen." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://vanssay.net/guides/restrict-framer-site-to-one-country.html" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="guide.css" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Can I make my Framer site available in only one country?","acceptedAnswer":{"@type":"Answer","text":"Yes — with an allowlist rule. The Bouncer plugin lets you pick the countries that may access the site; every visitor from anywhere else sees a block screen. Framer itself has no such setting."}},
+{"@type":"Question","name":"What's the difference between a blocklist and an allowlist?","acceptedAnswer":{"@type":"Answer","text":"A blocklist bans specific countries and lets everyone else in. An allowlist does the opposite: only listed countries get in. Allowlists are safer when access should be the exception, not the rule."}},
+{"@type":"Question","name":"Will restricting my site to one country affect Google indexing?","acceptedAnswer":{"@type":"Answer","text":"Google crawls almost entirely from US IPs. If the US is on your allowlist, indexing continues normally. If you must exclude the US, expect reduced crawling of the blocked content."}}]}
+</script>
+</head>
+<body>
+<nav><div class="nav-in">
+  <a class="logo" href="../index.html"><b>V</b>anssay</a>
+  <div class="nav-links"><a href="../geoblock.html">Bouncer</a><a href="../geoblock.html#pricing">Pricing</a><a href="../contact.html">Contact</a></div>
+  <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Get the plugin</a>
+</div></nav>
+
+<article>
+<p class="eyebrow">Framer guide</p>
+<h1>How to restrict a Framer site to one country</h1>
+<p class="lead">Sometimes the requirement isn't "block these countries" — it's "<em>only</em> this country gets in." A local service, a licensed product, a regional launch. That's allowlist geoblocking, and here's how to do it on Framer.</p>
+<p class="meta">Updated July 2026 · 3 min read</p>
+
+<h2>Blocklist vs. allowlist</h2>
+<p>A <strong>blocklist</strong> names the countries to keep out and admits everyone else. An <strong>allowlist</strong> flips the default: you name the countries allowed in, and the rest of the world is blocked. When access should be the exception — a US-only offer, a UK-licensed product, a Swiss-only client portal — the allowlist is the right shape, because you can't forget to block a country you never thought of.</p>
+
+<h2>Common reasons to do this</h2>
+<ul>
+<li><strong>Licensing &amp; regulation:</strong> your product or content is only cleared for certain markets (finance, gambling, alcohol, health).</li>
+<li><strong>Local businesses:</strong> a clinic, agency, or shop that serves one country and gets nothing but scraper and spam traffic from everywhere else.</li>
+<li><strong>Regional launches:</strong> soft-launch in one market before opening up.</li>
+<li><strong>Contractual exclusivity:</strong> a distributor owns the other territories.</li>
+</ul>
+
+<h2>Setting it up on Framer</h2>
+<p>Framer has no visitor-access settings, so the allowlist comes from a plugin. With <a href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Bouncer</a>:</p>
+<ol class="steps">
+<li><strong>Install Bouncer</strong> from the Framer marketplace.</li>
+<li><strong>Switch the rule to allowlist mode</strong> and select your country (or several — e.g. US + Canada).</li>
+<li><strong>Style the block screen</strong> everyone else will see: your logo and a clear message like "This service is only available in the United States." A branded explanation beats a mystery error.</li>
+<li><strong>Optionally block VPNs too.</strong> An allowlist is IP-based, so add <a href="block-vpn-framer.html">VPN &amp; proxy detection</a> if people routing in from outside actually matters.</li>
+<li><strong>Publish.</strong> Rules are enforced server-side on the live site and can be changed anytime without republishing.</li>
+</ol>
+
+<div class="note"><strong>SEO note:</strong> Google crawls almost entirely from US IP addresses. Keep the US on your allowlist if you want the site indexed; if you legally can't, accept that blocked pages won't be crawled from blocked regions.</div>
+
+<div class="cta-box">
+<h2>Make your Framer site country-exclusive in 2 minutes</h2>
+<p>Bouncer — allowlist or blocklist by country, VPN detection, branded block screen. Free plan available.</p>
+<a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Install Bouncer for Framer</a>
+&nbsp; <a class="btn btn-line" href="../geoblock.html">See features &amp; pricing</a>
+</div>
+
+<h2>FAQ</h2>
+<details><summary>Can I allow more than one country?</summary><p>Yes — the allowlist takes any set of countries. Pick one or twenty; everyone outside the list is blocked.</p></details>
+<details><summary>Can I restrict just one page instead of the whole site?</summary><p>Yes. Rules can apply to the full site or to specific pages — for example a members page restricted to one market while the homepage stays worldwide.</p></details>
+<details><summary>What do blocked visitors see?</summary><p>A block screen you design: your logo, colors, and copy. Not a bare 403 error.</p></details>
+
+<div class="related">
+<h2>Related guides</h2>
+<ul>
+<li><a href="block-countries-framer.html">How to block countries on a Framer site</a></li>
+<li><a href="block-vpn-framer.html">How to block VPN &amp; proxy traffic on Framer</a></li>
+<li><a href="framer-redirect-by-country.html">Redirect visitors by country instead of blocking them</a></li>
+</ul>
+</div>
+</article>
+
+<footer class="site-foot"><div class="wrap">
+<span>© 2026 Vanssay</span>
+<span><a href="../geoblock.html">Bouncer</a> · <a href="../index.html">All plugins</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></span>
+</div></footer>
+</body>
+</html>

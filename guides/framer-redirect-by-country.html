@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How to Redirect Framer Visitors by Country (Geo-Redirect Guide)</title>
+<meta name="description" content="Send Framer visitors to the right regional or language page based on their country. Why JS redirect hacks hurt SEO, what Google recommends, and the 2-minute plugin setup." />
+<link rel="canonical" href="https://vanssay.net/guides/framer-redirect-by-country.html" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%230e7afe'/><path d='M34,4H25L13,36H22Z' fill='%237c5cff'/></svg>" />
+<meta property="og:title" content="How to Redirect Framer Visitors by Country (Geo-Redirect Guide)" />
+<meta property="og:description" content="Geo-redirects on Framer done right: regional pages, language routing, and why forced redirects hurt SEO." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://vanssay.net/guides/framer-redirect-by-country.html" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="guide.css" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Can Framer redirect visitors based on their country?","acceptedAnswer":{"@type":"Answer","text":"Not natively — Framer's redirects are static path rules. Country-based routing needs a plugin like Router, which detects the visitor's country server-side and sends them to the page you choose."}},
+{"@type":"Question","name":"Do geo-redirects hurt SEO?","acceptedAnswer":{"@type":"Answer","text":"Forced automatic redirects can — Google recommends letting users and crawlers reach any version, and suggesting rather than forcing. A suggestion banner ('It looks like you're in France — view the French page?') is the SEO-safe pattern."}},
+{"@type":"Question","name":"Can I redirect by language instead of country?","acceptedAnswer":{"@type":"Answer","text":"Yes. Router can route on browser language as well as country or region, which is often the better signal for choosing a language version."}}]}
+</script>
+</head>
+<body>
+<nav><div class="nav-in">
+  <a class="logo" href="../index.html"><b>V</b>anssay</a>
+  <div class="nav-links"><a href="../router.html">Router</a><a href="../geoblock.html">Bouncer</a><a href="../contact.html">Contact</a></div>
+  <a class="btn btn-green" style="background:#0e7afe" href="https://www.framer.com/community/marketplace/plugins/router-vanssay/">Get the plugin</a>
+</div></nav>
+
+<article>
+<p class="eyebrow">Framer guide</p>
+<h1>How to redirect Framer visitors by country</h1>
+<p class="lead">A French visitor lands on your English homepage. A US visitor lands on your EU pricing. Geo-redirects fix this — but Framer can't do them natively, and the copy-paste JavaScript hacks come with SEO costs. Here's the right way.</p>
+<p class="meta">Updated July 2026 · 4 min read</p>
+
+<h2>What Framer can and can't do</h2>
+<p>Framer's built-in redirects map one path to another — static rules, same for every visitor. Localization gives you translated pages, but nothing routes a visitor to the right one based on where they are. For country-, region-, or language-based routing you need logic that runs per visitor.</p>
+
+<h2>The JavaScript hack, and why to skip it</h2>
+<p>The common workaround is custom code: call a free geolocation API, then <code>window.location = ...</code>. It works in a demo and degrades in production: the original page flashes before the jump, free geo APIs rate-limit right when traffic spikes, and — worst — <strong>forced client-side redirects are exactly what Google's internationalization guidance warns against</strong>. Googlebot crawls mostly from US IPs; if every US visit gets bounced to <code>/en-us</code>, that's what gets crawled, and your other versions suffer.</p>
+
+<h2>The SEO-safe pattern: suggest, don't force</h2>
+<p>Google's own recommendation is to let visitors (and crawlers) reach any version, and <em>suggest</em> the better one. That's the pattern <a href="https://www.framer.com/community/marketplace/plugins/router-vanssay/">Router</a> implements for Framer:</p>
+<ol class="steps">
+<li><strong>Install Router</strong> from the Framer marketplace.</li>
+<li><strong>Create rules:</strong> country, region, browser language, VPN status, or device → target page. E.g. France → <code>/fr</code>, DACH → <code>/de</code>, Spanish speakers → <code>/es</code>.</li>
+<li><strong>Pick the behavior per rule:</strong> a polite suggestion banner ("It looks like you're in France — switch to the French page?") or an instant redirect where forcing genuinely fits (e.g. legal separation of regional stores).</li>
+<li><strong>Publish.</strong> Detection is server-side — no flash of the wrong page, no API keys in your page source, and rules update without republishing.</li>
+</ol>
+
+<h2>Redirecting vs. blocking</h2>
+<p>Redirects and blocks solve different problems: redirect when every visitor has <em>some</em> right destination (language and regional versions), block when certain visitors should see <em>nothing</em> (licensing, compliance, spam). If you're after the second, you want <a href="block-countries-framer.html">country blocking with Bouncer</a> instead — or both plugins together: route the markets you serve, block the ones you can't.</p>
+
+<div class="cta-box">
+<h2>Route every visitor to the right page</h2>
+<p>Router for Framer — geo, language, and device rules with SEO-safe suggestion banners. Free plan available.</p>
+<a class="btn btn-green" style="background:#0e7afe" href="https://www.framer.com/community/marketplace/plugins/router-vanssay/">Install Router for Framer</a>
+&nbsp; <a class="btn btn-line" href="../router.html">See features &amp; pricing</a>
+</div>
+
+<h2>FAQ</h2>
+<details><summary>Will the suggestion banner annoy visitors?</summary><p>It's a small dismissible prompt, and it only appears when the visitor's location or language doesn't match the page they're on. One click accepts, one click dismisses.</p></details>
+<details><summary>Can I combine country and language rules?</summary><p>Yes — rules can target country, region, browser language, VPN status, or device type, so you can express things like "German speakers outside DACH → /de".</p></details>
+<details><summary>Does this work with Framer Localization?</summary><p>Yes — Router just sends visitors to whichever page or locale URL you specify, including Framer's localized paths.</p></details>
+
+<div class="related">
+<h2>Related guides</h2>
+<ul>
+<li><a href="block-countries-framer.html">How to block countries on a Framer site</a></li>
+<li><a href="restrict-framer-site-to-one-country.html">Restrict a Framer site to one country (allowlist)</a></li>
+<li><a href="block-vpn-framer.html">How to block VPN &amp; proxy traffic on Framer</a></li>
+</ul>
+</div>
+</article>
+
+<footer class="site-foot"><div class="wrap">
+<span>© 2026 Vanssay</span>
+<span><a href="../router.html">Router</a> · <a href="../index.html">All plugins</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></span>
+</div></footer>
+</body>
+</html>

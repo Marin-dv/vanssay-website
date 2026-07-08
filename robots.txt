@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /account.html
+Disallow: /accounts.html
+Disallow: /geoblock-account.html
+Disallow: /maintenance-account.html
+Disallow: /router-account.html
+
+Sitemap: https://vanssay.net/sitemap.xml
