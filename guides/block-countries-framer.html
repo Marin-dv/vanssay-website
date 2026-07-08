@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="guide.css" />
+<link rel="stylesheet" href="guide.css?v=2" />
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
 {"@type":"Question","name":"Does Framer have built-in country blocking?","acceptedAnswer":{"@type":"Answer","text":"No. Framer has no native geoblocking feature. To block visitors by country you need a marketplace plugin like Bouncer, a CDN-level rule (Cloudflare), or custom code."}},
@@ -27,7 +27,7 @@
 <nav class="top"><div class="nav-in">
   <a class="logo" href="../index.html"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
   <div class="nav-links"><a href="../geoblock.html">Bouncer</a><a href="../geoblock.html#pricing">Pricing</a><a href="index.html">Guides</a><a href="../contact.html">Contact</a></div>
-  <a class="btn btn-line" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener"><svg class="i-framer" viewBox="0 0 24 36" aria-hidden="true"><path fill="currentColor" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Bouncer on Framer</a>
+  <a class="btn btn-line" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener"><svg class="i-framer" width="12" height="18" viewBox="0 0 24 36" aria-hidden="true"><path fill="currentColor" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Bouncer on Framer</a>
 </div></nav>
 
 <div class="layout">
@@ -42,8 +42,8 @@
 </div>
 <p class="meta">Updated July 2026 · 6 min read</p>
 <div class="compat">
-  <span><svg class="i-framer" viewBox="0 0 24 36" aria-hidden="true"><path fill="#16151b" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Works on any Framer site</span>
-  <span><svg class="i-cf" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>A simpler alternative to Cloudflare</span>
+  <span><svg class="i-framer" width="12" height="18" viewBox="0 0 24 36" aria-hidden="true"><path fill="#16151b" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Works on any Framer site</span>
+  <span><svg class="i-cf" width="24" height="13" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>A simpler alternative to Cloudflare</span>
 </div>
 
 <h2 id="why">Why Framer can't do it on its own</h2>
@@ -82,7 +82,7 @@
   <figcaption>The block screen a visitor from a blocked country sees. Text, colours and logo are yours to set.</figcaption>
 </figure>
 
-<h2 id="cloudflare" class="h2ic"><svg class="i-cf" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>Method 2: Cloudflare in front of your domain</h2>
+<h2 id="cloudflare" class="h2ic"><svg class="i-cf" width="24" height="13" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>Method 2: Cloudflare in front of your domain</h2>
 <p>If you route your domain's DNS through Cloudflare with its proxy enabled, a free <a href="https://developers.cloudflare.com/waf/custom-rules/" target="_blank" rel="noopener">WAF custom rule</a> can block a country before the request ever reaches Framer. It works, and it has genuine strengths a plugin doesn't: the block happens at the network edge, and you get DDoS and firewall protection for the whole domain as a side effect.</p>
 <p>The trade-offs on Framer specifically: you have to move your nameservers to Cloudflare (propagation can take a day), and the WAF only filters traffic while the proxy is on, which is the mode Framer's own custom-domain guidance tells you to <em>disable</em>, because proxying in front of Framer's SSL is a known source of certificate and redirect problems. A blocked visitor also gets Cloudflare's generic error page unless you pay for custom block pages, and rules apply to the whole domain, not a single page. Full walk-through: <a href="framer-geoblocking-cloudflare.html">Cloudflare geoblocking on Framer</a>.</p>
 
@@ -94,7 +94,7 @@
 <table>
 <tr><th></th>
 <th><span class="th-b"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#16a34a" stroke-width="2" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg>Plugin (Bouncer)</span></th>
-<th><span class="th-b"><svg class="i-cf" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>Cloudflare</span></th>
+<th><span class="th-b"><svg class="i-cf" width="24" height="13" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>Cloudflare</span></th>
 <th><span class="th-b"><span class="mono" style="font-family:'Space Mono',monospace;color:var(--muted);font-size:13px">&lt;/&gt;</span>Custom code</span></th></tr>
 <tr><td>Setup time</td><td class="yes">~2 minutes</td><td>~1 hour + DNS wait</td><td>Hours, then upkeep</td></tr>
 <tr><td>No DNS / nameserver changes</td><td class="yes">Yes</td><td class="no">Move nameservers</td><td class="yes">Yes</td></tr>
@@ -155,6 +155,6 @@
 <span>© 2026 Vanssay</span>
 <span><a href="../geoblock.html">Bouncer</a> · <a href="../index.html">All plugins</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></span>
 </div></footer>
-<script src="guide.js" defer></script>
+<script src="guide.js?v=2" defer></script>
 </body>
 </html>

@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="guide.css" />
+<link rel="stylesheet" href="guide.css?v=2" />
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
 {"@type":"Question","name":"Can I use Cloudflare to block countries on a Framer site?","acceptedAnswer":{"@type":"Answer","text":"Yes, if you move your DNS to Cloudflare and keep the proxy on, a WAF custom rule can block by country. But Framer's guidance recommends disabling that proxy, and blocked visitors see a generic Cloudflare error page."}},
@@ -26,7 +26,7 @@
 <nav class="top"><div class="nav-in">
   <a class="logo" href="../index.html"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
   <div class="nav-links"><a href="../geoblock.html">Bouncer</a><a href="../geoblock.html#pricing">Pricing</a><a href="index.html">Guides</a><a href="../contact.html">Contact</a></div>
-  <a class="btn btn-line" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener"><svg class="i-framer" viewBox="0 0 24 36" aria-hidden="true"><path fill="currentColor" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Bouncer on Framer</a>
+  <a class="btn btn-line" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener"><svg class="i-framer" width="12" height="18" viewBox="0 0 24 36" aria-hidden="true"><path fill="currentColor" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Bouncer on Framer</a>
 </div></nav>
 
 <div class="layout">
@@ -41,11 +41,11 @@
 </div>
 <p class="meta">Updated July 2026 · 5 min read</p>
 <div class="compat">
-  <span><svg class="i-framer" viewBox="0 0 24 36" aria-hidden="true"><path fill="#16151b" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Works on any Framer site</span>
-  <span><svg class="i-cf" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>Cloudflare compared honestly</span>
+  <span><svg class="i-framer" width="12" height="18" viewBox="0 0 24 36" aria-hidden="true"><path fill="#16151b" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Works on any Framer site</span>
+  <span><svg class="i-cf" width="24" height="13" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>Cloudflare compared honestly</span>
 </div>
 
-<h2 id="setup" class="h2ic"><svg class="i-cf" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>The Cloudflare setup, honestly</h2>
+<h2 id="setup" class="h2ic"><svg class="i-cf" width="24" height="13" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>The Cloudflare setup, honestly</h2>
 <ol class="steps">
 <li><strong>Move your domain's DNS to Cloudflare.</strong> Create a free account, add the site, and switch nameservers at your registrar. Propagation can take up to a day.</li>
 <li><strong>Point the domain at Framer</strong> per Framer's custom-domain instructions, with records set to <strong>Proxied</strong> (orange cloud). This is the catch, see below.</li>
@@ -79,7 +79,7 @@
 <h2 id="compare">Cloudflare vs. a plugin</h2>
 <table>
 <tr><th></th>
-<th><span class="th-b"><svg class="i-cf" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>Cloudflare (free)</span></th>
+<th><span class="th-b"><svg class="i-cf" width="24" height="13" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>Cloudflare (free)</span></th>
 <th><span class="th-b"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#16a34a" stroke-width="2" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg>Plugin (Bouncer)</span></th></tr>
 <tr><td>DNS / nameserver changes</td><td class="no">Required</td><td class="yes">None</td></tr>
 <tr><td>Works with Framer's recommended DNS</td><td class="no">No (needs proxy on)</td><td class="yes">Yes</td></tr>
@@ -130,6 +130,6 @@
 <span>© 2026 Vanssay</span>
 <span><a href="../geoblock.html">Bouncer</a> · <a href="../index.html">All plugins</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></span>
 </div></footer>
-<script src="guide.js" defer></script>
+<script src="guide.js?v=2" defer></script>
 </body>
 </html>
