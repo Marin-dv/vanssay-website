@@ -4,11 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Cloudflare Geoblocking on Framer: Setup, Limits &amp; an Easier Alternative</title>
-<meta name="description" content="Yes, you can block countries on a Framer site with Cloudflare, but it needs a DNS migration and the proxy Framer tells you to disable. Here's the honest setup, the limits, and the 2-minute alternative." />
+<meta name="description" content="You can block countries on a Framer site with Cloudflare, but it needs a DNS migration and the proxy Framer tells you to disable. The honest setup, the limits, and the 2-minute alternative." />
 <link rel="canonical" href="https://vanssay.net/guides/framer-geoblocking-cloudflare.html" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%2316a34a'/><path d='M34,4H25L13,36H22Z' fill='%2322c55e'/></svg>" />
 <meta property="og:title" content="Cloudflare Geoblocking on Framer: Setup, Limits & an Easier Alternative" />
-<meta property="og:description" content="How Cloudflare country blocking actually behaves on a Framer site, and when a marketplace plugin is the better call." />
+<meta property="og:description" content="How Cloudflare country blocking actually behaves on a Framer site, and when a plugin is the better call." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://vanssay.net/guides/framer-geoblocking-cloudflare.html" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,80 +17,119 @@
 <link rel="stylesheet" href="guide.css" />
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-{"@type":"Question","name":"Can I use Cloudflare to block countries on a Framer site?","acceptedAnswer":{"@type":"Answer","text":"Yes, if you move your domain's DNS to Cloudflare and keep the proxy (orange cloud) enabled, a WAF custom rule can block by country. However, Framer's custom-domain guidance recommends disabling that proxy, and blocked visitors see an unstyled Cloudflare error page."}},
-{"@type":"Question","name":"Does Cloudflare country blocking work with the proxy disabled?","acceptedAnswer":{"@type":"Answer","text":"No. WAF rules only apply to proxied (orange-cloud) traffic. With DNS-only mode, the mode usually recommended for Framer domains, Cloudflare never sees the requests and cannot block anything."}},
-{"@type":"Question","name":"What is the alternative to Cloudflare for Framer geoblocking?","acceptedAnswer":{"@type":"Answer","text":"A Framer marketplace plugin like Bouncer blocks countries server-side with no DNS changes, shows a block screen styled to your site, supports per-page rules, and adds VPN/proxy detection."}}]}
+{"@type":"Question","name":"Can I use Cloudflare to block countries on a Framer site?","acceptedAnswer":{"@type":"Answer","text":"Yes, if you move your DNS to Cloudflare and keep the proxy on, a WAF custom rule can block by country. But Framer's guidance recommends disabling that proxy, and blocked visitors see a generic Cloudflare error page."}},
+{"@type":"Question","name":"Does Cloudflare country blocking work with the proxy off?","acceptedAnswer":{"@type":"Answer","text":"No. WAF rules only apply to proxied traffic. In DNS-only mode, the mode usually recommended for Framer, Cloudflare never sees the requests and can't block anything."}},
+{"@type":"Question","name":"What is the alternative to Cloudflare for Framer geoblocking?","acceptedAnswer":{"@type":"Answer","text":"A plugin like Bouncer blocks countries server-side with no DNS changes, shows a block screen styled to your site, supports per-page rules, and adds VPN/proxy detection."}}]}
 </script>
 </head>
 <body>
-<nav><div class="nav-in">
+<nav class="top"><div class="nav-in">
   <a class="logo" href="../index.html"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
-  <div class="nav-links"><a href="../geoblock.html">Bouncer</a><a href="../geoblock.html#pricing">Pricing</a><a href="../contact.html">Contact</a></div>
-  <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Get the plugin</a>
+  <div class="nav-links"><a href="../geoblock.html">Bouncer</a><a href="../geoblock.html#pricing">Pricing</a><a href="index.html">Guides</a><a href="../contact.html">Contact</a></div>
+  <a class="btn btn-line" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener"><svg class="i-framer" viewBox="0 0 24 36" aria-hidden="true"><path fill="currentColor" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Bouncer on Framer</a>
 </div></nav>
 
+<div class="layout">
 <article>
 <p class="eyebrow">Framer guide</p>
 <h1>Cloudflare geoblocking on a Framer site: what actually works</h1>
-<p class="lead">"Use Cloudflare" is the standard answer for blocking countries, and on a Framer site it does work, with caveats that most answers skip. Here's the real setup, where it bites, and when a plugin is the better tool.</p>
-<p class="meta">Updated July 2026 · 4 min read</p>
+<p class="lead">"Use Cloudflare" is the standard answer for blocking countries, and on a Framer site it does work, with caveats most answers skip. Here's the real setup, where it bites, and when a plugin is the simpler tool.</p>
 
-<h2>The Cloudflare setup, honestly</h2>
+<div class="byline">
+  <span class="av"><svg width="18" height="18" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#4b4b52"/><path d="M34,4H25L13,36H22Z" fill="#22c55e"/></svg></span>
+  <div>By the <b>Vanssay team</b>. We make Bouncer, a plugin alternative to Cloudflare, so we've been careful to give Cloudflare its due, including the cases where it's the better choice.</div>
+</div>
+<p class="meta">Updated July 2026 · 5 min read</p>
+<div class="compat">
+  <span><svg class="i-framer" viewBox="0 0 24 36" aria-hidden="true"><path fill="#16151b" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Works on any Framer site</span>
+  <span><svg class="i-cf" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>Cloudflare compared honestly</span>
+</div>
+
+<h2 id="setup" class="h2ic"><svg class="i-cf" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>The Cloudflare setup, honestly</h2>
 <ol class="steps">
-<li><strong>Move your domain's DNS to Cloudflare.</strong> Create a free account, add your site, and switch your nameservers at your registrar. Propagation can take up to a day.</li>
-<li><strong>Point the domain at Framer</strong> per Framer's custom-domain instructions, and set the records to <strong>Proxied</strong> (orange cloud). This is the catch, see below.</li>
-<li><strong>Create a WAF custom rule</strong>: Security → WAF → Custom rules → field <em>Country</em>, operator <em>equals</em>, action <em>Block</em>. The free plan includes a handful of custom rules.</li>
+<li><strong>Move your domain's DNS to Cloudflare.</strong> Create a free account, add the site, and switch nameservers at your registrar. Propagation can take up to a day.</li>
+<li><strong>Point the domain at Framer</strong> per Framer's custom-domain instructions, with records set to <strong>Proxied</strong> (orange cloud). This is the catch, see below.</li>
+<li><strong>Add a WAF custom rule:</strong> Security → WAF → Custom rules → field <em>Country</em>, operator <em>equals</em>, action <em>Block</em>. See <a href="https://developers.cloudflare.com/waf/custom-rules/" target="_blank" rel="noopener">Cloudflare's docs</a>.</li>
 </ol>
 
-<h2>The three catches on Framer specifically</h2>
-<h3>1. WAF only works with the proxy Framer tells you to turn off</h3>
-<p>Cloudflare's firewall only filters <strong>proxied</strong> traffic. But Framer's custom-domain guidance recommends DNS-only (grey cloud) mode, because proxying in front of Framer's own SSL and redirects is a known source of certificate errors and redirect loops. You can make proxied mode work (SSL mode "Full", no conflicting rules), but you're now maintaining a config Framer doesn't support if something breaks.</p>
+<h2 id="catches">The three catches on Framer</h2>
+<h3>1. WAF needs the proxy Framer tells you to turn off</h3>
+<p>Cloudflare's firewall only filters <strong>proxied</strong> traffic. But Framer's custom-domain guidance recommends DNS-only (grey cloud) mode, because proxying in front of Framer's SSL and redirects is a known source of certificate errors and redirect loops. You can make proxied mode work, but you're then maintaining a setup Framer doesn't support if it breaks.</p>
 <h3>2. Blocked visitors get a Cloudflare error page</h3>
-<p>A blocked visitor sees Cloudflare's generic 1020/403 screen, Cloudflare branding, error codes, no explanation. Custom block pages are a paid Cloudflare feature. If that visitor is a client, a partner traveling, or a regulator, that's the impression they get of your brand.</p>
+<p>A blocked visitor sees Cloudflare's generic 1020/403 screen: Cloudflare branding, error codes, no explanation. Custom block pages are a paid Cloudflare feature. If that visitor is a client or partner, that's the impression they get.</p>
 <h3>3. It's all-or-nothing, domain-wide</h3>
-<p>The rule blocks the entire domain. You can't block only your pricing page, only a gated section, or show different behavior per page. And every change means logging into a second dashboard that the rest of your Framer workflow never touches.</p>
+<p>The rule blocks the entire domain. You can't block only a pricing page or a gated section, and every change means a second dashboard your Framer workflow never touches.</p>
 
-<h2>The alternative: block countries inside Framer</h2>
-<p><a href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Bouncer</a> is a Framer marketplace plugin that does the same job at the site layer: each visitor is checked server-side on load, and blocked countries see an access screen <strong>styled to match your site</strong>, your logo, your words. No DNS migration, no proxy, nothing for Framer support to disown. It also does what Cloudflare's free plan doesn't: <a href="block-vpn-framer.html">VPN and proxy detection</a>, per-page rules, and <a href="restrict-framer-site-to-one-country.html">allowlist mode</a>.</p>
+<h2 id="alternative">The alternative: block inside Framer</h2>
+<p><a href="block-countries-framer.html">Bouncer</a> does the same job at the site layer: each visitor is checked server-side on load, and blocked countries see an access screen <strong>styled to match your site</strong>. No DNS migration, no proxy, nothing for Framer support to disown. It also does what Cloudflare's free plan doesn't: <a href="block-vpn-framer.html">VPN and proxy detection</a>, per-page rules, and <a href="restrict-framer-site-to-one-country.html">allowlist mode</a>. Here's the difference a blocked visitor sees:</p>
 
-<figure>
-<img src="img/bouncer-how-it-works.png" alt="Bouncer for Framer checks each visit server-side and shows blocked visitors a branded block screen instead of a Cloudflare error" loading="lazy" width="1600" height="1200" />
-<figcaption>Blocked visitors get a screen styled to your site, not a generic Cloudflare error page.</figcaption>
+<figure class="shot" style="max-width:440px">
+  <div class="bs">
+    <div class="bar"><i></i><i></i><i></i><span class="u">atelier-kessler.com</span></div>
+    <div class="screen">
+      <span class="sh"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8fd6ae" stroke-width="1.8"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg></span>
+      <h3>Access unavailable</h3>
+      <p>Sorry, this content isn't available from your location.</p>
+      <span class="home">Back to home</span>
+    </div>
+  </div>
+  <figcaption>A plugin block screen (styled to your site), versus Cloudflare's generic error page.</figcaption>
 </figure>
 
+<h2 id="compare">Cloudflare vs. a plugin</h2>
 <table>
-<tr><th></th><th>Cloudflare (free)</th><th>Bouncer plugin</th></tr>
+<tr><th></th>
+<th><span class="th-b"><svg class="i-cf" viewBox="0 0 44 24" aria-hidden="true"><g fill="#F6821F"><ellipse cx="16" cy="13" rx="9" ry="8"/><ellipse cx="27" cy="11" rx="10" ry="9"/><rect x="11" y="13" width="29" height="9" rx="4.5"/><rect x="32" y="11" width="9" height="11" rx="4.5"/></g><ellipse cx="13" cy="10" rx="4.5" ry="3.5" fill="#FBAD41"/></svg>Cloudflare (free)</span></th>
+<th><span class="th-b"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#16a34a" stroke-width="2" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg>Plugin (Bouncer)</span></th></tr>
 <tr><td>DNS / nameserver changes</td><td class="no">Required</td><td class="yes">None</td></tr>
-<tr><td>Compatible with Framer's recommended DNS setup</td><td class="no">No (needs proxy on)</td><td class="yes">Yes</td></tr>
-<tr><td>Block screen</td><td class="no">Generic Cloudflare error</td><td class="yes">Branded, matches your site</td></tr>
+<tr><td>Works with Framer's recommended DNS</td><td class="no">No (needs proxy on)</td><td class="yes">Yes</td></tr>
+<tr><td>Block page matches your site</td><td class="no">Paid only (generic error)</td><td class="yes">Yes</td></tr>
 <tr><td>Per-page / per-section rules</td><td class="no">Domain-wide only</td><td class="yes">Yes</td></tr>
-<tr><td>VPN &amp; proxy detection</td><td class="no">Paid add-on</td><td class="yes">Included in paid plans</td></tr>
-<tr><td>Managed from</td><td>Cloudflare dashboard</td><td>Inside Framer</td></tr>
-<tr><td>Setup time</td><td>~1 hour + propagation</td><td>~2 minutes</td></tr>
+<tr><td>VPN / proxy detection</td><td class="no">Not on free plan</td><td class="yes">Yes (Pro)</td></tr>
+<tr><td>Edge DDoS / firewall</td><td class="yes">Yes</td><td class="no">No</td></tr>
+<tr><td>Setup time</td><td>~1 hour + DNS wait</td><td class="yes">~2 minutes</td></tr>
 </table>
 
-<p><strong>When Cloudflare is still the right call:</strong> your DNS already lives there with the proxy on and stable, you want blocking at the network edge before a single byte reaches Framer, or you're also using it for DDoS/WAF reasons anyway. If that's not you, the plugin route is simply less machinery.</p>
+<p><strong>When Cloudflare is still the right call:</strong> your DNS already lives there with the proxy on and stable, you want blocking at the network edge before a byte reaches Framer, or you're using it for DDoS/WAF anyway. Otherwise the plugin route is less machinery for the same result.</p>
 
-<div class="cta-box">
-<h2>Skip the DNS migration</h2>
-<p>Bouncer blocks countries and VPNs from inside Framer, with a block screen that looks like your site. Free plan available.</p>
-<a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Install Bouncer for Framer</a>
-&nbsp; <a class="btn btn-line" href="../geoblock.html">See features &amp; pricing</a>
+<div class="endcta">
+  <div class="t"><b>Bouncer</b>, block countries from inside Framer, no DNS migration, block screen that matches your site. Free plan available.</div>
+  <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener">View Bouncer on Framer</a>
 </div>
 
-<div class="related">
-<h2>Related guides</h2>
-<ul>
-<li><a href="block-countries-framer.html">How to block countries on a Framer site (all 3 methods)</a></li>
-<li><a href="block-vpn-framer.html">How to block VPN &amp; proxy traffic on Framer</a></li>
-<li><a href="framer-redirect-by-country.html">Redirect Framer visitors by country instead of blocking</a></li>
-</ul>
-</div>
+<h2 id="faq">Common questions</h2>
+<details><summary>Does Cloudflare blocking work in DNS-only mode?</summary><p>No. WAF rules only apply to proxied (orange-cloud) traffic. In DNS-only mode Cloudflare never sees the request, so it can't block it.</p></details>
+<details><summary>Can I keep Cloudflare and just skip the proxy?</summary><p>You can use Cloudflare for DNS in grey-cloud mode, but then its country blocking doesn't run, you'd need a plugin for the blocking itself.</p></details>
+<details><summary>Is the plugin slower than edge blocking?</summary><p>The plugin adds one fast server-side lookup at load; visitors don't notice it. Cloudflare blocks slightly earlier (at the edge), which matters for DDoS but not for a normal country rule.</p></details>
+
+<p class="refs">Sources: <a href="https://developers.cloudflare.com/waf/custom-rules/" target="_blank" rel="noopener">Cloudflare WAF custom rules</a> · <a href="https://www.framer.com/help/" target="_blank" rel="noopener">Framer custom-domain help</a>.</p>
 </article>
+
+<aside class="rail">
+  <div class="toc-t">On this page</div>
+  <nav>
+    <a href="#setup">The Cloudflare setup</a>
+    <a href="#catches">The three catches</a>
+    <a href="#alternative">The alternative</a>
+    <a href="#compare">Cloudflare vs. plugin</a>
+    <a href="#faq">Common questions</a>
+  </nav>
+  <div class="rail-sec">
+    <div class="toc-t">Related guides</div>
+    <nav>
+      <a href="block-countries-framer.html">Block countries (all methods)</a>
+      <a href="block-vpn-framer.html">Block VPN &amp; proxy traffic</a>
+      <a href="restrict-framer-site-to-one-country.html">Restrict to one country</a>
+    </nav>
+  </div>
+  <a class="rail-try" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener">The plugin in this guide is <b>Bouncer</b>, on the Framer marketplace →</a>
+</aside>
+</div>
 
 <footer class="site-foot"><div class="wrap">
 <span>© 2026 Vanssay</span>
 <span><a href="../geoblock.html">Bouncer</a> · <a href="../index.html">All plugins</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></span>
 </div></footer>
+<script src="guide.js" defer></script>
 </body>
 </html>

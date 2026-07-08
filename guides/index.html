@@ -4,48 +4,61 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Framer Geoblocking &amp; Geo-Redirect Guides | Vanssay</title>
-<meta name="description" content="Practical guides for controlling who sees your Framer site: block countries, block VPNs, restrict to one country, GDPR geoblocking, and geo-redirects." />
+<meta name="description" content="Practical guides for controlling who sees your Framer site: block countries, block VPNs, restrict to one country, GDPR geoblocking, and geo-redirects by country or language." />
 <link rel="canonical" href="https://vanssay.net/guides/" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%2316a34a'/><path d='M34,4H25L13,36H22Z' fill='%2322c55e'/></svg>" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="guide.css" />
+<style>
+.hubwrap{max-width:820px;margin:0 auto;padding:0 28px}
+.gcards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0 8px}
+@media(max-width:640px){.gcards{grid-template-columns:1fr}}
+.gcard{display:block;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 18px;text-decoration:none;transition:.18s}
+.gcard:hover{border-color:var(--green);transform:translateY(-2px);text-decoration:none}
+.gcard b{font-family:'Bricolage Grotesque',sans-serif;font-size:15.5px;color:var(--text);display:block;margin-bottom:5px}
+.gcard span{font-size:13px;color:var(--text-2);line-height:1.5}
+</style>
 </head>
 <body>
-<nav><div class="nav-in">
+<nav class="top"><div class="nav-in">
   <a class="logo" href="../index.html"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
   <div class="nav-links"><a href="../geoblock.html">Bouncer</a><a href="../router.html">Router</a><a href="../contact.html">Contact</a></div>
-  <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Get Bouncer</a>
+  <a class="btn btn-line" href="../index.html">All plugins</a>
 </div></nav>
 
+<div class="hubwrap">
 <article>
 <p class="eyebrow">Guides</p>
 <h1>Framer geoblocking &amp; geo-redirect guides</h1>
-<p class="lead">Everything about controlling who sees your Framer site, blocking countries and VPNs, allowlists, GDPR geoblocking, and routing visitors by location.</p>
+<p class="lead">Everything about controlling who sees your Framer site: blocking countries and VPNs, allowlists, GDPR geoblocking, and routing visitors by country or language.</p>
 
 <h2>Blocking access</h2>
-<ul>
-<li><a href="block-countries-framer.html">How to block countries on a Framer site</a>, the three methods compared: plugin, Cloudflare, custom code.</li>
-<li><a href="framer-geoblocking-cloudflare.html">Cloudflare geoblocking on Framer</a>, the honest setup, its limits, and when a plugin is simpler.</li>
-<li><a href="block-vpn-framer.html">How to block VPN &amp; proxy traffic</a>, close the loophole in any country block.</li>
-<li><a href="restrict-framer-site-to-one-country.html">Restrict a Framer site to one country</a>, allowlist mode for US-only, UK-only, or any-market-only sites.</li>
-<li><a href="block-eu-visitors-framer.html">Block EU visitors (GDPR geoblocking)</a>, the 27+4 countries, the setup, and the honest caveats.</li>
-</ul>
+<div class="gcards">
+  <a class="gcard" href="block-countries-framer.html"><b>Block countries on Framer</b><span>The three methods compared: plugin, Cloudflare, custom code.</span></a>
+  <a class="gcard" href="framer-geoblocking-cloudflare.html"><b>Cloudflare vs. a plugin</b><span>The honest Cloudflare setup, its limits, and when a plugin is simpler.</span></a>
+  <a class="gcard" href="block-vpn-framer.html"><b>Block VPN &amp; proxy traffic</b><span>Close the loophole any country block leaves open.</span></a>
+  <a class="gcard" href="restrict-framer-site-to-one-country.html"><b>Restrict to one country</b><span>Allowlist mode for US-only, UK-only, or any single market.</span></a>
+  <a class="gcard" href="block-eu-visitors-framer.html"><b>Block EU visitors (GDPR)</b><span>The 27+ countries, the setup, and the honest legal caveats.</span></a>
+</div>
 
-<h2>Routing instead of blocking</h2>
-<ul>
-<li><a href="framer-redirect-by-country.html">Redirect Framer visitors by country</a>, geo-redirects without hurting SEO.</li>
-<li><a href="framer-redirect-by-language.html">Send visitors to the right language version</a>, route by browser language to your localized pages.</li>
-</ul>
+<h2>Routing visitors</h2>
+<div class="gcards">
+  <a class="gcard" href="router-for-framer.html"><b>What Router does &amp; why</b><span>An intro to geo, language and device routing for Framer.</span></a>
+  <a class="gcard" href="framer-redirect-by-country.html"><b>Redirect by country</b><span>Geo-redirects done the SEO-safe way: suggest, don't force.</span></a>
+  <a class="gcard" href="framer-redirect-by-language.html"><b>Redirect by language</b><span>Route by browser language to your localized pages.</span></a>
+</div>
 
-<div class="cta-box">
-<h2>The plugins behind these guides</h2>
-<p><strong>Bouncer</strong> blocks countries and VPNs with a branded block screen. <strong>Router</strong> sends visitors to the right regional page. Both free to start.</p>
-<a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Bouncer, block countries &amp; VPNs</a>
-&nbsp; <a class="btn btn-line" href="https://www.framer.com/community/marketplace/plugins/router-vanssay/">Router, geo-redirects</a>
+<div class="endcta">
+  <div class="t"><b>The plugins behind these guides.</b> Bouncer blocks countries and VPNs; Router sends visitors to the right page. Both free to start.</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener">Bouncer</a>
+    <a class="btn btn-line" href="https://www.framer.com/community/marketplace/plugins/router-vanssay/" target="_blank" rel="noopener">Router</a>
+  </div>
 </div>
 </article>
+</div>
 
 <footer class="site-foot"><div class="wrap">
 <span>© 2026 Vanssay</span>

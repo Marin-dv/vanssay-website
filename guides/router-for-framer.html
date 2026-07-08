@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Router for Framer: Send Every Visitor to the Right Page</title>
+<meta name="description" content="Framer can't route visitors by where they are. Router adds geo, language and device redirects, plus a non-forced suggestion banner, with no code and no DNS changes. Here's what it does and when it's worth it." />
+<link rel="canonical" href="https://vanssay.net/guides/router-for-framer.html" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%2316a34a'/><path d='M34,4H25L13,36H22Z' fill='%2322c55e'/></svg>" />
+<meta property="og:title" content="Router for Framer: Send Every Visitor to the Right Page" />
+<meta property="og:description" content="Geo, language and device redirects for Framer, plus an SEO-safe suggestion banner. No code, no DNS changes." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://vanssay.net/guides/router-for-framer.html" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="guide.css" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Can Framer redirect visitors by country or language?","acceptedAnswer":{"@type":"Answer","text":"Not natively. Framer's redirects are static path rules that are the same for every visitor. The Router plugin adds per-visitor routing by country, region, language, device or VPN status, server-side."}},
+{"@type":"Question","name":"Is Router better than a JavaScript redirect?","acceptedAnswer":{"@type":"Answer","text":"Yes. A pasted JS redirect flashes the wrong page first, can expose an API key, and forced client-side redirects are what Google's guidance warns against. Router decides server-side and can suggest rather than force."}},
+{"@type":"Question","name":"Does Router hurt SEO?","acceptedAnswer":{"@type":"Answer","text":"Used with its suggestion banner, no. Google recommends letting users and crawlers reach any version and suggesting the better one, which a dismissible banner does without blocking crawling."}}]}
+</script>
+</head>
+<body>
+<nav class="top"><div class="nav-in">
+  <a class="logo" href="../index.html"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+  <div class="nav-links"><a href="../router.html">Router</a><a href="../geoblock.html">Bouncer</a><a href="index.html">Guides</a><a href="../contact.html">Contact</a></div>
+  <a class="btn btn-line" href="https://www.framer.com/community/marketplace/plugins/router-vanssay/" target="_blank" rel="noopener"><svg class="i-framer" viewBox="0 0 24 36" aria-hidden="true"><path fill="currentColor" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Router on Framer</a>
+</div></nav>
+
+<div class="layout">
+<article>
+<p class="eyebrow">Framer guide</p>
+<h1>Router for Framer: send every visitor the right way</h1>
+<p class="lead">A French visitor lands on your English homepage. A mobile visitor gets your desktop layout. A US shopper sees EU pricing. Framer can't fix this on its own, its redirects are the same for everyone. Router adds routing based on <em>who the visitor is</em>. Here's what it does, and when it's actually worth adding.</p>
+
+<div class="byline">
+  <span class="av"><svg width="18" height="18" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#4b4b52"/><path d="M34,4H25L13,36H22Z" fill="#22c55e"/></svg></span>
+  <div>By the <b>Vanssay team</b>. We build Router, so treat this as an explainer from the people who made it, we've flagged the cases where you don't need a plugin at all.</div>
+</div>
+<p class="meta">Updated July 2026 · 5 min read</p>
+<div class="compat">
+  <span><svg class="i-framer" viewBox="0 0 24 36" aria-hidden="true"><path fill="#16151b" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Works on any Framer site</span>
+  <span>No code · no DNS changes</span>
+</div>
+
+<h2 id="why">Why Framer can't route by visitor</h2>
+<p>Framer's built-in redirects map one path to another, the same rule for every visitor, so they can't send a French speaker to <code>/fr</code> or a mobile user to a lighter page. Localization gives you translated pages, but nothing that routes a visitor <em>to</em> the right one. Anything that reacts to where a visitor is, or what device or language they use, has to run per visit, which is exactly the gap Router fills.</p>
+
+<h2 id="what">What Router does</h2>
+<p>Router lets you stack redirect rules that are evaluated for each visitor, on the server, the moment the page loads. Each rule matches on one or more signals and sends (or offers) the visitor a destination. Rules run top to bottom, and the first match wins.</p>
+
+<figure class="shot">
+  <img src="img/router-rules-ui.png" alt="The Router plugin's Redirect rules panel in the Framer editor: an ordered list of rules with toggles, each matching a condition and sending visitors to a path, first match wins" loading="lazy" width="1268" height="810" />
+  <figcaption>The Router plugin's Redirect rules panel, running inside the Framer editor.</figcaption>
+</figure>
+
+<p>You can match on:</p>
+<ul>
+<li><strong>Country or region</strong>, send France to <code>/fr</code>, or the DACH region to <code>/de</code>.</li>
+<li><strong>Browser language</strong>, often the better signal for choosing a language version than country.</li>
+<li><strong>Device</strong>, route mobile and desktop visitors to different pages.</li>
+<li><strong>VPN / proxy</strong>, treat anonymised traffic differently.</li>
+</ul>
+<p>Every decision is made server-side from the real IP, so there's no flash of the wrong page, no API key sitting in your published source, and nothing for a visitor to tamper with. There's also a built-in test console: preview exactly which rule fires for any country, language or device without spinning up a VPN.</p>
+
+<h2 id="suggest">Suggest, don't force (the SEO-safe part)</h2>
+<p>A forced redirect is the wrong default for language and region: Google's own internationalization guidance recommends letting users and crawlers reach any version and <em>suggesting</em> the better one, rather than bouncing everyone automatically. Googlebot crawls mostly from US IPs, so blanket forced redirects can leave your other versions poorly crawled.</p>
+<p>Router's answer is a small, dismissible suggestion banner ("It looks like you're in France, view the French page?") that auto-translates into the visitor's language and remembers their choice so they're never asked twice. You keep forced redirects for the cases that genuinely need them (a legally separate regional store, for example), and suggest everywhere else.</p>
+
+<figure class="shot" style="max-width:440px">
+  <img src="img/router-suggestion.png" alt="A Router suggestion banner on a Framer site: a Stay? prompt offering a location-matched version, with Take me there and Stay here buttons" loading="lazy" width="648" height="570" />
+  <figcaption>The suggestion banner in action: it offers the better-matched page and lets the visitor choose, instead of forcing a redirect.</figcaption>
+</figure>
+
+<h2 id="when">When Router is worth it</h2>
+<ul>
+<li><strong>Multi-language sites</strong> that want visitors on the right locale without an intrusive auto-redirect.</li>
+<li><strong>Regional pricing or stores</strong> where US and EU visitors should land on different pages.</li>
+<li><strong>Campaign landing pages</strong> that must keep UTM parameters intact through the redirect.</li>
+<li><strong>Mobile-specific pages</strong> or apps you want mobile visitors sent to.</li>
+</ul>
+
+<h3>When you might not need it</h3>
+<p>Be honest with yourself first: if every visitor should see the same page, you don't need routing at all. If you only have one static path-to-path redirect, Framer's built-in redirect handles it. And if you're a developer comfortable running your own edge middleware (Cloudflare Workers, a reverse proxy), you can build this yourself, Router exists so you don't have to, and so it stays inside Framer with no code or DNS changes.</p>
+
+<h2 id="blockvsroute">Routing vs. blocking</h2>
+<p>Router <em>sends</em> visitors somewhere; it doesn't keep anyone out. If your goal is to stop certain visitors from seeing the site at all, for licensing or compliance, you want <a href="block-countries-framer.html">country blocking with Bouncer</a> instead. The two are often used together: route the markets you serve, block the ones you can't.</p>
+
+<div class="endcta">
+  <div class="t"><b>Router</b>, geo, language and device routing for Framer, with an SEO-safe suggestion banner. Free plan available.</div>
+  <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/router-vanssay/" target="_blank" rel="noopener">View Router on Framer</a>
+</div>
+
+<h2 id="faq">Common questions</h2>
+<details><summary>Can I combine signals in one rule?</summary><p>Yes. A rule can match country, region, language, device and VPN status together, so you can express things like "German speakers outside DACH → /de".</p></details>
+<details><summary>Does it work with Framer Localization?</summary><p>Yes. Router just sends or suggests whichever locale URL you specify, including Framer's own localized paths.</p></details>
+<details><summary>Will my UTM / campaign parameters survive the redirect?</summary><p>Yes, on paid plans Router can carry the visitor's query string onto the destination, so ad attribution keeps working.</p></details>
+<details><summary>Can visitors dodge a geo rule with a VPN?</summary><p>Geo is IP-based, so a VPN can change what Router sees. On paid plans you can add VPN/proxy awareness to handle that traffic explicitly.</p></details>
+
+<p class="refs">Sources: <a href="https://developers.google.com/search/docs/specialty/international/locale-adaptive-pages" target="_blank" rel="noopener">Google Search Central: locale-adaptive pages</a> · <a href="https://www.framer.com/help/" target="_blank" rel="noopener">Framer help</a>.</p>
+</article>
+
+<aside class="rail">
+  <div class="toc-t">On this page</div>
+  <nav>
+    <a href="#why">Why Framer can't route</a>
+    <a href="#what">What Router does</a>
+    <a href="#suggest">Suggest, don't force</a>
+    <a href="#when">When it's worth it</a>
+    <a href="#blockvsroute">Routing vs. blocking</a>
+    <a href="#faq">Common questions</a>
+  </nav>
+  <div class="rail-sec">
+    <div class="toc-t">Related guides</div>
+    <nav>
+      <a href="framer-redirect-by-country.html">Redirect by country</a>
+      <a href="framer-redirect-by-language.html">Redirect by language</a>
+      <a href="block-countries-framer.html">Block countries instead</a>
+    </nav>
+  </div>
+  <a class="rail-try" href="https://www.framer.com/community/marketplace/plugins/router-vanssay/" target="_blank" rel="noopener">The plugin in this guide is <b>Router</b>, on the Framer marketplace →</a>
+</aside>
+</div>
+
+<footer class="site-foot"><div class="wrap">
+<span>© 2026 Vanssay</span>
+<span><a href="../router.html">Router</a> · <a href="../index.html">All plugins</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></span>
+</div></footer>
+<script src="guide.js" defer></script>
+</body>
+</html>

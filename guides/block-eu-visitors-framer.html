@@ -4,11 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>How to Block EU Visitors from a Framer Site (GDPR Geoblocking)</title>
-<meta name="description" content="Some US businesses choose to geoblock EU traffic rather than build GDPR compliance. Here's how to block all EU/EEA countries on a Framer site, and what geoblocking does and doesn't do legally." />
+<meta name="description" content="Some US businesses geoblock EU traffic rather than build GDPR compliance. Here's how to block all EU/EEA countries on a Framer site, and what geoblocking does and doesn't do legally." />
 <link rel="canonical" href="https://vanssay.net/guides/block-eu-visitors-framer.html" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%2316a34a'/><path d='M34,4H25L13,36H22Z' fill='%2322c55e'/></svg>" />
 <meta property="og:title" content="How to Block EU Visitors from a Framer Site (GDPR Geoblocking)" />
-<meta property="og:description" content="Block all EU/EEA countries on a Framer site in one step, and understand what geoblocking does and doesn't do for GDPR exposure." />
+<meta property="og:description" content="Block all EU/EEA countries on a Framer site in one sitting, and understand what geoblocking does and doesn't do for GDPR exposure." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://vanssay.net/guides/block-eu-visitors-framer.html" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -18,66 +18,85 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
 {"@type":"Question","name":"Can I block all EU visitors from my Framer site?","acceptedAnswer":{"@type":"Answer","text":"Yes. Framer has no built-in option, but the Bouncer plugin lets you add the EU/EEA countries to a block list; visitors from those countries then see a block screen instead of your site."}},
-{"@type":"Question","name":"Does blocking EU visitors make me GDPR-compliant?","acceptedAnswer":{"@type":"Answer","text":"Not by itself, GDPR applies based on whom you target and process data about, not just where traffic comes from. Geoblocking demonstrates you don't offer services to the EU market, which several US publishers use to reduce exposure, but it isn't a legal guarantee. Ask a lawyer for your case."}},
-{"@type":"Question","name":"Which countries do I need to block for the EU?","acceptedAnswer":{"@type":"Answer","text":"The 27 EU member states, and for full EEA coverage also Iceland, Liechtenstein and Norway. The UK has its own UK GDPR, so many blockers include it too."}}]}
+{"@type":"Question","name":"Does blocking EU visitors make me GDPR-compliant?","acceptedAnswer":{"@type":"Answer","text":"Not by itself. GDPR applies based on whom you target and whose data you process, not just where traffic comes from. Geoblocking shows you don't offer services to the EU market, which several US publishers rely on, but it isn't a legal guarantee. Ask a lawyer."}},
+{"@type":"Question","name":"Which countries do I need to block for the EU?","acceptedAnswer":{"@type":"Answer","text":"The 27 EU member states, plus Iceland, Liechtenstein and Norway for full EEA coverage. The UK has its own UK GDPR, so many blockers include it too."}}]}
 </script>
 </head>
 <body>
-<nav><div class="nav-in">
+<nav class="top"><div class="nav-in">
   <a class="logo" href="../index.html"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
-  <div class="nav-links"><a href="../geoblock.html">Bouncer</a><a href="../geoblock.html#pricing">Pricing</a><a href="../contact.html">Contact</a></div>
-  <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Get the plugin</a>
+  <div class="nav-links"><a href="../geoblock.html">Bouncer</a><a href="../geoblock.html#pricing">Pricing</a><a href="index.html">Guides</a><a href="../contact.html">Contact</a></div>
+  <a class="btn btn-line" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener"><svg class="i-framer" viewBox="0 0 24 36" aria-hidden="true"><path fill="currentColor" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Bouncer on Framer</a>
 </div></nav>
 
+<div class="layout">
 <article>
 <p class="eyebrow">Framer guide</p>
 <h1>How to block EU visitors from a Framer site</h1>
-<p class="lead">After GDPR, a number of US-only businesses made a blunt call: rather than run consent banners and data-processing agreements for a market they don't serve, they block EU traffic entirely. If that's the call you've made, here's how to do it on Framer, and what it does and doesn't buy you.</p>
-<p class="meta">Updated July 2026 · 4 min read</p>
+<p class="lead">After GDPR, a number of US-only businesses made a blunt call: rather than run consent banners and data-processing agreements for a market they don't serve, they block EU traffic entirely. If that's your call, here's how to do it on Framer, and what it does and doesn't buy you.</p>
+
+<div class="byline">
+  <span class="av"><svg width="18" height="18" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#4b4b52"/><path d="M34,4H25L13,36H22Z" fill="#22c55e"/></svg></span>
+  <div>By the <b>Vanssay team</b>. We build Bouncer, the plugin used below. This is not legal advice, and we say so plainly where it matters.</div>
+</div>
+<p class="meta">Updated July 2026 · 5 min read</p>
+<div class="compat">
+  <span><svg class="i-framer" viewBox="0 0 24 36" aria-hidden="true"><path fill="#16151b" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Works on any Framer site</span>
+</div>
 
 <div class="note"><strong>Not legal advice.</strong> GDPR applies based on whom you target and whose data you process, not purely on where requests come from. Geoblocking the EU is strong evidence you don't offer services to that market, and some well-known US publishers use exactly this approach, but only a lawyer can tell you if it's sufficient for your situation.</div>
 
-<h2>What "blocking the EU" means in practice</h2>
+<h2 id="which">What "blocking the EU" means</h2>
 <p>You block the <strong>27 EU member states</strong>. For the full EEA (where GDPR also applies) add <strong>Iceland, Liechtenstein, and Norway</strong>. The UK is no longer in the EU but has its own near-identical UK GDPR, so most people who geoblock for this reason include the UK as well, call it 31 countries. Switzerland has its own data law (FADP) and is a judgment call.</p>
 
-<h2>Setting it up on Framer</h2>
-<p>Framer has no geoblocking setting, so this comes from a plugin. With <a href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Bouncer</a>:</p>
+<h2 id="setup">Setting it up on Framer</h2>
+<p>Framer has no geoblocking setting, so this comes from a plugin. With <a href="block-countries-framer.html">Bouncer</a>:</p>
 <ol class="steps">
 <li><strong>Install Bouncer</strong> from the Framer marketplace.</li>
-<li><strong>Add the EU/EEA countries</strong> (and the UK if you're including it) to the block list. Alternatively, flip it around: <a href="restrict-framer-site-to-one-country.html">allowlist only the countries you actually serve</a>, simpler and nothing slips through.</li>
-<li><strong>Write an honest block screen.</strong> The standard message: "Due to European data-protection regulations, this site is not available in your region." Your logo, your styling, visitors understand a clear notice; they distrust a raw error.</li>
+<li><strong>Add the EU/EEA countries</strong> (and the UK if you're including it) to the block list. Or flip it around and <a href="restrict-framer-site-to-one-country.html">allowlist only the countries you actually serve</a>, simpler, and nothing slips through.</li>
+<li><strong>Write an honest block screen:</strong> "Due to European data-protection regulations, this site is not available in your region." Your logo, your styling.</li>
 <li><strong>Publish.</strong> Enforcement is server-side per visit; update the country list anytime without republishing.</li>
 </ol>
 
-<h2>Two honest caveats</h2>
+<h2 id="caveats">Two honest caveats</h2>
 <p><strong>VPNs:</strong> an EU visitor on a US VPN will get through an IP-based block. For a GDPR-motivated block this mostly doesn't matter, someone actively circumventing your regional notice is a very different posture than you marketing to them, but you can also enable <a href="block-vpn-framer.html">VPN &amp; proxy blocking</a> to tighten it.</p>
-<p><strong>It's a business trade-off:</strong> you're giving up all EU traffic, including harmless readers. If the EU is (or might become) a real market for you, proper GDPR compliance is worth more than a wall. Geoblocking fits when the market is genuinely out of scope and compliance overhead is pure cost.</p>
+<p><strong>It's a business trade-off:</strong> you're giving up all EU traffic, including harmless readers. If the EU is (or might become) a real market, proper GDPR compliance is worth more than a wall. Geoblocking fits when the market is genuinely out of scope and compliance overhead is pure cost.</p>
 
-<div class="cta-box">
-<h2>Block the EU from your Framer site in one sitting</h2>
-<p>Bouncer, pick the countries, style the notice, publish. Server-side enforcement, free plan available.</p>
-<a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Install Bouncer for Framer</a>
-&nbsp; <a class="btn btn-line" href="../geoblock.html">See features &amp; pricing</a>
+<div class="endcta">
+  <div class="t"><b>Bouncer</b>, pick the countries, style the notice, publish. Server-side enforcement, free plan available.</div>
+  <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener">View Bouncer on Framer</a>
 </div>
 
-<h2>FAQ</h2>
+<h2 id="faq">Common questions</h2>
 <details><summary>Does geoblocking the EU exempt me from GDPR?</summary><p>Not automatically. It shows you don't offer services to the EU market, which materially reduces exposure for US-only businesses, but applicability depends on your targeting and data practices. Confirm with counsel.</p></details>
-<details><summary>Do I still need a cookie banner if I block the EU?</summary><p>That's between you and your lawyer, other jurisdictions (UK, California, Brazil…) have their own rules. Blocking the EU only addresses the EU.</p></details>
+<details><summary>Do I still need a cookie banner if I block the EU?</summary><p>That's between you and your lawyer, other jurisdictions (UK, California, Brazil) have their own rules. Blocking the EU only addresses the EU.</p></details>
 <details><summary>Can I block the EU on just part of my site?</summary><p>Yes, rules can target specific pages, e.g. gate a data-heavy app page while leaving a static homepage worldwide.</p></details>
-
-<div class="related">
-<h2>Related guides</h2>
-<ul>
-<li><a href="block-countries-framer.html">How to block countries on a Framer site</a></li>
-<li><a href="restrict-framer-site-to-one-country.html">Restrict a Framer site to one country (allowlist)</a></li>
-<li><a href="block-vpn-framer.html">How to block VPN &amp; proxy traffic on Framer</a></li>
-</ul>
-</div>
 </article>
+
+<aside class="rail">
+  <div class="toc-t">On this page</div>
+  <nav>
+    <a href="#which">What "the EU" means</a>
+    <a href="#setup">Setting it up</a>
+    <a href="#caveats">Honest caveats</a>
+    <a href="#faq">Common questions</a>
+  </nav>
+  <div class="rail-sec">
+    <div class="toc-t">Related guides</div>
+    <nav>
+      <a href="block-countries-framer.html">Block countries on Framer</a>
+      <a href="restrict-framer-site-to-one-country.html">Restrict to one country</a>
+      <a href="block-vpn-framer.html">Block VPN &amp; proxy traffic</a>
+    </nav>
+  </div>
+  <a class="rail-try" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener">The plugin in this guide is <b>Bouncer</b>, on the Framer marketplace →</a>
+</aside>
+</div>
 
 <footer class="site-foot"><div class="wrap">
 <span>© 2026 Vanssay</span>
 <span><a href="../geoblock.html">Bouncer</a> · <a href="../index.html">All plugins</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></span>
 </div></footer>
+<script src="guide.js" defer></script>
 </body>
 </html>

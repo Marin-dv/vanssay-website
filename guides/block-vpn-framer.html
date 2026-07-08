@@ -4,11 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>How to Block VPN &amp; Proxy Traffic on a Framer Site</title>
-<meta name="description" content="Country blocks are IP-based, so VPNs walk right through them. Here's how VPN and proxy detection works and how to enable it on a Framer site in minutes." />
+<meta name="description" content="Country blocks are IP-based, so VPNs walk right through them. Here's how VPN and proxy detection works, what it can and can't catch, and how to enable it on a Framer site." />
 <link rel="canonical" href="https://vanssay.net/guides/block-vpn-framer.html" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%2316a34a'/><path d='M34,4H25L13,36H22Z' fill='%2322c55e'/></svg>" />
 <meta property="og:title" content="How to Block VPN & Proxy Traffic on a Framer Site" />
-<meta property="og:description" content="How VPN detection works, what it can and can't catch, and how to turn it on for a Framer site." />
+<meta property="og:description" content="How VPN detection works, what it catches, and how to turn it on for a Framer site." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://vanssay.net/guides/block-vpn-framer.html" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,72 +17,91 @@
 <link rel="stylesheet" href="guide.css" />
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-{"@type":"Question","name":"Can I block VPN users from my Framer site?","acceptedAnswer":{"@type":"Answer","text":"Yes. Framer has no built-in option, but the Bouncer marketplace plugin detects VPN, proxy, and datacenter IPs server-side and can block or flag that traffic alongside country rules."}},
-{"@type":"Question","name":"How does VPN detection work?","acceptedAnswer":{"@type":"Answer","text":"Detection checks the visitor's IP against continuously updated intelligence: known VPN exit nodes, datacenter and hosting-provider ranges, open proxies, and Tor relays. Residential IPs pass; anonymized traffic gets flagged."}},
-{"@type":"Question","name":"Is VPN detection 100% accurate?","acceptedAnswer":{"@type":"Answer","text":"No detection is perfect, brand-new exit nodes and residential proxies can slip through, and rare false positives happen. It reliably stops the mainstream VPN apps that account for the vast majority of bypass attempts."}}]}
+{"@type":"Question","name":"Can I block VPN users from my Framer site?","acceptedAnswer":{"@type":"Answer","text":"Yes. Framer has no built-in option, but the Bouncer plugin detects VPN, proxy and datacenter IPs server-side and can block or flag that traffic alongside country rules."}},
+{"@type":"Question","name":"How does VPN detection work?","acceptedAnswer":{"@type":"Answer","text":"It checks the visitor's IP against continuously updated intelligence: known VPN exit nodes, datacenter ranges, open proxies and Tor relays. Residential IPs pass; anonymised traffic is flagged."}},
+{"@type":"Question","name":"Is VPN detection 100% accurate?","acceptedAnswer":{"@type":"Answer","text":"No detection is perfect, brand-new exit nodes and residential proxies can slip through and rare false positives happen. It reliably stops the mainstream VPN apps behind almost all bypass attempts."}}]}
 </script>
 </head>
 <body>
-<nav><div class="nav-in">
+<nav class="top"><div class="nav-in">
   <a class="logo" href="../index.html"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
-  <div class="nav-links"><a href="../geoblock.html">Bouncer</a><a href="../geoblock.html#pricing">Pricing</a><a href="../contact.html">Contact</a></div>
-  <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Get the plugin</a>
+  <div class="nav-links"><a href="../geoblock.html">Bouncer</a><a href="../geoblock.html#pricing">Pricing</a><a href="index.html">Guides</a><a href="../contact.html">Contact</a></div>
+  <a class="btn btn-line" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener"><svg class="i-framer" viewBox="0 0 24 36" aria-hidden="true"><path fill="currentColor" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Bouncer on Framer</a>
 </div></nav>
 
+<div class="layout">
 <article>
 <p class="eyebrow">Framer guide</p>
 <h1>How to block VPN &amp; proxy traffic on a Framer site</h1>
-<p class="lead">Any country block can be stepped around by a $3/month VPN, because geolocation only sees the IP address. If your restriction actually matters, licensing, gated launches, fraud, compliance, you need VPN detection on top. Here's how to add it to a Framer site.</p>
+<p class="lead">Any country block can be stepped around with a $3/month VPN, because geolocation only sees the IP address. If your restriction actually matters, for licensing, gated launches, fraud or compliance, you need VPN detection on top. Here's how to add it on Framer.</p>
+
+<div class="byline">
+  <span class="av"><svg width="18" height="18" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#4b4b52"/><path d="M34,4H25L13,36H22Z" fill="#22c55e"/></svg></span>
+  <div>By the <b>Vanssay team</b>. We build Bouncer, which does this, and we've been upfront below about the limits of any VPN detection.</div>
+</div>
 <p class="meta">Updated July 2026 · 4 min read</p>
+<div class="compat">
+  <span><svg class="i-framer" viewBox="0 0 24 36" aria-hidden="true"><path fill="#16151b" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Works on any Framer site</span>
+</div>
 
-<h2>Why country blocking alone isn't enough</h2>
-<p>Geoblocking maps the visitor's IP to a country. A VPN gives the visitor a different IP in a country of their choosing, so to your block rule, a user in a blocked region connecting through a US VPN server <em>is</em> a US visitor. If you're blocking countries for anything with stakes (regulated products, region-locked content, contest eligibility, scraper defense), the VPN route is the first thing people try.</p>
+<h2 id="why">Why country blocking alone isn't enough</h2>
+<p>Geoblocking maps the visitor's IP to a country. A VPN gives the visitor a different IP in a country of their choosing, so a user in a blocked region on a US VPN server looks like a US visitor to your rule. If you're blocking countries for anything with stakes, the VPN route is the first thing people try.</p>
 
-<h2>How VPN detection actually works</h2>
+<h2 id="how">How VPN detection works</h2>
 <p>You can't ask a browser "are you on a VPN?", detection happens server-side by classifying the IP itself:</p>
 <ul>
-<li><strong>Datacenter ranges:</strong> VPN servers live in datacenters (AWS, M247, Datacamp…). Real visitors come from residential and mobile ISPs. An IP announced by a hosting provider is almost never a human on their home connection.</li>
-<li><strong>Known exit nodes:</strong> commercial VPN providers' server IPs are catalogued and continuously refreshed in IP-intelligence databases.</li>
+<li><strong>Datacenter ranges:</strong> VPN servers live in datacenters. Real visitors come from residential and mobile ISPs. An IP announced by a hosting provider is almost never a person on their home connection.</li>
+<li><strong>Known exit nodes:</strong> commercial VPN providers' server IPs are catalogued and continuously refreshed.</li>
 <li><strong>Proxy &amp; Tor lists:</strong> open proxies and Tor relays are public and easy to match.</li>
 </ul>
-<p>Honest caveat: no detection is 100%. Fresh exit nodes and residential-proxy services can slip through, and rare false positives exist (e.g. some corporate networks). In practice, IP-intelligence blocking stops the mainstream VPN apps, NordVPN, Surfshark, Proton, Mullvad and the like, which is where nearly all bypass traffic comes from.</p>
+<p>The honest caveat: no detection is 100%. Fresh exit nodes and residential-proxy services can slip through, and rare false positives exist (some corporate networks). In practice, IP-intelligence blocking stops the mainstream VPN apps, NordVPN, Surfshark, Proton, Mullvad, which is where nearly all bypass traffic comes from.</p>
 
-<h2>Setting it up in Framer</h2>
-<p>Framer has no native option, and Cloudflare's free plan doesn't classify VPNs either. <a href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Bouncer</a> does it as a toggle:</p>
+<h2 id="setup">Setting it up on Framer</h2>
+<p>Framer has no native option, and Cloudflare's free plan doesn't classify VPNs either. <a href="block-countries-framer.html">Bouncer</a> does it as a toggle:</p>
 <ol class="steps">
 <li><strong>Install Bouncer</strong> from the Framer marketplace.</li>
-<li><strong>Enable VPN &amp; proxy detection</strong> (paid plans, from $6/mo), optionally alongside <a href="block-countries-framer.html">country rules</a>.</li>
-<li><strong>Choose the response:</strong> show your branded block screen to anonymized traffic, on the whole site or specific pages.</li>
-<li><strong>Publish.</strong> Every visit is checked server-side; there's nothing to bypass in the page source, and if the check service were ever down your site fails open instead of locking everyone out.</li>
+<li><strong>Turn on VPN &amp; proxy detection</strong> (paid plans), optionally alongside your <a href="block-countries-framer.html">country rules</a>.</li>
+<li><strong>Choose the response:</strong> show your branded block screen to anonymised traffic, on the whole site or specific pages.</li>
+<li><strong>Publish.</strong> Every visit is checked server-side, and if the service is ever unreachable the site fails open rather than locking everyone out.</li>
 </ol>
 
 <div class="note"><strong>Tip:</strong> combining the two rules is what makes geoblocking real, block the countries you must, and block VPN/proxy/datacenter traffic so the block can't be trivially routed around.</div>
 
-<div class="cta-box">
-<h2>Close the VPN loophole on your Framer site</h2>
-<p>Bouncer detects VPNs, proxies, and datacenter traffic server-side, with a block screen that matches your brand. From $6/mo.</p>
-<a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">Install Bouncer for Framer</a>
-&nbsp; <a class="btn btn-line" href="../geoblock.html">See features &amp; pricing</a>
+<div class="endcta">
+  <div class="t"><b>Bouncer</b>, detects VPNs, proxies and datacenter traffic server-side, with a block screen that matches your brand. From $6/mo.</div>
+  <a class="btn btn-green" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener">View Bouncer on Framer</a>
 </div>
 
-<h2>FAQ</h2>
-<details><summary>Will it block normal visitors by mistake?</summary><p>False positives are rare and mostly limited to traffic that already looks non-residential (corporate VPNs, some hosting-based networks). Regular home and mobile connections pass untouched.</p></details>
-<details><summary>Can I block VPNs without blocking any country?</summary><p>Yes, VPN/proxy detection is an independent rule. You can allow every country and still turn away anonymized traffic.</p></details>
+<h2 id="faq">Common questions</h2>
+<details><summary>Will it block normal visitors by mistake?</summary><p>False positives are rare and mostly limited to traffic that already looks non-residential (corporate VPNs, some hosting networks). Regular home and mobile connections pass untouched.</p></details>
+<details><summary>Can I block VPNs without blocking any country?</summary><p>Yes, VPN/proxy detection is an independent rule. You can allow every country and still turn away anonymised traffic.</p></details>
 <details><summary>Does it slow my site down?</summary><p>The check is a single fast server-side lookup at load time; visitors don't notice it, and your Framer pages are untouched otherwise.</p></details>
-
-<div class="related">
-<h2>Related guides</h2>
-<ul>
-<li><a href="block-countries-framer.html">How to block countries on a Framer site</a></li>
-<li><a href="restrict-framer-site-to-one-country.html">Restrict a Framer site to one country (allowlist)</a></li>
-<li><a href="framer-geoblocking-cloudflare.html">Cloudflare geoblocking on Framer: setup &amp; limits</a></li>
-</ul>
-</div>
 </article>
+
+<aside class="rail">
+  <div class="toc-t">On this page</div>
+  <nav>
+    <a href="#why">Why country blocks leak</a>
+    <a href="#how">How detection works</a>
+    <a href="#setup">Setting it up</a>
+    <a href="#faq">Common questions</a>
+  </nav>
+  <div class="rail-sec">
+    <div class="toc-t">Related guides</div>
+    <nav>
+      <a href="block-countries-framer.html">Block countries on Framer</a>
+      <a href="restrict-framer-site-to-one-country.html">Restrict to one country</a>
+      <a href="framer-geoblocking-cloudflare.html">Cloudflare vs. a plugin</a>
+    </nav>
+  </div>
+  <a class="rail-try" href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/" target="_blank" rel="noopener">The plugin in this guide is <b>Bouncer</b>, on the Framer marketplace →</a>
+</aside>
+</div>
 
 <footer class="site-foot"><div class="wrap">
 <span>© 2026 Vanssay</span>
 <span><a href="../geoblock.html">Bouncer</a> · <a href="../index.html">All plugins</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></span>
 </div></footer>
+<script src="guide.js" defer></script>
 </body>
 </html>

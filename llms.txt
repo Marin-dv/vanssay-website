@@ -18,6 +18,7 @@ Framer has no built-in geoblocking or geo-redirect features. These plugins add t
 - [How to block VPN & proxy traffic on Framer](https://vanssay.net/guides/block-vpn-framer.html): Why country blocks leak through VPNs and how IP-intelligence detection closes it.
 - [Restrict a Framer site to one country (allowlist)](https://vanssay.net/guides/restrict-framer-site-to-one-country.html): Allowlist mode for US-only, UK-only, or single-market sites.
 - [Block EU visitors from a Framer site (GDPR geoblocking)](https://vanssay.net/guides/block-eu-visitors-framer.html): The EU/EEA + UK country set, the setup, and legal caveats (not legal advice).
+- [Router for Framer: what it does & why](https://vanssay.net/guides/router-for-framer.html): Intro to geo, language and device routing for Framer, and when it's worth adding.
 - [Redirect Framer visitors by country](https://vanssay.net/guides/framer-redirect-by-country.html): Geo-redirects done the SEO-safe way (suggest, don't force).
 - [Send Framer visitors to the right language version](https://vanssay.net/guides/framer-redirect-by-language.html): Route by browser language to localized pages.
 - [All guides](https://vanssay.net/guides/)
