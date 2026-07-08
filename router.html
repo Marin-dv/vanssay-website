@@ -95,7 +95,7 @@ h2{font-size:clamp(28px,4.4vw,48px);font-weight:800;letter-spacing:-.03em;line-h
 .plan li{display:flex;gap:9px;align-items:flex-start;color:var(--text-2)}
 .plan li strong{color:var(--text);font-weight:700}
 .plan li::before{content:"✓";font-weight:900;color:var(--green);flex-shrink:0}
-.plan li.no{opacity:.45}.plan li.no::before{content:"—";color:var(--muted)}
+.plan li.no{opacity:.45}.plan li.no::before{content:"-";color:var(--muted)}
 .plan .btn{margin-top:auto;width:100%}
 .faq{max-width:720px;margin:46px auto 0;display:flex;flex-direction:column;gap:12px;text-align:left}
 details{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 24px;box-shadow:var(--shadow)}
@@ -122,7 +122,7 @@ h3,.feat h3,.plan-name,.plan-price,summary{font-family:'Bricolage Grotesque',-ap
 
 <nav><div class="nav-in">
   <a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40"><path d="M6,4H15L27,36H18Z" fill="rgba(124,58,237,.55)"/><path d="M34,4H25L13,36H22Z" fill="#7c3aed"/></svg><span>Rou<b>ter</b></span></a>
-  <div class="nav-links"><a href="/">All plugins</a><a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="contact">Contact</a><a href="router-account">Account</a></div>
+  <div class="nav-links"><a href="/">All plugins</a><a href="#features">Features</a><a href="#howto">How it works</a><a href="#pricing">Pricing</a><a href="#guides">Guides</a><a href="#faq">FAQ</a><a href="contact">Contact</a></div>
   <a class="btn btn-line" href="https://www.framer.com/community/marketplace/plugins/router-vanssay/" target="_blank" rel="noopener">Add to Framer</a>
 </div></nav>
 
@@ -164,6 +164,20 @@ h3,.feat h3,.plan-name,.plan-price,summary{font-family:'Bricolage Grotesque',-ap
     <div class="feat"><div class="ico">🛰️</div><h3>VPN-aware</h3><p>Reuses the Vanssay Bouncer engine to spot VPN/proxy traffic, so visitors can't dodge your geo rules with a VPN.</p></div>
     <div class="feat"><div class="ico">🧪</div><h3>Test console</h3><p>Preview exactly which rule fires for a visitor from any country, language or device, without a VPN. Plus memory so no one is redirected twice.</p></div>
   </div>
+</div></section>
+
+<section id="howto"><div class="wrap center">
+  <div class="eyebrow">How it works</div>
+  <h2>Route by <span class="serif">anything.</span></h2>
+  <p class="lead">Stack rules by country, region, language, device or VPN status. They run top to bottom and the first match wins, so a French visitor lands on <code>/fr</code>, a mobile US visitor gets your mobile URL, and everyone else stays put. Every decision is made server-side in milliseconds, so there's no flash of the wrong page and nothing for a visitor to bypass.</p>
+  <figure style="margin:44px auto 0;max-width:960px">
+    <img src="guides/img/router-rules.png" alt="Router for Framer redirect rules: France to /fr, DACH to /de, Spanish language to /es, mobile US to a mobile URL, VPN to /global, first match wins, with a test console" loading="lazy" width="1600" height="1200" style="width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--border)" />
+    <figcaption style="font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted);margin-top:10px">Build rules visually and test which one fires for any country, language or device, no VPN needed.</figcaption>
+  </figure>
+  <figure style="margin:26px auto 0;max-width:960px">
+    <img src="guides/img/router-banner.png" alt="Router suggestion banner on a Framer site offering a French visitor the French version while letting them stay" loading="lazy" width="1600" height="1200" style="width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--border)" />
+    <figcaption style="font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted);margin-top:10px">Prefer not to force it? Suggest the better page with a dismissible, auto-translated banner. Kinder to SEO and to visitors.</figcaption>
+  </figure>
 </div></section>
 
 <section id="pricing"><div class="wrap center">
@@ -221,6 +235,17 @@ h3,.feat h3,.plan-name,.plan-price,summary{font-family:'Bricolage Grotesque',-ap
     <details><summary>Will my UTM / campaign tracking survive?</summary><p>Yes. Turn on "Preserve query / UTM params" and Router carries the visitor's query string onto the destination URL, so your analytics and ad attribution keep working through the redirect.</p></details>
     <details><summary>Can people dodge it with a VPN?</summary><p>On Pro and up, enable VPN-aware rules: the backend flags anonymising proxies and datacenter IPs (the same engine as Vanssay Bouncer), so geo rules can't be bypassed with a VPN.</p></details>
     <details><summary>Does one subscription cover multiple sites?</summary><p>Yes, your plan is tied to your Vanssay account, not a project, and it's the same login as every other Vanssay plugin.</p></details>
+  </div>
+</div></section>
+
+<section id="guides"><div class="wrap center">
+  <div class="eyebrow">Guides</div>
+  <h2>Framer routing, <span class="serif">explained.</span></h2>
+  <p class="lead">Guides for sending visitors to the right page, and for blocking the ones you can't serve.</p>
+  <div class="feat-grid" style="text-align:left">
+    <a class="feat" href="guides/framer-redirect-by-country.html"><h3>Redirect visitors by country</h3><p>Geo-redirects and language routing without hurting SEO.</p></a>
+    <a class="feat" href="guides/framer-redirect-by-language.html"><h3>Send visitors to the right language</h3><p>Route by browser language to your localized Framer pages.</p></a>
+    <a class="feat" href="guides/"><h3>All Framer guides →</h3><p>Every geo-redirect and geoblocking guide in one place.</p></a>
   </div>
 </div></section>
 

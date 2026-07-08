@@ -121,7 +121,7 @@
     var name = document.getElementById("name").value.trim();
     var from = document.getElementById("from").value.trim();
     var msg = document.getElementById("msg").value.trim();
-    var body = msg + "\n\n— " + (name || "") + (from ? " (" + from + ")" : "");
+    var body = msg + "\n\n- " + (name || "") + (from ? " (" + from + ")" : "");
     window.location.href =
       "mailto:support@vanssay.net?subject=" + encodeURIComponent("[" + topic + "] Vanssay") + "&body=" + encodeURIComponent(body);
   });

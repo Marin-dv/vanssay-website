@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How to Send Framer Visitors to the Right Language Version</title>
+<meta name="description" content="Detect a visitor's browser language and route them to the matching Framer page, without the JS redirect hacks that hurt SEO. The suggestion-banner method, set up in minutes." />
+<link rel="canonical" href="https://vanssay.net/guides/framer-redirect-by-language.html" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M6,4H15L27,36H18Z' fill='%230e7afe'/><path d='M34,4H25L13,36H22Z' fill='%237c5cff'/></svg>" />
+<meta property="og:title" content="How to Send Framer Visitors to the Right Language Version" />
+<meta property="og:description" content="Route Framer visitors to the right language page by browser language, the SEO-safe way." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://vanssay.net/guides/framer-redirect-by-language.html" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="guide.css" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Can Framer redirect visitors by browser language?","acceptedAnswer":{"@type":"Answer","text":"Not natively. Framer Localization creates translated pages but does not route visitors to them by language. The Router plugin reads the visitor's language server-side and sends or suggests the matching page."}},
+{"@type":"Question","name":"Should I redirect by country or by language?","acceptedAnswer":{"@type":"Answer","text":"Language is usually the better signal for choosing a language version: a French speaker in Canada wants French, not the Canadian-English page. Country is better for pricing, currency, and legal or regional stores. Router can combine both."}},
+{"@type":"Question","name":"Do language redirects hurt SEO?","acceptedAnswer":{"@type":"Answer","text":"Forced automatic redirects can. Google recommends letting users and crawlers reach any version and suggesting the better one, which a dismissible banner does without blocking crawling."}}]}
+</script>
+</head>
+<body>
+<nav><div class="nav-in">
+  <a class="logo" href="../index.html"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+  <div class="nav-links"><a href="../router.html">Router</a><a href="../geoblock.html">Bouncer</a><a href="../contact.html">Contact</a></div>
+  <a class="btn btn-green" style="background:#0e7afe" href="https://www.framer.com/community/marketplace/plugins/router-vanssay/">Get the plugin</a>
+</div></nav>
+
+<article>
+<p class="eyebrow">Framer guide</p>
+<h1>How to send Framer visitors to the right language version</h1>
+<p class="lead">You built French, German, and Spanish versions of your Framer site. But everyone still lands on the English one. Framer translates pages; it doesn't route visitors to them. Here's how to close that gap by browser language, without wrecking your SEO.</p>
+<p class="meta">Updated July 2026 · 4 min read</p>
+
+<h2>Country or language: which signal?</h2>
+<p>They answer different questions. <strong>Language</strong> is the right signal for choosing a language version: a French speaker in Canada wants French, and a German expat in Spain wants German, regardless of where their IP sits. <strong>Country</strong> is the right signal for pricing, currency, and legal or regional stores. The browser sends an <code>Accept-Language</code> preference on every request, which is exactly what you want for language routing, and you can combine it with country when you need both.</p>
+
+<h2>Why not the JavaScript version</h2>
+<p>The copy-paste approach reads <code>navigator.language</code> and redirects with JavaScript. It flashes the wrong page first, and forced client-side redirects are what Google's internationalization guidance warns against. Googlebot crawls mostly from US, English-preferring requests; if it always gets bounced, your other language versions may not get crawled well.</p>
+
+<h2>The SEO-safe setup with Router</h2>
+<p>Framer has no language-routing setting, so this comes from a plugin. <a href="https://www.framer.com/community/marketplace/plugins/router-vanssay/">Router</a> reads the visitor's language server-side and acts on it:</p>
+<ol class="steps">
+<li><strong>Install Router</strong> from the Framer marketplace.</li>
+<li><strong>Add language rules:</strong> <code>fr → /fr</code>, <code>de → /de</code>, <code>es → /es</code>. Combine with country if needed (for example German speakers outside DACH to a specific page).</li>
+<li><strong>Choose suggest or redirect.</strong> A dismissible banner offers the matching page and auto-translates itself into the visitor's language, so it's readable even before they switch. The visitor stays in control, and the choice is remembered so they're never asked twice.</li>
+<li><strong>Publish.</strong> Detection runs server-side, so there's no flash of the wrong page and no API keys in your source.</li>
+</ol>
+
+<figure>
+<img src="img/router-banner.png" alt="Router suggestion banner on a Framer site offering a French visitor the French version, auto-translated, while letting them stay" loading="lazy" width="1600" height="1200" />
+<figcaption>An auto-translated banner suggests the visitor's language version instead of forcing a redirect.</figcaption>
+</figure>
+
+<div class="note"><strong>Tip:</strong> keep every language version reachable by a stable URL and let crawlers see all of them. Pair this with <code>hreflang</code> tags so search engines index the right version per language, then use Router to guide humans to it.</div>
+
+<div class="cta-box">
+<h2>Match every visitor to their language</h2>
+<p>Router for Framer routes by language, country, and device, with SEO-safe suggestion banners. Free plan available.</p>
+<a class="btn btn-green" style="background:#0e7afe" href="https://www.framer.com/community/marketplace/plugins/router-vanssay/">Install Router for Framer</a>
+&nbsp; <a class="btn btn-line" href="../router.html">See features &amp; pricing</a>
+</div>
+
+<h2>FAQ</h2>
+<details><summary>Does this work with Framer Localization?</summary><p>Yes. Router just sends or suggests whichever locale URL you specify, including Framer's own localized paths.</p></details>
+<details><summary>Can I combine language and country?</summary><p>Yes. Rules can match language, country, region, device, or VPN status, alone or combined, and the first matching rule wins.</p></details>
+<details><summary>What if the visitor's language isn't one I support?</summary><p>They fall through to your default page. Only visitors whose language matches a rule are routed or shown a banner.</p></details>
+
+<div class="related">
+<h2>Related guides</h2>
+<ul>
+<li><a href="framer-redirect-by-country.html">Redirect Framer visitors by country</a></li>
+<li><a href="block-countries-framer.html">How to block countries on a Framer site</a></li>
+<li><a href="restrict-framer-site-to-one-country.html">Restrict a Framer site to one country (allowlist)</a></li>
+</ul>
+</div>
+</article>
+
+<footer class="site-foot"><div class="wrap">
+<span>© 2026 Vanssay</span>
+<span><a href="../router.html">Router</a> · <a href="../index.html">All plugins</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></span>
+</div></footer>
+</body>
+</html>

@@ -183,17 +183,17 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
 const fmt = (n) => Number(n || 0).toLocaleString();
 const money = (n) => "$" + Number(n || 0).toLocaleString();
-const date = (d) => d ? new Date(d).toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" }) : "—";
-const dt = (d) => d ? new Date(d).toLocaleString(undefined, { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }) : "—";
+const date = (d) => d ? new Date(d).toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" }) : "-";
+const dt = (d) => d ? new Date(d).toLocaleString(undefined, { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }) : "-";
 // Apify costs are tiny (fractions of a cent → a few $); show enough precision to be useful.
 const usd = (n) => { n = Number(n || 0); return "$" + (n >= 1 ? n.toFixed(2) : n.toFixed(4)); };
 const planBadge = (p) => { p = p || "free"; return `<span class="badge b-${esc(p)}">${esc(p[0].toUpperCase()+p.slice(1))}</span>`; };
-const statusBadge = (s) => { const k = s==="active"||s==="trialing"?"b-active":s==="canceled"?"b-canceled":"b-other"; return `<span class="badge ${k}">${esc(s||"—")}</span>`; };
+const statusBadge = (s) => { const k = s==="active"||s==="trialing"?"b-active":s==="canceled"?"b-canceled":"b-other"; return `<span class="badge ${k}">${esc(s||"-")}</span>`; };
 const flag = (cc) => (cc && cc.length === 2 ? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0))) : "🏳️");
 const shortId = (id) => `<span class="mono" title="${esc(id)}">${esc(String(id||"").slice(0,8))}…</span>`;
 const val = (r) => (r && r.status === "fulfilled" ? r.value : null);
 const why = (r) => (r && r.status === "rejected" ? (r.reason && r.reason.message) || "request failed" : "");
-const unavailable = (label, r) => `<div class="empty">${esc(label)} unavailable — ${esc(why(r) || "no data")}</div>`;
+const unavailable = (label, r) => `<div class="empty">${esc(label)} unavailable, ${esc(why(r) || "no data")}</div>`;
 
 async function api(path, opts) {
   opts = opts || {}; // guard: null must not crash on opts.body
@@ -277,10 +277,10 @@ function planSplitPanel(bill) {
     <div class="kv"><span>Conversion (of all accounts)</span><strong>${t ? ((bill.plans.paid/t)*100).toFixed(1) : "0"}%</strong></div></div>`;
 }
 
-/* ── Overview — every plugin on one screen ── */
+/* ── Overview, every plugin on one screen ── */
 async function renderOverview() {
   const v = $("view");
-  v.innerHTML = `<div class="page-head"><div><h2>Overview</h2><p>All plugins — revenue, accounts and live activity.</p></div></div><div id="ov"><div class="empty">Loading…</div></div>`;
+  v.innerHTML = `<div class="page-head"><div><h2>Overview</h2><p>All plugins, revenue, accounts and live activity.</p></div></div><div id="ov"><div class="empty">Loading…</div></div>`;
   const ov = $("ov");
 
   // Billing per product (Accounts) + domain overview per plugin backend.
@@ -359,7 +359,7 @@ async function renderOverview() {
   ov.querySelectorAll("[data-open]").forEach((a) => a.onclick = (e) => { e.preventDefault(); switchTab("prod:" + a.dataset.open); });
 }
 
-/* ── Users — one global list, per-plugin plans ── */
+/* ── Users, one global list, per-plugin plans ── */
 let usersState = { search: "", page: 1, pageSize: 25 };
 async function renderUsers() {
   $("view").innerHTML = `
@@ -411,7 +411,7 @@ async function loadUsers() {
   if ($("u-next")) $("u-next").onclick = () => { usersState.page++; loadUsers(); };
 }
 
-/* ── User detail modal — cross-plugin ── */
+/* ── User detail modal, cross-plugin ── */
 async function openUser(id) {
   const root = $("modal-root");
   root.innerHTML = `<div class="modal-bg"><div class="modal"><div class="empty">Loading…</div></div></div>`;
@@ -438,7 +438,7 @@ async function openUser(id) {
       </div>
       <div class="kv"><span>User ID</span><span class="mono">${esc(u.id)}</span></div>
       <div class="kv"><span>Joined</span><span>${date(u.createdAt)}</span></div>
-      <div class="kv"><span>Stripe customer</span><span class="mono">${esc(u.stripeCustomerId || "—")}</span></div>
+      <div class="kv"><span>Stripe customer</span><span class="mono">${esc(u.stripeCustomerId || "-")}</span></div>
       <div class="kv"><span>Reviews monthly quota</span><span>${base.quota>0?fmt(base.quota):"Unlimited"}</span></div>
     </div>
 
@@ -464,7 +464,7 @@ async function openUser(id) {
         <button class="btn btn-line btn-sm" id="m-sendreset">Send password reset</button>
         <button class="btn btn-danger btn-sm" id="m-delete" style="margin-left:auto">Delete account</button>
       </div>
-      <p class="note">Deleting removes the shared account — it affects every plugin.</p>
+      <p class="note">Deleting removes the shared account, it affects every plugin.</p>
     </div>
 
     <div class="sec-title">Subscriptions · all plugins (${allSubs.length})</div>
@@ -473,7 +473,7 @@ async function openUser(id) {
 
     <div class="sec-title">Reviews · businesses (${base.configs.length})</div>
     <div class="card" style="padding:0;overflow:hidden">${base.configs.length ? `<table><thead><tr><th>Google</th><th>Trustpilot</th><th>Min ★</th></tr></thead><tbody>
-      ${base.configs.map((c)=>`<tr><td>${esc(c.googleBusinessName||c.googlePlaceId||"—")}</td><td class="truncate">${esc(c.trustpilotUrl||"—")}</td><td>${c.minStars}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No businesses connected.</div>`}</div>
+      ${base.configs.map((c)=>`<tr><td>${esc(c.googleBusinessName||c.googlePlaceId||"-")}</td><td class="truncate">${esc(c.trustpilotUrl||"-")}</td><td>${c.minStars}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No businesses connected.</div>`}</div>
 
     <div class="sec-title">Reviews · embed pages (${base.pages.length})</div>
     <div class="card" style="padding:0;overflow:hidden">${base.pages.length ? `<table><thead><tr><th>Page</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
@@ -502,7 +502,7 @@ async function openUser(id) {
     try { await api("/admin/users/"+id,{method:"DELETE"}); close(); loadUsers(); } catch(e){ showErr("m-err",e.message);} };
 }
 
-/* ── Subscriptions — per plugin ── */
+/* ── Subscriptions, per plugin ── */
 let subsProd = "reviews";
 async function renderSubs() {
   const bar = `<div class="prodbar">${PRODUCTS.map((p) => `<button class="pb ${subsProd===p.key?"on":""}" data-prod="${p.key}">${p.icon} ${esc(p.label)}</button>`).join("")}</div>`;
@@ -525,16 +525,16 @@ async function renderSubs() {
       <th>Email</th><th>Plan</th><th>Status</th><th>Live</th><th class="right">MRR</th><th>Period end</th><th>Created</th><th>Stripe sub</th>
     </tr></thead><tbody>${d.subscriptions.map((s)=>`<tr>
       <td>${esc(s.email)}</td><td>${planBadge(s.plan)}</td><td>${statusBadge(s.status)}</td>
-      <td>${s.live?"✅":"—"}</td><td class="right">${s.monthlyValue?money(s.monthlyValue):"—"}</td>
+      <td>${s.live?"✅":"-"}</td><td class="right">${s.monthlyValue?money(s.monthlyValue):"-"}</td>
       <td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td>
       <td class="mono truncate">${esc(s.stripeSubscriptionId||"manual")}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No subscriptions yet.</div>`}</div>`;
 }
 
-/* ── Expenses — Apify scraping costs (Trustpilot + Google) ── */
+/* ── Expenses, Apify scraping costs (Trustpilot + Google) ── */
 async function renderExpenses() {
   $("view").innerHTML = `
-    <div class="page-head"><div><h2>Expenses</h2><p>Apify scraping costs — every paid-plan Trustpilot &amp; Google fetch. Exact per-run cost read back from Apify; cached loads are free.</p></div></div>
+    <div class="page-head"><div><h2>Expenses</h2><p>Apify scraping costs, every paid-plan Trustpilot &amp; Google fetch. Exact per-run cost read back from Apify; cached loads are free.</p></div></div>
     <div id="ex"><div class="empty">Loading…</div></div>`;
   let d;
   try { d = await api("/admin/expenses"); }
@@ -572,12 +572,12 @@ async function renderExpenses() {
     </tr></thead><tbody>${d.recent.map((r) => `<tr>
       <td>${dt(r.createdAt)}</td>
       <td>${pill(r.platform)}</td>
-      <td class="truncate">${/^https?:\/\//.test(r.sourceId) ? `<a href="${esc(r.sourceId)}" target="_blank">${esc(r.sourceId.replace(/^https?:\/\/(www\.)?/,""))}</a>` : esc(r.sourceId || "—")}</td>
+      <td class="truncate">${/^https?:\/\//.test(r.sourceId) ? `<a href="${esc(r.sourceId)}" target="_blank">${esc(r.sourceId.replace(/^https?:\/\/(www\.)?/,""))}</a>` : esc(r.sourceId || "-")}</td>
       <td class="right">${fmt(r.items)}</td>
       <td class="right">${usd(r.cost)}</td>
       <td>${r.status === "SUCCEEDED" ? "✅" : statusBadge(r.status)}</td>
     </tr>`).join("")}</tbody></table>` : `<div class="empty">No scrapes recorded yet. Costs appear here after the first paid-plan Trustpilot or Google fetch (cache misses only).</div>`}</div>
-    <p class="note">Only paid-plan fetches hit Apify: free Trustpilot uses the self-hosted scraper and free Google uses the Places API (Google's $200/mo credit) — both $0.</p>`;
+    <p class="note">Only paid-plan fetches hit Apify: free Trustpilot uses the self-hosted scraper and free Google uses the Places API (Google's $200/mo credit), both $0.</p>`;
 }
 
 /* ── Plugin pages ── */
@@ -627,7 +627,7 @@ async function renderReviews(head) {
   ]);
   const [bill, pages, biz, cache] = rs.map(val);
   $("view").innerHTML = `
-    ${head("Google + Trustpilot reviews widget — usage, embeds and sources.")}
+    ${head("Google + Trustpilot reviews widget, usage, embeds and sources.")}
     ${bill ? `<div class="kpis">
       <div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
       <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${fmt(bill.plans.pro)} Pro · ${fmt(bill.plans.ultra)} Ultra</div></div>
@@ -650,15 +650,15 @@ async function renderReviews(head) {
       </tbody></table>`:`<div class="empty">No embeds tracked yet.</div>`}</div>
       <div class="tablewrap">${pages.hosts.length?`<table><thead><tr><th>Host</th><th class="right">Pages</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
         ${pages.hosts.map((h)=>`<tr><td class="truncate">${esc(h.host)}</td><td class="right">${fmt(h.pages)}</td><td class="right">${fmt(h.views)}</td><td class="right">${fmt(h.clicks)}</td></tr>`).join("")}
-      </tbody></table>`:`<div class="empty">—</div>`}</div>
+      </tbody></table>`:`<div class="empty">-</div>`}</div>
     </div>` : unavailable("Pages", rs[1])}
 
     <div class="sec-title">Businesses (connected sources)</div>
     ${biz ? `<div class="tablewrap" style="margin-bottom:16px">${biz.businesses.length?`<table><thead><tr>
       <th>Owner</th><th>Google business</th><th>Place ID</th><th>Trustpilot</th><th class="right">Min ★</th><th>Connected</th>
     </tr></thead><tbody>${biz.businesses.map((b)=>`<tr>
-      <td>${esc(b.email)}</td><td>${esc(b.googleBusinessName||"—")}</td><td class="mono truncate">${esc(b.googlePlaceId||"—")}</td>
-      <td class="truncate">${b.trustpilotUrl?`<a href="${esc(b.trustpilotUrl)}" target="_blank">${esc(b.trustpilotUrl.replace(/^https?:\/\/(www\.)?/,""))}</a>`:"—"}</td>
+      <td>${esc(b.email)}</td><td>${esc(b.googleBusinessName||"-")}</td><td class="mono truncate">${esc(b.googlePlaceId||"-")}</td>
+      <td class="truncate">${b.trustpilotUrl?`<a href="${esc(b.trustpilotUrl)}" target="_blank">${esc(b.trustpilotUrl.replace(/^https?:\/\/(www\.)?/,""))}</a>`:"-"}</td>
       <td class="right">${b.minStars}</td><td>${date(b.createdAt)}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No businesses connected yet.</div>`}</div>` : unavailable("Businesses", rs[2])}
 
@@ -677,7 +677,7 @@ async function renderGeoblock(head) {
   const [bill, dom, trend, countries, sites, cache] = rs.map(val);
   const maxC = countries ? Math.max(1, ...countries.countries.map((c) => c.blocked || c.visits)) : 1;
   $("view").innerHTML = `
-    ${head("Geo/VPN blocking — protected sites and block activity.")}
+    ${head("Geo/VPN blocking, protected sites and block activity.")}
     <div class="kpis">
       ${bill ? `<div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
       <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${fmt(bill.plans.pro)} Pro · ${fmt(bill.plans.ultra)} Ultra</div></div>` : ""}
@@ -701,8 +701,8 @@ async function renderGeoblock(head) {
     ${sites ? `<div class="tablewrap" style="margin-bottom:16px">${sites.sites.length?`<table><thead><tr>
       <th>Owner</th><th>Label</th><th>Mode</th><th class="right">Countries</th><th>VPN</th><th>Action</th><th>Scope</th><th>Strict</th><th>Created</th>
     </tr></thead><tbody>${sites.sites.map((s)=>`<tr>
-      <td>${shortId(s.userId)}</td><td>${esc(s.label||"—")}</td><td>${esc(s.mode)}</td><td class="right">${fmt(s.countries)}</td>
-      <td>${s.vpnBlock?"✓":"—"}</td><td>${esc(s.action)}</td><td>${esc(s.scope)}</td><td>${s.strictMode?"✓":"—"}</td><td>${date(s.createdAt)}</td>
+      <td>${shortId(s.userId)}</td><td>${esc(s.label||"-")}</td><td>${esc(s.mode)}</td><td class="right">${fmt(s.countries)}</td>
+      <td>${s.vpnBlock?"✓":"-"}</td><td>${esc(s.action)}</td><td>${esc(s.scope)}</td><td>${s.strictMode?"✓":"-"}</td><td>${date(s.createdAt)}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No protected sites yet.</div>`}</div>` : unavailable("Sites", rs[4])}
     ${cachePanel(cache, rs[5], p, "IP geolocation cache (ip-api lookups)")}`;
   bindCache(p);
@@ -718,7 +718,7 @@ async function renderRouterP(head) {
   const [bill, dom, trend, countries, sites, cache] = rs.map(val);
   const maxC = countries ? Math.max(1, ...countries.countries.map((c) => c.redirected || c.visits)) : 1;
   $("view").innerHTML = `
-    ${head("Geo/language/device redirects — routed sites and redirect activity.")}
+    ${head("Geo/language/device redirects, routed sites and redirect activity.")}
     <div class="kpis">
       ${bill ? `<div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
       <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${fmt(bill.plans.pro)} Pro · ${fmt(bill.plans.ultra)} Ultra</div></div>` : ""}
@@ -742,8 +742,8 @@ async function renderRouterP(head) {
     ${sites ? `<div class="tablewrap" style="margin-bottom:16px">${sites.sites.length?`<table><thead><tr>
       <th>Owner</th><th>Label</th><th>Enabled</th><th class="right">Rules</th><th>Default</th><th>Webhook</th><th>Created</th>
     </tr></thead><tbody>${sites.sites.map((s)=>`<tr>
-      <td>${shortId(s.userId)}</td><td>${esc(s.label||"—")}</td><td>${s.enabled?"✓":"—"}</td><td class="right">${fmt(s.rules)}</td>
-      <td>${s.hasDefault?"✓":"—"}</td><td>${s.webhook?"✓":"—"}</td><td>${date(s.createdAt)}</td>
+      <td>${shortId(s.userId)}</td><td>${esc(s.label||"-")}</td><td>${s.enabled?"✓":"-"}</td><td class="right">${fmt(s.rules)}</td>
+      <td>${s.hasDefault?"✓":"-"}</td><td>${s.webhook?"✓":"-"}</td><td>${date(s.createdAt)}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No routed sites yet.</div>`}</div>` : unavailable("Sites", rs[4])}
     ${cachePanel(cache, rs[5], p, "IP geolocation cache (ip-api lookups)")}`;
   bindCache(p);
@@ -757,7 +757,7 @@ async function renderMaintenance(head) {
   ]);
   const [bill, dom, trend, sites] = rs.map(val);
   $("view").innerHTML = `
-    ${head("Server-side maintenance mode — protected sites and traffic held back.")}
+    ${head("Server-side maintenance mode, protected sites and traffic held back.")}
     <div class="kpis">
       ${bill ? `<div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
       <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${fmt(bill.plans.pro)} Pro · ${fmt(bill.plans.ultra)} Ultra</div></div>` : ""}
@@ -776,8 +776,8 @@ async function renderMaintenance(head) {
     ${sites ? `<div class="tablewrap">${sites.sites.length?`<table><thead><tr>
       <th>Owner</th><th>Label</th><th>In maintenance</th><th>Action</th><th class="right">IP whitelist</th><th>Schedule</th><th>Created</th>
     </tr></thead><tbody>${sites.sites.map((s)=>`<tr>
-      <td>${shortId(s.userId)}</td><td>${esc(s.label||"—")}</td><td>${s.enabled?"🟠 on":"—"}</td><td>${esc(s.action||"—")}</td>
-      <td class="right">${fmt(s.whitelistSize)}</td><td>${s.autoSchedule?"✓":"—"}</td><td>${date(s.createdAt)}</td>
+      <td>${shortId(s.userId)}</td><td>${esc(s.label||"-")}</td><td>${s.enabled?"🟠 on":"-"}</td><td>${esc(s.action||"-")}</td>
+      <td class="right">${fmt(s.whitelistSize)}</td><td>${s.autoSchedule?"✓":"-"}</td><td>${date(s.createdAt)}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No sites yet.</div>`}</div>` : unavailable("Sites", rs[3])}`;
 }
 

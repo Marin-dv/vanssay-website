@@ -30,6 +30,9 @@ td{color:var(--text-2)}
 .steps{counter-reset:step;list-style:none;margin-left:0}
 .steps li{counter-increment:step;position:relative;padding-left:42px;margin:14px 0}
 .steps li::before{content:counter(step);position:absolute;left:0;top:1px;width:28px;height:28px;border-radius:4px;background:var(--green-soft);color:var(--green);font-family:'Space Mono',monospace;font-weight:700;font-size:13px;display:grid;place-items:center}
+figure{margin:26px 0}
+figure img{width:100%;height:auto;display:block;border-radius:6px;border:1px solid var(--border);background:#0b0e0c}
+figcaption{font-family:'Space Mono',monospace;font-size:11.5px;color:var(--muted);margin-top:9px;text-align:center}
 .note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:4px;padding:14px 18px;margin:18px 0;font-size:14px;color:var(--text-2)}
 .cta-box{background:var(--ink);border-radius:4px;padding:30px 28px;margin:44px 0;color:#e7f6ef}
 .cta-box h2{color:#fff;margin:0 0 8px;font-size:23px}
