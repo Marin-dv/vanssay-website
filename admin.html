@@ -193,6 +193,11 @@ const planBadge = (p) => { p = p || "free"; return `<span class="badge b-${esc(p
 const statusBadge = (s) => { const k = s==="active"||s==="trialing"?"b-active":s==="canceled"?"b-canceled":"b-other"; return `<span class="badge ${k}">${esc(s||"-")}</span>`; };
 const flag = (cc) => (cc && cc.length === 2 ? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0))) : "🏳️");
 const shortId = (id) => `<span class="mono" title="${esc(id)}">${esc(String(id||"").slice(0,8))}…</span>`;
+// Owner cell: prefer the email (resolved from Accounts), fall back to the opaque id.
+const owner = (s) => s.email ? `<span title="${esc(s.userId)}">${esc(s.email)}</span>` : shortId(s.userId);
+// Website cell: the domain captured from the published site's /check calls.
+const hostOf = (u) => { try { return new URL(u).host; } catch { return String(u || ""); } };
+const website = (s) => s.domain ? `<a class="mono" href="${esc(s.domain)}" target="_blank" rel="noopener">${esc(hostOf(s.domain))}</a>` : "-";
 const val = (r) => (r && r.status === "fulfilled" ? r.value : null);
 const why = (r) => (r && r.status === "rejected" ? (r.reason && r.reason.message) || "request failed" : "");
 const unavailable = (label, r) => `<div class="empty">${esc(label)} unavailable, ${esc(why(r) || "no data")}</div>`;
@@ -701,9 +706,9 @@ async function renderGeoblock(head) {
     </tbody></table>`:`<div class="empty">No blocks recorded yet.</div>`}</div>` : unavailable("Countries", rs[3])}
     <div class="sec-title">Protected sites</div>
     ${sites ? `<div class="tablewrap" style="margin-bottom:16px">${sites.sites.length?`<table><thead><tr>
-      <th>Owner</th><th>Label</th><th>Mode</th><th class="right">Countries</th><th>VPN</th><th>Action</th><th>Scope</th><th>Strict</th><th>Created</th>
+      <th>Owner</th><th>Website</th><th>Label</th><th>Mode</th><th class="right">Countries</th><th>VPN</th><th>Action</th><th>Scope</th><th>Strict</th><th>Created</th>
     </tr></thead><tbody>${sites.sites.map((s)=>`<tr>
-      <td>${shortId(s.userId)}</td><td>${esc(s.label||"-")}</td><td>${esc(s.mode)}</td><td class="right">${fmt(s.countries)}</td>
+      <td>${owner(s)}</td><td>${website(s)}</td><td>${esc(s.label||"-")}</td><td>${esc(s.mode)}</td><td class="right">${fmt(s.countries)}</td>
       <td>${s.vpnBlock?"✓":"-"}</td><td>${esc(s.action)}</td><td>${esc(s.scope)}</td><td>${s.strictMode?"✓":"-"}</td><td>${date(s.createdAt)}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No protected sites yet.</div>`}</div>` : unavailable("Sites", rs[4])}
     ${cachePanel(cache, rs[5], p, "IP geolocation cache (ip-api lookups)")}`;
