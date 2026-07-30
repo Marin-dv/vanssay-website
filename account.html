@@ -240,11 +240,19 @@ async function load() {
     const badge = $("d-plan");
     badge.textContent = plan === "ultra" ? "Agency" : plan[0].toUpperCase() + plan.slice(1);
     badge.className = "badge b-" + plan;
-    $("d-renew").textContent = me.subscription.currentPeriodEnd ? "Renews " + new Date(me.subscription.currentPeriodEnd).toLocaleDateString() : (plan === "free" ? "Free forever. Upgrade anytime." : "Active subscription.");
+    const interval = me.subscription.interval; // 'month' | 'year' | null
+    const billedLabel = interval === "year" ? "Billed yearly" : interval === "month" ? "Billed monthly" : null;
+    if (plan === "free") {
+      $("d-renew").textContent = "Free forever. Upgrade anytime.";
+    } else {
+      const renews = me.subscription.currentPeriodEnd ? "renews " + new Date(me.subscription.currentPeriodEnd).toLocaleDateString() : "active subscription";
+      $("d-renew").textContent = billedLabel ? `${billedLabel} · ${renews}` : renews[0].toUpperCase() + renews.slice(1);
+    }
 
     const actions = $("d-billing");
     const checkout = (choice) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: { plan: choice } }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
     const portal = async () => { try { const r = await api("/billing/portal", { method: "POST" }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
+    const switchInterval = (to) => async () => { showErr("dash-err", ""); try { await api("/billing/change-interval", { method: "POST", body: { interval: to } }); location.reload(); } catch (e) { showErr("dash-err", e.message); } };
 
     let cycle = "monthly"; // billing-cycle toggle driving the upgrade buttons
     function renderBilling() {
@@ -264,8 +272,12 @@ async function load() {
         mk(`Go Agency (${PLAN_COPY[agencyChoice].price})`, "btn-blue", checkout(agencyChoice));
       } else if (plan === "pro") {
         mk(`Upgrade to Agency (${PLAN_COPY[agencyChoice].price})`, "btn-blue", checkout(agencyChoice));
+        if (interval === "month") mk("Switch to yearly · 2 months free", "btn-line", switchInterval("year"));
+        else if (interval === "year") mk("Switch to monthly", "btn-line", switchInterval("month"));
         mk("Manage / cancel billing", "btn-line", portal);
       } else {
+        if (interval === "month") mk("Switch to yearly · 2 months free", "btn-line", switchInterval("year"));
+        else if (interval === "year") mk("Switch to monthly", "btn-line", switchInterval("month"));
         mk("Manage / cancel billing", "btn-line", portal);
       }
     }
