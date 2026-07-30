@@ -135,6 +135,10 @@ h2{font-size:clamp(32px,4.6vw,56px);font-weight:900;letter-spacing:-.035em;line-
 .plan-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px}
 .plan-price{font-family:'Bricolage Grotesque',sans-serif;font-size:52px;font-weight:900;letter-spacing:-.045em;margin:12px 0 2px}
 .plan-price span{font-family:'Space Mono',monospace;font-size:15px;font-weight:600;color:var(--muted);letter-spacing:0}
+.bill-toggle{display:inline-flex;gap:4px;padding:4px;margin:0 auto 34px;background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:99px}
+.bill-opt{display:inline-flex;align-items:center;gap:8px;border:0;background:transparent;color:var(--muted);font-family:inherit;font-size:14px;font-weight:700;padding:9px 18px;border-radius:99px;cursor:pointer}
+.bill-opt.on{background:var(--accent);color:#fff}
+.bill-save{font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;background:#4a9e0a;color:#fff}
 .plan-for{font-family:'Space Mono',monospace;font-size:13.5px;color:var(--text-2);margin-bottom:26px}
 .plan ul{list-style:none;display:flex;flex-direction:column;gap:12px;font-size:14px;margin-bottom:32px;text-align:left}
 .plan li{display:flex;gap:10px;align-items:flex-start;color:var(--text-2)}
@@ -214,6 +218,10 @@ details p{margin-top:12px;font-size:14.5px;color:var(--text-2)}
     <div class="eyebrow">Pricing</div>
     <h2>Start free. Upgrade when<br/>the reviews start <span class="serif">selling.</span></h2>
     <p class="lead">One subscription covers every Framer project you own.</p>
+    <div class="bill-toggle" role="group" aria-label="Billing cycle">
+      <button type="button" class="bill-opt on" data-cycle="mo">Monthly</button>
+      <button type="button" class="bill-opt" data-cycle="yr">Yearly <span class="bill-save">2 months free</span></button>
+    </div>
     <div class="plans">
       <div class="plan">
         <div class="plan-name">Free</div><div class="plan-price">$0</div><div class="plan-for">Test the waters</div>
@@ -229,7 +237,7 @@ details p{margin-top:12px;font-size:14.5px;color:var(--text-2)}
       </div>
       <div class="plan featured">
         <span class="plan-flag">Most popular</span>
-        <div class="plan-name">Pro</div><div class="plan-price">$9<span>/mo</span></div><div class="plan-for">For serious sites</div>
+        <div class="plan-name">Pro</div><div class="plan-price js-price" data-mo="9" data-yr="90">$9<span>/mo</span></div><div class="plan-for">For serious sites</div>
         <ul>
           <li><span><strong>50,000 views</strong>/month</span></li>
           <li><span><strong>All 8 widgets</strong> + all future widgets</span></li>
@@ -242,7 +250,7 @@ details p{margin-top:12px;font-size:14.5px;color:var(--text-2)}
         <a class="btn btn-blue" href="account">Upgrade to Pro</a>
       </div>
       <div class="plan">
-        <div class="plan-name">Ultra</div><div class="plan-price">$39<span>/mo</span></div><div class="plan-for">Maximum social proof</div>
+        <div class="plan-name">Agency</div><div class="plan-price js-price" data-mo="29" data-yr="290">$29<span>/mo</span></div><div class="plan-for">Maximum social proof</div>
         <ul>
           <li><span><strong>Unlimited views</strong></span></li>
           <li><span>Everything in Pro</span></li>
@@ -250,7 +258,7 @@ details p{margin-top:12px;font-size:14.5px;color:var(--text-2)}
           <li><span>Up to <strong>15 connected businesses</strong></span></li>
           <li><span><strong>Priority support</strong> + early access</span></li>
         </ul>
-        <a class="btn btn-dark" href="account">Go Ultra</a>
+        <a class="btn btn-dark" href="account">Go Agency</a>
       </div>
     </div>
     <p class="guarantee">7-day money-back guarantee · Cancel anytime, in two clicks</p>
@@ -342,6 +350,19 @@ let lastY=0;
 addEventListener("scroll",()=>{
   const y=scrollY;document.getElementById("nav").classList.toggle("hidden",y>lastY&&y>140);lastY=y;
 },{passive:true});
+
+/* pricing: monthly / yearly toggle (yearly = 2 months free) */
+(function(){
+  const opts=document.querySelectorAll(".bill-opt");
+  function setCycle(c){
+    opts.forEach(o=>o.classList.toggle("on",o.dataset.cycle===c));
+    document.querySelectorAll(".js-price").forEach(el=>{
+      const val=c==="yr"?el.dataset.yr:el.dataset.mo;
+      el.innerHTML="$"+val+"<span>"+(c==="yr"?"/yr":"/mo")+"</span>";
+    });
+  }
+  opts.forEach(o=>o.addEventListener("click",()=>setCycle(o.dataset.cycle)));
+})();
 </script>
 </body>
 </html>
