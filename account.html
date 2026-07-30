@@ -54,6 +54,9 @@
     .meter span { display:block; height:100%; background:var(--accent); border-radius:99px; }
     .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
     .actions .btn { width:auto; flex:1; margin-top:0; }
+    .cycle { display:flex; width:100%; gap:4px; padding:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:99px; margin-bottom:2px; }
+    .cycle-opt { flex:1; border:0; background:transparent; color:var(--text-2); font:inherit; font-size:12.5px; font-weight:700; padding:8px 10px; border-radius:99px; cursor:pointer; }
+    .cycle-opt.on { background:var(--surface-1,#fff); color:var(--accent); box-shadow:0 1px 2px rgba(0,0,0,.08); }
     #dash { display:none; }
     h3 { font-size:15px; font-weight:800; margin-bottom:4px; }
     /* Loading state while the session is verified (e.g. arriving from the plugin) */
@@ -143,8 +146,14 @@
 
 <script>
 const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
-// Stripe price ids: leave empty to use the backend defaults.
-const PRICE_PRO = "price_1TjlQZB3xYzGNURHgqEBd8xT", PRICE_ULTRA = "price_1TlZEbB3xYzGNURHcZ8uytId";
+// Checkout sends a plan CHOICE; the backend resolves the live Stripe price id
+// from its env (single source of truth). Yearly plans give 2 months free.
+const PLAN_COPY = {
+  pro:        { label: "Pro",    price: "$9/mo"  },
+  proYearly:  { label: "Pro",    price: "$90/yr" },
+  ultra:      { label: "Agency", price: "$29/mo" },
+  ultraYearly:{ label: "Agency", price: "$290/yr" },
+};
 const TKEY = "vanssay.token";
 let registerMode = false;
 
@@ -229,17 +238,38 @@ async function load() {
     $("d-email").textContent = me.user.email; $("d-email2").textContent = me.user.email;
     const plan = me.subscription.plan;
     const badge = $("d-plan");
-    badge.textContent = plan[0].toUpperCase() + plan.slice(1);
+    badge.textContent = plan === "ultra" ? "Agency" : plan[0].toUpperCase() + plan.slice(1);
     badge.className = "badge b-" + plan;
     $("d-renew").textContent = me.subscription.currentPeriodEnd ? "Renews " + new Date(me.subscription.currentPeriodEnd).toLocaleDateString() : (plan === "free" ? "Free forever. Upgrade anytime." : "Active subscription.");
 
-    const actions = $("d-billing"); actions.innerHTML = "";
-    const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
-    const checkout = (priceId) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: priceId ? { priceId } : {} }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
+    const actions = $("d-billing");
+    const checkout = (choice) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: { plan: choice } }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
     const portal = async () => { try { const r = await api("/billing/portal", { method: "POST" }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
-    if (plan === "free") { mk("Upgrade to Pro ($9/mo)", "btn-line", checkout(PRICE_PRO)); mk("Go Ultra ($39/mo)", "btn-blue", checkout(PRICE_ULTRA)); }
-    else if (plan === "pro") { mk("Upgrade to Ultra ($39/mo)", "btn-blue", checkout(PRICE_ULTRA)); mk("Manage / cancel billing", "btn-line", portal); }
-    else { mk("Manage / cancel billing", "btn-line", portal); }
+
+    let cycle = "monthly"; // billing-cycle toggle driving the upgrade buttons
+    function renderBilling() {
+      actions.innerHTML = "";
+      const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
+      // Monthly / yearly toggle — yearly gives 2 months free. Only where upgrading is possible.
+      if (plan === "free" || plan === "pro") {
+        const t = document.createElement("div"); t.className = "cycle";
+        const seg = (val, txt) => { const s = document.createElement("button"); s.type = "button"; s.className = "cycle-opt" + (cycle === val ? " on" : ""); s.textContent = txt; s.onclick = () => { cycle = val; renderBilling(); }; t.appendChild(s); };
+        seg("monthly", "Monthly"); seg("yearly", "Yearly · 2 months free");
+        actions.appendChild(t);
+      }
+      const proChoice = cycle === "yearly" ? "proYearly" : "pro";
+      const agencyChoice = cycle === "yearly" ? "ultraYearly" : "ultra";
+      if (plan === "free") {
+        mk(`Upgrade to Pro (${PLAN_COPY[proChoice].price})`, "btn-line", checkout(proChoice));
+        mk(`Go Agency (${PLAN_COPY[agencyChoice].price})`, "btn-blue", checkout(agencyChoice));
+      } else if (plan === "pro") {
+        mk(`Upgrade to Agency (${PLAN_COPY[agencyChoice].price})`, "btn-blue", checkout(agencyChoice));
+        mk("Manage / cancel billing", "btn-line", portal);
+      } else {
+        mk("Manage / cancel billing", "btn-line", portal);
+      }
+    }
+    renderBilling();
 
     try {
       const u = await api("/track/usage");
@@ -253,8 +283,8 @@ async function load() {
       $("quota-banner").style.display = over ? "block" : "none";
       if (over) {
         $("qb-limit").textContent = u.limit.toLocaleString();
-        $("quota-up").textContent = plan === "free" ? "Upgrade to Pro ($9/mo)" : "Upgrade to Ultra ($39/mo)";
-        $("quota-up").onclick = checkout(plan === "free" ? PRICE_PRO : PRICE_ULTRA);
+        $("quota-up").textContent = plan === "free" ? "Upgrade to Pro ($9/mo)" : "Upgrade to Agency ($29/mo)";
+        $("quota-up").onclick = checkout(plan === "free" ? "pro" : "ultra");
       }
     } catch (e) { $("d-limit").textContent = "Usage unavailable right now."; }
   } catch (e) {
