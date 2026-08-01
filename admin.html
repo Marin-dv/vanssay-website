@@ -12,9 +12,10 @@
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     :root {
-      --bg:#f6f7f9; --surface:#fff; --surface-2:#f4f4f5; --border:#e4e4e7; --text:#18181b;
-      --text-2:#52525b; --muted:#a1a1aa; --accent:#0e7afe; --pro:#7c5cff; --error:#dc2626;
-      --green:#16a34a; --amber:#d97706; --shadow:0 1px 2px rgba(0,0,0,.05); --shadow-md:0 8px 30px rgba(0,0,0,.07);
+      --bg:#f7f7f8; --surface:#fff; --surface-2:#f4f4f5; --border:#e6e6e9; --text:#18181b;
+      --text-2:#52525b; --muted:#a1a1aa; --accent:#4f46e5; --accent-soft:#eef0fe; --pro:#6d5cf0;
+      --ink:#141417; --error:#dc2626; --green:#16a34a; --amber:#d97706;
+      --shadow:0 1px 2px rgba(24,24,27,.05); --shadow-md:0 10px 34px rgba(24,24,27,.09);
     }
     body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.55; min-height:100vh; -webkit-font-smoothing:antialiased; font-size:14px; }
     a { color:var(--accent); text-decoration:none; }
@@ -29,10 +30,10 @@
     .gate .card { padding:26px; }
     label { display:block; font-size:12.5px; font-weight:600; margin:14px 0 5px; }
     input, select { width:100%; padding:10px 13px; border:1px solid var(--border); border-radius:9px; font:inherit; font-size:14px; outline:none; background:#fff; }
-    input:focus, select:focus { border-color:var(--accent); box-shadow:0 0 0 3px #eaf3ff; }
+    input:focus, select:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
     .btn { display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:10px 16px; border-radius:10px; font-size:13.5px; font-weight:700; border:1px solid transparent; background:var(--surface-2); color:var(--text); }
     .btn:hover { filter:brightness(.98); }
-    .btn-blue { background:linear-gradient(120deg,var(--accent),var(--pro)); color:#fff; }
+    .btn-blue { background:var(--accent); color:#fff; }
     .btn-line { background:#fff; border-color:var(--border); }
     .btn-danger { background:var(--error); color:#fff; }
     .btn-full { width:100%; margin-top:18px; }
@@ -41,14 +42,17 @@
     .ok { background:#e9f7ef; color:var(--green); border-radius:9px; padding:9px 13px; font-size:12.5px; margin-top:12px; display:none; }
 
     /* ── Shell ── */
-    .shell { display:none; min-height:100vh; grid-template-columns:230px 1fr; }
-    aside { background:var(--surface); border-right:1px solid var(--border); padding:22px 16px; position:sticky; top:0; height:100vh; display:flex; flex-direction:column; gap:4px; }
-    .brand { display:flex; align-items:center; gap:9px; font-weight:800; font-size:16px; padding:0 8px 18px; }
-    .navlink { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:9px; color:var(--text-2); font-weight:600; font-size:13.5px; border:none; background:none; width:100%; text-align:left; }
+    .shell { display:none; min-height:100vh; grid-template-columns:236px 1fr; }
+    aside { background:var(--surface); border-right:1px solid var(--border); padding:20px 14px; position:sticky; top:0; height:100vh; display:flex; flex-direction:column; gap:2px; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:800; font-size:15.5px; letter-spacing:-.01em; padding:2px 8px 16px; }
+    .brand .logo { width:28px; height:28px; border-radius:8px; background:var(--ink); display:flex; align-items:center; justify-content:center; flex:none; }
+    .navlink { display:flex; align-items:center; gap:11px; padding:9px 11px; border-radius:9px; color:var(--text-2); font-weight:600; font-size:13.5px; border:none; background:none; width:100%; text-align:left; position:relative; transition:background .12s,color .12s; }
     .navlink:hover { background:var(--surface-2); color:var(--text); }
-    .navlink.active { background:#eaf3ff; color:var(--accent); }
-    .navlink .ic { width:18px; text-align:center; }
-    .navsep { font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:700; margin:14px 8px 4px; }
+    .navlink.active { background:var(--accent-soft); color:var(--accent); }
+    .navlink.active::before { content:""; position:absolute; left:-14px; top:8px; bottom:8px; width:3px; border-radius:0 3px 3px 0; background:var(--accent); }
+    .navlink .ic { width:18px; text-align:center; font-size:14px; display:inline-flex; align-items:center; justify-content:center; }
+    .navlink .ic svg { width:16px; height:16px; }
+    .navsep { font-size:10px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); font-weight:700; margin:16px 11px 5px; }
     .aside-foot { margin-top:auto; font-size:12px; color:var(--muted); padding:12px 8px 0; border-top:1px solid var(--border); }
     main { padding:30px 34px 70px; max-width:1240px; }
     .page-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:22px; gap:16px; flex-wrap:wrap; }
@@ -64,8 +68,8 @@
     .kpi .k-label { font-size:12px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.03em; }
     .kpi .k-val { font-size:26px; font-weight:900; letter-spacing:-.02em; margin-top:4px; }
     .kpi .k-sub { font-size:12px; color:var(--text-2); margin-top:2px; }
-    .kpi.hero { background:linear-gradient(120deg,#0e7afe,#7c5cff); color:#fff; border:none; }
-    .kpi.hero .k-label, .kpi.hero .k-sub { color:rgba(255,255,255,.85); }
+    .kpi.hero { background:var(--ink); color:#fff; border:none; }
+    .kpi.hero .k-label, .kpi.hero .k-sub { color:rgba(255,255,255,.6); }
 
     .grid-2 { display:grid; grid-template-columns:1.4fr 1fr; gap:16px; }
     .grid-eq { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
@@ -79,7 +83,8 @@
 
     /* ── Bar chart ── */
     .chart { display:flex; align-items:flex-end; gap:6px; height:140px; }
-    .bar { flex:1; background:linear-gradient(180deg,#5aa6ff,#7c5cff); border-radius:5px 5px 0 0; min-height:3px; position:relative; }
+    .bar { flex:1; background:var(--accent); border-radius:5px 5px 0 0; min-height:3px; position:relative; opacity:.85; }
+    .bar:hover { opacity:1; }
     .bar:hover::after { content:attr(data-tip); position:absolute; bottom:100%; left:50%; transform:translateX(-50%); background:#18181b; color:#fff; font-size:11px; padding:4px 8px; border-radius:6px; white-space:nowrap; margin-bottom:5px; z-index:5; }
     .chart-x { display:flex; gap:6px; margin-top:6px; }
     .chart-x span { flex:1; text-align:center; font-size:10px; color:var(--muted); overflow:hidden; }
@@ -101,12 +106,13 @@
     .note { font-size:12px; color:var(--muted); padding:8px 2px; }
 
     .badge { display:inline-flex; padding:2px 10px; border-radius:99px; font-size:11.5px; font-weight:800; white-space:nowrap; }
-    .b-free { background:var(--surface-2); color:var(--text-2); } .b-pro { background:#f1edff; color:var(--pro); } .b-ultra { background:linear-gradient(90deg,var(--accent),var(--pro)); color:#fff; }
+    .b-free { background:var(--surface-2); color:var(--text-2); } .b-pro { background:var(--accent-soft); color:var(--pro); } .b-ultra { background:var(--ink); color:#fff; }
     .b-active { background:#e9f7ef; color:var(--green); } .b-canceled { background:#fdecec; color:var(--error); } .b-other { background:var(--surface-2); color:var(--text-2); }
+    .b-framer { background:#eef1f4; color:#111318; } .b-webflow { background:#e6f0ff; color:#155cc4; }
     .badges { display:flex; gap:5px; flex-wrap:wrap; }
     .pager { display:flex; align-items:center; gap:12px; justify-content:flex-end; margin-top:14px; font-size:13px; color:var(--text-2); }
     .meter { height:7px; border-radius:99px; background:var(--surface-2); overflow:hidden; }
-    .meter span { display:block; height:100%; background:linear-gradient(90deg,#0e7afe,#7c5cff); }
+    .meter span { display:block; height:100%; background:var(--accent); }
 
     /* ── Modal ── */
     .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; justify-content:flex-end; z-index:50; }
@@ -147,11 +153,15 @@
 <!-- ── App shell ── -->
 <div class="shell" id="shell">
   <aside>
-    <div class="brand"><svg width="20" height="20" viewBox="0 0 40 40"><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg> Admin</div>
-    <button class="navlink active" data-tab="overview"><span class="ic">📊</span> Overview</button>
-    <button class="navlink" data-tab="users"><span class="ic">👤</span> Users</button>
-    <button class="navlink" data-tab="subs"><span class="ic">💳</span> Subscriptions</button>
-    <button class="navlink" data-tab="expenses"><span class="ic">💸</span> Expenses</button>
+    <div class="brand">
+      <span class="logo"><svg width="16" height="16" viewBox="0 0 40 40"><path d="M6,4H15L27,36H18Z" fill="#fff"/><path d="M34,4H25L13,36H22Z" fill="#8b8bff"/></svg></span>
+      Vanssay <span style="color:var(--muted);font-weight:600">Admin</span>
+    </div>
+    <div class="navsep">Workspace</div>
+    <button class="navlink active" data-tab="overview"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></span> Overview</button>
+    <button class="navlink" data-tab="users"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span> Users</button>
+    <button class="navlink" data-tab="subs"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span> Subscriptions</button>
+    <button class="navlink" data-tab="expenses"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span> Expenses</button>
     <div class="navsep">Plugins</div>
     <div id="prod-nav"></div>
     <div class="aside-foot">
@@ -190,6 +200,8 @@ const dt = (d) => d ? new Date(d).toLocaleString(undefined, { month:"short", day
 // Apify costs are tiny (fractions of a cent → a few $); show enough precision to be useful.
 const usd = (n) => { n = Number(n || 0); return "$" + (n >= 1 ? n.toFixed(2) : n.toFixed(4)); };
 const planBadge = (p) => { p = p || "free"; return `<span class="badge b-${esc(p)}">${esc(p[0].toUpperCase()+p.slice(1))}</span>`; };
+// Signup platform (host): Framer or Webflow.
+const platformBadge = (p) => { const k = p === "webflow" ? "webflow" : "framer"; const lbl = k === "webflow" ? "Webflow" : "Framer"; return `<span class="badge b-${k}">${k==="webflow"?"◇":"◆"} ${lbl}</span>`; };
 const statusBadge = (s) => { const k = s==="active"||s==="trialing"?"b-active":s==="canceled"?"b-canceled":"b-other"; return `<span class="badge ${k}">${esc(s||"-")}</span>`; };
 const flag = (cc) => (cc && cc.length === 2 ? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0))) : "🏳️");
 const shortId = (id) => `<span class="mono" title="${esc(id)}">${esc(String(id||"").slice(0,8))}…</span>`;
@@ -337,6 +349,11 @@ async function renderOverview() {
       <div class="kpi"><div class="k-label">Accounts</div><div class="k-val">${fmt(anyBill.users.total)}</div><div class="k-sub">+${fmt(anyBill.users.newThisMonth)} this month · shared across plugins</div></div>
       <div class="kpi"><div class="k-label">Paying subscriptions</div><div class="k-val">${fmt(totPaid)}</div><div class="k-sub">across all plugins</div></div>
       <div class="kpi"><div class="k-label">Conversion</div><div class="k-val">${anyBill.users.total ? ((totPaid/anyBill.users.total)*100).toFixed(1) : "0"}%</div><div class="k-sub">paid subs / accounts</div></div>
+      ${anyBill.sources ? `<div class="kpi"><div class="k-label">By platform</div>
+        <div class="k-val" style="font-size:20px;display:flex;gap:14px;align-items:baseline">
+          <span>${fmt(anyBill.sources.framer)} <small style="font-size:11px;color:var(--muted);font-weight:700">FRAMER</small></span>
+          <span>${fmt(anyBill.sources.webflow)} <small style="font-size:11px;color:var(--muted);font-weight:700">WEBFLOW</small></span>
+        </div><div class="k-sub">where accounts signed up</div></div>` : ""}
     </div>
 
     <div class="prodgrid">
@@ -366,19 +383,28 @@ async function renderOverview() {
   ov.querySelectorAll("[data-open]").forEach((a) => a.onclick = (e) => { e.preventDefault(); switchTab("prod:" + a.dataset.open); });
 }
 
-/* ── Users, one global list, per-plugin plans ── */
-let usersState = { search: "", page: 1, pageSize: 25 };
+/* ── Users, one global account list ──
+   Shows each account, where it signed up (Framer / Webflow) and which plugins it
+   is actively using. Reviews-specific numbers (views, businesses) live on the
+   Reviews page now, not here. */
+let usersState = { search: "", source: "", page: 1, pageSize: 25 };
 async function renderUsers() {
   $("view").innerHTML = `
-    <div class="page-head"><div><h2>Users</h2><p>Every account, with its plan on each plugin. Click a row for details & overrides.</p></div></div>
+    <div class="page-head"><div><h2>Users</h2><p>Every account, where it signed up and which plugins it actively uses. Click a row for full detail & overrides.</p></div></div>
     <div class="toolbar">
       <input class="search" id="u-search" placeholder="Search by email…" value="${esc(usersState.search)}" />
+      <select id="u-source">
+        <option value="">All platforms</option>
+        <option value="framer" ${usersState.source==="framer"?"selected":""}>Framer</option>
+        <option value="webflow" ${usersState.source==="webflow"?"selected":""}>Webflow</option>
+      </select>
       <button class="btn btn-line btn-sm" id="u-refresh">Refresh</button>
     </div>
     <div class="tablewrap" id="u-table"><div class="empty">Loading…</div></div>
     <div class="pager" id="u-pager"></div>`;
   let timer;
   $("u-search").oninput = (e) => { clearTimeout(timer); timer = setTimeout(() => { usersState.search = e.target.value.trim(); usersState.page = 1; loadUsers(); }, 300); };
+  $("u-source").onchange = (e) => { usersState.source = e.target.value; usersState.page = 1; loadUsers(); };
   $("u-refresh").onclick = loadUsers;
   loadUsers();
 }
@@ -386,26 +412,35 @@ async function loadUsers() {
   const wrap = $("u-table");
   const qs = new URLSearchParams({ page: usersState.page, pageSize: usersState.pageSize });
   if (usersState.search) qs.set("search", usersState.search);
+  if (usersState.source) qs.set("source", usersState.source);
   // Same page of the same (global) user list, once per product → merge plans by id.
   const rs = await Promise.allSettled(PRODUCTS.map((p) => acct("/users?" + qs, null, p.key)));
   const base = val(rs[0]);
   if (!base) { wrap.innerHTML = unavailable("Users", rs[0]); $("u-pager").innerHTML = ""; return; }
-  const planOf = {};
-  PRODUCTS.forEach((p, i) => { const d = val(rs[i]); planOf[p.key] = new Map((d ? d.users : []).map((u) => [u.id, u.plan])); });
+  const planOf = {}, rowOf = {};
+  PRODUCTS.forEach((p, i) => { const d = val(rs[i]); planOf[p.key] = new Map((d ? d.users : []).map((u) => [u.id, u.plan]));
+    rowOf[p.key] = new Map((d ? d.users : []).map((u) => [u.id, u])); });
+
+  // "Actively using" = paid on that plugin, or (reviews) has businesses / views.
+  const usesPlugin = (u, key) => {
+    const pl = planOf[key].get(u.id) || "free";
+    if (pl !== "free") return true;
+    if (key === "reviews") { const r = rowOf.reviews.get(u.id) || u; return (r.businesses || 0) > 0 || (r.viewsThisMonth || 0) > 0; }
+    return false;
+  };
 
   if (!base.users.length) { wrap.innerHTML = `<div class="empty">No users found.</div>`; $("u-pager").innerHTML = ""; return; }
   wrap.innerHTML = `<table><thead><tr>
-      <th>Email</th><th>Plans</th><th class="right">Views / quota</th><th class="right">Businesses</th><th>Joined</th>
+      <th>Email</th><th>Platform</th><th>Actively using</th><th>Joined</th>
     </tr></thead><tbody>${base.users.map((u) => {
-      const badges = PRODUCTS.map((p) => {
+      const badges = PRODUCTS.filter((p) => usesPlugin(u, p.key)).map((p) => {
         const pl = planOf[p.key].get(u.id) || "free";
-        return pl !== "free" ? `<span class="badge b-${pl}" title="${esc(p.label)} · ${pl}">${p.icon} ${esc(p.label)} ${pl[0].toUpperCase()+pl.slice(1)}</span>` : "";
-      }).filter(Boolean).join("") || `<span class="badge b-free">Free</span>`;
+        return `<span class="badge b-${pl==="free"?"active":pl}" title="${esc(p.label)} · ${pl}">${p.icon} ${esc(p.label)}${pl!=="free"?" · "+pl[0].toUpperCase()+pl.slice(1):""}</span>`;
+      }).join("") || `<span class="note" style="padding:0">Not active yet</span>`;
       return `<tr class="clickable" data-id="${u.id}">
         <td>${esc(u.email)}</td>
+        <td>${platformBadge(u.platform)}</td>
         <td><div class="badges">${badges}</div></td>
-        <td class="right">${fmt(u.viewsThisMonth)}${u.quota>0?" / "+fmt(u.quota):" / ∞"}</td>
-        <td class="right">${fmt(u.businesses)}</td>
         <td>${date(u.createdAt)}</td>
       </tr>`;
     }).join("")}</tbody></table>`;
@@ -443,6 +478,7 @@ async function openUser(id) {
         <div class="kpi"><div class="k-label">Widget views (all months)</div><div class="k-val">${fmt(totalViews)}</div></div>
         <div class="kpi"><div class="k-label">“Powered by” clicks</div><div class="k-val">${fmt(totalClicks)}</div></div>
       </div>
+      <div class="kv"><span>Signed up on</span><span>${platformBadge(u.platform)}</span></div>
       <div class="kv"><span>User ID</span><span class="mono">${esc(u.id)}</span></div>
       <div class="kv"><span>Joined</span><span>${date(u.createdAt)}</span></div>
       <div class="kv"><span>Stripe customer</span><span class="mono">${esc(u.stripeCustomerId || "-")}</span></div>
@@ -627,6 +663,33 @@ function bindCache(p) {
 
 /* Reviews */
 let pagesSort = "poweredClicks";
+let reviewsUsers = { search: "", page: 1, pageSize: 25 };
+async function loadReviewsUsers() {
+  const wrap = $("rv-utable"); if (!wrap) return;
+  const qs = new URLSearchParams({ page: reviewsUsers.page, pageSize: reviewsUsers.pageSize });
+  if (reviewsUsers.search) qs.set("search", reviewsUsers.search);
+  let d;
+  try { d = await acct("/users?" + qs, null, "reviews"); }
+  catch (e) { wrap.innerHTML = `<div class="empty">Couldn't load users: ${esc(e.message)}</div>`; if ($("rv-upager")) $("rv-upager").innerHTML = ""; return; }
+  if (!d.users.length) { wrap.innerHTML = `<div class="empty">No users found.</div>`; $("rv-upager").innerHTML = ""; return; }
+  wrap.innerHTML = `<table><thead><tr>
+      <th>Email</th><th>Plan</th><th>Platform</th><th class="right">Views / quota</th><th class="right">Businesses</th><th>Joined</th>
+    </tr></thead><tbody>${d.users.map((u) => `<tr class="clickable" data-id="${u.id}">
+      <td>${esc(u.email)}</td>
+      <td>${planBadge(u.plan)}</td>
+      <td>${platformBadge(u.platform)}</td>
+      <td class="right">${fmt(u.viewsThisMonth)}${u.quota>0?" / "+fmt(u.quota):" / ∞"}</td>
+      <td class="right">${fmt(u.businesses)}</td>
+      <td>${date(u.createdAt)}</td>
+    </tr>`).join("")}</tbody></table>`;
+  wrap.querySelectorAll("tr.clickable").forEach((r) => r.onclick = () => openUser(r.dataset.id));
+  const pages = Math.max(1, Math.ceil(d.total / d.pageSize));
+  $("rv-upager").innerHTML = `<span>${d.total} user(s) · page ${d.page}/${pages}</span>
+    <button class="btn btn-line btn-sm" ${d.page<=1?"disabled":""} id="rv-prev">← Prev</button>
+    <button class="btn btn-line btn-sm" ${d.page>=pages?"disabled":""} id="rv-next">Next →</button>`;
+  if ($("rv-prev")) $("rv-prev").onclick = () => { reviewsUsers.page--; loadReviewsUsers(); };
+  if ($("rv-next")) $("rv-next").onclick = () => { reviewsUsers.page++; loadReviewsUsers(); };
+}
 async function renderReviews(head) {
   const p = PROD.reviews;
   const rs = await Promise.allSettled([
@@ -635,6 +698,15 @@ async function renderReviews(head) {
   const [bill, pages, biz, cache] = rs.map(val);
   $("view").innerHTML = `
     ${head("Google + Trustpilot reviews widget, usage, embeds and sources.")}
+
+    <div class="sec-title" style="margin-top:0">Users</div>
+    <div class="toolbar">
+      <input class="search" id="rv-search" placeholder="Search users by email…" value="${esc(reviewsUsers.search)}" />
+      <button class="btn btn-line btn-sm" id="rv-refresh">Refresh</button>
+    </div>
+    <div class="tablewrap" id="rv-utable"><div class="empty">Loading…</div></div>
+    <div class="pager" id="rv-upager" style="margin-bottom:24px"></div>
+
     ${bill ? `<div class="kpis">
       <div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
       <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${fmt(bill.plans.pro)} Pro · ${fmt(bill.plans.ultra)} Ultra</div></div>
@@ -672,6 +744,10 @@ async function renderReviews(head) {
     ${cachePanel(cache, rs[3], p, "Review cache (Google/Trustpilot payloads)")}`;
   bindCache(p);
   if ($("p-sort")) $("p-sort").onchange = (e) => { pagesSort = e.target.value; renderReviews(head); };
+  let rvTimer;
+  if ($("rv-search")) $("rv-search").oninput = (e) => { clearTimeout(rvTimer); rvTimer = setTimeout(() => { reviewsUsers.search = e.target.value.trim(); reviewsUsers.page = 1; loadReviewsUsers(); }, 300); };
+  if ($("rv-refresh")) $("rv-refresh").onclick = loadReviewsUsers;
+  loadReviewsUsers();
 }
 
 /* Bouncer (geoblock) */
