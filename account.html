@@ -101,8 +101,8 @@
     <p style="margin:-22px 0 26px"><a href="accounts" style="color:var(--accent);font-weight:600;font-size:13.5px">← Your Vanssay account &amp; all plugins</a></p>
 
     <div id="quota-banner" class="quota-alert">
-      <strong>⚠️ Your reviews are hidden</strong>
-      <p>You've used all <span id="qb-limit">300</span> free widget views this month, so your reviews have <b>stopped showing on your site</b>. Upgrade to turn them back on instantly.</p>
+      <strong>Your widget is showing fewer reviews</strong>
+      <p>You've used all <span id="qb-limit">300</span> free widget views this month, so your widget now shows <b>3 reviews</b> instead of your full set. It stays live on your site. Upgrade to show them all and remove the watermark.</p>
       <button class="btn btn-blue" id="quota-up">Upgrade to Pro ($9/mo)</button>
     </div>
 
@@ -290,8 +290,9 @@ async function load() {
       const pct = u.limit > 0 ? Math.min(100, (u.views / u.limit) * 100) : 0;
       const m = $("d-meter"); m.style.width = pct + "%";
       m.style.background = pct > 90 ? "var(--error)" : pct > 70 ? "#d97706" : "var(--accent)";
-      // Quota hit → reviews are hidden on the live site. Make it loud + offer upgrade.
-      const over = u.limit > 0 && u.views >= u.limit;
+      // Over the free cap → the widget degrades to 3 reviews (it is never hidden).
+      // Only free plans degrade, so only nudge them; paid keeps its full set.
+      const over = plan === "free" && u.limit > 0 && u.views > u.limit;
       $("quota-banner").style.display = over ? "block" : "none";
       if (over) {
         $("qb-limit").textContent = u.limit.toLocaleString();
