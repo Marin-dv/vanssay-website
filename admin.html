@@ -414,19 +414,29 @@ async function loadUsers() {
   if (usersState.search) qs.set("search", usersState.search);
   if (usersState.source) qs.set("source", usersState.source);
   // Same page of the same (global) user list, once per product → merge plans by id.
-  const rs = await Promise.allSettled(PRODUCTS.map((p) => acct("/users?" + qs, null, p.key)));
+  // In parallel, pull each plugin's domain owners so we can flag *free* users who
+  // are still actively using a plugin (e.g. a free Bouncer site). Reviews' domain
+  // activity comes back in its own users payload (businesses/views); the other
+  // plugins expose owners via their own backend's /admin/sites (site.userId is the
+  // shared Accounts user id).
+  const [rs, siteRs] = await Promise.all([
+    Promise.allSettled(PRODUCTS.map((p) => acct("/users?" + qs, null, p.key))),
+    Promise.allSettled(PRODUCTS.map((p) => (p.base ? api(p.base + "/admin/sites") : Promise.resolve(null)))),
+  ]);
   const base = val(rs[0]);
   if (!base) { wrap.innerHTML = unavailable("Users", rs[0]); $("u-pager").innerHTML = ""; return; }
-  const planOf = {}, rowOf = {};
+  const planOf = {}, rowOf = {}, activeIds = {};
   PRODUCTS.forEach((p, i) => { const d = val(rs[i]); planOf[p.key] = new Map((d ? d.users : []).map((u) => [u.id, u.plan]));
-    rowOf[p.key] = new Map((d ? d.users : []).map((u) => [u.id, u])); });
+    rowOf[p.key] = new Map((d ? d.users : []).map((u) => [u.id, u]));
+    const sd = val(siteRs[i]); activeIds[p.key] = new Set(sd && sd.sites ? sd.sites.map((s) => s.userId).filter(Boolean) : []); });
 
-  // "Actively using" = paid on that plugin, or (reviews) has businesses / views.
+  // "Actively using" = paid on that plugin, has a domain config there, or
+  // (reviews) has businesses / views.
   const usesPlugin = (u, key) => {
     const pl = planOf[key].get(u.id) || "free";
     if (pl !== "free") return true;
     if (key === "reviews") { const r = rowOf.reviews.get(u.id) || u; return (r.businesses || 0) > 0 || (r.viewsThisMonth || 0) > 0; }
-    return false;
+    return activeIds[key] ? activeIds[key].has(u.id) : false;
   };
 
   if (!base.users.length) { wrap.innerHTML = `<div class="empty">No users found.</div>`; $("u-pager").innerHTML = ""; return; }
