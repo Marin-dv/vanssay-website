@@ -135,7 +135,7 @@ const PLAN_LABEL = {
   geoblock:    { free: "Free", pro: "Pro", ultra: "Ultra" },
   router:      { free: "Free", pro: "Pro", ultra: "Agency" },
   maintenance: { free: "Free", pro: "Pro", ultra: "Pro" },
-  instagram:   { free: "No plan", starter: "Starter", pro: "Pro", ultra: "Pro" },
+  instagram:   { free: "No plan", starter: "Starter", pro: "Pro", ultra: "Pro", lifetime: "Lifetime" },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -206,9 +206,12 @@ $("auth-btn").onclick = async () => {
 render();
 $("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-btn").click());
 
-function planBadge(product, plan) {
-  const label = (PLAN_LABEL[product] || {})[plan] || plan[0].toUpperCase() + plan.slice(1);
-  return '<span class="badge b-' + plan + '">' + label + '</span>';
+function planBadge(product, plan, lifetime) {
+  // A one-time Lifetime purchase is recorded as the `pro` tier, so the tier
+  // alone would mislabel it as a subscription. `lifetime` comes from
+  // /billing/entitlements and overrides the label.
+  const label = lifetime ? "Lifetime" : (PLAN_LABEL[product] || {})[plan] || plan[0].toUpperCase() + plan.slice(1);
+  return '<span class="badge b-' + (lifetime ? "ultra" : plan) + '">' + label + '</span>';
 }
 function vIcon(color) {
   return '<svg width="20" height="20" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="' + color + '" fill-opacity=".5"/><path d="M34,4H25L13,36H22Z" fill="' + color + '"/></svg>';
@@ -232,12 +235,13 @@ async function load() {
     PLUGINS.forEach((p, i) => {
       const r = results[i];
       const plan = r.status === "fulfilled" ? r.value.plan : "free";
+      const lifetime = r.status === "fulfilled" && Boolean(r.value.lifetime);
       const row = document.createElement("a");
       row.className = "plug"; row.href = p.acct;
       row.innerHTML =
         '<span class="ico" style="background:' + p.color + '1a">' + vIcon(p.color) + '</span>' +
         '<span class="grow"><span class="name">' + p.name + '</span></span>' +
-        '<span class="right">' + planBadge(p.product, plan) + '<span class="open">Manage →</span></span>';
+        '<span class="right">' + planBadge(p.product, plan, lifetime) + '<span class="open">Manage →</span></span>';
       wrap.appendChild(row);
     });
   } catch (e) {
