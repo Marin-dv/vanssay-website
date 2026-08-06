@@ -132,6 +132,8 @@
     .planrow .pname { font-weight:700; font-size:13px; }
     .ministat { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .ministat .kpi { padding:12px 14px; } .ministat .k-val { font-size:20px; }
+    .muted-sm { font-weight:600; font-size:11.5px; color:var(--text-2); }
+    .muted-sm .good { color:#16a34a; } .muted-sm .bad { color:#dc2626; }
   </style>
 </head>
 <body>
@@ -187,6 +189,7 @@ const PRODUCTS = [
   { key: "reviews",     label: "Reviews",     icon: "⭐", base: "",             cache: true  },
   { key: "geoblock",    label: "Bouncer",     icon: "🛡️", base: "/geoblock",    cache: true  },
   { key: "router",      label: "Router",      icon: "🧭", base: "/router",      cache: true  },
+  { key: "instagram",   label: "Instagram",   icon: "📸", base: "/instagram",   cache: false },
   { key: "maintenance", label: "Maintenance", icon: "🚧", base: "/maintenance", cache: false },
 ];
 const PROD = Object.fromEntries(PRODUCTS.map((p) => [p.key, p]));
@@ -640,6 +643,7 @@ async function renderProduct(key) {
   if (key === "reviews") return renderReviews(head);
   if (key === "geoblock") return renderGeoblock(head);
   if (key === "router") return renderRouterP(head);
+  if (key === "instagram") return renderInstagram(head);
   if (key === "maintenance") return renderMaintenance(head);
 }
 
@@ -872,6 +876,92 @@ async function renderMaintenance(head) {
       <td>${shortId(s.userId)}</td><td>${esc(s.label||"-")}</td><td>${s.enabled?"🟠 on":"-"}</td><td>${esc(s.action||"-")}</td>
       <td class="right">${fmt(s.whitelistSize)}</td><td>${s.autoSchedule?"✓":"-"}</td><td>${date(s.createdAt)}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No sites yet.</div>`}</div>` : unavailable("Sites", rs[3])}`;
+}
+
+/* Instagram — the funnel is the point of this page: of everyone who opens the
+   plugin, where exactly do they stop? Steps count DISTINCT visitors, so one
+   person previewing five profiles counts once. */
+let igDays = 30;
+const IG_STEP = {
+  opened:            ["Opened the plugin",     "Plugin loaded in the Framer editor"],
+  preview_requested: ["Submitted a handle",    "Typed a profile and pressed Preview"],
+  preview_loaded:    ["Saw a feed",            "The scrape came back and rendered"],
+  layout_picked:     ["Tried a layout",        "Changed layout at least once"],
+  insert_clicked:    ["Pressed Insert",        "Clicked Insert to Canvas"],
+  paywall_opened:    ["Saw the paywall",       "The plan chooser was shown"],
+  checkout_started:  ["Opened Stripe",         "Checkout was launched"],
+  unlocked:          ["Paid & came back",      "Returned with an active plan"],
+  feed_created:      ["Feed on the canvas",    "A feed was saved and inserted"],
+};
+function igFunnelPanel(f, r) {
+  if (!f) return `<div class="panel">${unavailable("Funnel", r)}</div>`;
+  const top = f.steps.length ? f.steps[0].visitors : 0;
+  const rows = f.steps.map((st, i) => {
+    const meta = IG_STEP[st.step] || [st.step, ""];
+    const pctTop = top ? Math.round((st.visitors / top) * 100) : 0;
+    const from = st.fromPrevious === null ? "" :
+      `<span class="${st.fromPrevious < 50 ? "bad" : "good"}">${st.fromPrevious}% of previous</span>`;
+    const lost = i && st.droppedHere ? ` · ${fmt(st.droppedHere)} lost here` : "";
+    return `<div style="margin-bottom:12px">
+      <div class="kv" style="border:none;padding-bottom:3px">
+        <span title="${esc(meta[1])}">${i + 1}. ${esc(meta[0])}</span>
+        <strong>${fmt(st.visitors)} <span class="muted-sm">${from}${lost}</span></strong>
+      </div>
+      <div class="meter"><span style="width:${pctTop}%"></span></div></div>`;
+  }).join("");
+  const conv = top ? ((f.steps[f.steps.length - 1].visitors / top) * 100).toFixed(1) : "0";
+  return `<div class="panel"><h3>Funnel · last ${f.days} days</h3>${rows}
+    <div class="kv" style="margin-top:10px"><span>Open → feed on canvas</span><strong>${conv}%</strong></div>
+    <div class="kv"><span>Previews that failed</span><strong>${fmt(f.failed)}</strong></div></div>`;
+}
+async function renderInstagram(head) {
+  const rs = await Promise.allSettled([
+    acct("/overview", null, "instagram"), api("/instagram/admin/overview"),
+    api("/instagram/admin/funnel?days=" + igDays), api("/instagram/admin/feeds"),
+  ]);
+  const [bill, dom, funnel, feeds] = rs.map(val);
+  const fn = dom && dom.funnel30d ? dom.funnel30d : null;
+  $("view").innerHTML = `
+    ${head("Instagram feeds, and where people stop between opening the plugin and paying.")}
+    <div class="kpis">
+      ${bill ? `<div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
+      <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${fmt(bill.plans.starter || 0)} Starter · ${fmt(bill.plans.pro)} Pro</div></div>` : ""}
+      ${dom ? `<div class="kpi"><div class="k-label">Feeds</div><div class="k-val">${fmt(dom.feeds)}</div><div class="k-sub">${fmt(dom.cachedHandles)} handles cached</div></div>` : ""}
+      ${fn ? `<div class="kpi"><div class="k-label">Opened (30d)</div><div class="k-val">${fmt(fn.opened)}</div><div class="k-sub">${fmt(fn.previewed)} saw a feed</div></div>
+      <div class="kpi"><div class="k-label">Reached checkout</div><div class="k-val">${fmt(fn.checkout)}</div><div class="k-sub">${fmt(fn.paywall)} saw the paywall</div></div>
+      <div class="kpi"><div class="k-label">Converted</div><div class="k-val">${fmt(fn.unlocked)}</div><div class="k-sub">${fn.opened ? ((fn.unlocked / fn.opened) * 100).toFixed(1) : "0"}% of opens</div></div>` : ""}
+    </div>
+    ${!bill && !dom ? unavailable("Instagram", rs[1]) : ""}
+
+    <div class="toolbar"><div class="sec-title" style="margin:0">Where people stop</div>
+      <select id="ig-days" style="width:auto;margin-left:auto">
+        ${[7, 30, 90].map((d) => `<option value="${d}" ${igDays === d ? "selected" : ""}>Last ${d} days</option>`).join("")}
+      </select></div>
+    <div class="grid-2" style="margin-bottom:16px">
+      ${igFunnelPanel(funnel, rs[2])}
+      ${funnel && funnel.trend.length ? `<div class="panel"><h3>Plugin opens · daily</h3>
+        ${barChart(funnel.trend.map((t, i) => ({ v: t.opened, tip: `${t.day}: ${fmt(t.opened)} opened, ${fmt(t.converted)} converted`, label: i % 5 === 0 ? t.day.slice(8) : "" })))}
+        <p class="note">Hover a bar for that day's conversions.</p></div>` : `<div class="panel"><div class="empty">No events yet.</div></div>`}
+    </div>
+
+    <div class="sec-title">Visitors · furthest step reached</div>
+    ${funnel ? `<div class="tablewrap" style="margin-bottom:16px">${funnel.visitors.length ? `<table><thead><tr>
+      <th>Who</th><th>Stopped at</th><th>Profiles previewed</th><th class="right">Events</th><th>First seen</th><th>Last seen</th>
+    </tr></thead><tbody>${funnel.visitors.map((v) => `<tr>
+      <td>${v.email ? esc(v.email) : shortId(v.anonId)}${v.converted ? ' <span class="badge b-active">converted</span>' : ""}</td>
+      <td>${esc((IG_STEP[v.furthestStep] || [v.furthestStep])[0])}${v.failed ? ' <span class="badge b-canceled">preview failed</span>' : ""}</td>
+      <td class="truncate">${v.handles.length ? v.handles.map((h) => "@" + esc(h)).join(", ") : "-"}</td>
+      <td class="right">${fmt(v.events)}</td><td>${dt(v.firstSeen)}</td><td>${dt(v.lastSeen)}</td>
+    </tr>`).join("")}</tbody></table>` : `<div class="empty">No plugin sessions recorded yet.</div>`}</div>` : unavailable("Visitors", rs[2])}
+
+    <div class="sec-title">Feeds</div>
+    ${feeds ? `<div class="tablewrap">${feeds.feeds.length ? `<table><thead><tr>
+      <th>Owner</th><th>Handle</th><th>Layout</th><th>Mode</th><th>Created</th>
+    </tr></thead><tbody>${feeds.feeds.map((f) => `<tr>
+      <td>${f.email ? esc(f.email) : shortId(f.userId)}</td><td>@${esc(f.handle)}</td>
+      <td>${esc(f.layout)}</td><td>${esc(f.mode)}</td><td>${date(f.createdAt)}</td>
+    </tr>`).join("")}</tbody></table>` : `<div class="empty">No feeds created yet.</div>`}</div>` : unavailable("Feeds", rs[3])}`;
+  if ($("ig-days")) $("ig-days").onchange = (e) => { igDays = Number(e.target.value); renderInstagram(head); };
 }
 
 boot();
