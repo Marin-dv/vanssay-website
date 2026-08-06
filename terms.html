@@ -34,7 +34,7 @@ footer{max-width:760px;margin:0 auto;padding:0 28px 60px;font-size:13.5px;color:
 <nav><div class="nav-in"><a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a><a href="privacy" style="font-size:14px;font-weight:600">Privacy Policy →</a></div></nav>
 <main>
   <h1>Terms of Service</h1>
-  <p class="date">Last updated: July 3, 2026</p>
+  <p class="date">Last updated: August 6, 2026</p>
 
   <p>These terms govern your use of Vanssay: our Framer plugins, our website (vanssay.net) and related services (together, the "Service"). The Service is operated by <b>Marin de Vanssay</b>, sole trader (vanssay.net), contactable at <a href="mailto:support@vanssay.net">support@vanssay.net</a>. By creating an account or using the Service, you agree to these terms.</p>
 
@@ -46,15 +46,16 @@ footer{max-width:760px;margin:0 auto;padding:0 28px 60px;font-size:13.5px;color:
       <li><a href="#s3">Plans, billing &amp; refunds</a></li>
       <li><a href="#s4">Acceptable use</a></li>
       <li><a href="#s5">Reviews</a></li>
-      <li><a href="#s6">Bouncer &amp; Router</a></li>
-      <li><a href="#s7">Maintenance Mode</a></li>
-      <li><a href="#s8">Data protection</a></li>
-      <li><a href="#s9">Intellectual property</a></li>
-      <li><a href="#s10">Availability &amp; disclaimer</a></li>
-      <li><a href="#s11">Liability</a></li>
-      <li><a href="#s12">Termination</a></li>
-      <li><a href="#s13">Changes &amp; law</a></li>
-      <li><a href="#s14">Contact</a></li>
+      <li><a href="#s6">Instagram Feed</a></li>
+      <li><a href="#s7">Bouncer &amp; Router</a></li>
+      <li><a href="#s8">Maintenance Mode</a></li>
+      <li><a href="#s9">Data protection</a></li>
+      <li><a href="#s10">Intellectual property</a></li>
+      <li><a href="#s11">Availability &amp; disclaimer</a></li>
+      <li><a href="#s12">Liability</a></li>
+      <li><a href="#s13">Termination</a></li>
+      <li><a href="#s14">Changes &amp; law</a></li>
+      <li><a href="#s15">Contact</a></li>
     </ol>
   </div>
 
@@ -62,18 +63,19 @@ footer{max-width:760px;margin:0 auto;padding:0 28px 60px;font-size:13.5px;color:
   <p>Vanssay provides Framer plugins that share one Vanssay account. Currently:</p>
   <ul>
     <li><b>Google &amp; Trustpilot Reviews</b>, displays reviews from your own Google Business Profile and/or Trustpilot page as widgets on your Framer site.</li>
+    <li><b>Instagram Feed</b>, displays the posts of a public Instagram account you own or represent as widgets on your Framer site.</li>
     <li><b>Bouncer</b>, controls access to your Framer site by visitor country and VPN/proxy status.</li>
     <li><b>Router</b>, redirects or suggests pages to visitors based on country, region, language, device or VPN/proxy status, with optional UTM/query-string preservation and a soft suggestion banner.</li>
     <li><b>Maintenance Mode</b>, puts your site behind a maintenance page with an IP whitelist so you retain access (availability may vary; some plugins are released progressively).</li>
   </ul>
-  <p>We are not affiliated with, endorsed by, or sponsored by Google, Trustpilot, Framer or Stripe.</p>
+  <p>We are not affiliated with, endorsed by, or sponsored by Google, Trustpilot, Instagram, Meta, Framer or Stripe.</p>
 
   <h2 id="s2">2. Your account</h2>
   <p>You must provide a valid email address and keep your credentials secure. One Vanssay account grants access to every plugin. You are responsible for all activity under your account. You must be at least 16, or the age of digital consent in your country, and use the Service for business or professional purposes. You may only connect business profiles, domains and sites you own or are authorized to represent.</p>
 
   <h2 id="s3">3. Plans, billing &amp; refunds</h2>
   <ul>
-    <li>Each plugin has a <b>Free plan</b>, free forever within its limits (views, reviews, widgets, IPs, rules, watermark, etc.).</li>
+    <li>Most plugins have a <b>Free plan</b>, free forever within its limits (views, reviews, widgets, IPs, rules, watermark, etc.). <b>Instagram Feed has no free tier</b>: paid plans start with a 7-day free trial that requires a payment method, and the plugin stops serving feeds if no plan is active.</li>
     <li><b>Paid plans</b> (e.g. Pro, Ultra, Agency) are billed monthly or annually via <b>Stripe</b> and renew automatically until cancelled. Some plugins also offer a one-time <b>Lifetime</b> purchase.</li>
     <li>Your plan is tied to your Vanssay account and covers every Framer project you own for that plugin. Plans are per plugin unless stated otherwise.</li>
     <li>You can cancel anytime from your account page; access continues until the end of the paid period, after which your setup keeps working within Free-plan limits.</li>
@@ -88,7 +90,16 @@ footer{max-width:760px;margin:0 auto;padding:0 28px 60px;font-size:13.5px;color:
   <h2 id="s5">5. Reviews</h2>
   <p>For Reviews we retrieve only <b>publicly available</b> review content via the platforms' interfaces and cache it temporarily to serve your widgets. Review content belongs to its authors and the originating platforms; you are responsible for ensuring your display of it complies with Google's and Trustpilot's terms. We do not guarantee that any given review will be available, as platforms may change or restrict their interfaces at any time.</p>
 
-  <h2 id="s6">6. Bouncer &amp; Router: accuracy, fail-open &amp; your responsibility</h2>
+  <h2 id="s6">6. Instagram Feed</h2>
+  <ul>
+    <li><b>Public content only.</b> We retrieve the public profile and posts of the Instagram account you connect, through a third-party service (Apify). We never ask for your Instagram password and never log in as you.</li>
+    <li><b>Your rights to the content.</b> You may only connect an account you own or are authorized to represent, and you are responsible for having the rights to display its posts, captions and images on your site, and for complying with Instagram's and Meta's terms.</li>
+    <li><b>Not real-time.</b> Feeds refresh on a schedule set by your plan (and on demand within your plan's limits), so what your site shows may lag behind Instagram. Curated feeds stay as you set them and do not refresh automatically.</li>
+    <li><b>Availability.</b> Instagram does not offer a public interface for this and may change or restrict access at any time. We cannot guarantee that any given account, post or image will remain retrievable, and interruptions caused by such changes are not a defect in the Service.</li>
+    <li><b>Cached copies.</b> Posts are cached on our servers and baked into the widget you insert, so a feed may briefly continue to show content after it is deleted on Instagram. Removing a feed stops further updates but does not retroactively alter pages you have already published.</li>
+  </ul>
+
+  <h2 id="s7">7. Bouncer &amp; Router: accuracy, fail-open &amp; your responsibility</h2>
   <ul>
     <li><b>Best-effort accuracy.</b> IP geolocation and VPN/proxy detection are inherently imperfect and may produce false positives or negatives. We do not guarantee a visitor's true location, nor that every VPN or proxy will be detected.</li>
     <li><b>Fail-open by default.</b> If a check cannot complete (for example during an outage), visitors are allowed through (Bouncer) or not redirected (Router), so your site is never locked out. Blocking and redirecting are therefore not guaranteed at all times, and you accept this default behavior.</li>
@@ -96,28 +107,28 @@ footer{max-width:760px;margin:0 auto;padding:0 28px 60px;font-size:13.5px;color:
     <li><b>Your responsibility.</b> You are solely responsible for the rules you configure and for ensuring they, and any notice you owe your visitors, comply with all laws applicable to you and your visitors (see §8).</li>
   </ul>
 
-  <h2 id="s7">7. Maintenance Mode</h2>
+  <h2 id="s8">8. Maintenance Mode</h2>
   <p>Maintenance Mode adds an overlay or redirect when you enable it and <b>fails open</b> if our backend is unreachable, so visitors are never stuck on a broken page. You are responsible for maintaining a valid IP whitelist; if your IP changes you may need to re-add it to regain access. Availability, features and pricing for plugins marked "coming soon" may change before release.</p>
 
-  <h2 id="s8">8. Data protection &amp; your visitors</h2>
+  <h2 id="s9">9. Data protection &amp; your visitors</h2>
   <p>Our handling of personal data is described in our <a href="privacy">Privacy Policy</a>, which forms part of these terms. For data about <b>your own site's visitors</b> processed by Bouncer, Router or Maintenance Mode (e.g. the real-time IP check), <b>you are the data controller</b> and Vanssay acts as your <b>processor</b>. You are responsible for having a lawful basis and for providing any privacy notice your jurisdiction (including the GDPR) requires. A data-processing addendum (DPA) is available on request at <a href="mailto:support@vanssay.net">support@vanssay.net</a>.</p>
 
-  <h2 id="s9">9. Intellectual property</h2>
+  <h2 id="s10">10. Intellectual property</h2>
   <p>The Vanssay software, plugins, widgets, branding and site are our property. We grant you a non-exclusive, non-transferable, revocable license to use the plugins on sites you own or manage while your account is in good standing. Review content and any content you supply remain yours (or their authors').</p>
 
-  <h2 id="s10">10. Availability &amp; disclaimer</h2>
-  <p>The Service is provided "as is" and "as available". We rely on third-party providers (Google, Trustpilot, Framer, Stripe, Resend, ip-api.com and our hosting) and cannot guarantee uninterrupted availability or that those providers will not change their interfaces. To the maximum extent permitted by law, we disclaim all warranties, express or implied.</p>
+  <h2 id="s11">11. Availability &amp; disclaimer</h2>
+  <p>The Service is provided "as is" and "as available". We rely on third-party providers (Google, Trustpilot, Instagram, Apify, Framer, Stripe, Brevo, ip-api.com and our hosting) and cannot guarantee uninterrupted availability or that those providers will not change their interfaces. To the maximum extent permitted by law, we disclaim all warranties, express or implied.</p>
 
-  <h2 id="s11">11. Limitation of liability</h2>
+  <h2 id="s12">12. Limitation of liability</h2>
   <p>To the maximum extent permitted by law, we are not liable for indirect, incidental or consequential loss, lost profits or lost data, and our total liability for any claim is limited to the amounts you paid us in the 12 months preceding the claim. Nothing in these terms excludes liability that cannot be excluded by law, including your statutory consumer rights.</p>
 
-  <h2 id="s12">12. Termination</h2>
+  <h2 id="s13">13. Termination</h2>
   <p>You may delete your account at any time by contacting <a href="mailto:support@vanssay.net">support@vanssay.net</a>. We may terminate or suspend access for breach of these terms, with notice where reasonable. On termination, your license ends; the Privacy Policy governs deletion of your data.</p>
 
-  <h2 id="s13">13. Changes &amp; governing law</h2>
+  <h2 id="s14">14. Changes &amp; governing law</h2>
   <p>We may update these terms; material changes will be posted here with an updated date and, where significant, notified by email. Continued use after changes constitutes acceptance. These terms are governed by <b>French law</b>. Mandatory consumer-protection rules of your country of residence still apply, and EU consumers may use the <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">EU Online Dispute Resolution platform</a>.</p>
 
-  <h2 id="s14">14. Contact</h2>
+  <h2 id="s15">15. Contact</h2>
   <p>Marin de Vanssay, <a href="mailto:support@vanssay.net">support@vanssay.net</a></p>
 </main>
 <footer>© 2026 Vanssay · <a href="/">Home</a> · <a href="privacy">Privacy Policy</a></footer>
