@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Live demo | Instagram Feed for Framer</title>
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+<link rel="apple-touch-icon" href="/favicon-180.png" />
+<meta name="description" content="The exact Instagram Feed plugin preview, running live in your browser: a real @nike feed in all six layouts — Profile, Grid, Slider, Carousel, Marquee and Rainbow." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+   This page is a 1:1 port of the plugin's Preview screen. The CSS below is
+   copied verbatim from Instagram_Feed_for_Framer/plugin/src/styles/*.css so
+   the demo renders pixel-identically to the real plugin. Keep them in sync.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f6f6f7;
+  --surface-3: #eeeef1;
+  --border: #e6e6e9;
+  --border-strong: #d7d7dc;
+
+  --text: #0d0d11;
+  --text-secondary: #63636c;
+  --text-muted: #9a9aa2;
+  --text-on-ink: #ffffff;
+
+  --ink: #101014;
+  --ink-hover: #26262c;
+  --ink-soft: #f1f1f3;
+
+  --success: #158a52;
+  --success-soft: #e8f7ef;
+
+  --grad-1: #f6913d;
+  --grad-2: #e0457b;
+  --grad-3: #7452e0;
+  --gradient: linear-gradient(135deg, var(--grad-1), var(--grad-2) 55%, var(--grad-3));
+
+  --focus-ring: 0 0 0 3px rgba(16, 16, 20, 0.12);
+
+  --body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(15, 15, 20, 0.05);
+  --shadow-md: 0 6px 20px rgba(15, 15, 20, 0.08);
+  --shadow-lg: 0 20px 56px rgba(15, 15, 20, 0.18);
+
+  --space-3xs: 2px; --space-2xs: 4px; --space-xs: 6px; --space-sm: 8px;
+  --space-md: 12px; --space-lg: 16px; --space-xl: 24px; --space-2xl: 32px; --space-3xl: 48px;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  font-family: var(--body);
+  font-size: 13px; line-height: 1.5; color: var(--text); background: var(--bg);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+#root { height: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+h1, h2, h3, h4, p { margin: 0; }
+button, input { font-family: inherit; color: inherit; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+::selection { background: rgba(116, 82, 224, 0.22); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--radius-full); border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: #b8b8c0; }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes riseIn { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+@keyframes marqueeScroll { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+
+/* ── App shell ─────────────────────────────────────────────────────────── */
+.app { flex: 1; display: flex; flex-direction: column; background: var(--surface-2); min-height: 100vh; }
+.connect-v2 { background: var(--bg); }
+.logo-mark {
+  width: 40px; height: 40px; border-radius: 12px; background: var(--gradient);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: var(--shadow-sm);
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+.btn {
+  appearance: none; border: 1px solid transparent; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 13px; font-weight: 600; line-height: 1; padding: 11px 18px;
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs);
+  transition: background .14s ease, border-color .14s ease, color .14s ease, transform .06s ease, box-shadow .14s ease;
+  white-space: nowrap; text-decoration: none;
+}
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.btn-primary { background: var(--ink); color: var(--text-on-ink); border-color: var(--ink); }
+.btn-primary:hover:not(:disabled) { background: var(--ink-hover); }
+.btn-outline { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
+.btn-outline:hover:not(:disabled) { background: var(--ink-soft); }
+.btn-ghost { background: transparent; color: var(--text-secondary); border-color: transparent; }
+.btn-ghost:hover:not(:disabled) { background: var(--ink-soft); color: var(--text); }
+.btn-sm { padding: 7px 12px; font-size: 12px; }
+
+/* ── Pills ─────────────────────────────────────────────────────────────── */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: var(--radius-full); font-size: 10.5px; font-weight: 700; letter-spacing: .01em; }
+.pill-neutral { background: var(--surface-2); color: var(--text-secondary); border: 1px solid var(--border); }
+.pill-accent { background: var(--ink); color: #fff; }
+
+/* ── Topbar ────────────────────────────────────────────────────────────── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-md) var(--space-xl); border-bottom: 1px solid var(--border);
+  background: var(--surface); flex-shrink: 0;
+}
+.topbar-brand { display: flex; align-items: center; gap: var(--space-sm); }
+.topbar-brand .wordmark { font-size: 14px; font-weight: 700; letter-spacing: -.01em; }
+.topbar-brand .ver { font-size: 10.5px; color: var(--text-muted); font-weight: 600; padding: 2px 6px; border-radius: var(--radius-full); background: var(--surface-2); }
+.topbar-right { display: flex; align-items: center; gap: var(--space-sm); }
+
+/* ── Preview two-pane (rail + canvas) ──────────────────────────────────── */
+.preview-shell { flex: 1; display: flex; min-height: 0; overflow: hidden; }
+.layout-rail {
+  width: 176px; flex-shrink: 0; border-right: 1px solid var(--border); background: var(--surface);
+  overflow-y: auto; padding: var(--space-md); display: flex; flex-direction: column; gap: var(--space-sm);
+}
+.layout-rail-title { font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); padding: 0 var(--space-2xs); }
+.layout-rail-list { display: flex; flex-direction: column; gap: var(--space-sm); }
+.layout-thumb-card {
+  appearance: none; text-align: left; border: 1.5px solid var(--border); background: var(--surface);
+  border-radius: var(--radius); padding: var(--space-sm); cursor: pointer; display: flex; flex-direction: column;
+  gap: var(--space-sm); transition: border-color .14s ease, box-shadow .14s ease, transform .08s ease;
+}
+.layout-thumb-card:hover { border-color: var(--border-strong); }
+.layout-thumb-card:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.layout-thumb-card[data-active="true"] { border-color: var(--ink); box-shadow: var(--shadow-sm); }
+.layout-thumb-canvas { height: 76px; border-radius: var(--radius-sm); background: var(--surface-2); overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 6px; }
+.layout-thumb-meta { display: flex; flex-direction: column; gap: 1px; padding: 0 2px 2px; }
+.layout-thumb-name { font-size: 12px; font-weight: 700; }
+.layout-thumb-hint { font-size: 10.5px; color: var(--text-muted); }
+
+/* Mini layout schematics (image-backed) */
+.lt { width: 100%; height: 100%; }
+.lt span, .lt i { background-size: cover; background-position: center; display: block; }
+.lt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.lt-grid span { aspect-ratio: 1; border-radius: 2px; background-color: var(--surface-3); }
+.lt-profile { display: flex; flex-direction: column; gap: 4px; }
+.lt-profile-head { display: flex; align-items: center; gap: 5px; }
+.lt-profile-head i { width: 16px; height: 16px; border-radius: 50%; background-color: var(--surface-3); }
+.lt-profile-lines { display: flex; flex-direction: column; gap: 3px; }
+.lt-profile-lines b, .lt-profile-lines s { display: block; height: 3px; border-radius: 2px; background: var(--border-strong); }
+.lt-profile-lines b { width: 28px; }
+.lt-profile-lines s { width: 18px; }
+.lt-profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.lt-profile-grid span { aspect-ratio: 1; border-radius: 2px; background-color: var(--surface-3); }
+.lt-slider { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; height: 100%; }
+.lt-slider-frame { width: 46px; height: 46px; border-radius: 4px; background-color: var(--surface-3); }
+.lt-dots { display: flex; gap: 3px; }
+.lt-dots i { width: 4px; height: 4px; border-radius: 50%; background: var(--border-strong); }
+.lt-dots i[data-on] { background: var(--ink); }
+.lt-carousel { display: flex; align-items: center; justify-content: center; gap: 3px; height: 100%; }
+.lt-carousel .mid { width: 40px; height: 52px; border-radius: 4px; background-color: var(--surface-3); }
+.lt-carousel .side { width: 22px; height: 42px; border-radius: 4px; opacity: .7; background-color: var(--surface-3); }
+.lt-marquee { display: flex; align-items: center; height: 100%; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
+.lt-marquee-track { display: flex; gap: 3px; transform: translateX(-8px); }
+.lt-marquee-track span { width: 34px; height: 46px; border-radius: 3px; flex-shrink: 0; background-color: var(--surface-3); }
+.lt-rainbow { position: relative; display: flex; align-items: center; justify-content: center; height: 100%; }
+.lt-rainbow .r { position: absolute; width: 34px; height: 46px; border-radius: 4px; border: 2px solid var(--surface); background-color: var(--surface-3); box-shadow: var(--shadow-sm); }
+.lt-rainbow .r-c { z-index: 3; }
+.lt-rainbow .r-l { transform: translateX(-20px) rotate(-12deg); z-index: 1; opacity: .85; }
+.lt-rainbow .r-r { transform: translateX(20px) rotate(12deg); z-index: 2; opacity: .9; }
+
+/* Right pane */
+.preview-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.preview-main-scroll { flex: 1; overflow-y: auto; padding: var(--space-lg); }
+.preview-canvas { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.preview-context { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); margin-bottom: var(--space-md); }
+.preview-context .who { display: flex; align-items: center; gap: var(--space-sm); min-width: 0; }
+.preview-context .who img { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; }
+.preview-context .who b { font-size: 13.5px; font-weight: 700; }
+.preview-context .who span { font-size: 11.5px; color: var(--text-muted); }
+.preview-actionbar {
+  border-top: 1px solid var(--border); background: var(--surface); padding: var(--space-md) var(--space-lg);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); flex-shrink: 0;
+}
+.preview-actionbar .status { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--success); min-width: 0; }
+.preview-actionbar .actions { display: flex; gap: var(--space-sm); flex-shrink: 0; }
+
+/* ── Preview stage ─────────────────────────────────────────────────────── */
+.preview-stage { overflow: hidden; animation: stageIn .34s cubic-bezier(.22, 1, .36, 1); }
+@keyframes stageIn { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+
+/* Profile header */
+.ig-profile-header { display: flex; gap: var(--space-xl); padding: var(--space-xl); align-items: center; }
+.ig-profile-avatar { width: 86px; height: 86px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.ig-profile-name-row { display: flex; align-items: center; gap: 6px; }
+.ig-profile-name-row h3 { font-size: 16px; font-weight: 700; }
+.ig-verified { color: #3897f0; flex-shrink: 0; display: flex; }
+.ig-follow-btn {
+  margin-left: var(--space-xs); padding: 5px 14px; border: none; border-radius: 8px; background: #0095f6;
+  color: #fff; font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0; transition: background .15s ease;
+}
+.ig-follow-btn:hover { background: #1877f2; }
+.ig-profile-stats { display: flex; gap: var(--space-lg); margin-top: var(--space-sm); font-size: 13px; }
+.ig-profile-stats b { font-weight: 700; }
+.ig-profile-stats span { color: var(--text-secondary); }
+.ig-profile-bio { margin-top: var(--space-sm); font-size: 12.5px; color: var(--text); white-space: pre-line; max-width: 46ch; }
+.ig-profile-bio .bio-name { font-weight: 700; }
+.ig-profile-link { display: inline-flex; align-items: center; gap: 4px; margin-top: 2px; color: #3897f0; font-weight: 600; font-size: 12.5px; text-decoration: none; }
+.ig-profile-link:hover { text-decoration: underline; }
+
+/* Post tile */
+.post-tile { position: relative; overflow: hidden; background: var(--surface-3); cursor: pointer; border: none; padding: 0; display: block; width: 100%; }
+.post-tile img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+.post-tile:hover img { transform: scale(1.035); }
+.post-tile:focus-visible { outline: none; box-shadow: inset 0 0 0 3px rgba(255, 255, 255, .7), var(--focus-ring); }
+.post-tile-type-badge {
+  position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(13, 13, 17, .55); color: #fff; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px);
+}
+.post-tile-overlay {
+  position: absolute; inset: 0; background: rgba(13, 13, 17, .38); opacity: 0; transition: opacity .18s ease;
+  display: flex; align-items: center; justify-content: center; gap: var(--space-lg); color: #fff; font-weight: 700; font-size: 13.5px;
+}
+.post-tile:hover .post-tile-overlay { opacity: 1; }
+.post-tile-overlay span { display: flex; align-items: center; gap: 5px; }
+
+/* Grid layout */
+.grid-layout { display: grid; gap: var(--gap, 4px); grid-template-columns: repeat(var(--cols, 3), 1fr); padding: var(--gap, 4px); }
+.grid-layout .post-tile { aspect-ratio: 1; border-radius: var(--tile-radius, 4px); animation: tileIn .44s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--i, 0) * 26ms); }
+@keyframes tileIn { from { opacity: 0; transform: translateY(9px) scale(.985) } to { opacity: 1; transform: none } }
+
+/* Placeholder (locked) tile */
+.post-tile-placeholder {
+  aspect-ratio: 1; border-radius: var(--tile-radius, 4px);
+  background: linear-gradient(160deg, #dce6f7 0%, #eef0fb 55%, #e4f1f7 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; padding: var(--space-md); text-align: center;
+}
+.post-tile-placeholder .lock-pill { font-size: 9.5px; font-weight: 800; letter-spacing: .04em; background: rgba(255, 255, 255, .85); color: var(--text); padding: 5px 9px; border-radius: var(--radius-full); box-shadow: var(--shadow-sm); }
+.post-tile-placeholder .post-n { font-size: 11px; color: rgba(13, 13, 17, .45); font-weight: 600; }
+
+/* Slider layout */
+.slider-layout { padding: var(--space-xl); display: flex; flex-direction: column; align-items: center; gap: var(--space-md); }
+.slider-stage { position: relative; width: 100%; max-width: 420px; aspect-ratio: 1; border-radius: var(--tile-radius, 12px); overflow: hidden; }
+.slider-slide { width: 100%; height: 100%; animation: slideFade .34s cubic-bezier(.22, 1, .36, 1); }
+.slider-stage .post-tile { height: 100%; }
+@keyframes slideFade { from { opacity: 0; transform: scale(1.015) } to { opacity: 1; transform: none } }
+.slider-nav { display: flex; align-items: center; gap: var(--space-lg); }
+.slider-arrow {
+  width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--surface);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); transition: background .14s ease;
+}
+.slider-arrow:hover { background: var(--ink-soft); }
+.slider-dots { display: flex; gap: 6px; }
+.slider-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-strong); border: none; padding: 0; cursor: pointer; transition: background .14s ease, transform .14s ease; }
+.slider-dot[data-active="true"] { background: var(--ink); transform: scale(1.3); }
+
+/* Coverflow carousel */
+.cover-carousel { padding: var(--space-xl) var(--space-md); display: flex; align-items: center; justify-content: center; gap: var(--space-sm); }
+.cover-stage {
+  position: relative; flex: 1; height: 330px; overflow: hidden; perspective: 1200px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 24%, #000 76%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 24%, #000 76%, transparent);
+}
+.cover-card {
+  position: absolute; top: 50%; left: 50%; width: 232px; aspect-ratio: 4/5; margin: 0;
+  border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md);
+  transition: transform .62s cubic-bezier(.22, 1, .36, 1), opacity .62s cubic-bezier(.22, 1, .36, 1), filter .62s cubic-bezier(.22, 1, .36, 1), box-shadow .62s ease;
+  will-change: transform, opacity, filter; transform: translate(-50%, -50%);
+}
+.cover-card:not([data-off="0"]) { pointer-events: none; }
+.cover-card[data-off="0"] { z-index: 5; transform: translate(-50%, -50%) scale(1); filter: none; }
+.cover-card[data-off="-1"] { z-index: 4; transform: translate(-50%, -50%) translateX(-74%) scale(.8); filter: blur(2.5px) brightness(.92); opacity: .85; }
+.cover-card[data-off="1"] { z-index: 4; transform: translate(-50%, -50%) translateX(74%) scale(.8); filter: blur(2.5px) brightness(.92); opacity: .85; }
+.cover-card[data-off="-2"] { z-index: 3; transform: translate(-50%, -50%) translateX(-152%) scale(.6); filter: blur(7px) brightness(.9); opacity: .22; }
+.cover-card[data-off="2"] { z-index: 3; transform: translate(-50%, -50%) translateX(152%) scale(.6); filter: blur(7px) brightness(.9); opacity: .22; }
+.cover-card[data-off="-3"] { z-index: 2; transform: translate(-50%, -50%) translateX(-198%) scale(.52); filter: blur(8px); opacity: 0; }
+.cover-card[data-off="3"] { z-index: 2; transform: translate(-50%, -50%) translateX(198%) scale(.52); filter: blur(8px); opacity: 0; }
+.cover-arrow { position: relative; z-index: 6; flex-shrink: 0; }
+
+/* Marquee layout */
+.marquee-layout {
+  padding: var(--space-xl) 0; overflow: hidden; position: relative;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.marquee-track { display: flex; gap: var(--space-md); width: max-content; animation: marqueeScroll 26s linear infinite; }
+.marquee-layout:hover .marquee-track { animation-play-state: paused; }
+.marquee-track .post-tile { width: 190px; aspect-ratio: 4/5; border-radius: var(--tile-radius, 10px); flex-shrink: 0; }
+
+/* Rainbow layout */
+.rainbow-layout { padding: var(--space-2xl) var(--space-xl); display: flex; align-items: center; justify-content: center; gap: var(--space-md); }
+.rainbow-stage {
+  position: relative; height: 360px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  width: 100%; max-width: 640px; display: flex; align-items: center; justify-content: center;
+}
+.rainbow-card {
+  position: absolute; width: 220px; aspect-ratio: 4/5; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-md);
+  transition: transform .62s cubic-bezier(.22, 1, .36, 1), opacity .62s cubic-bezier(.22, 1, .36, 1), filter .62s cubic-bezier(.22, 1, .36, 1);
+  will-change: transform, opacity, filter; border: 4px solid var(--surface);
+}
+.rainbow-card[data-off="0"] { z-index: 4; transform: translateX(0) rotate(0deg) scale(1); }
+.rainbow-card[data-off="-1"] { z-index: 3; transform: translateX(-150px) rotate(-9deg) scale(.94); filter: brightness(.94); }
+.rainbow-card[data-off="1"] { z-index: 3; transform: translateX(150px) rotate(9deg) scale(.94); filter: brightness(.94); }
+.rainbow-card[data-off="-2"] { z-index: 2; transform: translateX(-260px) rotate(-16deg) scale(.86); filter: brightness(.88); opacity: .7; }
+.rainbow-card[data-off="2"] { z-index: 2; transform: translateX(260px) rotate(16deg) scale(.86); filter: brightness(.88); opacity: .7; }
+.rainbow-card[data-off="-3"] { z-index: 1; transform: translateX(-345px) rotate(-22deg) scale(.78); filter: brightness(.82); opacity: 0; }
+.rainbow-card[data-off="3"] { z-index: 1; transform: translateX(345px) rotate(22deg) scale(.78); filter: brightness(.82); opacity: 0; }
+.rainbow-arrow { position: relative; z-index: 4; }
+
+/* Stat chip */
+.stat-chip {
+  position: absolute; bottom: 8px; left: 8px; display: flex; gap: 8px; background: rgba(13, 13, 17, .55);
+  color: #fff; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: var(--radius-full); backdrop-filter: blur(2px);
+}
+.stat-chip span { display: flex; align-items: center; gap: 3px; }
+
+/* ── Lightbox ──────────────────────────────────────────────────────────── */
+.lightbox-backdrop {
+  position: fixed; inset: 0; background: rgba(10, 10, 13, .6); backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center; padding: var(--space-xl); z-index: 50; animation: fadeIn .15s ease;
+}
+.lightbox {
+  background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; display: flex;
+  width: min(880px, 100%); max-height: min(680px, 90vh); box-shadow: var(--shadow-lg); animation: riseIn .18s ease;
+}
+.lightbox-media { flex: 1.15; background: #000; display: flex; align-items: center; justify-content: center; position: relative; min-width: 0; }
+.lightbox-media img { width: 100%; height: 100%; object-fit: contain; }
+.lightbox-media-frame { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; animation: lbMediaIn .26s ease; }
+@keyframes lbMediaIn { from { opacity: 0 } to { opacity: 1 } }
+.lightbox-side { flex: 1; min-width: 260px; max-width: 320px; display: flex; flex-direction: column; }
+.lightbox-side-head { display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-lg); border-bottom: 1px solid var(--border); }
+.lightbox-side-head img { width: 34px; height: 34px; border-radius: 50%; }
+.lightbox-side-head strong { font-size: 13px; }
+.lightbox-caption { padding: var(--space-lg); font-size: 13px; color: var(--text); overflow-y: auto; flex: 1; white-space: pre-line; }
+.lightbox-meta { padding: var(--space-lg); border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: var(--space-sm); align-items: flex-start; }
+.lightbox-stats { display: flex; gap: var(--space-lg); font-size: 12.5px; color: var(--text-secondary); }
+.lightbox-stats span { display: flex; align-items: center; gap: 5px; font-weight: 600; color: var(--text); }
+.lightbox-date { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .03em; }
+.lightbox-close {
+  position: absolute; top: var(--space-md); right: var(--space-md); z-index: 2; background: rgba(13, 13, 17, .5);
+  color: #fff; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer;
+}
+.lightbox-carousel-nav {
+  position: absolute; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255, 255, 255, .85); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text);
+}
+.lightbox-carousel-nav.prev { left: var(--space-md); }
+.lightbox-carousel-nav.next { right: var(--space-md); }
+.lightbox-carousel-dots { position: absolute; bottom: var(--space-md); left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
+.lightbox-carousel-dots span { width: 5px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, .5); }
+.lightbox-carousel-dots span[data-active="true"] { background: #fff; }
+.lightbox-post-nav {
+  position: relative; z-index: 51; flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; border: none;
+  background: rgba(255, 255, 255, .14); color: #fff; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background .16s ease, transform .12s ease;
+}
+.lightbox-post-nav:hover { background: rgba(255, 255, 255, .26); }
+.lightbox-post-nav:active { transform: scale(.92); }
+.lightbox-post-nav.prev { margin-right: var(--space-lg); }
+.lightbox-post-nav.next { margin-left: var(--space-lg); }
+.lightbox-counter { margin-left: auto; font-size: 11.5px; font-weight: 600; color: var(--text-muted); }
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .preview-shell { flex-direction: column; }
+  .layout-rail { width: 100%; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; }
+  .layout-rail-list { flex-direction: row; overflow-x: auto; }
+  .layout-thumb-card { width: 128px; flex-shrink: 0; }
+  .lightbox { flex-direction: column; max-height: 92vh; }
+  .lightbox-side { max-width: none; }
+  .lightbox-post-nav { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(13, 13, 17, .5); }
+  .lightbox-post-nav.prev { left: 8px; margin: 0; }
+  .lightbox-post-nav.next { right: 8px; margin: 0; }
+  .preview-actionbar { flex-wrap: wrap; }
+  .topbar { padding: var(--space-md); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .preview-stage, .grid-layout .post-tile, .slider-slide, .lightbox-media-frame, .marquee-track { animation: none !important; }
+  .post-tile img { transition: none; }
+}
+
+/* ── Page-only chrome (not part of the plugin) ─────────────────────────── */
+.demo-strip {
+  display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+  padding: 9px 16px; background: var(--ink); color: rgba(255, 255, 255, .82);
+  font-size: 12px; font-weight: 500; text-align: center;
+}
+.demo-strip b { color: #fff; font-weight: 700; }
+.demo-strip a { color: #fff; text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="root">
+
+  <!-- Site chrome: the one thing that is NOT in the plugin -->
+  <div class="demo-strip">
+    <span><b>Live demo.</b> This is the real Instagram Feed plugin preview, running in your browser with a real @nike feed.</span>
+    <a href="instagram">← Back to Instagram Feed</a>
+  </div>
+
+  <div class="app connect-v2">
+    <header class="topbar">
+      <div class="topbar-brand">
+        <div class="logo-mark" style="width:28px;height:28px;border-radius:8.4px;color:#fff" aria-hidden>
+          <svg width="15.4" height="15.4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <span class="wordmark">Instagram Feed</span>
+        <span class="ver">v1.0.0</span>
+      </div>
+      <div class="topbar-right">
+        <a class="btn btn-ghost btn-sm" href="instagram#pricing">Pricing</a>
+        <a class="btn btn-outline btn-sm" href="instagram-account">Sign in</a>
+      </div>
+    </header>
+
+    <div class="preview-shell">
+      <aside class="layout-rail" aria-label="Choose a layout">
+        <div class="layout-rail-title">Layout</div>
+        <div class="layout-rail-list" id="rail"></div>
+      </aside>
+
+      <div class="preview-main">
+        <div class="preview-main-scroll">
+          <div class="preview-context">
+            <div class="who">
+              <img src="assets/ig-demo/avatar.webp" alt="" />
+              <div><b>@nike</b> <span>· 291.6M followers</span></div>
+            </div>
+            <span class="pill pill-neutral" id="layout-pill">profile layout</span>
+          </div>
+
+          <div class="preview-canvas" id="canvas"></div>
+        </div>
+
+        <div class="preview-actionbar">
+          <span class="status">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1 14-4-4 1.4-1.4L11 13.2l5.6-5.6L18 9l-7 7z"/></svg>
+            Preview loaded with 6 posts
+          </span>
+          <div class="actions">
+            <a class="btn btn-outline" href="instagram#layouts">How it works</a>
+            <a class="btn btn-primary" href="instagram#pricing">Get the plugin</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="lightbox-root"></div>
+</div>
+
+<script>
+/* ─────────────────────────────────────────────────────────────────────────
+   Port of the plugin's Preview screen (React → vanilla). Behaviour, markup
+   and class names mirror plugin/src/{screens/Preview,components/*}.tsx.
+   Demo data is the committed @nike scrape from lib/demoFeed.ts.
+   ───────────────────────────────────────────────────────────────────────── */
+const A = "assets/ig-demo/";
+
+const PROFILE = {
+  handle: "nike",
+  fullName: "Nike",
+  avatarUrl: A + "avatar.webp",
+  bio: "Just Do It.",
+  externalUrl: "http://empli.fi/nike",
+  verified: true,
+  postsCount: 1668,
+  followers: 291607476,
+  following: 264,
+};
+
+const POSTS = [
+  {
+    id: "3935562768090283565", type: "image", mediaUrl: A + "post-1.webp",
+    permalink: "https://www.instagram.com/p/Dad7XxvRj4t/",
+    caption: "The story continues @cristiano",
+    likes: 1840631, comments: 16855, timestamp: "2026-07-06T22:11:14.000Z",
+  },
+  {
+    id: "3952772575138859291", type: "carousel", mediaUrl: A + "post-2.webp",
+    permalink: "https://www.instagram.com/p/DbbEbbjDskb/",
+    caption: "Skating rink or salon, @alysaxliu leads the pack with style that rings true. From hoodie to toe. \n\nElevate the everyday in Nike Studio Fleece, available now.",
+    likes: 929070, comments: 1747, timestamp: "2026-07-30T16:00:32.000Z",
+    carousel: [{ mediaUrl: A + "slide-2-1.webp" }, { mediaUrl: A + "slide-2-2.webp" }, { mediaUrl: A + "slide-2-3.webp" }],
+  },
+  {
+    id: "3939816185620865274", type: "image", mediaUrl: A + "post-3.webp",
+    permalink: "https://www.instagram.com/p/DatCfJgRCD6/",
+    caption: "Always was, always will be. World No. 1 @janniksin leaves no doubt as he takes a second consecutive title in London.",
+    likes: 249904, comments: 893, timestamp: "2026-07-12T18:59:13.000Z",
+  },
+  {
+    id: "3941115687112447588", type: "carousel", mediaUrl: A + "post-4.webp",
+    permalink: "https://www.instagram.com/p/Daxp9YlDpZk/",
+    caption: "Nike Atelier for Victor Wembanyama is shaped by instinct and precision, through a distinctly French lens. \n\nFootball heritage, reimagined. Excellence, embodied.\n\nNike Atelier Total 90 is available for preorder July 20 at The Broken Arm (Paris), Dover Street Market (Paris), and SNKRS (North America).\n\nThe bespoke Nike Atelier LenoWoven jacket reinterprets performance innovation through an elevated lens, crafted from a cotton yarn adaptation of material technology originally developed for Nike Football boots.\n\nAt the intersection of world-class athletes, distinctive style, and pinnacle craftsmanship, Nike Atelier is made for the exceptional.\n\nInspired by the Total 90 Laser III, the Nike Atelier Total 90 distills one of Nike Football’s most iconic silhouettes into its purest form.\n\n“My lifestyle influences my style, and comfort always comes first.” - Victor Wembanyama\n\nNike Atelier. One of One.",
+    likes: 220458, comments: 833, timestamp: "2026-07-14T14:00:22.000Z",
+    carousel: [{ mediaUrl: A + "slide-4-1.webp" }, { mediaUrl: A + "slide-4-2.webp" }, { mediaUrl: A + "slide-4-3.webp" }],
+  },
+  {
+    id: "3939674589332169959", type: "image", mediaUrl: A + "post-5.webp",
+    permalink: "https://www.instagram.com/p/DasiSprxuTn/",
+    caption: "@erling’s hunt never ends.",
+    likes: 175731, comments: 1268, timestamp: "2026-07-12T14:22:54.000Z",
+  },
+  {
+    id: "3943294951320627320", type: "carousel", mediaUrl: A + "post-6.webp",
+    permalink: "https://www.instagram.com/p/Da5Zd2iDqh4/",
+    caption: "Play Fast. Play Free. Play Light.\n \nThe Sabrina 4 provides the security and stability hoopers need for change of pace style of play. A new lightweight containment system locks down every move, while a Nike Flyplate on the midsole keeps you sturdy from end-to-end. \n \nAvailable now.",
+    likes: 94224, comments: 305, timestamp: "2026-07-17T14:10:11.000Z",
+    carousel: [{ mediaUrl: A + "slide-6-1.webp" }, { mediaUrl: A + "slide-6-2.webp" }, { mediaUrl: A + "slide-6-3.webp" }],
+  },
+];
+
+const MAX_POSTS_AFTER_INSERT = 18;
+const LAYOUTS = ["profile", "grid", "slider", "carousel", "marquee", "rainbow"];
+const LABELS = { profile: "Profile", grid: "Grid", slider: "Slider", carousel: "Carousel", marquee: "Marquee", rainbow: "Rainbow" };
+const HINTS = { profile: "Header + grid", grid: "Even tiles", slider: "One at a time", carousel: "Peek row", marquee: "Auto-scroll", rainbow: "Fanned cards" };
+
+/* ── lib/format.ts ─────────────────────────────────────────────────────── */
+const trim1 = (x) => (Math.round(x * 10) / 10).toString();
+function compact(n) {
+  if (n < 1000) return String(n);
+  if (n < 1e6) { const k = n / 1000; return (k >= 100 ? Math.round(k) : trim1(k)) + "K"; }
+  const m = n / 1e6;
+  return (m >= 100 ? Math.round(m) : trim1(m)) + "M";
+}
+function formatDate(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }).toUpperCase();
+}
+
+/* ── Icons (components/Icons.tsx) ──────────────────────────────────────── */
+const svg = (body, size, opts = {}) =>
+  `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${opts.fill || "none"}"${
+    opts.fill ? "" : ` stroke="currentColor" stroke-width="${opts.sw || 2}" stroke-linecap="round" stroke-linejoin="round"`
+  } aria-hidden="true">${body}</svg>`;
+const IconPlay = (s = 16) => svg('<path d="M8 5v14l11-7z"/>', s, { fill: "currentColor" });
+const IconStack = (s = 14) => svg('<rect x="7" y="3" width="14" height="14" rx="2"/><path d="M3 7v12a2 2 0 0 0 2 2h12"/>', s);
+const IconHeart = (s = 16) => svg('<path d="M12 21s-7.5-4.6-10-9.3C.7 9 1.6 5.5 4.7 4.6c2-.6 3.8.4 4.8 1.9L12 9l2.5-2.5c1-1.5 2.8-2.5 4.8-1.9 3.1.9 4 4.4 2.7 7.1C19.5 16.4 12 21 12 21z"/>', s, { fill: "currentColor" });
+const IconComment = (s = 16) => svg('<path d="M21 11.5a8.4 8.4 0 0 1-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1 1 21 11.5z"/>', s);
+const IconLeft = (s = 20) => svg('<path d="m15 6-6 6 6 6"/>', s);
+const IconRight = (s = 20) => svg('<path d="m9 6 6 6-6 6"/>', s);
+const IconClose = (s = 18) => svg('<path d="M18 6 6 18M6 6l12 12"/>', s);
+const IconExternal = (s = 14) => svg('<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>', s);
+const IconLink = (s = 12) => svg('<path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/>', s);
+const IconVerified = (s = 16) =>
+  `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m23 12-2.4-2.8.3-3.7-3.6-.8L15.4 1 12 2.5 8.6 1 6.7 4.7l-3.6.8.3 3.7L1 12l2.4 2.8-.3 3.7 3.6.8L8.6 23 12 21.5 15.4 23l1.9-3.7 3.6-.8-.3-3.7L23 12zm-12.9 4.2L6 12.1l1.5-1.4 2.6 2.6 5.4-5.4L17 9.4l-6.9 6.8z" fill="#3897f0"/></svg>`;
+
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* ── components/PostTile.tsx ───────────────────────────────────────────── */
+function postTile(post, i, opts = {}) {
+  const { showStats = true, chip = false, style = "" } = opts;
+  const badge =
+    post.type === "video" ? `<span class="post-tile-type-badge">${IconPlay(12)}</span>`
+    : post.type === "carousel" ? `<span class="post-tile-type-badge">${IconStack(12)}</span>` : "";
+  const overlay = showStats
+    ? `<span class="post-tile-overlay"><span>${IconHeart(15)} ${compact(post.likes)}</span><span>${IconComment(15)} ${compact(post.comments)}</span></span>`
+    : "";
+  const chipEl = chip
+    ? `<span class="stat-chip"><span>${IconHeart(11)} ${compact(post.likes)}</span><span>${IconComment(11)} ${compact(post.comments)}</span></span>`
+    : "";
+  return `<button type="button" class="post-tile" data-post="${post.id}" style="${style}"
+    aria-label="Open post: ${esc(post.caption.slice(0, 60))}">
+    <img src="${post.mediaUrl}" alt="${esc(post.caption || "Instagram post")}" loading="lazy" draggable="false" />
+    ${badge}${overlay}${chipEl}</button>`;
+}
+
+/* ── components/ProfileHeader.tsx ──────────────────────────────────────── */
+function profileHeader(p) {
+  return `<div class="ig-profile-header">
+    <img class="ig-profile-avatar" src="${p.avatarUrl}" alt="${p.handle} avatar" draggable="false" />
+    <div>
+      <div class="ig-profile-name-row">
+        <h3>${p.handle}</h3>
+        ${p.verified ? `<span class="ig-verified" aria-label="Verified">${IconVerified(16)}</span>` : ""}
+        <a class="ig-follow-btn" href="https://www.instagram.com/${p.handle}/" target="_blank" rel="noopener">Follow</a>
+      </div>
+      <div class="ig-profile-stats">
+        <span><b>${compact(p.postsCount)}</b> posts</span>
+        <span><b>${compact(p.followers)}</b> followers</span>
+        <span><b>${compact(p.following)}</b> following</span>
+      </div>
+      <div class="ig-profile-bio"><span class="bio-name">${esc(p.fullName)}</span>\n${esc(p.bio)}</div>
+      <a class="ig-profile-link" href="${p.externalUrl}" target="_blank" rel="noopener noreferrer">${IconLink(12)} ${p.externalUrl.replace(/^https?:\/\//, "")}</a>
+    </div>
+  </div>`;
+}
+
+/* ── components/FeedLayouts.tsx ────────────────────────────────────────── */
+const state = { layout: "profile", slider: 0, cover: 0, rainbow: 0 };
+
+function gridLayout({ teaser = true, columns = 3, cornerRadius = 4, gap = 4 } = {}) {
+  const tiles = POSTS.map((p, i) => postTile(p, i, { style: `--i:${i}` })).join("");
+  const n = teaser ? MAX_POSTS_AFTER_INSERT - POSTS.length : 0;
+  let ph = "";
+  for (let i = 0; i < n; i++) {
+    ph += `<div class="post-tile-placeholder" aria-hidden><span class="lock-pill">INSERT TO LOAD MORE POSTS</span><span class="post-n">Post ${POSTS.length + i + 1}</span></div>`;
+  }
+  return `<div class="grid-layout" style="--cols:${columns};--gap:${gap}px;--tile-radius:${cornerRadius}px">${tiles}${ph}</div>`;
+}
+
+function sliderLayout() {
+  const post = POSTS[state.slider];
+  const dots = POSTS.map((p, i) => `<button class="slider-dot" data-active="${i === state.slider}" data-slider-dot="${i}" aria-label="Go to post ${i + 1}" type="button"></button>`).join("");
+  return `<div class="slider-layout">
+    <div class="slider-stage" style="--tile-radius:12px">
+      <div class="slider-slide">${postTile(post, 0, { showStats: false, chip: true })}</div>
+    </div>
+    <div class="slider-nav">
+      <button class="slider-arrow" data-slider-go="-1" aria-label="Previous post" type="button">${IconLeft(18)}</button>
+      <div class="slider-dots">${dots}</div>
+      <button class="slider-arrow" data-slider-go="1" aria-label="Next post" type="button">${IconRight(18)}</button>
+    </div>
+  </div>`;
+}
+
+/** Offsets kept one ring wider than what's visible, so cards fade in/out
+ *  instead of popping (see FeedLayouts.tsx CarouselLayout). */
+function ring(n) {
+  const span = Math.min(3, Math.max(0, n - 1));
+  const out = [];
+  for (let o = -span; o <= span; o++) out.push(o);
+  return out;
+}
+
+function coverLayout() {
+  const n = POSTS.length, i = state.cover;
+  const cards = ring(n).map((o) => {
+    const post = POSTS[(((i + o) % n) + n) % n];
+    return `<div class="cover-card" data-off="${o}">${buildCover(post, o)}</div>`;
+  }).join("");
+  return `<div class="cover-carousel">
+    <button class="slider-arrow cover-arrow" data-cover-go="-1" aria-label="Previous post" type="button">${IconLeft(18)}</button>
+    <div class="cover-stage">${cards}</div>
+    <button class="slider-arrow cover-arrow" data-cover-go="1" aria-label="Next post" type="button">${IconRight(18)}</button>
+  </div>`;
+}
+
+function marqueeLayout() {
+  const loop = POSTS.concat(POSTS);
+  return `<div class="marquee-layout"><div class="marquee-track">${loop
+    .map((p) => postTile(p, 0, { showStats: false, style: "--tile-radius:10px" }))
+    .join("")}</div></div>`;
+}
+
+function rainbowLayout() {
+  const n = POSTS.length, c = state.rainbow;
+  const cards = ring(n).map((o) => {
+    const post = POSTS[(((c + o) % n) + n) % n];
+    return `<div class="rainbow-card" data-off="${o}">${buildRainbow(post, o)}</div>`;
+  }).join("");
+  return `<div class="rainbow-layout">
+    <button class="slider-arrow rainbow-arrow" data-rainbow-go="-1" aria-label="Previous" type="button">${IconLeft(18)}</button>
+    <div class="rainbow-stage">${cards}</div>
+    <button class="slider-arrow rainbow-arrow" data-rainbow-go="1" aria-label="Next" type="button">${IconRight(18)}</button>
+  </div>`;
+}
+
+function renderLayout(layout) {
+  switch (layout) {
+    case "profile": return profileHeader(PROFILE) + gridLayout();
+    case "grid": return gridLayout();
+    case "slider": return sliderLayout();
+    case "carousel": return coverLayout();
+    case "marquee": return marqueeLayout();
+    case "rainbow": return rainbowLayout();
+  }
+}
+
+const canvas = document.getElementById("canvas");
+function paint(animate = true) {
+  canvas.innerHTML = `<div class="preview-stage"${animate ? "" : ' style="animation:none"'}>${renderLayout(state.layout)}</div>`;
+  document.getElementById("layout-pill").textContent = state.layout + " layout";
+}
+
+/* Cards inside the carousel/rainbow decks must be re-slotted, not re-created,
+   or the CSS transition has nothing to interpolate. Re-render in place and let
+   the browser animate the data-off change. */
+function reslot(sel, current, build) {
+  const n = POSTS.length;
+  const cards = canvas.querySelectorAll(sel);
+  const offs = ring(n);
+  cards.forEach((card, k) => {
+    const o = offs[k];
+    const post = POSTS[(((current + o) % n) + n) % n];
+    card.dataset.off = o;
+    // Rebuild the tile, not just the <img>: the stats overlay / chip belongs to
+    // the post, so swapping only the image would show the wrong like count.
+    card.innerHTML = build(post, o);
+  });
+}
+const buildCover = (post, o) => postTile(post, 0, { showStats: o === 0, style: "--tile-radius:10px;width:100%;height:100%" });
+const buildRainbow = (post, o) => postTile(post, 0, { showStats: false, chip: o === 0, style: "width:100%;height:100%" });
+
+/* ── components/LayoutGallery.tsx ──────────────────────────────────────── */
+const img = (i) => POSTS[i % POSTS.length].mediaUrl;
+const bg = (i) => `style="background-image:url(${img(i)})"`;
+function thumb(layout) {
+  switch (layout) {
+    case "grid":
+      return `<div class="lt lt-grid">${[...Array(9)].map((_, i) => `<span ${bg(i)}></span>`).join("")}</div>`;
+    case "profile":
+      return `<div class="lt lt-profile">
+        <div class="lt-profile-head"><i style="background-image:url(${PROFILE.avatarUrl})"></i>
+        <div class="lt-profile-lines"><b></b><s></s></div></div>
+        <div class="lt-profile-grid">${[...Array(6)].map((_, i) => `<span ${bg(i)}></span>`).join("")}</div></div>`;
+    case "slider":
+      return `<div class="lt lt-slider"><span class="lt-slider-frame" ${bg(0)}></span><div class="lt-dots"><i data-on></i><i></i><i></i></div></div>`;
+    case "carousel":
+      return `<div class="lt lt-carousel"><span class="side" ${bg(3)}></span><span class="mid" ${bg(0)}></span><span class="side" ${bg(1)}></span></div>`;
+    case "marquee":
+      return `<div class="lt lt-marquee"><div class="lt-marquee-track">${[...Array(5)].map((_, i) => `<span ${bg(i)}></span>`).join("")}</div></div>`;
+    case "rainbow":
+      return `<div class="lt lt-rainbow"><span class="r r-l" ${bg(2)}></span><span class="r r-c" ${bg(0)}></span><span class="r r-r" ${bg(1)}></span></div>`;
+  }
+}
+document.getElementById("rail").innerHTML = LAYOUTS.map(
+  (l) => `<button type="button" class="layout-thumb-card" data-layout="${l}" data-active="${l === state.layout}" aria-pressed="${l === state.layout}">
+    <div class="layout-thumb-canvas">${thumb(l)}</div>
+    <div class="layout-thumb-meta"><span class="layout-thumb-name">${LABELS[l]}</span><span class="layout-thumb-hint">${HINTS[l]}</span></div>
+  </button>`,
+).join("");
+
+/* ── components/Lightbox.tsx ───────────────────────────────────────────── */
+const lbRoot = document.getElementById("lightbox-root");
+const lb = { open: false, idx: 0, slide: 0 };
+
+function paintLightbox() {
+  if (!lb.open) { lbRoot.innerHTML = ""; return; }
+  const post = POSTS[lb.idx];
+  const many = POSTS.length > 1;
+  const slides = post.type === "carousel" && post.carousel ? post.carousel : null;
+  const media = slides ? slides[lb.slide] : { mediaUrl: post.mediaUrl };
+
+  const carouselNav = slides && slides.length > 1
+    ? `${lb.slide > 0 ? `<button class="lightbox-carousel-nav prev" data-slide="-1" aria-label="Previous image" type="button">${IconLeft(18)}</button>` : ""}
+       ${lb.slide < slides.length - 1 ? `<button class="lightbox-carousel-nav next" data-slide="1" aria-label="Next image" type="button">${IconRight(18)}</button>` : ""}
+       <div class="lightbox-carousel-dots" aria-hidden>${slides.map((_, i) => `<span data-active="${i === lb.slide}"></span>`).join("")}</div>`
+    : "";
+
+  lbRoot.innerHTML = `<div class="lightbox-backdrop" role="dialog" aria-modal="true" aria-label="Post detail" data-close="1">
+    ${many ? `<button class="lightbox-post-nav prev" data-post-go="-1" aria-label="Previous post" type="button">${IconLeft(22)}</button>` : ""}
+    <div class="lightbox">
+      <div class="lightbox-media">
+        <button class="lightbox-close" data-close="1" aria-label="Close" type="button">${IconClose(16)}</button>
+        <div class="lightbox-media-frame"><img src="${media.mediaUrl}" alt="${esc(post.caption || "Instagram post")}" /></div>
+        ${carouselNav}
+      </div>
+      <div class="lightbox-side">
+        <div class="lightbox-side-head">
+          <img src="${PROFILE.avatarUrl}" alt="" />
+          <strong>${PROFILE.handle}</strong>
+          ${many ? `<span class="lightbox-counter">${lb.idx + 1} / ${POSTS.length}</span>` : ""}
+        </div>
+        <div class="lightbox-caption">${esc(post.caption)}</div>
+        <div class="lightbox-meta">
+          <div class="lightbox-stats">
+            <span>${IconHeart(15)} ${compact(post.likes)}</span>
+            <span>${IconComment(15)} ${compact(post.comments)}</span>
+          </div>
+          <div class="lightbox-date">${formatDate(post.timestamp)}</div>
+          <a class="btn btn-outline btn-sm" href="${post.permalink}" target="_blank" rel="noopener">${IconExternal(14)} View on Instagram</a>
+        </div>
+      </div>
+    </div>
+    ${many ? `<button class="lightbox-post-nav next" data-post-go="1" aria-label="Next post" type="button">${IconRight(22)}</button>` : ""}
+  </div>`;
+}
+
+/* ── Events ────────────────────────────────────────────────────────────── */
+document.addEventListener("click", (e) => {
+  const railBtn = e.target.closest("[data-layout]");
+  if (railBtn) {
+    state.layout = railBtn.dataset.layout;
+    document.querySelectorAll("[data-layout]").forEach((b) => {
+      const on = b.dataset.layout === state.layout;
+      b.dataset.active = on; b.setAttribute("aria-pressed", on);
+    });
+    paint();
+    return;
+  }
+
+  const sGo = e.target.closest("[data-slider-go]");
+  if (sGo) { state.slider = (state.slider + Number(sGo.dataset.sliderGo) + POSTS.length) % POSTS.length; paint(false); return; }
+  const sDot = e.target.closest("[data-slider-dot]");
+  if (sDot) { state.slider = Number(sDot.dataset.sliderDot); paint(false); return; }
+
+  const cGo = e.target.closest("[data-cover-go]");
+  if (cGo) { state.cover = (state.cover + Number(cGo.dataset.coverGo) + POSTS.length) % POSTS.length; reslot(".cover-card", state.cover, buildCover); return; }
+
+  const rGo = e.target.closest("[data-rainbow-go]");
+  if (rGo) { state.rainbow = (state.rainbow + Number(rGo.dataset.rainbowGo) + POSTS.length) % POSTS.length; reslot(".rainbow-card", state.rainbow, buildRainbow); return; }
+
+  // Lightbox controls first — a tile inside the modal must not reopen it.
+  if (lb.open) {
+    const pGo = e.target.closest("[data-post-go]");
+    if (pGo) { e.stopPropagation(); lb.slide = 0; lb.idx = (lb.idx + Number(pGo.dataset.postGo) + POSTS.length) % POSTS.length; paintLightbox(); return; }
+    const sl = e.target.closest("[data-slide]");
+    if (sl) { lb.slide += Number(sl.dataset.slide); paintLightbox(); return; }
+    // Close on the X, or on any backdrop click outside the modal card.
+    if (e.target.closest(".lightbox-close") || !e.target.closest(".lightbox")) {
+      lb.open = false; paintLightbox();
+    }
+    return;
+  }
+
+  const tile = e.target.closest(".post-tile");
+  if (tile && canvas.contains(tile)) {
+    const i = POSTS.findIndex((p) => p.id === tile.dataset.post);
+    if (i >= 0) { lb.open = true; lb.idx = i; lb.slide = 0; paintLightbox(); }
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (!lb.open) return;
+  if (e.key === "Escape") { lb.open = false; paintLightbox(); }
+  if (e.key === "ArrowLeft") { lb.slide = 0; lb.idx = (lb.idx - 1 + POSTS.length) % POSTS.length; paintLightbox(); }
+  if (e.key === "ArrowRight") { lb.slide = 0; lb.idx = (lb.idx + 1) % POSTS.length; paintLightbox(); }
+});
+
+// Deep link: instagram-preview#grid opens straight onto a layout.
+const wanted = location.hash.slice(1);
+if (LAYOUTS.includes(wanted)) {
+  state.layout = wanted;
+  document.querySelectorAll("[data-layout]").forEach((b) => {
+    const on = b.dataset.layout === wanted;
+    b.dataset.active = on; b.setAttribute("aria-pressed", on);
+  });
+}
+paint();
+</script>
+</body>
+</html>

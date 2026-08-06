@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account | Instagram Feed</title>
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+  <link rel="apple-touch-icon" href="/favicon-180.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafafa;--surface:#fff;--surface-2:#f4f4f5;--border:#e4e4e7;--text:#18181b;
+      --text-2:#52525b;--muted:#a1a1aa;--accent:#e0457b;--accent-2:#7452e0;--error:#dc2626;
+      --ig:linear-gradient(135deg,#f6913d,#e0457b 55%,#7452e0);
+      --shadow:0 1px 2px rgba(0,0,0,.05);--shadow-md:0 8px 30px rgba(0,0,0,.08)}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    nav{position:sticky;top:0;background:rgba(250,250,250,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);z-index:10}
+    .nav-in{max-width:1140px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px}
+    .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px}
+    .logo b{color:var(--accent)}
+    .logo-mark{width:26px;height:26px;border-radius:8px;background:var(--ig);display:grid;place-items:center;color:#fff;flex-shrink:0}
+    .nav-links{display:flex;gap:28px;font-size:14px;font-weight:500;color:var(--text-2)}
+    @media (max-width:700px){.nav-links{display:none}}
+    main{max-width:920px;margin:0 auto;padding:44px 28px 80px}
+    #auth,#loading{max-width:460px;margin-inline:auto}
+    .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+    .dash-grid .col{display:flex;flex-direction:column;gap:18px}
+    .dash-grid .card{margin-bottom:0}
+    @media (max-width:760px){main{max-width:520px}.dash-grid{grid-template-columns:1fr}}
+    h1{font-size:30px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+    .sub{color:var(--text-2);margin-bottom:28px}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;box-shadow:var(--shadow-md);margin-bottom:18px}
+    label{display:block;font-size:13px;font-weight:600;margin:14px 0 5px}
+    input{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:10px;font:inherit;font-size:14px;outline:none}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #fdecf3}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 20px;margin-top:18px;
+      border-radius:11px;font:inherit;font-size:14.5px;font-weight:700;border:1px solid transparent;cursor:pointer;text-align:center}
+    .btn-blue{background:var(--ig);color:#fff}
+    .btn-dark{background:var(--text);color:#fff}
+    .btn-line{background:var(--surface);border-color:var(--border);color:var(--text)}
+    .btn:disabled{opacity:.55;cursor:default}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .muted{color:var(--muted);font-size:13px}
+    .err{background:#fdecec;color:var(--error);border-radius:10px;padding:10px 14px;font-size:13px;margin-top:14px;display:none}
+    .switch{text-align:center;font-size:13.5px;color:var(--text-2);margin-top:18px}
+    .switch a{color:var(--accent);font-weight:600;cursor:pointer}
+    .badge{display:inline-flex;padding:3px 12px;border-radius:99px;font-size:12px;font-weight:800}
+    .b-none{background:var(--surface-2);color:var(--text-2)}
+    .b-starter{background:#fdecf3;color:var(--accent)}
+    .b-pro{background:var(--ig);color:#fff}
+    .b-lifetime{background:#18181b;color:#fff}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .actions .btn{width:auto;flex:1 1 180px;margin-top:0}
+    #dash{display:none}
+    h3{font-size:15px;font-weight:800;margin-bottom:4px}
+    #loading{display:none;text-align:center;padding:80px 0}
+    .spinner{width:34px;height:34px;margin:0 auto 16px;border-radius:50%;border:3px solid var(--surface-2);border-top-color:var(--accent);animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .feats{list-style:none;margin-top:10px;display:flex;flex-direction:column;gap:7px;font-size:13.5px;color:var(--text-2)}
+    .feats li::before{content:"⤳ "}
+    .soon{background:#fdecf3;color:var(--accent);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;margin-bottom:18px}
+    /* plan picker (signed in, no plan) */
+    .picks{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+    .pick{border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    .pick[data-hi="true"]{border-color:var(--accent);box-shadow:0 0 0 3px #fdecf3}
+    .pick .n{font-weight:800;font-size:15px}
+    .pick .p{font-weight:800;font-size:15px;margin-left:auto}
+    .pick .p small{font-weight:600;color:var(--muted);font-size:12px}
+    .pick .d{flex-basis:100%;font-size:13px;color:var(--text-2);margin-top:-4px}
+    .pick .btn{width:auto;margin-top:0;padding:9px 16px;font-size:13.5px}
+    .note{font-size:12.5px;color:var(--muted);margin-top:14px}
+  </style>
+</head>
+<body>
+<nav><div class="nav-in">
+  <a class="logo" href="/">
+    <span class="logo-mark"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></span>
+    <span>Instagram <b>Feed</b></span>
+  </a>
+  <div class="nav-links"><a href="instagram#features">Features</a><a href="instagram-preview">Live demo</a><a href="instagram#pricing">Pricing</a><a href="contact">Contact</a><a href="/">All plugins</a></div>
+</div></nav>
+
+<main>
+  <div id="loading"><div class="spinner"></div><p class="sub">Signing you in…</p></div>
+
+  <!-- Auth -->
+  <div id="auth">
+    <h1 id="auth-title">Welcome back</h1>
+    <p class="sub">Same account as the Instagram Feed plugin in Framer, and every other Vanssay plugin.</p>
+    <div class="card">
+      <div id="f-email"><label>Email</label><input id="email" type="email" placeholder="you@studio.com" autocomplete="email" /></div>
+      <div id="f-pass">
+        <label style="display:flex;justify-content:space-between">Password <a id="toggle-pass" style="color:var(--accent);cursor:pointer;font-weight:600">Show</a></label>
+        <input id="password" type="password" placeholder="Your password" autocomplete="current-password" />
+        <div style="text-align:right;margin-top:6px"><a id="forgot-link" style="font-size:12.5px;color:var(--accent);cursor:pointer">Forgot password?</a></div>
+      </div>
+      <div class="err" id="auth-err"></div>
+      <div class="err" id="auth-ok" style="background:#fdecf3;color:#e0457b"></div>
+      <button class="btn btn-blue" id="auth-btn">Sign in</button>
+      <div class="switch" id="auth-switch">New to Vanssay? <a>Create an account</a></div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dash">
+    <h1>Your account</h1>
+    <p class="sub" id="d-email"></p>
+    <p style="margin:-22px 0 26px"><a href="accounts" style="color:var(--accent);font-weight:600;font-size:13.5px">← Your Vanssay account &amp; all plugins</a></p>
+
+    <div class="dash-grid">
+      <div class="col">
+        <div class="card">
+          <div class="row"><h3>Plan</h3><span class="badge b-none" id="d-plan">No plan</span></div>
+          <p class="muted" id="d-renew"></p>
+          <div class="err" id="bill-err"></div>
+          <div id="d-picker"></div>
+          <div class="actions" id="d-billing"></div>
+          <p class="note" id="d-note"></p>
+        </div>
+
+        <div class="card">
+          <h3>Add another feed</h3>
+          <p class="muted">One-time $29, added to your account forever — on top of whatever your plan includes. Buy as many as you need.</p>
+          <div class="actions"><button class="btn btn-line" id="d-extra">Add a feed — $29 one-time</button></div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card">
+          <h3>What you get</h3>
+          <ul class="feats" id="d-feats"></ul>
+          <p class="muted" style="margin-top:12px">Connect feeds, pick layouts and insert them on the canvas from the <strong>Instagram Feed</strong> plugin inside Framer.</p>
+        </div>
+
+        <div class="card">
+          <h3>Profile</h3>
+          <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
+          <p class="muted">To change your email, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
+          <div class="err" id="dash-err"></div>
+          <div class="err" id="dash-ok" style="background:#fdecf3;color:#e0457b"></div>
+          <div class="actions">
+            <button class="btn btn-line" id="d-changepass">Change password</button>
+            <button class="btn btn-line" id="d-signout">Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// Identity AND billing are owned by the central Accounts service (the reviews
+// backend): auth, /auth/me and /billing all live there, scoped to this plugin
+// with product=instagram. The Instagram backend is asked separately for the
+// resolved plan + entitlements, because only it distinguishes the one-time
+// Lifetime purchase (Accounts records it as the `pro` tier) and knows the
+// per-plan feed/post/sync limits.
+const API = localStorage.getItem("instagram.apiBase") || "https://api.vanssay.net";
+const IG_API = localStorage.getItem("instagram.igApiBase") || (API + "/instagram");
+const PRODUCT = "instagram";
+const TKEY = "instagram.token";
+
+const $ = (id) => document.getElementById(id);
+const api = async (path, opts = {}) => {
+  const base = opts.base || API;
+  const headers = { ...(opts.body ? { "Content-Type": "application/json" } : {}) };
+  const t = localStorage.getItem(TKEY);
+  if (t) headers.Authorization = "Bearer " + t;
+  const res = await fetch(base + path, { method: opts.method || "GET", headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Something went wrong");
+  return data;
+};
+const showErr = (id, msg) => { const el = $(id); el.textContent = msg; el.style.display = msg ? "block" : "none"; };
+
+// Auto sign-in when arriving from the plugin (#token=<jwt>)
+if (location.hash.startsWith("#token=")) {
+  localStorage.setItem(TKEY, decodeURIComponent(location.hash.slice(7).split("&")[0]));
+  history.replaceState(null, "", location.pathname);
+}
+
+let mode = location.hash.startsWith("#reset=") ? "reset" : "login";
+const resetToken = mode === "reset" ? location.hash.slice(7) : "";
+const COPY = {
+  login: ["Welcome back", "Sign in", 'New to Vanssay? <a>Create an account</a>'],
+  register: ["Create your account", "Create account", 'Already have an account? <a>Sign in</a>'],
+  forgot: ["Reset your password", "Send reset link", '<a>Back to sign in</a>'],
+  reset: ["Choose a new password", "Set new password", '<a>Back to sign in</a>'],
+};
+function render() {
+  $("auth-title").textContent = COPY[mode][0];
+  $("auth-btn").textContent = COPY[mode][1];
+  $("auth-switch").innerHTML = COPY[mode][2];
+  $("f-email").style.display = mode === "reset" ? "none" : "block";
+  $("f-pass").style.display = mode === "forgot" ? "none" : "block";
+  $("forgot-link").style.display = mode === "login" ? "inline" : "none";
+  $("password").placeholder = mode === "reset" || mode === "register" ? "At least 8 characters" : "Your password";
+  showErr("auth-err", ""); showErr("auth-ok", "");
+}
+$("auth-switch").onclick = () => { mode = mode === "login" ? "register" : "login"; render(); };
+$("forgot-link").onclick = () => { mode = "forgot"; render(); };
+$("toggle-pass").onclick = () => {
+  const p = $("password");
+  p.type = p.type === "password" ? "text" : "password";
+  $("toggle-pass").textContent = p.type === "password" ? "Show" : "Hide";
+};
+$("auth-btn").onclick = async () => {
+  showErr("auth-err", ""); showErr("auth-ok", "");
+  try {
+    if (mode === "forgot") {
+      await api("/auth/forgot-password", { method: "POST", body: { email: $("email").value.trim() } });
+      showErr("auth-ok", "If an account exists for that email, a reset link from no-reply@vanssay.net is on its way.");
+      return;
+    }
+    if (mode === "reset") {
+      await api("/auth/reset-password", { method: "POST", body: { token: resetToken, password: $("password").value } });
+      history.replaceState(null, "", location.pathname);
+      mode = "login"; render();
+      showErr("auth-ok", "Password updated. Sign in with your new password.");
+      return;
+    }
+    const r = await api(mode === "register" ? "/auth/register" : "/auth/login", { method: "POST", body: { email: $("email").value.trim(), password: $("password").value } });
+    localStorage.setItem(TKEY, r.token);
+    load();
+  } catch (e) { showErr("auth-err", e.message); }
+};
+render();
+$("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-btn").click());
+
+// ── Plans (mirrors plugin/src/lib/types.ts PRICING_TIERS + the Instagram
+// backend's entitlementsFor()). Keep the three in sync. ──────────────────────
+const PLANS = {
+  starter:  { label: "Starter",  price: "$7.99/mo", checkout: "starter" },
+  pro:      { label: "Pro",      price: "$17.99/mo", checkout: "pro" },
+  lifetime: { label: "Lifetime", price: "$35 once", checkout: "lifetime" },
+};
+const FEATS = {
+  none: [
+    "Pick a plan to connect your first feed",
+    "7-day free trial on Starter and Pro",
+    "All 6 layouts on every plan",
+  ],
+  starter: [
+    "1 Instagram feed",
+    "Up to 18 posts per feed",
+    "Daily auto-sync · 3 manual syncs/day",
+    "Up to 10,000 feed views/month",
+    "All 6 layouts + curated picker",
+  ],
+  pro: [
+    "3 Instagram feeds",
+    "Up to 18 posts per feed",
+    "Daily auto-sync · 10 manual syncs/day",
+    "Up to 50,000 feed views/month",
+    "All 6 layouts + curated picker",
+    "Priority support",
+  ],
+  lifetime: [
+    "2 Instagram feeds, forever",
+    "Up to 12 posts per feed",
+    "Weekly auto-sync · 1 manual sync/day",
+    "Up to 50,000 feed views/month",
+    "All 6 layouts + curated picker",
+    "Priority support",
+  ],
+};
+const PLAN_LABEL = { none: "No plan", starter: "Starter", pro: "Pro", lifetime: "Lifetime" };
+
+/** Live entitlements beat the static table when the Instagram backend answers. */
+function featsFrom(ent, plan) {
+  if (!ent) return FEATS[plan] || FEATS.none;
+  const out = [
+    `${ent.connections} Instagram feed${ent.connections === 1 ? "" : "s"}`,
+    `Up to ${ent.maxPosts} posts per feed`,
+    `${ent.autoSyncHours >= 168 ? "Weekly" : "Daily"} auto-sync · ${ent.manualSyncPerDay} manual sync${ent.manualSyncPerDay === 1 ? "" : "s"}/day`,
+    `Up to ${ent.viewsPerMonth.toLocaleString("en-US")} feed views/month`,
+    "All 6 layouts + curated picker",
+  ];
+  if (ent.prioritySupport) out.push("Priority support");
+  return out;
+}
+
+const checkout = (plan) => async () => {
+  showErr("bill-err", "");
+  try {
+    const r = await api("/billing/create-checkout", { method: "POST", body: { product: PRODUCT, plan } });
+    location.href = r.checkoutUrl;
+  } catch (e) { showErr("bill-err", e.message); }
+};
+const portal = async () => {
+  showErr("bill-err", "");
+  try {
+    const r = await api("/billing/portal", { method: "POST", body: { product: PRODUCT } });
+    location.href = r.portalUrl;
+  } catch (e) { showErr("bill-err", e.message); }
+};
+
+async function load() {
+  if (mode === "reset") { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
+  if (!localStorage.getItem(TKEY)) { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
+  $("auth").style.display = "none"; $("dash").style.display = "none"; $("loading").style.display = "block";
+  try {
+    const me = await api("/auth/me");
+
+    // Preferred source: the Instagram backend, which resolves `lifetime`
+    // (a one-time purchase Accounts stores as the `pro` tier) and the real
+    // limits. If it can't be reached, fall back to the Accounts tier alone.
+    let plan = "none", ent = null;
+    try {
+      const igMe = await api("/auth/me", { base: IG_API });
+      plan = igMe.plan === "expired" ? "none" : igMe.plan;
+      ent = igMe.entitlements || null;
+    } catch {
+      const acc = await api("/billing/entitlements?product=" + PRODUCT);
+      plan = acc.plan === "free" ? "none" : acc.plan === "ultra" ? "pro" : acc.plan;
+    }
+
+    $("loading").style.display = "none"; $("dash").style.display = "block";
+    $("d-email").textContent = me.user.email; $("d-email2").textContent = me.user.email;
+
+    const badge = $("d-plan");
+    badge.textContent = PLAN_LABEL[plan] || plan;
+    badge.className = "badge b-" + (PLANS[plan] ? plan : "none");
+
+    $("d-renew").textContent =
+      plan === "none" ? "No active plan. Start a 7-day free trial, or buy Lifetime once."
+      : plan === "lifetime" ? "Lifetime — paid once, no subscription to renew."
+      : "Active subscription. Manage or cancel it any time in Stripe.";
+
+    $("d-feats").innerHTML = featsFrom(ent, plan).map((f) => "<li>" + f + "</li>").join("");
+
+    // Plan picker — only when there's nothing to double-charge against.
+    const picker = $("d-picker");
+    picker.innerHTML = "";
+    if (plan === "none") {
+      picker.innerHTML = `<div class="picks">
+        ${["starter", "pro", "lifetime"].map((k) => `
+          <div class="pick" data-hi="${k === "pro"}">
+            <span class="n">${PLANS[k].label}</span>
+            <span class="p">${PLANS[k].price}${k === "lifetime" ? "" : ' <small>after 7-day trial</small>'}</span>
+            <span class="d">${FEATS[k][0]} · ${FEATS[k][1]} · ${FEATS[k][2]}</span>
+            <button class="btn ${k === "pro" ? "btn-blue" : k === "lifetime" ? "btn-dark" : "btn-line"}" data-checkout="${k}">
+              ${k === "lifetime" ? "Get Lifetime" : "Start free trial"}
+            </button>
+          </div>`).join("")}
+      </div>`;
+      picker.querySelectorAll("[data-checkout]").forEach((b) => { b.onclick = checkout(PLANS[b.dataset.checkout].checkout); });
+    }
+
+    // Billing actions.
+    const actions = $("d-billing"); actions.innerHTML = "";
+    const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
+    if (plan === "starter" || plan === "pro") {
+      mk(plan === "starter" ? "Change plan (Starter ↔ Pro)" : "Change plan", "btn-blue", portal);
+      mk("Cancel subscription", "btn-line", portal);
+      $("d-note").textContent = "Changing or cancelling opens Stripe's own billing portal, where you can switch plan, update your card, download invoices, or cancel in one click. Cancelling keeps your feeds live until the end of the period you already paid for.";
+    } else if (plan === "lifetime") {
+      mk("Billing history & receipts", "btn-line", portal);
+      $("d-note").textContent = "Lifetime is a one-time payment, so there's no subscription to cancel. Need more feeds? Add them below for $29 each.";
+    } else {
+      $("d-note").textContent = "Monthly plans start with a 7-day free trial — cancel during it from this page and you're never charged.";
+    }
+
+    $("d-extra").disabled = plan === "none";
+    $("d-extra").onclick = checkout("extraFeed");
+    if (plan === "none") $("d-extra").title = "Pick a plan first — extra feeds are added on top of a plan.";
+  } catch (e) {
+    localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
+  }
+}
+$("d-signout").onclick = () => { localStorage.removeItem(TKEY); load(); };
+$("d-changepass").onclick = async () => {
+  const btn = $("d-changepass");
+  if (btn.disabled) return;
+  showErr("dash-err", ""); showErr("dash-ok", "");
+  try {
+    await api("/auth/forgot-password", { method: "POST", body: { email: $("d-email2").textContent.trim() } });
+    showErr("dash-ok", "Check your inbox: a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
+    btn.disabled = true; btn.style.opacity = ".55";
+    let left = 60; btn.textContent = "Email sent (" + left + "s)";
+    const t = setInterval(() => { left--; if (left <= 0) { clearInterval(t); btn.disabled = false; btn.style.opacity = ""; btn.textContent = "Change password"; } else btn.textContent = "Email sent (" + left + "s)"; }, 1000);
+  } catch (e) { showErr("dash-err", e.message); }
+};
+load();
+</script>
+</body>
+</html>
