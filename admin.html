@@ -107,6 +107,7 @@
 
     .badge { display:inline-flex; padding:2px 10px; border-radius:99px; font-size:11.5px; font-weight:800; white-space:nowrap; }
     .b-free { background:var(--surface-2); color:var(--text-2); } .b-pro { background:var(--accent-soft); color:var(--pro); } .b-ultra { background:var(--ink); color:#fff; }
+    .b-starter { background:#fdecf3; color:#e0457b; }
     .b-active { background:#e9f7ef; color:var(--green); } .b-canceled { background:#fdecec; color:var(--error); } .b-other { background:var(--surface-2); color:var(--text-2); }
     .b-framer { background:#eef1f4; color:#111318; } .b-webflow { background:#e6f0ff; color:#155cc4; }
     .badges { display:flex; gap:5px; flex-wrap:wrap; }
@@ -590,50 +591,94 @@ async function renderSubs() {
 /* ── Expenses, Apify scraping costs (Trustpilot + Google) ── */
 async function renderExpenses() {
   $("view").innerHTML = `
-    <div class="page-head"><div><h2>Expenses</h2><p>Apify scraping costs, every paid-plan Trustpilot &amp; Google fetch. Exact per-run cost read back from Apify; cached loads are free.</p></div></div>
+    <div class="page-head"><div><h2>Expenses</h2><p>Everything we pay Apify to scrape, across every plugin. Cache misses only: a cached widget load is free.</p></div></div>
     <div id="ex"><div class="empty">Loading…</div></div>`;
-  let d;
-  try { d = await api("/admin/expenses"); }
-  catch (e) { $("ex").innerHTML = `<div class="empty">Couldn't load: ${esc(e.message)}</div>`; return; }
 
-  const bp = Object.fromEntries(d.month.byPlatform.map((x) => [x.platform, x]));
+  // Reviews reads Apify's own settled cost per run; Instagram computes it from
+  // the per-item price (its scrape uses the sync endpoint, which never returns
+  // the run object). Both are shown, and the estimate is labelled as one.
+  const rs = await Promise.allSettled([api("/admin/expenses"), api("/instagram/admin/expenses")]);
+  const [rev, ig] = rs.map(val);
+  if (!rev && !ig) { $("ex").innerHTML = `<div class="empty">Couldn't load: ${esc(why(rs[0]) || "no data")}</div>`; return; }
+
+  const bp = Object.fromEntries(((rev && rev.month.byPlatform) || []).map((x) => [x.platform, x]));
   const tp = bp.trustpilot || { cost:0, items:0, requests:0 };
   const gg = bp.google || { cost:0, items:0, requests:0 };
-  const monthReq = tp.requests + gg.requests;
-  const pill = (pl) => pl === "google"
-    ? `<span class="badge b-active">🔵 Google</span>`
-    : `<span class="badge b-pro">⭐ Trustpilot</span>`;
+  const ba = Object.fromEntries(((ig && ig.month.byActor) || []).map((x) => [x.actor, x]));
+  const igProf = ba.profile || { cost:0, items:0, requests:0 };
+  const igPost = ba.post || { cost:0, items:0, requests:0 };
+
+  const revMonth = rev ? rev.month.total : 0;
+  const igMonth = ig ? ig.month.total : 0;
+  const monthTotal = revMonth + igMonth;
+  const monthReq = tp.requests + gg.requests + igProf.requests + igPost.requests;
+  const allTime = (rev ? rev.allTime.cost : 0) + (ig ? ig.allTime.cost : 0);
+  const allReq = (rev ? rev.allTime.requests : 0) + (ig ? ig.allTime.requests : 0);
+
+  // One 12-month series across both backends, keyed by month.
+  const series = new Map();
+  const addMonths = (list, key) => (list || []).forEach((m) => {
+    const row = series.get(m.month) || { month: m.month, reviews: 0, instagram: 0 };
+    row[key] += m.total; series.set(m.month, row);
+  });
+  addMonths(rev && rev.months, "reviews");
+  addMonths(ig && ig.months, "instagram");
+  const months = [...series.values()].sort((a, b) => a.month.localeCompare(b.month));
+
+  const src = (k) => ({
+    trustpilot: `<span class="badge b-pro">⭐ Trustpilot</span>`,
+    google: `<span class="badge b-active">🔵 Google</span>`,
+    profile: `<span class="badge b-starter">📸 IG profile</span>`,
+    post: `<span class="badge b-starter">📸 IG post</span>`,
+  }[k] || esc(k));
+
+  // Merge both ledgers into one recent-activity table.
+  const recent = [
+    ...((rev && rev.recent) || []).map((r) => ({
+      when: r.createdAt, plugin: "Reviews", kind: r.platform, source: r.sourceId,
+      items: r.items, cost: r.cost, status: r.status, exact: true,
+    })),
+    ...((ig && ig.recent) || []).map((r) => ({
+      when: r.createdAt, plugin: "Instagram", kind: r.actor, source: "@" + r.handle,
+      items: r.items, cost: r.cost, status: "SUCCEEDED", exact: false,
+    })),
+  ].sort((a, b) => new Date(b.when) - new Date(a.when)).slice(0, 200);
 
   $("ex").innerHTML = `
     <div class="kpis">
-      <div class="kpi hero"><div class="k-label">Spend · this month</div><div class="k-val">${usd(d.month.total)}</div><div class="k-sub">${fmt(monthReq)} paid scrape(s) · ${d.month.key}</div></div>
-      <div class="kpi"><div class="k-label">⭐ Trustpilot (month)</div><div class="k-val">${usd(tp.cost)}</div><div class="k-sub">${fmt(tp.requests)} scrapes · ${fmt(tp.items)} reviews</div></div>
-      <div class="kpi"><div class="k-label">🔵 Google (month)</div><div class="k-val">${usd(gg.cost)}</div><div class="k-sub">${fmt(gg.requests)} scrapes · ${fmt(gg.items)} reviews</div></div>
-      <div class="kpi"><div class="k-label">All-time spend</div><div class="k-val">${usd(d.allTime.cost)}</div><div class="k-sub">${fmt(d.allTime.requests)} scrapes total</div></div>
+      <div class="kpi hero"><div class="k-label">Spend · this month</div><div class="k-val">${usd(monthTotal)}</div><div class="k-sub">${fmt(monthReq)} paid scrape(s) · ${esc((rev && rev.month.key) || (ig && ig.month.key) || "")}</div></div>
+      <div class="kpi"><div class="k-label">⭐🔵 Reviews (month)</div><div class="k-val">${usd(revMonth)}</div><div class="k-sub">${fmt(tp.requests + gg.requests)} scrapes · ${fmt(tp.items + gg.items)} reviews</div></div>
+      <div class="kpi"><div class="k-label">📸 Instagram (month)</div><div class="k-val">${usd(igMonth)}</div><div class="k-sub">${ig ? `${fmt(igProf.requests + igPost.requests)} scrapes · ${fmt(igProf.items + igPost.items)} items` : "unavailable"}</div></div>
+      <div class="kpi"><div class="k-label">All-time spend</div><div class="k-val">${usd(allTime)}</div><div class="k-sub">${fmt(allReq)} scrapes total</div></div>
+      ${ig ? `<div class="kpi"><div class="k-label">IG scrapes today</div><div class="k-val">${fmt(ig.scrapesToday)}</div><div class="k-sub">against the daily budget</div></div>` : ""}
     </div>
 
     <div class="grid-2" style="margin-bottom:16px">
       <div class="panel"><h3>Monthly spend · last 12 months</h3>
-        ${barChart(d.months.map((m) => ({ v: m.total, tip: `${m.month}: ${usd(m.total)} (TP ${usd(m.trustpilot)} · G ${usd(m.google)})`, label: m.month.slice(5) })))}</div>
-      <div class="panel"><h3>This month by platform</h3>
-        ${planRow("⭐ Trustpilot", tp.cost, d.month.total)}
-        ${planRow("🔵 Google", gg.cost, d.month.total)}
-        <div class="kv" style="margin-top:10px"><span>Total this month</span><strong>${usd(d.month.total)}</strong></div>
-        <p class="note">Cost per scrape is Apify's exact <span class="mono">usageTotalUsd</span> for that run.</p></div>
+        ${barChart(months.map((m) => ({ v: m.reviews + m.instagram, tip: `${m.month}: ${usd(m.reviews + m.instagram)} (Reviews ${usd(m.reviews)} · IG ${usd(m.instagram)})`, label: m.month.slice(5) })))}</div>
+      <div class="panel"><h3>This month by source</h3>
+        ${planRow("⭐ Trustpilot", tp.cost, monthTotal)}
+        ${planRow("🔵 Google", gg.cost, monthTotal)}
+        ${planRow("📸 IG profile", igProf.cost, monthTotal)}
+        ${planRow("📸 IG post", igPost.cost, monthTotal)}
+        <div class="kv" style="margin-top:10px"><span>Total this month</span><strong>${usd(monthTotal)}</strong></div>
+        <p class="note">Reviews cost is Apify's exact <span class="mono">usageTotalUsd</span> per run. Instagram is items × unit price${ig ? ` (${usd(ig.unitPrice.profile)}/profile item, ${usd(ig.unitPrice.post)}/post item)` : ""} — both actors bill per dataset item.</p></div>
     </div>
 
-    <div class="sec-title">Recent scrapes (last ${d.recent.length})</div>
-    <div class="tablewrap">${d.recent.length ? `<table><thead><tr>
-      <th>When</th><th>Platform</th><th>Business</th><th class="right">Reviews</th><th class="right">Cost</th><th>Status</th>
-    </tr></thead><tbody>${d.recent.map((r) => `<tr>
-      <td>${dt(r.createdAt)}</td>
-      <td>${pill(r.platform)}</td>
-      <td class="truncate">${/^https?:\/\//.test(r.sourceId) ? `<a href="${esc(r.sourceId)}" target="_blank">${esc(r.sourceId.replace(/^https?:\/\/(www\.)?/,""))}</a>` : esc(r.sourceId || "-")}</td>
+    <div class="sec-title">Recent scrapes (last ${recent.length})</div>
+    <div class="tablewrap">${recent.length ? `<table><thead><tr>
+      <th>When</th><th>Plugin</th><th>Source</th><th>Target</th><th class="right">Items</th><th class="right">Cost</th><th>Status</th>
+    </tr></thead><tbody>${recent.map((r) => `<tr>
+      <td>${dt(r.when)}</td>
+      <td>${esc(r.plugin)}</td>
+      <td>${src(r.kind)}</td>
+      <td class="truncate">${/^https?:\/\//.test(r.source) ? `<a href="${esc(r.source)}" target="_blank">${esc(r.source.replace(/^https?:\/\/(www\.)?/,""))}</a>` : esc(r.source || "-")}</td>
       <td class="right">${fmt(r.items)}</td>
-      <td class="right">${usd(r.cost)}</td>
+      <td class="right">${usd(r.cost)}${r.exact ? "" : "*"}</td>
       <td>${r.status === "SUCCEEDED" ? "✅" : statusBadge(r.status)}</td>
-    </tr>`).join("")}</tbody></table>` : `<div class="empty">No scrapes recorded yet. Costs appear here after the first paid-plan Trustpilot or Google fetch (cache misses only).</div>`}</div>
-    <p class="note">Only paid-plan fetches hit Apify: free Trustpilot uses the self-hosted scraper and free Google uses the Places API (Google's $200/mo credit), both $0.</p>`;
+    </tr>`).join("")}</tbody></table>` : `<div class="empty">No scrapes recorded yet.</div>`}</div>
+    <p class="note">* estimated from the per-item price. Only paid-plan review fetches hit Apify: free Trustpilot uses the self-hosted scraper and free Google uses the Places API (Google's $200/mo credit), both $0. Every Instagram scrape is paid.</p>
+    ${!ig ? `<p class="note">Instagram spend unavailable: ${esc(why(rs[1]) || "no data")}</p>` : ""}`;
 }
 
 /* ── Plugin pages ── */
