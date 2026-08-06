@@ -120,9 +120,9 @@
           <p class="note" id="d-note"></p>
         </div>
 
-        <div class="card">
+        <div class="card" id="d-extra-card">
           <h3>Add another feed</h3>
-          <p class="muted">One-time $29, added to your account forever — on top of whatever your plan includes. Buy as many as you need.</p>
+          <p class="muted" id="d-extra-copy">One-time $29, added to your account forever — on top of whatever your plan includes. Buy as many as you need.</p>
           <div class="actions"><button class="btn btn-line" id="d-extra">Add a feed — $29 one-time</button></div>
         </div>
       </div>
@@ -363,9 +363,16 @@ async function load() {
       $("d-note").textContent = "Monthly plans start with a 7-day free trial — cancel during it from this page and you're never charged.";
     }
 
-    $("d-extra").disabled = plan === "none";
-    $("d-extra").onclick = checkout("extraFeed");
-    if (plan === "none") $("d-extra").title = "Pick a plan first — extra feeds are added on top of a plan.";
+    // The $29 extra-feed add-on is a Pro / Lifetime perk. Starter is a
+    // single-feed plan: the upgrade path there is Pro, not a bolt-on slot.
+    const canBuyExtra = plan === "pro" || plan === "lifetime";
+    $("d-extra").disabled = !canBuyExtra;
+    $("d-extra").onclick = canBuyExtra ? checkout("extraFeed") : null;
+    $("d-extra-copy").textContent =
+      canBuyExtra ? "One-time $29, added to your account forever — on top of the feeds your plan includes. Buy as many as you need."
+      : plan === "starter" ? "Extra feeds are available on Pro and Lifetime. Starter covers one feed — switch to Pro for three, then add more at $29 each."
+      : "Extra feeds are available on Pro and Lifetime. Pick one of those plans first.";
+    $("d-extra").title = canBuyExtra ? "" : "Available on Pro and Lifetime.";
   } catch (e) {
     localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
   }
