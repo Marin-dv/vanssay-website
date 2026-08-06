@@ -39,6 +39,7 @@
     .switch a { color:var(--accent); font-weight:600; cursor:pointer; }
     .badge { display:inline-flex; padding:3px 12px; border-radius:99px; font-size:12px; font-weight:800; }
     .b-free { background:var(--surface-2); color:var(--text-2); } .b-pro { background:#f1edff; color:var(--pro); } .b-ultra { background:linear-gradient(90deg,var(--accent),var(--pro)); color:#fff; }
+    .b-starter { background:#fdecf3; color:#e0457b; }
     .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
     .actions .btn { width:auto; flex:1; margin-top:0; }
     #dash { display:none; }
@@ -123,8 +124,19 @@ const PLUGINS = [
   { product: "geoblock",    name: "Bouncer",          acct: "geoblock-account",    color: "#22c55e" },
   { product: "router",      name: "Router",           acct: "router-account",      color: "#7c3aed" },
   { product: "instagram",   name: "Instagram Feed",   acct: "instagram-account",   color: "#e0457b" },
-  // { product: "maintenance", name: "Maintenance Mode", acct: "maintenance-account", color: "#0891b2" }, // hidden until plugin is live
+  { product: "maintenance", name: "Maintenance Mode", acct: "maintenance-account", color: "#0891b2" },
 ];
+
+// Accounts returns the internal tier (free/starter/pro/ultra); each plugin
+// brands those differently, so translate per product rather than showing a raw
+// tier. Instagram has NO free tier: `free` there means "no plan", not a plan.
+const PLAN_LABEL = {
+  reviews:     { free: "Free", pro: "Pro", ultra: "Agency" },
+  geoblock:    { free: "Free", pro: "Pro", ultra: "Ultra" },
+  router:      { free: "Free", pro: "Pro", ultra: "Agency" },
+  maintenance: { free: "Free", pro: "Pro", ultra: "Pro" },
+  instagram:   { free: "No plan", starter: "Starter", pro: "Pro", ultra: "Pro" },
+};
 
 const $ = (id) => document.getElementById(id);
 const api = async (path, opts = {}) => {
@@ -194,8 +206,8 @@ $("auth-btn").onclick = async () => {
 render();
 $("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-btn").click());
 
-function planBadge(plan) {
-  const label = plan[0].toUpperCase() + plan.slice(1);
+function planBadge(product, plan) {
+  const label = (PLAN_LABEL[product] || {})[plan] || plan[0].toUpperCase() + plan.slice(1);
   return '<span class="badge b-' + plan + '">' + label + '</span>';
 }
 function vIcon(color) {
@@ -225,7 +237,7 @@ async function load() {
       row.innerHTML =
         '<span class="ico" style="background:' + p.color + '1a">' + vIcon(p.color) + '</span>' +
         '<span class="grow"><span class="name">' + p.name + '</span></span>' +
-        '<span class="right">' + planBadge(plan) + '<span class="open">Manage →</span></span>';
+        '<span class="right">' + planBadge(p.product, plan) + '<span class="open">Manage →</span></span>';
       wrap.appendChild(row);
     });
   } catch (e) {
