@@ -882,9 +882,9 @@ async function renderRouterP(head) {
     </tbody></table>`:`<div class="empty">No redirects recorded yet.</div>`}</div>` : unavailable("Countries", rs[3])}
     <div class="sec-title">Routed sites</div>
     ${sites ? `<div class="tablewrap" style="margin-bottom:16px">${sites.sites.length?`<table><thead><tr>
-      <th>Owner</th><th>Label</th><th>Enabled</th><th class="right">Rules</th><th>Default</th><th>Webhook</th><th>Created</th>
+      <th>Owner</th><th>Website</th><th>Label</th><th>Enabled</th><th class="right">Rules</th><th>Default</th><th>Webhook</th><th>Created</th>
     </tr></thead><tbody>${sites.sites.map((s)=>`<tr>
-      <td>${shortId(s.userId)}</td><td>${esc(s.label||"-")}</td><td>${s.enabled?"✓":"-"}</td><td class="right">${fmt(s.rules)}</td>
+      <td>${owner(s)}</td><td>${website(s)}</td><td>${esc(s.label||"-")}</td><td>${s.enabled?"✓":"-"}</td><td class="right">${fmt(s.rules)}</td>
       <td>${s.hasDefault?"✓":"-"}</td><td>${s.webhook?"✓":"-"}</td><td>${date(s.createdAt)}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No routed sites yet.</div>`}</div>` : unavailable("Sites", rs[4])}
     ${cachePanel(cache, rs[5], p, "IP geolocation cache (ip-api lookups)")}`;
