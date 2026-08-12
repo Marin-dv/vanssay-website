@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>How to Add Live Google Reviews to a Framer Site (Full Setup Guide)</title>
+<meta name="description" content="Step by step: create a Google Places API key, restrict it properly, find your Place ID, and show live Google reviews on a Framer site with the Google Reviews Live component. Includes every error message and its fix." />
+<link rel="canonical" href="https://vanssay.net/guides/google-reviews-framer-setup.html" />
+<link rel="icon" href="/favicon-guide.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-guide-48.png" sizes="48x48" />
+<link rel="apple-touch-icon" href="/favicon-guide-180.png" />
+<meta property="og:title" content="How to Add Live Google Reviews to a Framer Site (Full Setup Guide)" />
+<meta property="og:description" content="Create the API key, restrict it, find your Place ID, and go live. Every step, and every error message explained." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://vanssay.net/guides/google-reviews-framer-setup.html" />
+<style>
+/* ══════════════════════════════════════════════════════════════════════════
+   Self-contained. Deliberately NOT guide.css: this guide carries the same
+   light Google-product styling as the Google Reviews Live product page, so
+   the two read as one product. The structure (article + sticky rail, steps,
+   figures, FAQ) matches the other Vanssay guides, and the class names are
+   kept so guide.js scroll-spy works unchanged.
+   ══════════════════════════════════════════════════════════════════════════ */
+:root{
+  color-scheme: light;
+  --bg:#ffffff;
+  --surface:#f8f9fa;
+  --sunken:#f1f3f4;
+  --border:#dadce0;
+  --border-soft:#e8eaed;
+  --ink:#202124;
+  --muted:#5f6368;
+  --accent:#1a73e8;
+  --accent-hover:#1b66c9;
+  --accent-soft:#e8f0fe;
+  --warn:#b06000;
+  --font:"Google Sans",Roboto,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+:where(a,button,summary):focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+/* top nav */
+nav.top{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border-soft)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:64px;margin:0 auto;max-width:1080px;padding:0 28px;gap:16px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:500;font-size:17px;letter-spacing:-.015em;color:var(--ink)}
+.logo:hover{text-decoration:none}
+.nav-links{display:flex;gap:26px;font-size:14px}
+.nav-links a{color:var(--muted)}
+.nav-links a:hover{color:var(--ink);text-decoration:none}
+@media(max-width:820px){.nav-links{display:none}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 22px;border-radius:4px;border:1px solid transparent;font-family:inherit;font-size:.9375rem;font-weight:500;cursor:pointer;text-decoration:none;transition:background-color .15s ease,border-color .15s ease}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover);text-decoration:none}
+.btn-line{background:transparent;border-color:var(--border);color:var(--accent)}
+.btn-line:hover{background:var(--surface);text-decoration:none}
+
+/* layout: article + sticky rail */
+.layout{max-width:1080px;margin:0 auto;padding:0 28px;display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:56px;align-items:start}
+article{min-width:0;padding:48px 0 40px}
+.rail{position:sticky;top:88px;padding-top:60px}
+.rail .toc-t{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.rail nav a{display:block;color:var(--muted);font-size:13.5px;line-height:1.4;padding:6px 0 6px 14px;border-left:2px solid var(--border-soft)}
+.rail nav a:hover{color:var(--ink);border-color:var(--border);text-decoration:none}
+.rail nav a.active{color:var(--accent);border-color:var(--accent);font-weight:500}
+.rail-try{display:block;margin-top:24px;padding-top:16px;border-top:1px solid var(--border-soft);font-size:13px;color:var(--muted)}
+.rail-try b{color:var(--ink);font-weight:500}
+.rail-try:hover{text-decoration:none;color:var(--ink)}
+@media(max-width:900px){.layout{grid-template-columns:1fr;max-width:740px}.rail{display:none}}
+
+/* typography */
+.eyebrow{display:inline-block;font-size:13px;font-weight:500;color:var(--accent);margin-bottom:12px}
+h1{font-size:clamp(1.9rem,1.3rem+1.8vw,2.5rem);font-weight:500;letter-spacing:-.025em;line-height:1.14;text-wrap:balance;margin-bottom:16px}
+h2{font-size:clamp(1.35rem,1.1rem+.8vw,1.75rem);font-weight:500;letter-spacing:-.018em;line-height:1.2;text-wrap:balance;margin:48px 0 12px;padding-top:8px}
+h3{font-size:1.0625rem;font-weight:500;margin:26px 0 8px}
+.lead{font-size:1.125rem;color:var(--muted);margin-bottom:8px}
+article p{margin:12px 0;color:var(--muted)}
+article p strong,article li strong{color:var(--ink);font-weight:500}
+article ul,article ol{margin:12px 0 12px 22px;color:var(--muted)}
+article li{margin:7px 0}
+code{font-family:var(--mono);font-size:.85em;background:var(--sunken);padding:1.5px 6px;border-radius:4px;color:var(--ink)}
+
+/* byline + meta + compat */
+.byline{display:flex;gap:13px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin:22px 0 6px;font-size:14px;color:var(--muted)}
+.byline .av{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:var(--sunken);display:grid;place-items:center}
+.byline b{color:var(--ink);font-weight:500}
+.meta{font-size:13px;color:var(--muted);margin:14px 0 4px}
+.compat{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 2px}
+.compat span{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:5px 12px}
+.i-framer{width:11px;height:auto}
+
+/* steps */
+.steps{counter-reset:step;list-style:none;margin-left:0}
+.steps li{counter-increment:step;position:relative;padding-left:42px;margin:16px 0}
+.steps li::before{content:counter(step);position:absolute;left:0;top:2px;width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:500;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+
+/* note */
+.note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:4px;padding:14px 18px;margin:22px 0;font-size:14.5px;color:var(--muted)}
+.note strong{color:var(--ink);font-weight:500}
+.note.warn{border-left-color:var(--warn)}
+
+/* figures */
+.shot{margin:28px auto;max-width:680px}
+.shot>img{width:100%;height:auto;display:block;border-radius:8px;border:1px solid var(--border)}
+figcaption{font-size:12.5px;color:var(--muted);margin-top:11px;text-align:center;line-height:1.5}
+
+/* Framer properties-panel illustration (this component's own controls) */
+.fp{max-width:296px;margin:0 auto;background:#1c1c1f;border:1px solid #303034;border-radius:10px;padding:12px}
+.fp .fp-t{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#78787e;margin-bottom:10px}
+.fp .r{display:flex;align-items:center;gap:8px;margin:7px 0}
+.fp .k{width:84px;flex-shrink:0;font-size:11.5px;color:#9b9ba1}
+.fp .v{flex:1;min-width:0;background:#232326;border:1px solid #34343a;border-radius:5px;padding:5px 8px;font-size:11.5px;color:#e6e6ea;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fp .v.sel{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.fp .v.sel::after{content:"⌄";color:#78787e;font-size:12px;line-height:1}
+.fp .v.mono{font-family:var(--mono);font-size:10.5px;color:#c7c7cf}
+.fp .v.dim{color:#6c6c73}
+.fp .sw{width:22px;height:22px;border-radius:5px;border:1px solid #34343a;flex-shrink:0}
+.fp .hr{height:1px;background:#2b2b30;margin:11px 0}
+
+/* tables */
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+th,td{border:1px solid var(--border);padding:11px 13px;text-align:left;vertical-align:top}
+th{font-weight:500;background:var(--surface);font-size:13.5px}
+td{color:var(--muted)}
+.errtable td:first-child{width:42%;color:var(--ink)}
+.errtable code{display:inline-block;line-height:1.5}
+
+/* cost tiles */
+.costs{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:20px 0}
+.cost{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px}
+.cost b{display:block;font-size:1.75rem;font-weight:500;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
+.cost span{display:block;font-size:13px;color:var(--muted);margin-top:4px;line-height:1.5}
+
+/* end CTA */
+.endcta{border:1px solid var(--border);border-radius:8px;padding:22px;margin:44px 0 8px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--surface)}
+.endcta .t{font-size:14.5px;color:var(--muted);max-width:420px}
+.endcta .t b{color:var(--ink);font-weight:500}
+
+/* FAQ */
+details{border:1px solid var(--border);border-radius:8px;padding:15px 19px;margin:10px 0;background:var(--bg)}
+details:hover{border-color:var(--muted)}
+summary{font-weight:500;font-size:15px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px;color:var(--ink)}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:20px;font-weight:400;color:var(--accent);line-height:1.2}
+details[open] summary::after{content:"–"}
+details p{margin-top:8px;font-size:14.5px}
+
+.refs{font-size:13px;color:var(--muted);margin-top:28px;border-top:1px solid var(--border-soft);padding-top:16px}
+.refs a{color:var(--muted);text-decoration:underline}
+
+/* footer */
+.site-foot{border-top:1px solid var(--border-soft);padding:32px 0;margin-top:56px;color:var(--muted);font-size:14px}
+.site-foot .wrap{max-width:1080px;margin:0 auto;padding:0 28px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.site-foot a{color:var(--muted)}
+.site-foot a:hover{color:var(--ink)}
+
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition-duration:.001ms!important}}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"HowTo","name":"Add live Google reviews to a Framer site","description":"Create a Google Places API key, restrict it, find your Place ID, and display live Google reviews on a Framer site.","totalTime":"PT10M","step":[
+{"@type":"HowToStep","name":"Enable Places API (New)","text":"In Google Cloud Console, create a project and enable the Places API (New), then turn on billing for the project."},
+{"@type":"HowToStep","name":"Create an API key","text":"Under Credentials, create an API key and copy it."},
+{"@type":"HowToStep","name":"Restrict the key","text":"Restrict the key to your website domains and to the Places API (New) only."},
+{"@type":"HowToStep","name":"Find your Place ID","text":"Use Google's Place ID Finder to search your business and copy its Place ID."},
+{"@type":"HowToStep","name":"Add the component in Framer","text":"Insert the Google Reviews Live component onto a frame in your Framer project."},
+{"@type":"HowToStep","name":"Paste your credentials","text":"Paste the API key and Place ID into the component's properties panel."},
+{"@type":"HowToStep","name":"Publish","text":"Choose a layout, style it, and publish the site."}]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Why does Google only return five reviews?","acceptedAnswer":{"@type":"Answer","text":"Five is the maximum the Places API returns for a place. It is a limit of the API itself, not of any particular widget. Showing more requires the Google Business Profile API, which only the verified business owner can authorise."}},
+{"@type":"Question","name":"Is my Google API key safe in the page?","acceptedAnswer":{"@type":"Answer","text":"The key is visible in the page source, which is true of every client-side Google Maps integration. Restricting it to your own domains in Google Cloud Console makes it unusable anywhere else."}},
+{"@type":"Question","name":"How much does the Google Places API cost?","acceptedAnswer":{"@type":"Answer","text":"Google bills the calls to your own Cloud project and includes a monthly free allowance. The component caches reviews in the visitor's browser for 24 hours by default, so a typical small business site stays well inside it."}},
+{"@type":"Question","name":"Do the reviews update automatically?","acceptedAnswer":{"@type":"Answer","text":"Yes. The component fetches from Google directly, so new reviews appear once the cache window passes. You never republish the site to refresh them."}}]}
+</script>
+</head>
+<body>
+<nav class="top"><div class="nav-in">
+  <a class="logo" href="../index.html"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#202124"/><path d="M34,4H25L13,36H22Z" fill="#1a73e8"/></svg>Vanssay</a>
+  <div class="nav-links"><a href="../reviews.html">Reviews</a><a href="index.html">Guides</a><a href="../contact.html">Contact</a></div>
+  <a class="btn btn-primary" href="../reviews.html">Get the component</a>
+</div></nav>
+
+<div class="layout">
+<article>
+<p class="eyebrow">Framer guide</p>
+<h1>How to add live Google reviews to a Framer site</h1>
+<p class="lead">Framer can't read your Google reviews on its own. This walks through the whole setup end to end: creating a Google API key, restricting it so it can't be abused, finding your Place ID, and dropping the component onto a frame. Around ten minutes, and most of that is Google Cloud Console rather than Framer.</p>
+
+<div class="byline">
+  <span class="av"><svg width="18" height="18" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#5f6368"/><path d="M34,4H25L13,36H22Z" fill="#1a73e8"/></svg></span>
+  <div>By the <b>Vanssay team</b>. We build the component used in this guide. The Google Cloud steps below are the same whichever review widget you end up using, so they are worth following either way.</div>
+</div>
+<p class="meta">Updated August 2026 · 9 min read</p>
+<div class="compat">
+  <span><svg class="i-framer" width="11" height="17" viewBox="0 0 24 36" aria-hidden="true"><path fill="#202124" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Works on any Framer site</span>
+  <span>No account · No subscription</span>
+</div>
+
+<h2 id="before">Before you start</h2>
+<p>You need three things, and you can get all of them for free:</p>
+<ul>
+<li>A <strong>Google account</strong> with access to <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a>.</li>
+<li>A <strong>credit card</strong> to enable billing on the Cloud project. Google requires one even inside the free allowance, and a normal small business site will not exceed it.</li>
+<li>Your <strong>business on Google Maps</strong>. You do not need to own or have claimed the listing to display its reviews.</li>
+</ul>
+<p>You do <em>not</em> need a Vanssay account, a server, or a subscription. The component talks to Google directly from your site.</p>
+
+<div class="note"><strong>A note on the five review limit before you spend ten minutes.</strong> Google's Places API returns a maximum of five reviews per business. That is Google's cap, not the component's, and it applies to every review widget that works from an API key. If you need more than five, see <a href="#five">why five</a> below.</div>
+
+<h2 id="enable">Step 1: Enable the Places API</h2>
+<p>Open <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a> and create a project, or pick an existing one from the dropdown at the top. The project name is only for your own reference.</p>
+<p>Then go to <strong>APIs &amp; Services → Library</strong>, search for <strong>Places API (New)</strong>, and click Enable.</p>
+
+<div class="note warn"><strong>Pick the right one.</strong> There are two entries with near-identical names. You want <strong>Places API (New)</strong>, not the older "Places API". The old one cannot be called from a browser at all, so the component will not work with it.</div>
+
+
+<p>If the project has no billing account attached, Google will ask for one now. Add it. Nothing is charged inside the monthly free allowance, and <a href="#cost">what this actually costs</a> is broken down further down.</p>
+
+<h2 id="key">Step 2: Create the API key</h2>
+<p>Go to <strong>APIs &amp; Services → Credentials</strong>, click <strong>Create credentials</strong>, and choose <strong>API key</strong>. Google generates the key immediately. Copy it somewhere for a moment, it starts with <code>AIza</code>.</p>
+<p>Do not close this screen yet. The next step is the one that matters.</p>
+
+
+<h2 id="restrict">Step 3: Restrict the key (do not skip this)</h2>
+<p>An unrestricted Google API key is a billing liability. The key travels to the visitor's browser, so anyone can read it in the page source, and an unrestricted one can be copied and used on someone else's site at your expense. A restricted key cannot. This takes thirty seconds and it is the single most important step on this page.</p>
+<p>Click <strong>Edit API key</strong> and set both restrictions:</p>
+
+<ol class="steps">
+<li><strong>Application restrictions → Websites.</strong> Add your live domain as <code>https://yoursite.com/*</code>. Add <code>https://*.framer.website/*</code> as well, so Framer previews and staging URLs keep working. If you use a www subdomain, add that too, Google treats it as a separate referrer.</li>
+<li><strong>API restrictions → Restrict key.</strong> Select <strong>Places API (New)</strong> and nothing else. Now the key can only be used for this one purpose.</li>
+<li><strong>Save.</strong> Google can take up to five minutes to apply restriction changes. If reviews do not appear straight away, wait a moment and reload.</li>
+</ol>
+
+
+<div class="note"><strong>Restricting the key breaks testing outside the browser.</strong> That is the point, and it is a good sign. A restricted key only works from the domains you listed, so any test that is not a real page load from one of them will be refused.</div>
+
+<h2 id="placeid">Step 4: Find your Place ID</h2>
+<p>A Place ID is Google's permanent identifier for a business. Open Google's <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener">Place ID Finder</a>, type your business name and address into the search box, and click the result. The ID appears in a small card on the map and starts with <code>ChIJ</code>.</p>
+<p>Copy the whole thing, including the <code>ChIJ</code> prefix.</p>
+
+
+<div class="note"><strong>Two businesses at one address?</strong> Search the exact business name rather than the address, and check the name on the result card matches. Pasting the wrong Place ID shows someone else's reviews, which is the kind of thing nobody notices for a month.</div>
+
+<h2 id="insert">Step 5: Add the component in Framer</h2>
+<p>In your Framer project, open the <strong>Insert</strong> panel, find <strong>Google Reviews Live</strong> under your components, and drag it onto a frame. Put it on the page where you want the reviews to appear, at the width you want them to fill.</p>
+<p>It renders sample reviews right away. That is deliberate: you can pick a layout and style it before you have gone anywhere near Google Cloud Console. The sample data disappears the moment you paste a real key, and it never appears on a published site.</p>
+
+
+<h2 id="paste">Step 6: Paste the key and the Place ID</h2>
+<p>Select the component and look at the properties panel on the right. Paste your API key into <strong>API key</strong> and your Place ID into <strong>Place ID</strong>. Your real reviews replace the samples within a second.</p>
+
+<figure class="shot">
+  <div class="fp">
+    <div class="fp-t">Google Reviews Live</div>
+    <div class="r"><span class="k">API key</span><span class="v mono">AIza••••••••••••••••••</span></div>
+    <div class="r"><span class="k">Place ID</span><span class="v mono">ChIJ••••••••••••••••</span></div>
+    <div class="hr"></div>
+    <div class="r"><span class="k">Layout</span><span class="v sel">Ticker</span></div>
+    <div class="r"><span class="k">Min rating</span><span class="v sel">4 stars and up</span></div>
+    <div class="r"><span class="k">Max reviews</span><span class="v">5</span></div>
+    <div class="r"><span class="k">Header</span><span class="v sel">On</span></div>
+    <div class="hr"></div>
+    <div class="r"><span class="k">Language</span><span class="v dim">auto</span></div>
+    <div class="r"><span class="k">Refresh</span><span class="v">24h</span></div>
+    <div class="hr"></div>
+    <div class="r"><span class="k">Text</span><span class="sw" style="background:#202124"></span><span class="v">#202124</span></div>
+    <div class="r"><span class="k">Card</span><span class="sw" style="background:#ffffff"></span><span class="v">#FFFFFF</span></div>
+    <div class="r"><span class="k">Radius</span><span class="v">12</span></div>
+  </div>
+  <figcaption>The properties panel, illustrated. Everything below the two credentials is styling and can be changed at any time.</figcaption>
+</figure>
+
+<p>What each control does:</p>
+<ul>
+<li><strong>Layout.</strong> Ticker, carousel, highlight, grid, list, spotlight, or a compact rating badge. Switch freely, nothing else needs changing.</li>
+<li><strong>Min rating.</strong> Hides reviews below the rating you pick. Leave it on "All reviews" unless you have a reason not to, a wall of nothing but five stars reads as fake to most people.</li>
+<li><strong>Max reviews.</strong> Caps how many are shown, up to the five Google returns.</li>
+<li><strong>Language.</strong> A code like <code>en</code> or <code>fr</code>. Leave it blank and Google decides, which usually means the reviewer's original language. Set it and Google returns its own translations where it has them.</li>
+<li><strong>Refresh.</strong> How long reviews are cached in each visitor's browser before Google is called again. 24 hours is the default and suits almost everyone. Lower it only if you genuinely need reviews to appear faster than that, because it costs you more API calls.</li>
+<li><strong>Text, Card, Radius, card size, padding, gap, font.</strong> Ordinary styling. Set the colours to match your site.</li>
+</ul>
+
+<h2 id="publish">Step 7: Publish</h2>
+<p>Publish the site as usual. The component fetches reviews on the visitor's own page load, so from here on new reviews appear on their own. You never republish to refresh them.</p>
+<p>Load the live URL once and confirm the reviews are there. If the section is empty on the live site but fine on the canvas, it is nearly always the referrer restriction from step 3, and <a href="#trouble">the troubleshooting table</a> covers it.</p>
+
+<h2 id="cost">What this actually costs</h2>
+<p>Google bills Places API calls to your own Cloud project, and includes a monthly free allowance. Whether you stay inside it comes down to caching, which is why the component caches by default.</p>
+
+<div class="costs">
+  <div class="cost"><b>1 call</b><span>per visitor, per 24 hours, at the default Refresh setting</span></div>
+  <div class="cost"><b>0 calls</b><span>for repeat page views inside that window, including other pages on your site</span></div>
+  <div class="cost"><b>$0</b><span>for a typical small business site, which sits inside Google's monthly free allowance</span></div>
+</div>
+
+<p>Without caching, every page load would be a billable call. With it, a visitor who reads five pages costs you one. You can watch the real number in Google Cloud Console under <strong>APIs &amp; Services → Metrics</strong>, and if you want a hard ceiling, set a quota there so the API simply stops rather than bills you.</p>
+<p>Google's current rates are on the <a href="https://developers.google.com/maps/documentation/places/web-service/usage-and-billing" target="_blank" rel="noopener">Places API billing page</a>. Check it yourself rather than trusting any widget's marketing, including ours, because Google changes the tiers periodically.</p>
+
+<h2 id="five">Five reviews, and what to do if you need more</h2>
+<p>Five is all the Places API returns. Ask for a place's reviews and Google sends at most five, chosen by its own relevance ordering. There is no parameter to request more and no paid Google tier that raises it. Every product that works from an API key you paste yourself hits the same ceiling, this one included.</p>
+<p>For most sites that is genuinely fine. Five recent reviews under a real star average is the social proof people actually read, and it costs you nothing per month.</p>
+<p>If you need your full review history, the reviews have to be fetched somewhere other than the visitor's browser, on a schedule, and stored. That is a different kind of product, and we make one.</p>
+
+<h3>Vanssay Reviews, when five is not enough</h3>
+<p><a href="../reviews.html">Vanssay Reviews</a> is our hosted plugin. It syncs your reviews server-side and keeps them in sync, so the widget is not limited to what a single browser request can fetch:</p>
+<ul>
+<li><strong>Well past five Google reviews</strong> on the paid plans, synced on a schedule rather than fetched per visit.</li>
+<li><strong>Trustpilot alongside Google</strong> in the same widget, with one combined rating across both. No other Framer plugin does the cross-platform average.</li>
+<li><strong>No API key to create</strong>, and no Google Cloud billing to set up. You search your business, connect it, and you are done.</li>
+<li><strong>A free plan</strong> to try it on, which shows the same five Google reviews as this component so you can see the widget before paying.</li>
+</ul>
+<p>The honest trade-off, so you pick the right one: Reviews is a <strong>subscription</strong> rather than a one-time purchase, and the widget loads through our servers instead of talking to Google directly. If what you want is no recurring cost and no third party in the path, the component in this guide is the better fit and five reviews is the price of that. If you want your whole review history, several platforms in one place, and none of the Google Cloud setup above, Reviews is what that looks like.</p>
+
+<div class="endcta">
+  <div class="t"><b>Need more than five?</b> Vanssay Reviews syncs your full history from Google and Trustpilot, with one combined rating. Free plan available.</div>
+  <a class="btn btn-primary" href="../reviews.html">See Vanssay Reviews</a>
+</div>
+
+<h2 id="trouble">Troubleshooting</h2>
+<p>The component tells you what is wrong, but only inside the Framer editor. On your published site a failure renders nothing at all, so visitors never see a broken box or an error meant for you. If reviews are missing on the live site, open the canvas and read the message there.</p>
+
+<table class="errtable">
+<tr><th>What you see</th><th>What to do</th></tr>
+<tr>
+  <td><code>That API key isn't valid</code></td>
+  <td>The key was mistyped or truncated. Copy it again from Credentials, and check there is no trailing space.</td>
+</tr>
+<tr>
+  <td><code>Google blocked this domain</code></td>
+  <td>The site's address is not in the key's website restrictions. Add it exactly, including <code>https://</code> and the <code>/*</code> at the end, and add <code>https://*.framer.website/*</code> for previews. Changes take up to five minutes.</td>
+</tr>
+<tr>
+  <td><code>This key can't use Places API (New)</code></td>
+  <td>Either the API is not enabled on the project, or the key's API restriction does not include it. Check both, and confirm you enabled Places API <em>(New)</em> and not the older Places API.</td>
+</tr>
+<tr>
+  <td><code>Google rejected the request, check the Place ID</code></td>
+  <td>The Place ID is malformed. It should start with <code>ChIJ</code> and have no spaces. Re-copy it from the Place ID Finder.</td>
+</tr>
+<tr>
+  <td><code>No place found for that Place ID</code></td>
+  <td>The ID is well formed but no longer resolves, which happens when a listing is merged or removed. Search the business again and take the current ID.</td>
+</tr>
+<tr>
+  <td><code>Google refused the key</code></td>
+  <td>Usually billing. Open the project's Billing page and confirm an active account is attached.</td>
+</tr>
+<tr>
+  <td><code>Google rate limit reached</code></td>
+  <td>Too many calls in a short window, normally from testing with Refresh set very low. Wait a minute and put Refresh back up.</td>
+</tr>
+<tr>
+  <td>Sample reviews still showing</td>
+  <td>One of the two fields is empty. The component only goes live when both the API key and the Place ID are filled in.</td>
+</tr>
+<tr>
+  <td>Empty on the live site, fine on the canvas</td>
+  <td>Almost always the referrer restriction. The canvas runs on framer.com, your published site does not, so a key restricted to only one of them works in only one place. Add your live domain.</td>
+</tr>
+<tr>
+  <td>Reviews are out of date</td>
+  <td>Working as intended. They refresh once the Refresh window passes, 24 hours by default. Your own browser holds its cached copy until then.</td>
+</tr>
+</table>
+
+<div class="endcta">
+  <div class="t"><b>Google Reviews Live</b>, seven layouts, styled to match your site, no subscription and no server in between. One-time purchase.</div>
+  <a class="btn btn-primary" href="../reviews.html">See the component</a>
+</div>
+
+<h2 id="faq">Common questions</h2>
+<details><summary>Do I need to own the Google listing?</summary><p>No. Displaying a public business listing's reviews only needs its Place ID. Ownership matters for the Business Profile API, which is the route to more than five reviews, but not for this.</p></details>
+<details><summary>Is it safe to have my API key in the page?</summary><p>Yes, once it is restricted. The key is visible in the page source, which is true of every client-side Google Maps integration including Google's own examples. A key locked to your domains and to one API cannot be used anywhere else, so reading it gains an attacker nothing. An unrestricted key is a real risk, which is why step 3 exists.</p></details>
+<details><summary>Will the reviews slow my site down?</summary><p>Barely. It is one request to Google, made after the page renders, and cached for the next 24 hours. Nothing blocks the page from loading, and a failed request renders nothing rather than hanging.</p></details>
+<details><summary>Can I show reviews for more than one location?</summary><p>Yes. Place a second component and give it the other location's Place ID. They cache separately and do not interfere.</p></details>
+<details><summary>Can I hide bad reviews?</summary><p>You can set a minimum rating, so for example only four stars and up are shown. Worth being careful with it: a page showing nothing but perfect scores tends to read as less trustworthy, not more, and shoppers frequently look for the critical ones first.</p></details>
+<details><summary>What happens if Google is unreachable?</summary><p>The component keeps showing the cached copy if it has one. If it does not, it renders nothing and the section collapses. Your page never shows an error to visitors.</p></details>
+
+<p class="refs">Sources: <a href="https://developers.google.com/maps/documentation/places/web-service/place-details" target="_blank" rel="noopener">Places API (New) place details</a> · <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener">Place ID Finder</a> · <a href="https://developers.google.com/maps/documentation/places/web-service/usage-and-billing" target="_blank" rel="noopener">Places API usage and billing</a> · <a href="https://developers.google.com/maps/api-security-best-practices" target="_blank" rel="noopener">Google Maps API key security best practices</a>.</p>
+</article>
+
+<aside class="rail">
+  <div class="toc-t">On this page</div>
+  <nav>
+    <a href="#before">Before you start</a>
+    <a href="#enable">1. Enable the API</a>
+    <a href="#key">2. Create the key</a>
+    <a href="#restrict">3. Restrict the key</a>
+    <a href="#placeid">4. Find your Place ID</a>
+    <a href="#insert">5. Add the component</a>
+    <a href="#paste">6. Paste credentials</a>
+    <a href="#publish">7. Publish</a>
+    <a href="#cost">What it costs</a>
+    <a href="#five">Need more than five?</a>
+    <a href="#trouble">Troubleshooting</a>
+    <a href="#faq">Common questions</a>
+  </nav>
+  <a class="rail-try" href="../reviews.html">The component in this guide is <b>Google Reviews Live</b> →</a>
+</aside>
+</div>
+
+<footer class="site-foot"><div class="wrap">
+<span>© 2026 Vanssay</span>
+<span><a href="../reviews.html">Reviews</a> · <a href="../index.html">All plugins</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></span>
+</div></footer>
+<script src="guide.js?v=2" defer></script>
+</body>
+</html>
