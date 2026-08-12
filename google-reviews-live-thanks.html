@@ -89,7 +89,14 @@ footer a{color:var(--muted)}
   <div class="panel">
     <div class="lbl">Your component link</div>
     <div class="urlrow">
-      <div class="urlbox" id="url">REPLACE_WITH_COMPONENT_URL</div>
+      <!-- Version ID deliberately stripped. Framer treats an unversioned URL as
+           "track the latest", so fixes reach every buyer without them doing
+           anything, which is what the pricing page promises with "Updates
+           included". The cost: saving a broken edit in the master Framer
+           project pushes it straight to every live customer site. To pin
+           buyers to today's build instead, append
+           @Mxl03rvQrl6N2gKcmr7s -->
+      <div class="urlbox" id="url">https://framer.com/m/GoogleLiveReviews-5XDCNq.js</div>
       <button class="btn btn-primary" id="copy" type="button">Copy</button>
       <span class="copied" id="copied">Copied</span>
     </div>
