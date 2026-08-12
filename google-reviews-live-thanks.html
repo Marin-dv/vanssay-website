@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your component is ready — Google Reviews Live</title>
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+<link rel="apple-touch-icon" href="/favicon-180.png" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="description" content="Thanks for buying Google Reviews Live. Add the component to your Framer project and connect your Google reviews." />
+<style>
+/* Same light Google styling as the product page and the setup guide. */
+:root{
+  color-scheme: light;
+  --bg:#ffffff;--surface:#f8f9fa;--sunken:#f1f3f4;--border:#dadce0;--border-soft:#e8eaed;
+  --ink:#202124;--muted:#5f6368;--accent:#1a73e8;--accent-hover:#1b66c9;--accent-soft:#e8f0fe;
+  --font:"Google Sans",Roboto,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+:where(a,button):focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+nav.top{border-bottom:1px solid var(--border-soft)}
+.nav-in{display:flex;align-items:center;height:64px;margin:0 auto;max-width:820px;padding:0 28px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:500;font-size:17px;letter-spacing:-.015em;color:var(--ink)}
+.logo:hover{text-decoration:none}
+
+.wrap{max-width:820px;margin:0 auto;padding:56px 28px 80px}
+
+.tick{width:52px;height:52px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;margin-bottom:24px}
+h1{font-size:clamp(1.9rem,1.3rem+1.8vw,2.4rem);font-weight:500;letter-spacing:-.025em;line-height:1.15;margin-bottom:14px}
+.lead{font-size:1.125rem;color:var(--muted);max-width:60ch}
+
+h2{font-size:1.25rem;font-weight:500;letter-spacing:-.015em;margin:48px 0 14px}
+p{margin:12px 0;color:var(--muted)}
+p strong{color:var(--ink);font-weight:500}
+code{font-family:var(--mono);font-size:.85em;background:var(--sunken);padding:1.5px 6px;border-radius:4px;color:var(--ink)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 24px;border:1px solid transparent;border-radius:4px;font-family:inherit;font-size:.9375rem;font-weight:500;cursor:pointer;text-decoration:none;transition:background-color .15s ease}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover);text-decoration:none}
+.btn-line{background:transparent;border-color:var(--border);color:var(--accent)}
+.btn-line:hover{background:var(--surface);text-decoration:none}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:26px;margin:20px 0}
+.panel .lbl{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.urlrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.urlbox{flex:1;min-width:260px;background:#fff;border:1px solid var(--border);border-radius:6px;padding:11px 13px;
+  font-family:var(--mono);font-size:13px;color:var(--ink);overflow:auto;white-space:nowrap}
+.copied{font-size:13px;color:var(--accent);display:none}
+.copied.on{display:inline}
+
+ol{margin:14px 0 14px 22px;color:var(--muted)}
+ol li{margin:10px 0}
+
+.note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:4px;padding:14px 18px;margin:22px 0;font-size:14.5px;color:var(--muted)}
+.note strong{color:var(--ink);font-weight:500}
+
+footer{border-top:1px solid var(--border-soft);margin-top:64px;padding:28px 0;color:var(--muted);font-size:14px}
+footer .wrap{padding:0 28px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+
+<nav class="top"><div class="nav-in">
+  <a class="logo" href="/index.html">
+    <svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true">
+      <path d="M6,4H15L27,36H18Z" fill="#202124" /><path d="M34,4H25L13,36H22Z" fill="#1a73e8" />
+    </svg>
+    Vanssay
+  </a>
+</div></nav>
+
+<div class="wrap">
+  <div class="tick">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
+  </div>
+
+  <h1>Thanks. Your component is ready.</h1>
+  <p class="lead">Add it to any Framer project with the link below. It is yours for every project you build, with no expiry.</p>
+
+  <div class="panel">
+    <div class="lbl">Your component link</div>
+    <div class="urlrow">
+      <div class="urlbox" id="url">REPLACE_WITH_COMPONENT_URL</div>
+      <button class="btn btn-primary" id="copy" type="button">Copy</button>
+      <span class="copied" id="copied">Copied</span>
+    </div>
+    <p style="margin-bottom:0;font-size:14px">Bookmark this page. The link is the product, so keep it somewhere you will find it again.</p>
+  </div>
+
+  <h2>Add it to a project</h2>
+  <ol>
+    <li>Copy the link above.</li>
+    <li>In Framer, open your project and paste the link straight onto the canvas. The component appears in your Assets under Code.</li>
+    <li>Drag it onto a frame. It shows sample reviews until you connect your own.</li>
+  </ol>
+
+  <h2>Connect your Google reviews</h2>
+  <p>The component reads your reviews directly from Google, so it needs your own Google API key and your Place ID. That takes about five minutes in Google Cloud Console, and the guide walks through every step including the key restrictions that keep it safe to publish.</p>
+  <p>
+    <a class="btn btn-line" href="/guides/google-reviews-framer-setup.html">Open the setup guide</a>
+  </p>
+
+  <div class="note">
+    <strong>One thing worth doing properly.</strong> Restrict your Google API key to your own domain before you publish. The key is visible in the page source of any site that uses it, and an unrestricted key can be used by anyone. Step 3 of the guide covers it.
+  </div>
+
+  <h2>If something is not working</h2>
+  <p>The component explains problems on the Framer canvas, and the guide has a <a href="/guides/google-reviews-framer-setup.html#trouble">troubleshooting table</a> matching every message to its fix. If you are still stuck, email <a href="mailto:support@vanssay.net">support@vanssay.net</a> and include what the canvas says.</p>
+</div>
+
+<footer><div class="wrap">
+  <span>© 2026 Vanssay</span>
+  <span><a href="/google-reviews-live.html">Google Reviews Live</a> · <a href="/contact.html">Contact</a> · <a href="/terms.html">Terms</a></span>
+</div></footer>
+
+<script>
+  const btn = document.getElementById("copy");
+  const url = document.getElementById("url");
+  const flag = document.getElementById("copied");
+  btn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(url.textContent.trim());
+      flag.classList.add("on");
+      setTimeout(() => flag.classList.remove("on"), 2000);
+    } catch (e) {
+      // Clipboard blocked (http, or permission denied): select it so the
+      // buyer can still copy by hand rather than being stuck.
+      const r = document.createRange();
+      r.selectNodeContents(url);
+      const s = getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+    }
+  });
+</script>
+</body>
+</html>
