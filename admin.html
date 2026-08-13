@@ -101,6 +101,9 @@
     tbody tr.clickable:hover { background:#f8fafc; cursor:pointer; }
     .mono { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; color:var(--text-2); }
     .truncate { max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    /* For values you actually need to read in full (Trustpilot URLs): wrap
+       instead of ellipsing, since the part that matters is at the end. */
+    .breakurl { white-space:normal; overflow-wrap:anywhere; word-break:break-word; min-width:200px; }
     .right { text-align:right; }
     .empty { padding:40px; text-align:center; color:var(--muted); }
     .note { font-size:12px; color:var(--muted); padding:8px 2px; }
@@ -203,6 +206,11 @@ const date = (d) => d ? new Date(d).toLocaleDateString(undefined, { year:"numeri
 const dt = (d) => d ? new Date(d).toLocaleString(undefined, { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }) : "-";
 // Apify costs are tiny (fractions of a cent → a few $); show enough precision to be useful.
 const usd = (n) => { n = Number(n || 0); return "$" + (n >= 1 ? n.toFixed(2) : n.toFixed(4)); };
+// A Trustpilot URL's useful part (the business slug) sits at the END, so an
+// ellipsis hid exactly what we needed. Render it whole, wrapped and clickable.
+const tpLink = (url) => url
+  ? `<a href="${esc(url)}" target="_blank" rel="noopener" title="${esc(url)}">${esc(String(url).replace(/^https?:\/\/(www\.)?/, ""))}</a>`
+  : "-";
 const planBadge = (p) => { p = p || "free"; return `<span class="badge b-${esc(p)}">${esc(p[0].toUpperCase()+p.slice(1))}</span>`; };
 // Signup platform (host): Framer or Webflow.
 const platformBadge = (p) => { const k = p === "webflow" ? "webflow" : "framer"; const lbl = k === "webflow" ? "Webflow" : "Framer"; return `<span class="badge b-${k}">${k==="webflow"?"◇":"◆"} ${lbl}</span>`; };
@@ -530,7 +538,7 @@ async function openUser(id) {
 
     <div class="sec-title">Reviews · businesses (${base.configs.length})</div>
     <div class="card" style="padding:0;overflow:hidden">${base.configs.length ? `<table><thead><tr><th>Google</th><th>Trustpilot</th><th>Min ★</th></tr></thead><tbody>
-      ${base.configs.map((c)=>`<tr><td>${esc(c.googleBusinessName||c.googlePlaceId||"-")}</td><td class="truncate">${esc(c.trustpilotUrl||"-")}</td><td>${c.minStars}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No businesses connected.</div>`}</div>
+      ${base.configs.map((c)=>`<tr><td>${esc(c.googleBusinessName||c.googlePlaceId||"-")}</td><td class="breakurl">${tpLink(c.trustpilotUrl)}</td><td>${c.minStars}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No businesses connected.</div>`}</div>
 
     <div class="sec-title">Reviews · embed pages (${base.pages.length})</div>
     <div class="card" style="padding:0;overflow:hidden">${base.pages.length ? `<table><thead><tr><th>Page</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
@@ -796,7 +804,7 @@ async function renderReviews(head) {
       <th>Owner</th><th>Google business</th><th>Place ID</th><th>Trustpilot</th><th class="right">Min ★</th><th>Connected</th>
     </tr></thead><tbody>${biz.businesses.map((b)=>`<tr>
       <td>${esc(b.email)}</td><td>${esc(b.googleBusinessName||"-")}</td><td class="mono truncate">${esc(b.googlePlaceId||"-")}</td>
-      <td class="truncate">${b.trustpilotUrl?`<a href="${esc(b.trustpilotUrl)}" target="_blank">${esc(b.trustpilotUrl.replace(/^https?:\/\/(www\.)?/,""))}</a>`:"-"}</td>
+      <td class="breakurl">${tpLink(b.trustpilotUrl)}</td>
       <td class="right">${b.minStars}</td><td>${date(b.createdAt)}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No businesses connected yet.</div>`}</div>` : unavailable("Businesses", rs[2])}
 
