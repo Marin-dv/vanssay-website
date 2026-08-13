@@ -168,6 +168,7 @@
     <button class="navlink" data-tab="users"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span> Users</button>
     <button class="navlink" data-tab="subs"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span> Subscriptions</button>
     <button class="navlink" data-tab="expenses"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span> Expenses</button>
+    <button class="navlink" data-tab="diag"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span> Diagnostics</button>
     <div class="navsep">Plugins</div>
     <div id="prod-nav"></div>
     <div class="aside-foot">
@@ -285,7 +286,7 @@ function switchTab(tab) {
   document.querySelectorAll(".navlink").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
   $("view").innerHTML = `<div class="empty">Loading…</div>`;
   if (tab.startsWith("prod:")) return renderProduct(tab.slice(5));
-  ({ overview: renderOverview, users: renderUsers, subs: renderSubs, expenses: renderExpenses }[tab])();
+  ({ overview: renderOverview, users: renderUsers, subs: renderSubs, expenses: renderExpenses, diag: renderDiagnostics }[tab])();
 }
 
 /* ── Shared pieces ── */
@@ -687,6 +688,98 @@ async function renderExpenses() {
     </tr>`).join("")}</tbody></table>` : `<div class="empty">No scrapes recorded yet.</div>`}</div>
     <p class="note">* estimated from the per-item price. Only paid-plan review fetches hit Apify: free Trustpilot uses the self-hosted scraper and free Google uses the Places API (Google's $200/mo credit), both $0. Every Instagram scrape is paid.</p>
     ${!ig ? `<p class="note">Instagram spend unavailable: ${esc(why(rs[1]) || "no data")}</p>` : ""}`;
+}
+
+/* ── Diagnostics ───────────────────────────────────────────────────────────────
+   Two halves. On-demand health probes (they really call Google/Stripe and really
+   run the scraper, so they're buttons), and the onboarding signals the backend
+   now records: a user reading an empty widget, and a re-sync refused by the free
+   cooldown. One of each in a row is a user staring at a blank widget. */
+const ISSUE_LABEL = {
+  empty_cache_read: "Empty widget read",
+  refresh_throttled: "Re-sync throttled",
+};
+const issueBadge = (k) =>
+  `<span class="badge ${k === "empty_cache_read" ? "b-canceled" : "b-other"}">${esc(ISSUE_LABEL[k] || k)}</span>`;
+
+function checkRow(c) {
+  return `<div class="kv"><span>${c.ok ? "✅" : "❌"} <strong>${esc(c.name)}</strong></span>
+    <span style="text-align:right;color:var(--text-2)">${esc(c.detail)} · <span class="mono">${fmt(c.ms)}ms</span></span></div>`;
+}
+
+async function renderDiagnostics() {
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Diagnostics</h2><p>Live health checks, and the onboarding failures that used to leave no trace.</p></div></div>
+    <div class="grid-eq" style="margin-bottom:16px">
+      <div class="panel"><h3>Prod health</h3>
+        <p class="note" style="padding:0 0 10px">Real calls: a Places search and a Stripe read. Press it, don't poll it.</p>
+        <button class="btn btn-blue btn-sm" id="h-prod">Check prod</button>
+        <div id="h-prod-out"></div></div>
+      <div class="panel"><h3>Trustpilot scraper</h3>
+        <p class="note" style="padding:0 0 10px">Live scrape through the self-hosted Playwright scraper, bypassing the cache. This is the free plan's only Trustpilot source. A healthy run takes a few seconds.</p>
+        <button class="btn btn-blue btn-sm" id="h-tp">Check scraper</button>
+        <div id="h-tp-out"></div></div>
+    </div>
+    <div id="diag"><div class="empty">Loading…</div></div>`;
+
+  const run = async (btnId, outId, path, render) => {
+    const btn = $(btnId), out = $(outId), label = btn.textContent;
+    btn.disabled = true; btn.textContent = "Checking…";
+    out.innerHTML = `<p class="note">Running…</p>`;
+    try {
+      out.innerHTML = render(await api(path));
+    } catch (e) {
+      out.innerHTML = `<p class="note" style="color:var(--danger,#dc2626)">Failed: ${esc(e.message)}</p>`;
+    } finally {
+      btn.disabled = false; btn.textContent = label;
+    }
+  };
+
+  $("h-prod").onclick = () => run("h-prod", "h-prod-out", "/admin/health/prod", (d) =>
+    `<div style="margin-top:12px">${d.checks.map(checkRow).join("")}</div>
+     <p class="note">${d.ok ? "All checks passed" : "Something is failing"} · ${dt(d.checkedAt)}</p>`);
+
+  $("h-tp").onclick = () => run("h-tp", "h-tp-out", "/admin/health/trustpilot", (d) =>
+    `<div style="margin-top:12px">
+       <div class="kv"><span>${d.ok ? "✅" : "❌"} <strong>Scrape</strong></span>
+         <span style="color:var(--text-2)">${d.ok ? `${fmt(d.reviews)} reviews` : esc(d.error || "failed")} · <span class="mono">${fmt(d.ms)}ms</span></span></div>
+       ${d.ok ? `<div class="kv"><span>Business</span><span>${esc(d.businessName || "-")}</span></div>
+       <div class="kv"><span>Rating</span><span>${d.averageRating} ★ of ${fmt(d.totalCount)}</span></div>
+       ${d.sample ? `<div class="kv"><span>Newest review</span><span>${esc(d.sample.authorName)} · ${d.sample.rating}★</span></div>` : ""}` : ""}
+     </div>
+     <p class="note truncate" style="max-width:100%">Target: ${esc(d.url)}</p>`);
+
+  let d;
+  try { d = await api("/admin/diagnostics"); }
+  catch (e) { $("diag").innerHTML = `<div class="empty">Signals unavailable: ${esc(e.message)}</div>`; return; }
+
+  const w = d.windows || {};
+  const at = (win, kind) => ((w[win] || {})[kind]) || 0;
+  const kpi = (kind, sub) => `<div class="kpi">
+    <div class="k-label">${esc(ISSUE_LABEL[kind])} · 24h</div>
+    <div class="k-val">${fmt(at("24h", kind))}</div>
+    <div class="k-sub">${fmt(at("7d", kind))} in 7d · ${fmt(at("30d", kind))} in 30d</div>
+    <div class="k-sub" style="margin-top:6px">${esc(sub)}</div></div>`;
+
+  $("diag").innerHTML = `
+    <div class="kpis">
+      ${kpi("empty_cache_read", "A connected business with nothing synced yet.")}
+      ${kpi("refresh_throttled", "A free re-sync refused by the hourly cooldown.")}
+    </div>
+    <p class="note" style="margin-top:-14px">A handful of each is normal: connecting a business briefly produces both. A steady stream, or the same account appearing repeatedly, means people are looking at empty widgets.</p>
+
+    <div class="sec-title">Accounts hit most · last 7 days</div>
+    <div class="tablewrap">${d.affected.length ? `<table><thead><tr><th>Account</th><th class="right">Events</th></tr></thead>
+      <tbody>${d.affected.map((a) => `<tr><td>${esc(a.email)}</td><td class="right">${fmt(a.events)}</td></tr>`).join("")}</tbody></table>`
+      : `<div class="empty">Nobody hit either signal in the last 7 days.</div>`}</div>
+
+    <div class="sec-title">Recent events (last ${d.recent.length})</div>
+    <div class="tablewrap">${d.recent.length ? `<table><thead><tr>
+      <th>When</th><th>Signal</th><th>Platform</th><th>Account</th><th>Source</th>
+    </tr></thead><tbody>${d.recent.map((r) => `<tr>
+      <td>${dt(r.createdAt)}</td><td>${issueBadge(r.kind)}</td><td>${esc(r.platform)}</td>
+      <td>${esc(r.email)}</td><td class="truncate mono">${esc(r.sourceId || "-")}</td>
+    </tr>`).join("")}</tbody></table>` : `<div class="empty">No events recorded yet.</div>`}</div>`;
 }
 
 /* ── Plugin pages ── */
