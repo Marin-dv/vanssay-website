@@ -307,11 +307,16 @@ async function load() {
     // Preferred source: the Instagram backend, which resolves `lifetime`
     // (a one-time purchase Accounts stores as the `pro` tier) and the real
     // limits. If it can't be reached, fall back to the Accounts tier alone.
-    let plan = "none", ent = null;
+    let plan = "none", ent = null, trial = false, trialEndsAt = null;
     try {
       const igMe = await api("/auth/me", { base: IG_API });
-      plan = igMe.plan === "expired" ? "none" : igMe.plan;
       ent = igMe.entitlements || null;
+      trial = igMe.trial === true;
+      trialEndsAt = igMe.trialEndsAt || null;
+      // On a gift, `plan` is the label ("trial") — the tier that actually
+      // decides limits and upgrade paths lives in entitlements. Resolve to the
+      // real tier so everything below behaves as it does for a paying account.
+      plan = igMe.plan === "expired" ? "none" : trial ? (ent && ent.plan) || "starter" : igMe.plan;
     } catch {
       const acc = await api("/billing/entitlements?product=" + PRODUCT);
       plan = acc.plan === "free" ? "none" : acc.plan === "ultra" ? "pro" : acc.plan;
@@ -321,11 +326,17 @@ async function load() {
     $("d-email").textContent = me.user.email; $("d-email2").textContent = me.user.email;
 
     const badge = $("d-plan");
-    badge.textContent = PLAN_LABEL[plan] || plan;
+    badge.textContent = trial ? "Free trial" : PLAN_LABEL[plan] || plan;
     badge.className = "badge b-" + (PLANS[plan] ? plan : "none");
 
+    // Days left, floored — "ends in 0 days" reads as today, which is right.
+    const daysLeft = trialEndsAt ? Math.max(0, Math.floor((new Date(trialEndsAt) - Date.now()) / 86400000)) : null;
+    const endsOn = trialEndsAt ? new Date(trialEndsAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) : null;
     $("d-renew").textContent =
-      plan === "none" ? "No active plan. Start a 7-day free trial, or buy Lifetime once."
+      trial ? `Free trial — full ${PLAN_LABEL[plan] || plan} access, at no cost and with no card on file.`
+        + (endsOn ? ` It ends on ${endsOn}${daysLeft !== null ? ` (${daysLeft} day${daysLeft === 1 ? "" : "s"} left)` : ""}.` : "")
+        + " Your feed stops showing on your published site when it ends, so pick a plan before then to keep it live."
+      : plan === "none" ? "No active plan. Start a 7-day free trial, or buy Lifetime once."
       : plan === "lifetime" ? "Lifetime — paid once, no subscription to renew."
       : "Active subscription. Manage or cancel it any time in Stripe.";
 
@@ -334,7 +345,9 @@ async function load() {
     // Plan picker — only when there's nothing to double-charge against.
     const picker = $("d-picker");
     picker.innerHTML = "";
-    if (plan === "none") {
+    // A trial has nothing to double-charge against either — and the whole point
+    // is to let them buy before it runs out, so keep the picker in front of them.
+    if (plan === "none" || trial) {
       picker.innerHTML = `<div class="picks">
         ${["starter", "pro", "lifetime"].map((k) => `
           <div class="pick" data-hi="${k === "pro"}">
@@ -352,7 +365,11 @@ async function load() {
     // Billing actions.
     const actions = $("d-billing"); actions.innerHTML = "";
     const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
-    if (plan === "starter" || plan === "pro") {
+    if (trial) {
+      // No Stripe customer exists behind a gift, so the billing portal would
+      // just error. Nothing to manage until they actually buy.
+      $("d-note").textContent = "There's nothing to bill while you're on the free trial — no card, no charge, nothing to cancel. Pick a plan above whenever you're ready and it starts from that moment.";
+    } else if (plan === "starter" || plan === "pro") {
       mk(plan === "starter" ? "Change plan (Starter ↔ Pro)" : "Change plan", "btn-blue", portal);
       mk("Cancel subscription", "btn-line", portal);
       $("d-note").textContent = "Changing or cancelling opens Stripe's own billing portal, where you can switch plan, update your card, download invoices, or cancel in one click. Cancelling keeps your feeds live until the end of the period you already paid for.";
