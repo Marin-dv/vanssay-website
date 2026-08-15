@@ -49,6 +49,13 @@
     .badge{display:inline-flex;padding:3px 12px;border-radius:99px;font-size:12px;font-weight:800}
     .b-none{background:var(--surface-2);color:var(--text-2)}
     .b-starter{background:#fdecf3;color:var(--accent)}
+    /* Trial countdown — the one number someone on a trial actually looks for,
+       so it gets its own block rather than a clause inside the paragraph. */
+    .trialbar{display:none;align-items:baseline;gap:9px;flex-wrap:wrap;margin:0 0 14px;padding:12px 14px;border-radius:12px;background:#fdecf3;border:1px solid #f6cfe0}
+    .trialbar b{font-size:23px;font-weight:800;color:var(--accent);line-height:1}
+    .trialbar span{font-size:13px;color:var(--text-2)}
+    .trialbar.ending{background:#fff2e8;border-color:#ffd5b8}
+    .trialbar.ending b{color:#c2410c}
     .b-pro{background:var(--ig);color:#fff}
     .b-lifetime{background:#18181b;color:#fff}
     .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
@@ -113,6 +120,7 @@
       <div class="col">
         <div class="card">
           <div class="row"><h3>Plan</h3><span class="badge b-none" id="d-plan">No plan</span></div>
+          <div class="trialbar" id="d-trial"></div>
           <p class="muted" id="d-renew"></p>
           <div class="err" id="bill-err"></div>
           <div id="d-picker"></div>
@@ -329,13 +337,25 @@ async function load() {
     badge.textContent = trial ? "Free trial" : PLAN_LABEL[plan] || plan;
     badge.className = "badge b-" + (PLANS[plan] ? plan : "none");
 
-    // Days left, floored — "ends in 0 days" reads as today, which is right.
+    // Days left, floored — "0 days left" correctly means it runs out today.
     const daysLeft = trialEndsAt ? Math.max(0, Math.floor((new Date(trialEndsAt) - Date.now()) / 86400000)) : null;
     const endsOn = trialEndsAt ? new Date(trialEndsAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) : null;
+
+    const tb = $("d-trial");
+    if (trial && daysLeft !== null) {
+      const unit = daysLeft === 1 ? "day" : "days";
+      tb.innerHTML = `<b>${daysLeft} ${unit} left</b><span>on your free trial${endsOn ? ` · ends ${endsOn}` : ""}</span>`;
+      // Last fortnight switches to a warmer colour — by then it's a deadline,
+      // not an FYI.
+      tb.className = "trialbar" + (daysLeft <= 14 ? " ending" : "");
+      tb.style.display = "flex";
+    } else {
+      tb.style.display = "none";
+    }
+
     $("d-renew").textContent =
-      trial ? `Free trial — full ${PLAN_LABEL[plan] || plan} access, at no cost and with no card on file.`
-        + (endsOn ? ` It ends on ${endsOn}${daysLeft !== null ? ` (${daysLeft} day${daysLeft === 1 ? "" : "s"} left)` : ""}.` : "")
-        + " Your feed stops showing on your published site when it ends, so pick a plan before then to keep it live."
+      trial ? `Full ${PLAN_LABEL[plan] || plan} access, at no cost and with no card on file.`
+        + " Your feed stops showing on your published site when the trial ends, so pick a plan before then to keep it live."
       : plan === "none" ? "No active plan. Start a 7-day free trial, or buy Lifetime once."
       : plan === "lifetime" ? "Lifetime — paid once, no subscription to renew."
       : "Active subscription. Manage or cancel it any time in Stripe.";
