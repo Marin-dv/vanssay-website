@@ -217,6 +217,7 @@ const planBadge = (p) => { p = p || "free"; return `<span class="badge b-${esc(p
 const platformBadge = (p) => { const k = p === "webflow" ? "webflow" : "framer"; const lbl = k === "webflow" ? "Webflow" : "Framer"; return `<span class="badge b-${k}">${k==="webflow"?"◇":"◆"} ${lbl}</span>`; };
 const statusBadge = (s) => { const k = s==="active"||s==="trialing"?"b-active":s==="canceled"?"b-canceled":"b-other"; return `<span class="badge ${k}">${esc(s||"-")}</span>`; };
 const flag = (cc) => (cc && cc.length === 2 ? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0))) : "🏳️");
+const minStarsLabel = (n) => (Number(n) > 1 ? Number(n) + "★+" : '<span class="muted">All</span>');
 const shortId = (id) => `<span class="mono" title="${esc(id)}">${esc(String(id||"").slice(0,8))}…</span>`;
 // Owner cell: prefer the email (resolved from Accounts), fall back to the opaque id.
 const owner = (s) => s.email ? `<span title="${esc(s.userId)}">${esc(s.email)}</span>` : shortId(s.userId);
@@ -340,6 +341,10 @@ async function renderOverview() {
   const anyBill = okBills[0]; // users are global to the Accounts service
   const totMRR = okBills.reduce((s, b) => s + b.revenue.mrr, 0);
   const totPaid = okBills.reduce((s, b) => s + b.plans.paid, 0);
+  // Recurring only. A Lifetime buyer has paid, but is not subscribed to
+  // anything — counting them here made "subscriptions" mean two different
+  // things in the same tile.
+  const totSubs = okBills.reduce((s, b) => s + b.plans.starter + b.plans.pro + b.plans.ultra, 0);
   // One-time money, kept apart from MRR: it doesn't recur, so adding it to a
   // monthly figure would overstate every month after the one it landed in.
   const totLife = okBills.reduce((s, b) => s + (b.revenue.lifetimeRevenue || 0), 0);
@@ -379,8 +384,8 @@ async function renderOverview() {
       <div class="kpi"><div class="k-label">Lifetime · one-time</div><div class="k-val">${money(totLife)}</div><div class="k-sub">${fmt(totLifeN)} purchase${totLifeN === 1 ? "" : "s"} · not recurring</div></div>
       <div class="kpi"><div class="k-label">Accounts</div><div class="k-val">${fmt(anyBill.users.total)}</div><div class="k-sub">+${fmt(anyBill.users.newThisMonth)} this month · shared across plugins</div></div>
       ${igOpened !== null ? `<div class="kpi"><div class="k-label">📸 Instagram opened</div><div class="k-val">${fmt(igOpened)}</div><div class="k-sub">distinct visitors · last 30 days</div></div>` : ""}
-      <div class="kpi"><div class="k-label">Paying subscriptions</div><div class="k-val">${fmt(totPaid)}</div><div class="k-sub">across all plugins</div></div>
-      <div class="kpi"><div class="k-label">Conversion</div><div class="k-val">${anyBill.users.total ? ((totPaid/anyBill.users.total)*100).toFixed(1) : "0"}%</div><div class="k-sub">paid subs / accounts</div></div>
+      <div class="kpi"><div class="k-label">Paying subscriptions</div><div class="k-val">${fmt(totSubs)}</div><div class="k-sub">recurring · plus ${fmt(totLifeN)} lifetime, ${fmt(okBills.reduce((s, b) => s + (b.plans.gifted || 0), 0))} gifted</div></div>
+      <div class="kpi"><div class="k-label">Conversion</div><div class="k-val">${anyBill.users.total ? ((totPaid/anyBill.users.total)*100).toFixed(1) : "0"}%</div><div class="k-sub">everyone who has paid / accounts</div></div>
       ${anyBill.sources ? `<div class="kpi"><div class="k-label">By platform</div>
         <div class="k-val" style="font-size:20px;display:flex;gap:14px;align-items:baseline">
           <span>${fmt(anyBill.sources.framer)} <small style="font-size:11px;color:var(--muted);font-weight:700">FRAMER</small></span>
@@ -559,7 +564,7 @@ async function openUser(id) {
 
     <div class="sec-title">Reviews · businesses (${base.configs.length})</div>
     <div class="card" style="padding:0;overflow:hidden">${base.configs.length ? `<table><thead><tr><th>Google</th><th>Trustpilot</th><th>Min ★</th></tr></thead><tbody>
-      ${base.configs.map((c)=>`<tr><td>${esc(c.googleBusinessName||c.googlePlaceId||"-")}</td><td class="breakurl">${tpLink(c.trustpilotUrl)}</td><td>${c.minStars}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No businesses connected.</div>`}</div>
+      ${base.configs.map((c)=>`<tr><td>${esc(c.googleBusinessName||c.googlePlaceId||"-")}</td><td class="breakurl">${tpLink(c.trustpilotUrl)}</td><td>${minStarsLabel(c.minStars)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No businesses connected.</div>`}</div>
 
     <div class="sec-title">Reviews · embed pages (${base.pages.length})</div>
     <div class="card" style="padding:0;overflow:hidden">${base.pages.length ? `<table><thead><tr><th>Page</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
@@ -918,7 +923,7 @@ async function renderReviews(head) {
     </tr></thead><tbody>${biz.businesses.map((b)=>`<tr>
       <td>${esc(b.email)}</td><td>${esc(b.googleBusinessName||"-")}</td><td class="mono truncate">${esc(b.googlePlaceId||"-")}</td>
       <td class="breakurl">${tpLink(b.trustpilotUrl)}</td>
-      <td class="right">${b.minStars}</td><td>${date(b.createdAt)}</td>
+      <td class="right">${minStarsLabel(b.minStars)}</td><td>${date(b.createdAt)}</td>
     </tr>`).join("")}</tbody></table>`:`<div class="empty">No businesses connected yet.</div>`}</div>` : unavailable("Businesses", rs[2])}
 
     ${cachePanel(cache, rs[3], p, "Review cache (Google/Trustpilot payloads)")}`;
