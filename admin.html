@@ -1061,6 +1061,11 @@ const IG_STEP = {
 };
 // Gift code lifecycle: unused → active (redeemed, still running) → ended.
 // "expired" is the other dead end: never redeemed before the code lapsed.
+const REACH_BADGE = {
+  queued:  '<span class="badge b-active">queued</span>',
+  sent:    '<span class="badge b-pro">sent</span>',
+  skipped: '<span class="badge b-other">skipped</span>',
+};
 const GIFT_BADGE = {
   unused:  '<span class="badge b-free">unused</span>',
   active:  '<span class="badge b-active">active</span>',
@@ -1094,8 +1099,9 @@ async function renderInstagram(head) {
     api("/instagram/admin/funnel?days=" + igDays), api("/instagram/admin/feeds"),
     acct("/gift-codes", null, "instagram"),
     api("/instagram/admin/live-sites"), api("/instagram/admin/user-costs"),
+    api("/instagram/admin/outreach"),
   ]);
-  const [bill, dom, funnel, feeds, gifts, sites, costs] = rs.map(val);
+  const [bill, dom, funnel, feeds, gifts, sites, costs, reach] = rs.map(val);
   const fn = dom && dom.funnel30d ? dom.funnel30d : null;
   $("view").innerHTML = `
     ${head("Instagram feeds, and where people stop between opening the plugin and paying.")}
@@ -1138,6 +1144,32 @@ async function renderInstagram(head) {
       <td>${f.email ? esc(f.email) : shortId(f.userId)}</td><td>@${esc(f.handle)}</td>
       <td>${esc(f.layout)}</td><td>${esc(f.mode)}</td><td>${date(f.createdAt)}</td>
     </tr>`).join("")}</tbody></table>` : `<div class="empty">No feeds created yet.</div>`}</div>` : unavailable("Feeds", rs[3])}
+
+    <div class="toolbar" style="margin-top:4px"><div class="sec-title" style="margin:0">Outreach · paywall drop-offs</div>
+      <button id="reach-scan" style="width:auto;margin-left:auto">Scan now</button></div>
+    ${reach ? `<div class="panel" style="margin-bottom:12px">
+      <p class="note" style="margin-top:0">Drafted 3 days after someone sees the paywall and leaves. Each gets a single-use
+        3-month code. <b>Send these by hand</b> — Instagram has no sanctioned way to start a conversation with someone who
+        hasn't messaged you, and bulk automated DMs from a new account get it banned. Space them out and vary the wording.</p>
+      <div class="kv"><span>Queued</span><strong>${fmt(reach.counts.queued || 0)}</strong></div>
+      <div class="kv"><span>Sent</span><strong>${fmt(reach.counts.sent || 0)}</strong></div>
+      <div class="kv"><span>Skipped (low signal)</span><strong>${fmt(reach.counts.skipped || 0)}</strong></div>
+      <div id="reach-out" class="note" style="margin-bottom:0"></div>
+    </div>
+    <div class="tablewrap" style="margin-bottom:16px">${reach.outreach.length ? `<table><thead><tr>
+      <th>Profile</th><th>Got to</th><th>Code</th><th>Last seen</th><th>Status</th><th>Draft</th><th></th>
+    </tr></thead><tbody>${reach.outreach.map((o) => `<tr>
+      <td><a href="https://instagram.com/${encodeURIComponent(o.handle)}" target="_blank" rel="noopener" style="color:var(--accent)">@${esc(o.handle)}</a>${o.lowSignal ? ' <span class="badge b-other">test handle</span>' : ""}</td>
+      <td>${fmt(o.events)} events</td>
+      <td><span class="mono">${o.code ? esc(o.code) : "-"}</span></td>
+      <td>${dt(o.lastSeen)}</td>
+      <td>${REACH_BADGE[o.status] || esc(o.status)}</td>
+      <td><button class="reach-copy" data-msg="${esc(o.message)}" style="width:auto;padding:4px 10px">Copy</button></td>
+      <td class="right">${o.status === "sent"
+        ? `<button class="reach-set" data-id="${esc(o.id)}" data-status="queued" style="width:auto;padding:4px 10px">Undo</button>`
+        : `<button class="reach-set" data-id="${esc(o.id)}" data-status="sent" style="width:auto;padding:4px 10px">Mark sent</button>
+           <button class="reach-set" data-id="${esc(o.id)}" data-status="skipped" style="width:auto;padding:4px 10px">Skip</button>`}</td>
+    </tr>`).join("")}</tbody></table>` : `<div class="empty">Nothing queued. Drop-offs appear 3 days after they leave.</div>`}</div>` : unavailable("Outreach", rs[7])}
 
     <div class="sec-title">Live sites · where feeds are actually being served</div>
     ${sites ? `<div class="tablewrap" style="margin-bottom:6px">${sites.sites.length ? `<table><thead><tr>
@@ -1213,6 +1245,31 @@ async function renderInstagram(head) {
     } catch (e) { out.textContent = e.message; }
     finally { if ($("gift-gen")) $("gift-gen").disabled = false; }
   };
+  if ($("reach-scan")) $("reach-scan").onclick = async () => {
+    const btn = $("reach-scan"), out = $("reach-out");
+    btn.disabled = true; if (out) out.textContent = "Scanning…";
+    try {
+      const r = await api("/instagram/admin/outreach/scan", { method: "POST", body: {} });
+      if (out) out.textContent = `Queued ${r.queued}, skipped ${r.skipped} as test handles.`;
+      const keep = out ? out.textContent : "";
+      await renderInstagram(head);
+      if ($("reach-out")) $("reach-out").textContent = keep;
+    } catch (e) { if (out) out.textContent = e.message; }
+    finally { if ($("reach-scan")) $("reach-scan").disabled = false; }
+  };
+  document.querySelectorAll(".reach-copy").forEach((b) => {
+    b.onclick = async () => {
+      try { await navigator.clipboard.writeText(b.dataset.msg); b.textContent = "Copied"; setTimeout(() => { b.textContent = "Copy"; }, 1500); }
+      catch { alert(b.dataset.msg); } // clipboard blocked → show it so it can still be copied by hand
+    };
+  });
+  document.querySelectorAll(".reach-set").forEach((b) => {
+    b.onclick = async () => {
+      b.disabled = true;
+      try { await api("/instagram/admin/outreach/" + encodeURIComponent(b.dataset.id), { method: "POST", body: { status: b.dataset.status } }); await renderInstagram(head); }
+      catch (e) { alert(e.message); b.disabled = false; }
+    };
+  });
   document.querySelectorAll(".gift-del").forEach((b) => {
     b.onclick = async () => {
       if (!confirm("Revoke this unused code? It can no longer be redeemed.")) return;
