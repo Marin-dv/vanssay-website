@@ -310,6 +310,18 @@ function planSplitPanel(bill) {
 }
 
 /* ── Overview, every plugin on one screen ── */
+// Plan mix for a product. Lifetime and gifted are listed on their own: both
+// resolve to the `pro` tier internally, so folding them in was what made a
+// single Lifetime buyer read as "1 Pro".
+function planBreakdown(pl) {
+  const parts = [];
+  if (pl.starter) parts.push(fmt(pl.starter) + " Starter");
+  if (pl.pro) parts.push(fmt(pl.pro) + " Pro");
+  if (pl.ultra) parts.push(fmt(pl.ultra) + " Ultra");
+  if (pl.lifetime) parts.push(fmt(pl.lifetime) + " Lifetime");
+  if (pl.gifted) parts.push(fmt(pl.gifted) + " gifted");
+  return fmt(pl.paid) + (parts.length ? " · " + parts.join(" / ") : "");
+}
 async function renderOverview() {
   const v = $("view");
   v.innerHTML = `<div class="page-head"><div><h2>Overview</h2><p>All plugins, revenue, accounts and live activity.</p></div></div><div id="ov"><div class="empty">Loading…</div></div>`;
@@ -328,6 +340,11 @@ async function renderOverview() {
   const anyBill = okBills[0]; // users are global to the Accounts service
   const totMRR = okBills.reduce((s, b) => s + b.revenue.mrr, 0);
   const totPaid = okBills.reduce((s, b) => s + b.plans.paid, 0);
+  // One-time money, kept apart from MRR: it doesn't recur, so adding it to a
+  // monthly figure would overstate every month after the one it landed in.
+  const totLife = okBills.reduce((s, b) => s + (b.revenue.lifetimeRevenue || 0), 0);
+  const totLifeN = okBills.reduce((s, b) => s + (b.revenue.lifetimeCount || 0), 0);
+  const igOpened = doms.instagram && doms.instagram.funnel30d ? doms.instagram.funnel30d.opened : null;
 
   // Per-product domain highlights.
   const domainKv = (p) => {
@@ -358,8 +375,10 @@ async function renderOverview() {
 
   ov.innerHTML = `
     <div class="kpis">
-      <div class="kpi hero"><div class="k-label">Total MRR · all plugins</div><div class="k-val">${money(totMRR)}</div><div class="k-sub">${money(totMRR*12)} / year</div></div>
+      <div class="kpi hero"><div class="k-label">Monthly · recurring</div><div class="k-val">${money(totMRR)}</div><div class="k-sub">${money(totMRR*12)} / year · subscriptions only</div></div>
+      <div class="kpi"><div class="k-label">Lifetime · one-time</div><div class="k-val">${money(totLife)}</div><div class="k-sub">${fmt(totLifeN)} purchase${totLifeN === 1 ? "" : "s"} · not recurring</div></div>
       <div class="kpi"><div class="k-label">Accounts</div><div class="k-val">${fmt(anyBill.users.total)}</div><div class="k-sub">+${fmt(anyBill.users.newThisMonth)} this month · shared across plugins</div></div>
+      ${igOpened !== null ? `<div class="kpi"><div class="k-label">📸 Instagram opened</div><div class="k-val">${fmt(igOpened)}</div><div class="k-sub">distinct visitors · last 30 days</div></div>` : ""}
       <div class="kpi"><div class="k-label">Paying subscriptions</div><div class="k-val">${fmt(totPaid)}</div><div class="k-sub">across all plugins</div></div>
       <div class="kpi"><div class="k-label">Conversion</div><div class="k-val">${anyBill.users.total ? ((totPaid/anyBill.users.total)*100).toFixed(1) : "0"}%</div><div class="k-sub">paid subs / accounts</div></div>
       ${anyBill.sources ? `<div class="kpi"><div class="k-label">By platform</div>
@@ -374,7 +393,8 @@ async function renderOverview() {
         const b = bills[p.key];
         return `<div class="panel"><h3>${p.icon} ${esc(p.label)} <a class="open" href="#" data-open="${p.key}">Open →</a></h3>
           ${b ? `<div class="mrr">${money(b.revenue.mrr)} <small>MRR</small></div>
-          <div class="kv"><span>Paying</span><strong>${fmt(b.plans.paid)} · ${fmt(b.plans.pro)} Pro / ${fmt(b.plans.ultra)} Ultra</strong></div>`
+          <div class="kv"><span>Paying</span><strong>${planBreakdown(b.plans)}</strong></div>
+          ${b.revenue.lifetimeRevenue ? `<div class="kv"><span>Lifetime (one-time)</span><strong>${money(b.revenue.lifetimeRevenue)}</strong></div>` : ""}`
           : `<div class="note">Billing unavailable.</div>`}
           ${domainKv(p).map(([k, x]) => `<div class="kv"><span>${k}</span><strong>${x}</strong></div>`).join("")}
         </div>`;
@@ -392,7 +412,7 @@ async function renderOverview() {
         <div class="kv" style="margin-top:10px"><span>Total</span><strong>${money(totMRR)} / mo</strong></div>
       </div>
     </div>
-    <p class="note">MRR is additive across plugins; one account can pay for several. Plan splits & activity live on each plugin's page.</p>`;
+    <p class="note">MRR counts subscriptions only. Lifetime is one-time revenue shown separately, valued at today's price. Gifted accounts have access but pay nothing, so they're excluded from both.</p>`;
   ov.querySelectorAll("[data-open]").forEach((a) => a.onclick = (e) => { e.preventDefault(); switchTab("prod:" + a.dataset.open); });
 }
 
@@ -1073,14 +1093,16 @@ async function renderInstagram(head) {
     acct("/overview", null, "instagram"), api("/instagram/admin/overview"),
     api("/instagram/admin/funnel?days=" + igDays), api("/instagram/admin/feeds"),
     acct("/gift-codes", null, "instagram"),
+    api("/instagram/admin/live-sites"), api("/instagram/admin/user-costs"),
   ]);
-  const [bill, dom, funnel, feeds, gifts] = rs.map(val);
+  const [bill, dom, funnel, feeds, gifts, sites, costs] = rs.map(val);
   const fn = dom && dom.funnel30d ? dom.funnel30d : null;
   $("view").innerHTML = `
     ${head("Instagram feeds, and where people stop between opening the plugin and paying.")}
     <div class="kpis">
       ${bill ? `<div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
-      <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${fmt(bill.plans.starter || 0)} Starter · ${fmt(bill.plans.pro)} Pro</div></div>` : ""}
+      <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${planBreakdown(bill.plans).replace(/^\S+\s·\s/, "")}</div></div>
+      ${bill.revenue.lifetimeRevenue ? `<div class="kpi"><div class="k-label">Lifetime · one-time</div><div class="k-val">${money(bill.revenue.lifetimeRevenue)}</div><div class="k-sub">${fmt(bill.revenue.lifetimeCount)} × ${money(bill.revenue.lifetimeUnitPrice)} · not in MRR</div></div>` : ""}` : ""}
       ${dom ? `<div class="kpi"><div class="k-label">Feeds</div><div class="k-val">${fmt(dom.feeds)}</div><div class="k-sub">${fmt(dom.cachedHandles)} handles cached</div></div>` : ""}
       ${fn ? `<div class="kpi"><div class="k-label">Opened (30d)</div><div class="k-val">${fmt(fn.opened)}</div><div class="k-sub">${fmt(fn.previewed)} saw a feed</div></div>
       <div class="kpi"><div class="k-label">Reached checkout</div><div class="k-val">${fmt(fn.checkout)}</div><div class="k-sub">${fmt(fn.paywall)} saw the paywall</div></div>
@@ -1116,6 +1138,34 @@ async function renderInstagram(head) {
       <td>${f.email ? esc(f.email) : shortId(f.userId)}</td><td>@${esc(f.handle)}</td>
       <td>${esc(f.layout)}</td><td>${esc(f.mode)}</td><td>${date(f.createdAt)}</td>
     </tr>`).join("")}</tbody></table>` : `<div class="empty">No feeds created yet.</div>`}</div>` : unavailable("Feeds", rs[3])}
+
+    <div class="sec-title">Live sites · where feeds are actually being served</div>
+    ${sites ? `<div class="tablewrap" style="margin-bottom:6px">${sites.sites.length ? `<table><thead><tr>
+      <th>Site</th><th>Feed</th><th>Owner</th><th class="right">Loads</th><th>First seen</th><th>Last seen</th>
+    </tr></thead><tbody>${sites.sites.map((x) => `<tr>
+      <td><a href="${esc(x.origin + x.path)}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(x.origin.replace(/^https?:\/\//, "") + x.path)}</a>${x.pageKnown ? "" : ' <span class="badge b-other">site</span>'}</td>
+      <td>${x.handle ? "@" + esc(x.handle) : "-"}${x.layout ? ' <span class="muted">· ' + esc(x.layout) + "</span>" : ""}</td>
+      <td>${x.email ? esc(x.email) : shortId(x.userId)}</td>
+      <td class="right">${fmt(x.views)}</td><td>${date(x.firstSeen)}</td><td>${dt(x.lastSeen)}</td>
+    </tr>`).join("")}</tbody></table>` : `<div class="empty">No live sites recorded yet. A row appears the first time a published page loads a feed.</div>`}</div>
+    <p class="note" style="margin-bottom:16px">Browsers usually send only the site, not the exact page, so most rows are the whole
+      origin (marked <span class="badge b-other">site</span>). Per-page detail needs a widget release. Framer's editor and preview hosts are excluded.</p>` : unavailable("Live sites", rs[5])}
+
+    <div class="sec-title">Cost per user · Apify scraping</div>
+    ${costs ? `<div class="kpis" style="margin-bottom:10px">
+      <div class="kpi"><div class="k-label">All-time spend</div><div class="k-val">${usd(costs.totals.allTimeUsd)}</div><div class="k-sub">every scrape we've paid for</div></div>
+      <div class="kpi"><div class="k-label">Attributed to users</div><div class="k-val">${usd(costs.totals.attributedUsd)}</div><div class="k-sub">handles someone kept a feed on</div></div>
+      <div class="kpi"><div class="k-label">Previews &amp; abandoned</div><div class="k-val">${usd(costs.totals.unattributedUsd)}</div><div class="k-sub">spend with no customer behind it</div></div>
+    </div>
+    <div class="tablewrap" style="margin-bottom:6px">${costs.users.length ? `<table><thead><tr>
+      <th>User</th><th class="right">Cost</th><th class="right">Scrapes</th><th>Handles</th>
+    </tr></thead><tbody>${costs.users.map((u) => `<tr>
+      <td>${u.email ? esc(u.email) : shortId(u.userId)}${u.shared ? ' <span class="badge b-other">shared</span>' : ""}</td>
+      <td class="right">${usd(u.costUsd)}</td><td class="right">${fmt(u.scrapes)}</td>
+      <td class="truncate">${u.handles.map((h) => "@" + esc(h)).join(", ")}</td>
+    </tr>`).join("")}</tbody></table>` : `<div class="empty">No scrape spend recorded yet.</div>`}</div>
+    <p class="note" style="margin-bottom:16px">We pay per handle, not per user: the feed cache is shared, so when two accounts show the same
+      profile we pay once. Those handles are split evenly between their owners and marked <span class="badge b-other">shared</span>.</p>` : unavailable("Cost per user", rs[6])}
 
     <div class="toolbar" style="margin-top:22px"><div class="sec-title" style="margin:0">Gift codes</div></div>
     <div class="panel" style="margin-bottom:12px">
