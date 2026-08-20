@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finish your upgrade | Vanssay</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+  <link rel="apple-touch-icon" href="/favicon-180.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#fafafa; --surface:#fff; --surface-2:#f4f4f5; --border:#e4e4e7; --text:#18181b;
+      --text-2:#52525b; --muted:#a1a1aa; --accent:#0e7afe; --pro:#7c5cff; --error:#dc2626;
+      --shadow-md:0 8px 30px rgba(0,0,0,.08);
+    }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.6;
+      min-height:100vh; display:flex; align-items:center; justify-content:center; padding:28px 20px;
+      -webkit-font-smoothing:antialiased; }
+    a { color:inherit; text-decoration:none; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:20px;
+      padding:38px 34px; width:100%; max-width:480px; box-shadow:var(--shadow-md); }
+    .logo { display:flex; align-items:center; justify-content:center; gap:9px; font-weight:800;
+      font-size:17px; margin-bottom:24px; }
+    h1 { font-size:23px; font-weight:900; letter-spacing:-.02em; line-height:1.25; margin-bottom:10px; }
+    p { color:var(--text-2); font-size:14.5px; }
+    p + p { margin-top:12px; }
+    .muted { color:var(--muted); font-size:13px; }
+    .note { margin:20px 0; padding:15px 17px; border:1px solid var(--border); border-radius:13px;
+      background:#fdfdfd; }
+    .note .lbl { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+      color:var(--muted); margin-bottom:7px; }
+    .row { display:flex; align-items:baseline; justify-content:space-between; gap:14px; }
+    .row + .row { margin-top:7px; }
+    .row .k { font-size:13.5px; color:var(--text-2); }
+    .row .v { font-size:14.5px; font-weight:700; color:var(--text); text-align:right;
+      overflow-wrap:anywhere; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:9px; width:100%;
+      padding:13px 20px; margin-top:20px; border-radius:12px; font:inherit; font-size:15px;
+      font-weight:700; border:1px solid transparent; cursor:pointer; color:#fff;
+      background:linear-gradient(120deg,var(--accent),var(--pro)); }
+    .btn[disabled] { opacity:.6; cursor:default; }
+    .btn-line { background:var(--surface); border-color:var(--border); color:var(--text); }
+    .err { background:#fdecec; color:var(--error); border-radius:11px; padding:11px 14px;
+      font-size:13.5px; margin-top:16px; display:none; }
+    .foot { margin-top:20px; text-align:center; font-size:12.5px; color:var(--muted); }
+    .foot a { color:var(--accent); font-weight:600; }
+    .spinner { width:30px; height:30px; margin:14px auto; border-radius:50%;
+      border:3px solid var(--surface-2); border-top-color:var(--accent); animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .center { text-align:center; }
+    .emoji { font-size:38px; line-height:1; margin-bottom:12px; }
+    [hidden] { display:none !important; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <svg width="22" height="22" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>
+      Vanssay
+    </div>
+
+    <!-- Checking the link -->
+    <div id="loading" class="center">
+      <div class="spinner"></div>
+      <p class="muted">Checking your link…</p>
+    </div>
+
+    <!-- Ready to retry -->
+    <div id="ready" hidden>
+      <h1 id="r-title">Let's finish your upgrade</h1>
+      <p id="r-lede">Your last payment didn't go through, so the upgrade never completed and you weren't charged. Everything in your account is exactly where you left it.</p>
+
+      <div class="note">
+        <div class="lbl" id="r-notelbl">What you're getting</div>
+        <div class="row"><span class="k" id="r-product">Plan</span><span class="v" id="r-plan">—</span></div>
+        <div class="row"><span class="k">Price</span><span class="v" id="r-price">—</span></div>
+        <div class="row"><span class="k">Account</span><span class="v" id="r-email">—</span></div>
+      </div>
+
+      <button class="btn" id="go">Try again with a card</button>
+      <div class="err" id="err"></div>
+      <p class="muted center" style="margin-top:12px" id="r-foot">Secure checkout by Stripe. You can use a different card — cancel anytime.</p>
+    </div>
+
+    <!-- Already sorted -->
+    <div id="active" hidden class="center">
+      <div class="emoji">🎉</div>
+      <h1>You're already set</h1>
+      <p id="a-msg">Your plan is active — there's nothing left to pay. You can close this tab.</p>
+      <a class="btn btn-line" href="/accounts">Go to my account</a>
+    </div>
+
+    <!-- Dead link -->
+    <div id="dead" hidden class="center">
+      <div class="emoji">⌛</div>
+      <h1 id="d-title">This link has expired</h1>
+      <p id="d-msg">Recovery links last 14 days. You can still upgrade in a couple of clicks from your account page.</p>
+      <a class="btn" href="/accounts">Go to my account</a>
+    </div>
+
+    <div class="foot">Questions? <a href="mailto:support@vanssay.net">support@vanssay.net</a></div>
+  </div>
+
+<script>
+const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
+const $ = (id) => document.getElementById(id);
+const token = new URLSearchParams(location.search).get("t") || "";
+let CTA = "Try again with a card";
+
+const show = (id) => {
+  for (const s of ["loading", "ready", "active", "dead"]) $(s).hidden = s !== id;
+};
+
+const dead = (title, msg) => {
+  if (title) $("d-title").textContent = title;
+  if (msg) $("d-msg").textContent = msg;
+  show("dead");
+};
+
+const money = (p) => {
+  if (!p) return "—";
+  const sym = { usd: "$", eur: "€", gbp: "£" }[p.currency] || "";
+  const amount = (p.amount / 100).toFixed(2).replace(/\.00$/, "");
+  const per = p.interval === "year" ? "year" : "month";
+  return (sym ? sym + amount : amount + " " + p.currency.toUpperCase()) + " / " + per;
+};
+
+async function load() {
+  if (!token) return dead("Something's missing", "This link is incomplete. Open it straight from the email, or upgrade from your account page.");
+
+  let info;
+  try {
+    const res = await fetch(API + "/billing/recover/" + encodeURIComponent(token));
+    info = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      // The API distinguishes a tampered link from a simply old one.
+      return info.code === "invalid"
+        ? dead("This link isn't valid", "We couldn't read this link. Open it straight from the email, or upgrade from your account page.")
+        : dead();
+    }
+  } catch {
+    return dead("We couldn't reach Vanssay", "Check your connection and reload the page, or upgrade from your account page.");
+  }
+
+  if (info.alreadyActive) {
+    $("a-msg").textContent = "Your " + info.productName + " " + info.planLabel +
+      " plan is active — there's nothing left to pay. You can close this tab.";
+    return show("active");
+  }
+
+  // `portal` = a renewal Stripe is still retrying, so the fix is replacing the
+  // card on the subscription they already have. `checkout` = the first payment
+  // never cleared, so there is nothing to repair — only a fresh attempt.
+  if (info.mode === "portal") {
+    $("r-title").textContent = "Let's fix your payment";
+    $("r-lede").textContent = "Your bank turned down the last payment for this plan. Your plan is still active for now — updating your card keeps it that way.";
+    $("r-notelbl").textContent = "The plan we're keeping";
+    $("r-foot").textContent = "Secure billing portal by Stripe. Your plan and price don't change.";
+    CTA = "Update my card";
+  }
+  $("r-product").textContent = info.productName;
+  $("r-plan").textContent = info.planLabel;
+  $("r-price").textContent = money(info.price);
+  $("r-email").textContent = info.email;
+  $("go").textContent = CTA;
+  show("ready");
+}
+
+$("go").addEventListener("click", async () => {
+  const btn = $("go");
+  btn.disabled = true;
+  btn.textContent = "Opening Stripe…";
+  $("err").style.display = "none";
+  try {
+    const res = await fetch(API + "/billing/recover", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.url) throw new Error(data.error || "We couldn't open Stripe.");
+    location.href = data.url;
+  } catch (e) {
+    $("err").textContent = e.message + " Please try again, or email support@vanssay.net.";
+    $("err").style.display = "block";
+    btn.disabled = false;
+    btn.textContent = CTA;
+  }
+});
+
+load();
+</script>
+</body>
+</html>
