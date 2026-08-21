@@ -7,7 +7,7 @@
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
 <link rel="apple-touch-icon" href="/favicon-180.png" />
-<meta name="description" content="The Instagram Feed plugin's own live demo, running in your browser: a real @nike feed in all six layouts — Profile, Grid, Slider, Carousel, Marquee and Rainbow." />
+<meta name="description" content="The Instagram Feed plugin's own live demo, running in your browser: a real @letypographe_be feed in all six layouts — Profile, Grid, Slider, Carousel, Marquee and Rainbow." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -386,62 +386,97 @@ img { display: block; max-width: 100%; }
 /* ─────────────────────────────────────────────────────────────────────────
    Port of the plugin's DemoExplorer (React → vanilla). Behaviour, markup and
    class names mirror plugin/src/components/{DemoExplorer,FeedLayouts,PostTile,
-   ProfileHeader,Lightbox}.tsx. Data is the committed @nike scrape from
+   ProfileHeader,Lightbox}.tsx. Data is the committed @letypographe_be scrape from
    lib/demoFeed.ts.
    ───────────────────────────────────────────────────────────────────────── */
 const A = "assets/ig-demo/";
 
 const PROFILE = {
-  handle: "nike",
-  fullName: "Nike",
+  handle: "letypographe_be",
+  fullName: "le typographe",
   avatarUrl: A + "avatar.webp",
-  bio: "Just Do It.",
-  externalUrl: "http://empli.fi/nike",
-  verified: true,
-  postsCount: 1668,
-  followers: 291607476,
-  following: 264,
+  bio: "Since 2007 / letterpress studio & stationery",
+  externalUrl: "http://www.typographe.be/",
+  verified: false,
+  postsCount: 1091,
+  followers: 12136,
+  following: 990,
 };
 
 const POSTS = [
   {
-    id: "3935562768090283565", type: "image", mediaUrl: A + "post-1.webp",
-    permalink: "https://www.instagram.com/p/Dad7XxvRj4t/",
-    caption: "The story continues @cristiano",
-    likes: 1840631, comments: 16855, timestamp: "2026-07-06T22:11:14.000Z",
+    id: "3963584790762663947", type: "carousel", mediaUrl: A + "post-1.webp",
+    permalink: "https://www.instagram.com/p/DcBe14CjLAL/",
+    caption: "le nouvel espace à Nantes avance bien !\nMÊME ADRESSE : la porte voisine !\n1 PLACE DE LA MONNAIE - NANTES #letypographe_nantes \nÀ bientôt 👋",
+    likes: 52, comments: 2, timestamp: "2026-08-14T14:02:28.000Z",
+    carousel: [{ mediaUrl: A + "slide-1-1.webp" }, { mediaUrl: A + "slide-1-2.webp" }, { mediaUrl: A + "slide-1-3.webp" }, { mediaUrl: A + "slide-1-4.webp" }, { mediaUrl: A + "slide-1-5.webp" }],
   },
   {
-    id: "3952772575138859291", type: "carousel", mediaUrl: A + "post-2.webp",
-    permalink: "https://www.instagram.com/p/DbbEbbjDskb/",
-    caption: "Skating rink or salon, @alysaxliu leads the pack with style that rings true. From hoodie to toe. \n\nElevate the everyday in Nike Studio Fleece, available now.",
-    likes: 929070, comments: 1747, timestamp: "2026-07-30T16:00:32.000Z",
-    carousel: [{ mediaUrl: A + "slide-2-1.webp" }, { mediaUrl: A + "slide-2-2.webp" }, { mediaUrl: A + "slide-2-3.webp" }],
+    id: "3953909030643206680", type: "image", mediaUrl: A + "post-2.webp",
+    permalink: "https://www.instagram.com/p/DbfG1CNsooY/",
+    caption: "Un IMMENSE MERCI à Nathalie ! #letypographe_nantes \nPour ces années de lancement 🚀 de la marque à Nantes, pour les expériences partagées 🙌 et le relais avec Florence. 🏃🏻‍♀️‍➡️ #gratitude \nTOUS, NOUS LUI DISONS MERCI !",
+    likes: 127, comments: 1, timestamp: "2026-08-01T05:41:58.000Z",
   },
   {
-    id: "3939816185620865274", type: "image", mediaUrl: A + "post-3.webp",
-    permalink: "https://www.instagram.com/p/DatCfJgRCD6/",
-    caption: "Always was, always will be. World No. 1 @janniksin leaves no doubt as he takes a second consecutive title in London.",
-    likes: 249904, comments: 893, timestamp: "2026-07-12T18:59:13.000Z",
+    id: "3951002066399018155", type: "carousel", mediaUrl: A + "post-3.webp",
+    permalink: "https://www.instagram.com/p/DbUx3IyjDyr/",
+    caption: "#eclair #orageux⚡️ @letypographe_be \nNOUVELLE CARTE",
+    likes: 38, comments: 0, timestamp: "2026-07-28T05:22:51.000Z",
+    carousel: [{ mediaUrl: A + "slide-3-1.webp" }, { mediaUrl: A + "slide-3-2.webp" }],
   },
   {
-    id: "3941115687112447588", type: "carousel", mediaUrl: A + "post-4.webp",
-    permalink: "https://www.instagram.com/p/Daxp9YlDpZk/",
-    caption: "Nike Atelier for Victor Wembanyama is shaped by instinct and precision, through a distinctly French lens. \n\nFootball heritage, reimagined. Excellence, embodied.\n\nNike Atelier Total 90 is available for preorder July 20 at The Broken Arm (Paris), Dover Street Market (Paris), and SNKRS (North America).\n\nThe bespoke Nike Atelier LenoWoven jacket reinterprets performance innovation through an elevated lens, crafted from a cotton yarn adaptation of material technology originally developed for Nike Football boots.\n\nAt the intersection of world-class athletes, distinctive style, and pinnacle craftsmanship, Nike Atelier is made for the exceptional.\n\nInspired by the Total 90 Laser III, the Nike Atelier Total 90 distills one of Nike Football’s most iconic silhouettes into its purest form.\n\n“My lifestyle influences my style, and comfort always comes first.” - Victor Wembanyama\n\nNike Atelier. One of One.",
-    likes: 220458, comments: 833, timestamp: "2026-07-14T14:00:22.000Z",
-    carousel: [{ mediaUrl: A + "slide-4-1.webp" }, { mediaUrl: A + "slide-4-2.webp" }, { mediaUrl: A + "slide-4-3.webp" }],
+    id: "3947503976902278662", type: "image", mediaUrl: A + "post-4.webp",
+    permalink: "https://www.instagram.com/p/DbIWfPEs74G/",
+    caption: "Du changement à Nantes ! @letypographe_nantes \nNathalie passe le relais à Florence pour la boutique. C’est un bel horizon à la suite d’une belle rencontre. Après des années courageuses pour lancer la boutique et la faire grandir, Nathalie passe le flambeau. Pour tout son travail et son dévouement à l’unisson avec la maison mère de Bruxelles, déjà nous voulons lui dire MERCI, en attendant de trinquer tous ensemble bientôt ! 😉Florence, Nantaise, et familière de la boutique, est une passionnée de papeterie et d’esthétique japonaise. Elle est également en accord avec le typographe. C’est une période heureuse qui se vit au typographe à Nantes et nous vous partageons cette nouvelle avec joie. \nD’autres informations à propos de ce relais vont suivre… Suivez nos instagram 👀 @letypographe_nantes @letypographe_be #papeterienantes",
+    likes: 105, comments: 7, timestamp: "2026-07-23T09:45:40.000Z",
   },
   {
-    id: "3939674589332169959", type: "image", mediaUrl: A + "post-5.webp",
-    permalink: "https://www.instagram.com/p/DasiSprxuTn/",
-    caption: "@erling’s hunt never ends.",
-    likes: 175731, comments: 1268, timestamp: "2026-07-12T14:22:54.000Z",
+    id: "3946238095888518618", type: "image", mediaUrl: A + "post-5.webp",
+    permalink: "https://www.instagram.com/p/DbD2qPgjI3a/",
+    caption: "🇧🇪🇧🇪🇧🇪\n21 JUILLET - fête nationale de la Belgique \n21 JULI - Belgische nationale feestdag\n21 JULI - Belgischer Nationalfeiertag\n@letypographe_be @béluga royal palace #lunionfaitlaforce #belgium #🇧🇪 #madeinbelgium",
+    likes: 62, comments: 0, timestamp: "2026-07-21T15:37:41.000Z",
   },
   {
-    id: "3943294951320627320", type: "carousel", mediaUrl: A + "post-6.webp",
-    permalink: "https://www.instagram.com/p/Da5Zd2iDqh4/",
-    caption: "Play Fast. Play Free. Play Light.\n \nThe Sabrina 4 provides the security and stability hoopers need for change of pace style of play. A new lightweight containment system locks down every move, while a Nike Flyplate on the midsole keeps you sturdy from end-to-end. \n \nAvailable now.",
-    likes: 94224, comments: 305, timestamp: "2026-07-17T14:10:11.000Z",
-    carousel: [{ mediaUrl: A + "slide-6-1.webp" }, { mediaUrl: A + "slide-6-2.webp" }, { mediaUrl: A + "slide-6-3.webp" }],
+    id: "3930187191112461744", type: "image", mediaUrl: A + "post-6.webp",
+    permalink: "https://www.instagram.com/p/DaK1G1jDG2w/",
+    caption: "HYPER CHAUD - MINI CARNET #serielimitée @letypographe_be \nhttps://www.typographe.be/produit/mini-cahier-hyper-chaud/",
+    likes: 36, comments: 0, timestamp: "2026-06-29T12:07:24.000Z",
+  },
+  {
+    id: "3922146717005022826", type: "image", mediaUrl: A + "post-7.webp",
+    permalink: "https://www.instagram.com/p/DZuQ6igDIZq/",
+    caption: "Et vous quel est votre programme de la semaine ? Et quel semainier utilisez-vous pour organiser votre emploi du temps ? @letypographe_be @letypographe_nantes\n\nDesk diary - Trilingual\n52 sheets\nA4 vertical format 21.3 x 30.5 cm\n120g nature paper - made of recycled and grape fibers\nOrange and gold print\nGold glue on the small side\n-\nLetterpress printed grid on each sheet\nThe blocks are entirely handmade in Brussels.\n\nhttps://www.typographe.be/en/produit/desk-diary-trilingual-vertical-orange-and-gold-print/",
+    likes: 44, comments: 0, timestamp: "2026-06-18T09:52:25.000Z",
+  },
+  {
+    id: "3911368012611771193", type: "image", mediaUrl: A + "post-8.webp",
+    permalink: "https://www.instagram.com/p/DZH-HvxjNs5/",
+    caption: "https://www.typographe.be/categorie-produit/blocs/les-blocs-pour-s-organiser/les-blocs-to-do/\n\nDans la gamme des blocs pour s’organiser, des nouveautés à découvrir ! @letypographe_be @letypographe_nantes",
+    likes: 38, comments: 0, timestamp: "2026-06-03T12:57:03.000Z",
+  },
+  {
+    id: "3905657007334496131", type: "image", mediaUrl: A + "post-9.webp",
+    permalink: "https://www.instagram.com/p/DYzrlrosBeD/",
+    caption: "composition MAI 2026\n@letypographe_be \n@letypographe_nantes \n#peaceandlove #onewordaday #actionreaction #nuna",
+    likes: 84, comments: 2, timestamp: "2026-05-26T15:52:07.000Z",
+  },
+  {
+    id: "3901437310470499266", type: "image", mediaUrl: A + "post-10.webp",
+    permalink: "https://www.instagram.com/p/DYksJAsDKvC/",
+    caption: "JEAN \na partagé beaucoup avec le typographe. Il a été embauché après avoir déposé dans la boîte aux lettres une lettre manuscrite pour postuler au poste de conducteur platine. Après une première année d’essai, il ne pensait pas être renouvelé car il craignait de ne pas avoir assez répondu aux exigences de la maison. « Monsieur est exigeant, mais c’est du beau travail. » avait-il confié à un visiteur. Il n’a jamais réussi à me tutoyer, c’était sa manière de poser un respect au travail. D’une autre génération, il arrivait au moins 15 minutes avant le début de son horaire, avec sa thermo de café pleine. Il ne mangeait pas le midi, mais montait tout de même partager le gâteau si un anniversaire était fêté. Ses chats comptaient énormément pour lui, il y faisait souvent allusion, tout en les aimant et en râlant gentiment pour dire à quel point ils prenaient une grande place... À l’atelier, il était sur le vif à tout moment, prêt à aider autant pour encoller des dos de blocs, décharger du papier, peser, assembler et séparer en reliure, monter des boîtes et plier les enveloppes, tout en parallèle des machines qui tournaient. Jean appréciait le travail accompli jusqu’au bout, il ne fallait pas que ça traîne ! À la fois ancrer dans une tradition d’impression, il a su s’ouvrir à la nouveauté et en était même curieux et partie prenante. Il a accompagné et retroussé ses manches pour monter des stands à Paris, Francfort et Londres. Pinceau et rouleau en mains, il a étalé bien des pots de peinture pour le typographe ! « Monsieur, c’est une belle couleur! » Il appréciait aussi les montages floraux en équipe pour la foire des antiquaires. C’était pour lui une opportunité de vivre autre chose pendant 10 jours. Très fidèle, même dans les moments critiques, il a toujours été présent, même pendant la Covid, le travail le préoccupait. Volontaire et bosseur, il a beaucoup contribué au développement du typographe, fier d’être de la maison. Parfois grincheux, il grognait sur la vie mais sa gentillesse l’emportait. Son départ à la pension n’a pas été simple, cela s’est fait peu à peu. Aujourd’hui, son grand départ nous touche. Adieu Jean ! Merci beaucoup. Gratitude du typographe.",
+    likes: 223, comments: 15, timestamp: "2026-05-20T20:06:31.000Z",
+  },
+  {
+    id: "3885883733446553230", type: "image", mediaUrl: A + "post-11.webp",
+    permalink: "https://www.instagram.com/p/DXtbqrSjO6O/",
+    caption: "#🫏 @letypographe_be @letypographe_nantes \nnew !",
+    likes: 49, comments: 0, timestamp: "2026-04-29T09:04:20.000Z",
+  },
+  {
+    id: "3875992697467369476", type: "image", mediaUrl: A + "post-12.webp",
+    permalink: "https://www.instagram.com/p/DXKStKMjPgE/",
+    caption: "les beaux jours et leurs voyages\n@letypographe_be \nvoyage à Nantes @letypographe_nantes \noù partez vous en voyage bientôt ?\nUn carnet pour accompagner vos escapades",
+    likes: 38, comments: 1, timestamp: "2026-04-15T17:34:42.000Z",
   },
 ];
 
