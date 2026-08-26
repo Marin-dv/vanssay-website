@@ -7,7 +7,7 @@
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
 <link rel="apple-touch-icon" href="/favicon-180.png" />
-<meta name="description" content="The Instagram Feed plugin's own live demo, running in your browser: a real @letypographe_be feed in all six layouts — Profile, Grid, Slider, Carousel, Marquee and Rainbow." />
+<meta name="description" content="The Instagram Feed plugin's own live demo, running in your browser: a real @letypographe_be feed in all seven layouts — Profile, Grid, Slider, Aperture, Carousel, Marquee and Rainbow." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -239,6 +239,80 @@ img { display: block; max-width: 100%; }
 .marquee-layout:hover .marquee-track { animation-play-state: paused; }
 .marquee-track .post-tile { width: 190px; aspect-ratio: 4/5; border-radius: var(--tile-radius, 10px); flex-shrink: 0; }
 
+/* Aperture layout — closed slices are tall pills carrying their date turned on
+   its side; the open one takes Instagram's own 4:5 while the rest retract to
+   share what is left. Widths are set in JS: every slice is sized the SAME way,
+   so one interpolating property carries the open instead of a layout-model jump. */
+.aperture-layout { padding: var(--space-md); }
+.aperture-row { display: flex; gap: 10px; height: 460px; padding: 14px; align-items: stretch; }
+.aperture-slice {
+  position: relative; flex: 0 0 auto; min-width: 0; overflow: hidden; cursor: pointer;
+  background: #111; border: none; padding: 0; border-radius: 22px;
+  transition: width .72s cubic-bezier(.22, 1, .36, 1), border-radius .72s cubic-bezier(.22, 1, .36, 1);
+  /* Chrome does not clip a transformed child to the parent's radius cleanly —
+     the #111 survives as dark specks in the corner antialiasing. */
+  -webkit-mask-image: -webkit-radial-gradient(#fff, #000);
+  mask-image: radial-gradient(#fff, #000);
+}
+.aperture-slice[data-on] { border-radius: 16px; }
+.aperture-slice img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: saturate(.85) brightness(.62);
+  transition: transform .9s cubic-bezier(.22, 1, .36, 1), filter .5s cubic-bezier(.22, 1, .36, 1);
+}
+/* Hovering a closed slice lifts it toward the open state — the affordance IS
+   the preview. */
+.aperture-slice:not([data-on]):hover img { filter: saturate(1) brightness(.92); }
+.aperture-slice:not([data-on]):hover .aperture-date { color: #fff; letter-spacing: .2em; }
+.aperture-slice[data-on] img { filter: none; transform: scale(1.02); }
+/* The open slice is the only thing that can open further, so its hover is a
+   slow push-in rather than a lift. */
+.aperture-slice[data-on]:hover img { transform: scale(1.07); }
+.aperture-date {
+  position: absolute; inset: auto 0 0 0; padding: 14px 10px; display: flex; justify-content: center;
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  font-size: 11px; font-weight: 800; letter-spacing: .16em; color: rgba(255, 255, 255, .9);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, .7);
+  transition: opacity .3s cubic-bezier(.22, 1, .36, 1), color .3s cubic-bezier(.22, 1, .36, 1), letter-spacing .45s cubic-bezier(.22, 1, .36, 1);
+}
+.aperture-slice[data-on] .aperture-date { opacity: 0; }
+/* The caption and the like count exist only in the open state, so the layout
+   uses data a grid throws away. */
+.aperture-cap {
+  position: absolute; inset: auto 0 0 0; padding: 22px; opacity: 0; transform: translateY(10px);
+  background: linear-gradient(transparent, rgba(6, 5, 10, .9));
+  transition: opacity .5s cubic-bezier(.22, 1, .36, 1) .12s, transform .5s cubic-bezier(.22, 1, .36, 1) .12s, padding .5s cubic-bezier(.22, 1, .36, 1);
+}
+.aperture-slice[data-on] .aperture-cap { opacity: 1; transform: none; }
+.aperture-slice[data-on]:hover .aperture-cap { padding-bottom: 26px; }
+.aperture-cap p {
+  margin: 0; color: #fff; font-size: 13.5px; font-weight: 600; line-height: 1.45; max-width: 44ch;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+/* Clamped at rest; hovering gives it the room to finish. */
+.aperture-slice[data-on]:hover .aperture-cap p { -webkit-line-clamp: 4; }
+.aperture-meta {
+  display: flex; align-items: center; gap: 14px; margin-top: 9px;
+  color: rgba(255, 255, 255, .82); font-size: 12px; font-weight: 700;
+}
+.aperture-meta span { display: flex; align-items: center; gap: 5px; }
+.aperture-go {
+  margin-left: auto; padding: 5px 11px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .35);
+  color: #fff; font-size: 11px; font-weight: 700; opacity: 0; transform: translateY(4px);
+  transition: opacity .34s cubic-bezier(.22, 1, .36, 1), transform .34s cubic-bezier(.22, 1, .36, 1), background .2s ease;
+}
+.aperture-slice[data-on]:hover .aperture-go { opacity: 1; transform: none; }
+.aperture-go:hover { background: rgba(255, 255, 255, .16); }
+@media (max-width: 720px) {
+  /* A row of 4:5 slices is unreadable on a phone — stack them as full-width
+     cards with their captions already on, and nothing to open. */
+  .aperture-row { flex-direction: column; height: auto; gap: 8px; padding: 8px; }
+  .aperture-slice { width: auto !important; aspect-ratio: 4/5; border-radius: 16px; }
+  .aperture-slice img { filter: none; }
+  .aperture-date { opacity: 0; }
+  .aperture-cap { opacity: 1; transform: none; }
+}
+
 /* Rainbow layout */
 .rainbow-layout { padding: var(--space-2xl) var(--space-xl); display: flex; align-items: center; justify-content: center; gap: var(--space-md); }
 .rainbow-stage {
@@ -341,6 +415,7 @@ img { display: block; max-width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
   .preview-stage, .grid-layout .post-tile, .slider-slide, .lightbox-media-frame, .marquee-track, .demo-explorer { animation: none !important; }
+  .aperture-slice, .aperture-slice img, .aperture-cap, .aperture-go { transition: none !important; }
   .post-tile-skel, .lightbox-skel { animation: none; }
   .post-tile img[data-loaded="true"], .lightbox-media img[data-loaded="true"] { animation: none; }
   .slider-dot { transition: background .2s ease; }
@@ -481,8 +556,8 @@ const POSTS = [
 ];
 
 // DemoExplorer's tab order + labels.
-const ORDER = ["profile", "grid", "slider", "carousel", "marquee", "rainbow"];
-const LABEL = { grid: "Grid", profile: "Profile", slider: "Slider", carousel: "Carousel", marquee: "Marquee", rainbow: "Rainbow" };
+const ORDER = ["profile", "grid", "slider", "aperture", "carousel", "marquee", "rainbow"];
+const LABEL = { grid: "Grid", profile: "Profile", slider: "Slider", aperture: "Aperture", carousel: "Carousel", marquee: "Marquee", rainbow: "Rainbow" };
 
 /* ── lib/format.ts ─────────────────────────────────────────────────────── */
 const trim1 = (x) => (Math.round(x * 10) / 10).toString();
@@ -491,6 +566,13 @@ function compact(n) {
   if (n < 1e6) { const k = n / 1000; return (k >= 100 ? Math.round(k) : trim1(k)) + "K"; }
   const m = n / 1e6;
   return (m >= 100 ? Math.round(m) : trim1(m)) + "M";
+}
+/* Short rail date ("MAR 14"): the long form is unreadable turned on its side in
+   a 46px pill. */
+function shortDate(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }).toUpperCase();
 }
 function formatDate(iso) {
   const d = new Date(iso);
@@ -568,7 +650,7 @@ function profileHeader(p) {
 /* ── components/FeedLayouts.tsx ────────────────────────────────────────────
    The demo renders without the `teaser` flag, so the grid shows the six real
    posts and no "insert to load more" placeholders. */
-const state = { layout: "profile", slider: 0, cover: 0, rainbow: 0 };
+const state = { layout: "profile", slider: 0, cover: 0, rainbow: 0, aperture: 0 };
 
 function gridLayout({ columns = 3, cornerRadius = 4, gap = 4 } = {}) {
   const tiles = POSTS.map((p, i) => postTile(p, { style: `--i:${i}` })).join("");
@@ -627,6 +709,59 @@ function marqueeLayout() {
     .join("")}</div></div>`;
 }
 
+/* Aperture. Six slices; only one is open. Opening is a WIDTH change on nodes
+   that already exist — so unlike every other layout here it must never repaint
+   the canvas, or there is nothing left for the transition to interpolate. */
+function apertureLayout() {
+  const slices = POSTS.slice(0, 6)
+    .map(
+      (p, i) => `<button type="button" class="aperture-slice"${i === state.aperture ? " data-on" : ""} data-aperture="${i}" data-post="${p.id}"
+        aria-label="${i === state.aperture ? "Open post" : `Show post from ${shortDate(p.timestamp)}`}">
+        <img src="${p.mediaUrl}" alt="${esc(p.caption || "Instagram post")}" loading="lazy" draggable="false">
+        <span class="aperture-date">${shortDate(p.timestamp)}</span>
+        <div class="aperture-cap">
+          <p>${esc(p.caption) || "&nbsp;"}</p>
+          <div class="aperture-meta">
+            <span>${IconHeart(13)} ${compact(p.likes)}</span>
+            <span>${IconComment(13)} ${compact(p.comments)}</span>
+            <span class="aperture-go">View post</span>
+          </div>
+        </div>
+      </button>`,
+    )
+    .join("");
+  return `<div class="aperture-layout"><div class="aperture-row" id="ap-row">${slices}</div></div>`;
+}
+
+/* Widths, computed from the room the row actually has. The open slice is the
+   post's own 4:5 taken from the row height, capped so it can never eat the row
+   and leave the closed pills at zero. A hovered closed slice takes LIFT shares
+   of what is left and the others one each, so the row's total width never
+   changes and nothing outside it reflows. */
+const AP = { GAP: 10, PAD: 14, LIFT: 1.45, hovered: -1 };
+function apertureSize() {
+  const row = document.getElementById("ap-row");
+  if (!row) return;
+  const slices = [...row.querySelectorAll(".aperture-slice")];
+  const n = slices.length;
+  if (!n) return;
+  // Stacked on a phone: the CSS owns the sizing there, so clear the inline widths.
+  if (window.matchMedia("(max-width: 720px)").matches) {
+    slices.forEach((el) => { el.style.width = ""; });
+    return;
+  }
+  const inner = row.clientWidth - AP.PAD * 2;
+  const h = row.clientHeight - AP.PAD * 2;
+  const open = Math.min(h * 0.8, inner - (n - 1) * (AP.GAP + 46));
+  const room = inner - open - AP.GAP * (n - 1);
+  const lifting = AP.hovered >= 0 && AP.hovered !== state.aperture;
+  const unit = n > 1 ? room / (lifting ? n - 2 + AP.LIFT : n - 1) : 0;
+  slices.forEach((el, i) => {
+    const w = i === state.aperture ? open : lifting && i === AP.hovered ? unit * AP.LIFT : unit;
+    el.style.width = Math.max(0, w) + "px";
+  });
+}
+
 function rainbowLayout() {
   const cards = deckCards("rainbow");
   return `<div class="rainbow-layout">
@@ -641,6 +776,7 @@ function renderLayout(layout) {
     case "profile": return profileHeader(PROFILE) + gridLayout();
     case "grid": return gridLayout();
     case "slider": return sliderLayout();
+    case "aperture": return apertureLayout();
     case "carousel": return coverLayout();
     case "marquee": return marqueeLayout();
     case "rainbow": return rainbowLayout();
@@ -650,7 +786,26 @@ function renderLayout(layout) {
 const canvas = document.getElementById("canvas");
 function paint(animate = true) {
   canvas.innerHTML = `<div class="preview-stage"${animate ? "" : ' style="animation:none"'}>${renderLayout(state.layout)}</div>`;
+  AP.hovered = -1;
+  apertureSize();
 }
+
+// The row is width-driven, so it has to be re-measured whenever the page is.
+window.addEventListener("resize", apertureSize);
+
+/* Hover changes only the widths — no repaint, or the lift would not animate. */
+canvas.addEventListener("mouseover", (e) => {
+  const sl = e.target.closest(".aperture-slice");
+  const i = sl ? Number(sl.dataset.aperture) : -1;
+  if (i === AP.hovered) return;
+  AP.hovered = i;
+  apertureSize();
+});
+canvas.addEventListener("mouseleave", () => {
+  if (AP.hovered === -1) return;
+  AP.hovered = -1;
+  apertureSize();
+});
 
 /* One step of the deck. Keys [i-span, i+span] shift by one: the outermost card
    leaves, a new one mounts on the far side at opacity 0 (the off-stage ring it
@@ -762,6 +917,25 @@ document.addEventListener("click", (e) => {
 
   const cGo = e.target.closest("[data-cover-go]");
   if (cGo) { advance("cover", Number(cGo.dataset.coverGo)); return; }
+
+  const ap = e.target.closest("[data-aperture]");
+  if (ap && canvas.contains(ap)) {
+    const i = Number(ap.dataset.aperture);
+    if (i !== state.aperture) {
+      // Attribute swap + re-measure, never a repaint: the width transition is
+      // the whole layout.
+      state.aperture = i;
+      canvas.querySelectorAll(".aperture-slice").forEach((el) => {
+        el.toggleAttribute("data-on", Number(el.dataset.aperture) === i);
+      });
+      apertureSize();
+      return;
+    }
+    // Clicking the OPEN slice is the same gesture as clicking any other post.
+    const k = POSTS.findIndex((p) => p.id === ap.dataset.post);
+    if (k >= 0) { lb.open = true; lb.idx = k; lb.slide = 0; paintLightbox(); }
+    return;
+  }
 
   const rGo = e.target.closest("[data-rainbow-go]");
   if (rGo) { advance("rainbow", Number(rGo.dataset.rainbowGo)); return; }
