@@ -1104,9 +1104,9 @@ async function renderInstagram(head) {
     api("/instagram/admin/funnel?days=" + igDays), api("/instagram/admin/feeds"),
     acct("/gift-codes", null, "instagram"),
     api("/instagram/admin/live-sites"), api("/instagram/admin/user-costs"),
-    api("/instagram/admin/outreach"),
+    api("/instagram/admin/outreach"), api("/instagram/admin/free-on-domain"),
   ]);
-  const [bill, dom, funnel, feeds, gifts, sites, costs, reach] = rs.map(val);
+  const [bill, dom, funnel, feeds, gifts, sites, costs, reach, freeDom] = rs.map(val);
   const fn = dom && dom.funnel30d ? dom.funnel30d : null;
   $("view").innerHTML = `
     ${head("Instagram feeds, and where people stop between opening the plugin and paying.")}
@@ -1175,6 +1175,20 @@ async function renderInstagram(head) {
         : `<button class="reach-set" data-id="${esc(o.id)}" data-status="sent" style="width:auto;padding:4px 10px">Mark sent</button>
            <button class="reach-set" data-id="${esc(o.id)}" data-status="skipped" style="width:auto;padding:4px 10px">Skip</button>`}</td>
     </tr>`).join("")}</tbody></table>` : `<div class="empty">Nothing queued. Drop-offs appear 3 days after they leave.</div>`}</div>` : unavailable("Outreach", rs[7])}
+
+    <div class="sec-title">Free feeds on a customer's own domain · the mistake</div>
+    ${freeDom ? `<div class="tablewrap" style="margin-bottom:6px">${freeDom.feeds.length ? `<table><thead><tr>
+      <th>Domain</th><th>Feed</th><th>Owner</th><th>Plan</th><th>Published</th>
+    </tr></thead><tbody>${freeDom.feeds.map((x) => `<tr>
+      <td><a href="https://${esc(x.domain)}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(x.domain)}</a></td>
+      <td>${x.handle ? "@" + esc(x.handle) : "-"}</td>
+      <td>${x.email ? esc(x.email) : shortId(x.userId)}</td>
+      <td><span class="badge b-other">${esc(x.plan)}</span></td>
+      <td>${dt(x.since)}</td>
+    </tr>`).join("")}</tbody></table>` : `<div class="empty">Nobody has published a free feed to their own domain. That is the plugin's canvas warning doing its job.</div>`}</div>
+    <p class="note" style="margin-bottom:16px">Each row is someone whose feed is <b>not rendering</b> on the domain they published to, because Free only
+      serves Framer addresses. They are the warmest upgrade conversations you have: the work is done and the site is live.
+      Rows disappear on their own when the owner upgrades, because the plan is read live rather than stored.</p>` : unavailable("Free feeds on a custom domain", rs[8])}
 
     <div class="sec-title">Live sites · where feeds are actually being served</div>
     ${sites ? `<div class="tablewrap" style="margin-bottom:6px">${sites.sites.length ? `<table><thead><tr>

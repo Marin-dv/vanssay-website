@@ -258,7 +258,7 @@ const FEATS = {
     "All 6 layouts + curated picker",
   ],
   pro: [
-    "3 Instagram feeds",
+    "10 Instagram feeds",
     "Up to 18 posts per feed",
     "Daily auto-sync · 10 manual syncs/day",
     "Up to 50,000 feed views/month",
@@ -407,7 +407,7 @@ async function load() {
     $("d-extra").onclick = canBuyExtra ? checkout("extraFeed") : null;
     $("d-extra-copy").textContent =
       canBuyExtra ? "One-time $29, added to your account forever — on top of the feeds your plan includes. Buy as many as you need."
-      : plan === "starter" ? "Extra feeds are available on Pro and Lifetime. Starter covers one feed — switch to Pro for three, then add more at $29 each."
+      : plan === "starter" ? "Extra feeds are available on Pro and Lifetime. Starter covers one feed, so switch to Pro for ten, then add more at $29 each."
       : "Extra feeds are available on Pro and Lifetime. Pick one of those plans first.";
     $("d-extra").title = canBuyExtra ? "" : "Available on Pro and Lifetime.";
   } catch (e) {
