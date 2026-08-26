@@ -240,7 +240,7 @@ img { display: block; max-width: 100%; }
 .marquee-track .post-tile { width: 190px; aspect-ratio: 4/5; border-radius: var(--tile-radius, 10px); flex-shrink: 0; }
 
 /* Aperture layout — closed slices are tall pills carrying their date turned on
-   its side; the open one takes Instagram's own 4:5 while the rest retract to
+   its side; the open one takes a full square while the rest retract to
    share what is left. Widths are set in JS: every slice is sized the SAME way,
    so one interpolating property carries the open instead of a layout-model jump. */
 .aperture-layout { padding: var(--space-md); }
@@ -307,7 +307,7 @@ img { display: block; max-width: 100%; }
   /* A row of 4:5 slices is unreadable on a phone — stack them as full-width
      cards with their captions already on, and nothing to open. */
   .aperture-row { flex-direction: column; height: auto; gap: 8px; padding: 8px; }
-  .aperture-slice { width: auto !important; aspect-ratio: 4/5; border-radius: 16px; }
+  .aperture-slice { width: auto !important; aspect-ratio: 1; border-radius: 16px; }
   .aperture-slice img { filter: none; }
   .aperture-date { opacity: 0; }
   .aperture-cap { opacity: 1; transform: none; }
@@ -734,11 +734,12 @@ function apertureLayout() {
 }
 
 /* Widths, computed from the room the row actually has. The open slice is the
-   post's own 4:5 taken from the row height, capped so it can never eat the row
+   post's own shape taken from the row height (AP.RATIO — 1 is square, .8 is
+   Instagram's 4:5), capped so it can never eat the row
    and leave the closed pills at zero. A hovered closed slice takes LIFT shares
    of what is left and the others one each, so the row's total width never
    changes and nothing outside it reflows. */
-const AP = { GAP: 10, PAD: 14, LIFT: 1.45, hovered: -1 };
+const AP = { GAP: 10, PAD: 14, LIFT: 1.45, RATIO: 1, hovered: -1 };
 function apertureSize() {
   const row = document.getElementById("ap-row");
   if (!row) return;
@@ -752,7 +753,7 @@ function apertureSize() {
   }
   const inner = row.clientWidth - AP.PAD * 2;
   const h = row.clientHeight - AP.PAD * 2;
-  const open = Math.min(h * 0.8, inner - (n - 1) * (AP.GAP + 46));
+  const open = Math.min(h * AP.RATIO, inner - (n - 1) * (AP.GAP + 46));
   const room = inner - open - AP.GAP * (n - 1);
   const lifting = AP.hovered >= 0 && AP.hovered !== state.aperture;
   const unit = n > 1 ? room / (lifting ? n - 2 + AP.LIFT : n - 1) : 0;
