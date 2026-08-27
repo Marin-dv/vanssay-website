@@ -1072,8 +1072,16 @@ const IG_STEP = {
   insert_clicked:    ["Pressed Insert",        "Clicked Insert to Canvas"],
   paywall_opened:    ["Saw the paywall",       "The plan chooser was shown"],
   checkout_started:  ["Opened Stripe",         "Checkout was launched"],
-  unlocked:          ["Paid & came back",      "Returned with an active plan"],
+  unlocked:          ["Signed up",             "Came back with an account. Free counts: it is a real plan"],
   feed_created:      ["Feed on the canvas",    "A feed was saved and inserted"],
+  paying:            ["Paying",                "On a paid plan today. Read from the plan, not from an event"],
+};
+// What a visitor IS now, which is a different question from how far they walked.
+// Free is a real plan, so having an account is not the same as being a customer.
+const IG_OUTCOME = {
+  paid: '<span class="badge b-pro">paying</span>',
+  free: '<span class="badge b-free">free</span>',
+  anon: "",
 };
 // Gift code lifecycle: unused → active (redeemed, still running) → ended.
 // "expired" is the other dead end: never redeemed before the code lapsed.
@@ -1104,9 +1112,14 @@ function igFunnelPanel(f, r) {
       </div>
       <div class="meter"><span style="width:${pctTop}%"></span></div></div>`;
   }).join("");
-  const conv = top ? ((f.steps[f.steps.length - 1].visitors / top) * 100).toFixed(1) : "0";
+  const paying = f.paying || 0;
+  const accounts = f.accounts || 0;
+  const conv = top ? ((paying / top) * 100).toFixed(1) : "0";
+  const signup = top ? ((accounts / top) * 100).toFixed(1) : "0";
   return `<div class="panel"><h3>Funnel · last ${f.days} days</h3>${rows}
-    <div class="kv" style="margin-top:10px"><span>Open → feed on canvas</span><strong>${conv}%</strong></div>
+    <div class="kv" style="margin-top:10px"><span>Open → account</span><strong>${signup}%</strong></div>
+    <div class="kv"><span>Open → paying</span><strong>${conv}%</strong></div>
+    <div class="kv"><span>On Free right now</span><strong>${fmt(Math.max(0, accounts - paying))}</strong></div>
     <div class="kv"><span>Previews that failed</span><strong>${fmt(f.failed)}</strong></div></div>`;
 }
 async function renderInstagram(head) {
@@ -1128,7 +1141,8 @@ async function renderInstagram(head) {
       ${dom ? `<div class="kpi"><div class="k-label">Feeds</div><div class="k-val">${fmt(dom.feeds)}</div><div class="k-sub">${fmt(dom.cachedHandles)} handles cached</div></div>` : ""}
       ${fn ? `<div class="kpi"><div class="k-label">Opened (30d)</div><div class="k-val">${fmt(fn.opened)}</div><div class="k-sub">${fmt(fn.previewed)} saw a feed</div></div>
       <div class="kpi"><div class="k-label">Reached checkout</div><div class="k-val">${fmt(fn.checkout)}</div><div class="k-sub">${fmt(fn.paywall)} saw the paywall</div></div>
-      <div class="kpi"><div class="k-label">Converted</div><div class="k-val">${fmt(fn.unlocked)}</div><div class="k-sub">${fn.opened ? ((fn.unlocked / fn.opened) * 100).toFixed(1) : "0"}% of opens</div></div>` : ""}
+      <div class="kpi"><div class="k-label">Signed up</div><div class="k-val">${fmt(funnel ? funnel.accounts : fn.unlocked)}</div><div class="k-sub">${fn.opened ? (((funnel ? funnel.accounts : fn.unlocked) / fn.opened) * 100).toFixed(1) : "0"}% of opens · free included</div></div>
+      ${funnel ? `<div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(funnel.paying)}</div><div class="k-sub">${funnel.accounts ? ((funnel.paying / funnel.accounts) * 100).toFixed(1) : "0"}% of accounts · ${fmt(Math.max(0, funnel.accounts - funnel.paying))} on Free</div></div>` : ""}` : ""}
     </div>
     ${!bill && !dom ? unavailable("Instagram", rs[1]) : ""}
 
@@ -1139,15 +1153,16 @@ async function renderInstagram(head) {
     <div class="grid-2" style="margin-bottom:16px">
       ${igFunnelPanel(funnel, rs[2])}
       ${funnel && funnel.trend.length ? `<div class="panel"><h3>Plugin opens · daily</h3>
-        ${barChart(funnel.trend.map((t, i) => ({ v: t.opened, tip: `${t.day}: ${fmt(t.opened)} opened, ${fmt(t.converted)} converted`, label: i % 5 === 0 ? t.day.slice(8) : "" })))}
-        <p class="note">Hover a bar for that day's conversions.</p></div>` : `<div class="panel"><div class="empty">No events yet.</div></div>`}
+        ${barChart(funnel.trend.map((t, i) => ({ v: t.opened, tip: `${t.day}: ${fmt(t.opened)} opened, ${fmt(t.signedUp)} signed up`, label: i % 5 === 0 ? t.day.slice(8) : "" })))}
+        <p class="note">Hover a bar for that day's sign-ups. Paying is a plan, not a day, so it isn't on this chart.</p></div>` : `<div class="panel"><div class="empty">No events yet.</div></div>`}
     </div>
 
     <div class="sec-title">Visitors · furthest step reached</div>
     ${funnel ? `<div class="tablewrap" style="margin-bottom:16px">${funnel.visitors.length ? `<table><thead><tr>
-      <th>Who</th><th>Stopped at</th><th>Profiles previewed</th><th class="right">Events</th><th>First seen</th><th>Last seen</th>
+      <th>Who</th><th>Now</th><th>Stopped at</th><th>Profiles previewed</th><th class="right">Events</th><th>First seen</th><th>Last seen</th>
     </tr></thead><tbody>${funnel.visitors.map((v) => `<tr>
-      <td>${v.email ? esc(v.email) : shortId(v.anonId)}${v.converted ? ' <span class="badge b-active">converted</span>' : ""}</td>
+      <td>${v.email ? esc(v.email) : shortId(v.anonId)}</td>
+      <td>${IG_OUTCOME[v.outcome] || '<span class="note" style="padding:0">no account</span>'}${v.plan && v.plan !== "free" && v.plan !== "expired" ? ` <span class="muted-sm">${esc(v.plan)}</span>` : ""}</td>
       <td>${esc((IG_STEP[v.furthestStep] || [v.furthestStep])[0])}${v.failed ? ' <span class="badge b-canceled">preview failed</span>' : ""}</td>
       <td class="truncate">${v.handles.length ? v.handles.map((h) => "@" + esc(h)).join(", ") : "-"}</td>
       <td class="right">${fmt(v.events)}</td><td>${dt(v.firstSeen)}</td><td>${dt(v.lastSeen)}</td>
