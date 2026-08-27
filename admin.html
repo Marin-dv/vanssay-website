@@ -190,12 +190,17 @@ const TKEY = "vanssay.token";
    One entry per plugin. `base` = the plugin backend's path prefix on the API
    host ("" = the Accounts/Reviews service itself). Adding a future plugin =
    add a row here + (if it has its own backend) it gets a sidebar page free. */
+// `activity` = where that plugin answers "which users are actually using me",
+// as [path, key of the array in the response]. Every row carries a userId (the
+// shared Accounts id). It differs per plugin because the plugins differ: the
+// blockers key off a site config, Instagram off a connected feed. Reviews is
+// not listed because its own /users payload already carries businesses + views.
 const PRODUCTS = [
-  { key: "reviews",     label: "Reviews",     icon: "⭐", base: "",             cache: true  },
-  { key: "geoblock",    label: "Bouncer",     icon: "🛡️", base: "/geoblock",    cache: true  },
-  { key: "router",      label: "Router",      icon: "🧭", base: "/router",      cache: true  },
-  { key: "instagram",   label: "Instagram",   icon: "📸", base: "/instagram",   cache: false },
-  { key: "maintenance", label: "Maintenance", icon: "🚧", base: "/maintenance", cache: false },
+  { key: "reviews",     label: "Reviews",     icon: "⭐", base: "",             cache: true,  activity: null },
+  { key: "geoblock",    label: "Bouncer",     icon: "🛡️", base: "/geoblock",    cache: true,  activity: ["/admin/sites", "sites"] },
+  { key: "router",      label: "Router",      icon: "🧭", base: "/router",      cache: true,  activity: ["/admin/sites", "sites"] },
+  { key: "instagram",   label: "Instagram",   icon: "📸", base: "/instagram",   cache: false, activity: ["/admin/feeds", "feeds"] },
+  { key: "maintenance", label: "Maintenance", icon: "🚧", base: "/maintenance", cache: false, activity: ["/admin/sites", "sites"] },
 ];
 const PROD = Object.fromEntries(PRODUCTS.map((p) => [p.key, p]));
 
@@ -452,24 +457,30 @@ async function loadUsers() {
   if (usersState.search) qs.set("search", usersState.search);
   if (usersState.source) qs.set("source", usersState.source);
   // Same page of the same (global) user list, once per product → merge plans by id.
-  // In parallel, pull each plugin's domain owners so we can flag *free* users who
-  // are still actively using a plugin (e.g. a free Bouncer site). Reviews' domain
-  // activity comes back in its own users payload (businesses/views); the other
-  // plugins expose owners via their own backend's /admin/sites (site.userId is the
-  // shared Accounts user id).
+  // In parallel, pull each plugin's owners so we can flag *free* users who are
+  // still actively using it (e.g. a free Bouncer site, or a free Instagram feed).
+  // Reviews' activity comes back in its own users payload (businesses/views); the
+  // others answer on their own backend, at the path PRODUCTS[].activity names —
+  // NOT one shared route. Instagram has no /admin/sites at all, so asking every
+  // plugin for that path 404'd there and silently dropped its badge: an account
+  // using Reviews and Instagram only ever showed Reviews.
   const [rs, siteRs] = await Promise.all([
     Promise.allSettled(PRODUCTS.map((p) => acct("/users?" + qs, null, p.key))),
-    Promise.allSettled(PRODUCTS.map((p) => (p.base ? api(p.base + "/admin/sites") : Promise.resolve(null)))),
+    Promise.allSettled(PRODUCTS.map((p) => (p.activity ? api(p.base + p.activity[0]) : Promise.resolve(null)))),
   ]);
   const base = val(rs[0]);
   if (!base) { wrap.innerHTML = unavailable("Users", rs[0]); $("u-pager").innerHTML = ""; return; }
   const planOf = {}, rowOf = {}, activeIds = {};
   PRODUCTS.forEach((p, i) => { const d = val(rs[i]); planOf[p.key] = new Map((d ? d.users : []).map((u) => [u.id, u.plan]));
     rowOf[p.key] = new Map((d ? d.users : []).map((u) => [u.id, u]));
-    const sd = val(siteRs[i]); activeIds[p.key] = new Set(sd && sd.sites ? sd.sites.map((s) => s.userId).filter(Boolean) : []); });
+    const sd = val(siteRs[i]);
+    const rows = sd && p.activity ? sd[p.activity[1]] : null;
+    activeIds[p.key] = new Set(Array.isArray(rows) ? rows.map((r) => r.userId).filter(Boolean) : []); });
 
-  // "Actively using" = paid on that plugin, has a domain config there, or
-  // (reviews) has businesses / views.
+  // "Actively using" = paid on that plugin, or free but with something to show
+  // for it there: a site config, an Instagram feed, or (reviews) businesses and
+  // views. The free signal is capped by each backend's own list size (feeds take
+  // 200, sites 500), so a very old free account can age out of its badge.
   const usesPlugin = (u, key) => {
     const pl = planOf[key].get(u.id) || "free";
     if (pl !== "free") return true;
