@@ -512,8 +512,20 @@ async function loadUsers() {
   if ($("u-next")) $("u-next").onclick = () => { usersState.page++; loadUsers(); };
 }
 
-/* ── User detail modal, cross-plugin ── */
-async function openUser(id) {
+/* ── User detail modal, cross-plugin ──
+   Shows one product's domain stats — whichever the user actually uses. `force`
+   pins it (clicking from the Reviews or Instagram page's own user list); with
+   no force (the global Users tab) it picks Reviews if they're active there,
+   else Instagram, else neither. */
+function productActivity(dets, igDetail) {
+  const r = dets.reviews;
+  const totalViews = r ? r.views.reduce((s, v) => s + v.views, 0) : 0;
+  const isReviews = !!r && (r.plan !== "free" || r.configs.length > 0 || totalViews > 0);
+  const i = dets.instagram;
+  const isInstagram = !!igDetail && ((i && i.plan !== "free") || igDetail.feeds.length > 0 || (igDetail.funnel && igDetail.funnel.events > 0));
+  return { isReviews, isInstagram, totalViews };
+}
+async function openUser(id, force) {
   const root = $("modal-root");
   root.innerHTML = `<div class="modal-bg"><div class="modal"><div class="empty">Loading…</div></div></div>`;
   root.querySelector(".modal-bg").onclick = (e) => { if (e.target.classList.contains("modal-bg")) root.innerHTML = ""; };
@@ -525,23 +537,76 @@ async function openUser(id) {
   const base = PRODUCTS.map((p) => dets[p.key]).find(Boolean);
   if (!base) { root.querySelector(".modal").innerHTML = `<div class="err" style="display:block">${esc(why(rs[0]))}</div>`; return; }
   const u = base.user;
-  const totalViews = base.views.reduce((s, v) => s + v.views, 0);
-  const totalClicks = base.pages.reduce((s, p) => s + p.poweredClicks, 0);
+  // Instagram's own domain data (feeds/live sites/cost/funnel) — best-effort,
+  // since the modal must still work if that plugin backend is unreachable.
+  let igDetail = null;
+  try { igDetail = await api("/instagram/admin/users/" + id); } catch {}
+
+  const { isReviews, isInstagram, totalViews } = productActivity(dets, igDetail);
+  const rv = dets.reviews;
+  // A forced product (clicked from the Reviews/Instagram page's own list) can
+  // still lack data if that call failed — fall back rather than crash on it.
+  const showReviews = (force || (isReviews ? "reviews" : isInstagram ? "instagram" : null)) === "reviews" && !!rv;
+  const showInstagram = (force || (isReviews ? "reviews" : isInstagram ? "instagram" : null)) === "instagram" && !!igDetail;
+  const totalClicks = rv ? rv.pages.reduce((s, p) => s + p.poweredClicks, 0) : 0;
   const allSubs = PRODUCTS.flatMap((p) => (dets[p.key] ? dets[p.key].subscriptions : []).map((s) => ({ ...s, product: p })));
+
+  const reviewsMinistat = `<div class="ministat" style="margin-bottom:14px">
+        <div class="kpi"><div class="k-label">Widget views (all months)</div><div class="k-val">${fmt(totalViews)}</div></div>
+        <div class="kpi"><div class="k-label">“Powered by” clicks</div><div class="k-val">${fmt(totalClicks)}</div></div>
+      </div>`;
+  const igMinistat = igDetail ? `<div class="ministat" style="margin-bottom:14px">
+        <div class="kpi"><div class="k-label">Feeds</div><div class="k-val">${fmt(igDetail.feeds.length)}</div></div>
+        <div class="kpi"><div class="k-label">Scrape cost (all-time)</div><div class="k-val">${usd(igDetail.cost.costUsd)}</div></div>
+      </div>` : "";
+
+  const reviewsSections = !rv ? "" : `
+    <div class="sec-title">Reviews · businesses (${rv.configs.length})</div>
+    <div class="card" style="padding:0;overflow:hidden">${rv.configs.length ? `<table><thead><tr><th>Google</th><th>Trustpilot</th><th>Min ★</th></tr></thead><tbody>
+      ${rv.configs.map((c)=>`<tr><td>${esc(c.googleBusinessName||c.googlePlaceId||"-")}</td><td class="breakurl">${tpLink(c.trustpilotUrl)}</td><td>${minStarsLabel(c.minStars)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No businesses connected.</div>`}</div>
+
+    <div class="sec-title">Reviews · embed pages (${rv.pages.length})</div>
+    <div class="card" style="padding:0;overflow:hidden">${rv.pages.length ? `<table><thead><tr><th>Page</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
+      ${rv.pages.map((p)=>`<tr><td class="truncate"><a href="${esc(p.pageUrl)}" target="_blank">${esc(p.pageUrl)}</a></td><td class="right">${fmt(p.views)}</td><td class="right">${fmt(p.poweredClicks)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No embeds recorded yet.</div>`}</div>
+
+    <div class="sec-title">Reviews · view history</div>
+    <div class="card" style="padding:0;overflow:hidden">${rv.views.length ? `<table><thead><tr><th>Month</th><th class="right">Views</th></tr></thead><tbody>
+      ${rv.views.map((vw)=>`<tr><td>${esc(vw.month)}</td><td class="right">${fmt(vw.views)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No views recorded.</div>`}</div>`;
+
+  const igSections = igDetail ? `
+    <div class="sec-title">Instagram · feeds (${igDetail.feeds.length})</div>
+    <div class="card" style="padding:0;overflow:hidden">${igDetail.feeds.length ? `<table><thead><tr><th>Handle</th><th>Layout</th><th>Mode</th><th>Created</th></tr></thead><tbody>
+      ${igDetail.feeds.map((f)=>`<tr><td>@${esc(f.handle)}</td><td>${esc(f.layout)}</td><td>${esc(f.mode)}</td><td>${date(f.createdAt)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No feeds created.</div>`}</div>
+
+    <div class="sec-title">Instagram · live sites (${igDetail.liveSites.length})</div>
+    <div class="card" style="padding:0;overflow:hidden">${igDetail.liveSites.length ? `<table><thead><tr><th>Site</th><th>Feed</th><th class="right">Loads</th><th>Last seen</th></tr></thead><tbody>
+      ${igDetail.liveSites.map((s)=>`<tr><td class="truncate"><a href="${esc(s.origin + s.path)}" target="_blank">${esc(s.origin.replace(/^https?:\/\//,"") + s.path)}</a></td><td>${s.handle?"@"+esc(s.handle):"-"}</td><td class="right">${fmt(s.views)}</td><td>${dt(s.lastSeen)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No live sites recorded.</div>`}</div>
+
+    <div class="sec-title">Instagram · funnel</div>
+    <div class="card">${igDetail.funnel ? `
+      <div class="kv"><span>Furthest step</span><span>${esc((IG_STEP[igDetail.funnel.furthestStep] || [igDetail.funnel.furthestStep])[0])}${igDetail.funnel.failed?' <span class="badge b-canceled">preview failed</span>':""}</span></div>
+      <div class="kv"><span>Handles tried</span><span>${igDetail.funnel.handles.length ? igDetail.funnel.handles.map(h=>"@"+esc(h)).join(", ") : "-"}</span></div>
+      <div class="kv"><span>Events</span><span>${fmt(igDetail.funnel.events)}</span></div>
+      <div class="kv"><span>First seen</span><span>${dt(igDetail.funnel.firstSeen)}</span></div>
+      <div class="kv"><span>Last seen</span><span>${dt(igDetail.funnel.lastSeen)}</span></div>` : `<div class="empty">No plugin sessions recorded.</div>`}</div>
+
+    <div class="sec-title">Instagram · scrape cost</div>
+    <div class="card">
+      <div class="kv"><span>Cost (all-time)</span><span>${usd(igDetail.cost.costUsd)}</span></div>
+      <div class="kv"><span>Scrapes</span><span>${fmt(igDetail.cost.scrapes)}</span></div>
+      <div class="kv"><span>Handles</span><span>${igDetail.cost.handles.length ? igDetail.cost.handles.map(h=>"@"+esc(h)).join(", ") : "-"}</span></div>
+    </div>` : `<div class="sec-title">Instagram</div><div class="card"><div class="empty">Instagram data unavailable.</div></div>`;
 
   root.querySelector(".modal").innerHTML = `
     <div class="modal-head"><h3>${esc(u.email)}</h3><button class="x" id="m-close">×</button></div>
 
     <div class="card">
-      <div class="ministat" style="margin-bottom:14px">
-        <div class="kpi"><div class="k-label">Widget views (all months)</div><div class="k-val">${fmt(totalViews)}</div></div>
-        <div class="kpi"><div class="k-label">“Powered by” clicks</div><div class="k-val">${fmt(totalClicks)}</div></div>
-      </div>
+      ${showReviews ? reviewsMinistat : showInstagram ? igMinistat : ""}
       <div class="kv"><span>Signed up on</span><span>${platformBadge(u.platform)}</span></div>
       <div class="kv"><span>User ID</span><span class="mono">${esc(u.id)}</span></div>
       <div class="kv"><span>Joined</span><span>${date(u.createdAt)}</span></div>
       <div class="kv"><span>Stripe customer</span><span class="mono">${esc(u.stripeCustomerId || "-")}</span></div>
-      <div class="kv"><span>Reviews monthly quota</span><span>${base.quota>0?fmt(base.quota):"Unlimited"}</span></div>
+      ${showReviews ? `<div class="kv"><span>Reviews monthly quota</span><span>${rv.quota>0?fmt(rv.quota):"Unlimited"}</span></div>` : ""}
     </div>
 
     <div class="card">
@@ -562,7 +627,7 @@ async function openUser(id) {
       }).join("")}
       <div class="err" id="m-err"></div><div class="ok" id="m-ok"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
-        <button class="btn btn-line btn-sm" id="m-resetviews">Reset month views (Reviews)</button>
+        ${showReviews ? `<button class="btn btn-line btn-sm" id="m-resetviews">Reset month views (Reviews)</button>` : ""}
         <button class="btn btn-line btn-sm" id="m-sendreset">Send password reset</button>
         <button class="btn btn-danger btn-sm" id="m-delete" style="margin-left:auto">Delete account</button>
       </div>
@@ -573,17 +638,7 @@ async function openUser(id) {
     <div class="card" style="padding:0;overflow:hidden">${allSubs.length ? `<table><thead><tr><th>Plugin</th><th>Plan</th><th>Status</th><th>Period end</th><th>Created</th></tr></thead><tbody>
       ${allSubs.map((s)=>`<tr><td>${s.product.icon} ${esc(s.product.label)}</td><td>${planBadge(s.plan)}</td><td>${statusBadge(s.status)}</td><td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No subscriptions.</div>`}</div>
 
-    <div class="sec-title">Reviews · businesses (${base.configs.length})</div>
-    <div class="card" style="padding:0;overflow:hidden">${base.configs.length ? `<table><thead><tr><th>Google</th><th>Trustpilot</th><th>Min ★</th></tr></thead><tbody>
-      ${base.configs.map((c)=>`<tr><td>${esc(c.googleBusinessName||c.googlePlaceId||"-")}</td><td class="breakurl">${tpLink(c.trustpilotUrl)}</td><td>${minStarsLabel(c.minStars)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No businesses connected.</div>`}</div>
-
-    <div class="sec-title">Reviews · embed pages (${base.pages.length})</div>
-    <div class="card" style="padding:0;overflow:hidden">${base.pages.length ? `<table><thead><tr><th>Page</th><th class="right">Views</th><th class="right">Clicks</th></tr></thead><tbody>
-      ${base.pages.map((p)=>`<tr><td class="truncate"><a href="${esc(p.pageUrl)}" target="_blank">${esc(p.pageUrl)}</a></td><td class="right">${fmt(p.views)}</td><td class="right">${fmt(p.poweredClicks)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No embeds recorded yet.</div>`}</div>
-
-    <div class="sec-title">Reviews · view history</div>
-    <div class="card" style="padding:0;overflow:hidden">${base.views.length ? `<table><thead><tr><th>Month</th><th class="right">Views</th></tr></thead><tbody>
-      ${base.views.map((vw)=>`<tr><td>${esc(vw.month)}</td><td class="right">${fmt(vw.views)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No views recorded.</div>`}</div>
+    ${showReviews ? reviewsSections : showInstagram ? igSections : `<p class="note">Not actively using Reviews or Instagram yet.</p>`}
   `;
   const close = () => { root.innerHTML = ""; };
   const flash = (msg) => { showErr("m-err",""); $("m-ok").textContent = msg; $("m-ok").style.display = "block"; };
@@ -597,7 +652,7 @@ async function openUser(id) {
     try { await api("/admin/users/"+id, { method:"PATCH", body:{ plan: $("m-plan-"+k).value, product: k } }); flash(PROD[k].label + " plan saved."); loadUsers(); }
     catch(e){ showErr("m-err", e.message); }
   });
-  $("m-resetviews").onclick = async () => { try { await api("/admin/users/"+id+"/reset-views",{method:"POST"}); flash("Views reset to 0."); } catch(e){ showErr("m-err",e.message);} };
+  if ($("m-resetviews")) $("m-resetviews").onclick = async () => { try { await api("/admin/users/"+id+"/reset-views",{method:"POST"}); flash("Views reset to 0."); } catch(e){ showErr("m-err",e.message);} };
   $("m-sendreset").onclick = async () => { try { await api("/admin/users/"+id+"/send-reset",{method:"POST"}); flash("Password-reset email sent."); } catch(e){ showErr("m-err",e.message);} };
   $("m-delete").onclick = async () => {
     if (!confirm("Permanently delete "+u.email+" and ALL their data across every plugin? This cannot be undone.")) return;
@@ -860,17 +915,32 @@ function bindCache(p) {
 /* Reviews */
 let pagesSort = "poweredClicks";
 let reviewsUsers = { search: "", page: 1, pageSize: 25 };
+// Client-side paginated table (small, real-world account counts): fetch one
+// large page from Accounts, keep only users actually using this product, then
+// slice locally. Reviews' own /users response already carries businesses/views,
+// so "active" = paid, or free with something connected — same rule the global
+// Users tab uses per plugin.
+function pageSlice(rows, state, wrapId, pagerId, renderRow) {
+  const filtered = state.search ? rows.filter((u) => u.email.toLowerCase().includes(state.search.toLowerCase())) : rows;
+  const wrap = $(wrapId), pager = $(pagerId);
+  if (!filtered.length) { wrap.innerHTML = `<div class="empty">No users found.</div>`; if (pager) pager.innerHTML = ""; return; }
+  const pages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
+  state.page = Math.min(state.page, pages);
+  const start = (state.page - 1) * state.pageSize;
+  const slice = filtered.slice(start, start + state.pageSize);
+  return { filtered, pages, slice };
+}
 async function loadReviewsUsers() {
   const wrap = $("rv-utable"); if (!wrap) return;
-  const qs = new URLSearchParams({ page: reviewsUsers.page, pageSize: reviewsUsers.pageSize });
-  if (reviewsUsers.search) qs.set("search", reviewsUsers.search);
   let d;
-  try { d = await acct("/users?" + qs, null, "reviews"); }
+  try { d = await acct("/users?pageSize=1000", null, "reviews"); }
   catch (e) { wrap.innerHTML = `<div class="empty">Couldn't load users: ${esc(e.message)}</div>`; if ($("rv-upager")) $("rv-upager").innerHTML = ""; return; }
-  if (!d.users.length) { wrap.innerHTML = `<div class="empty">No users found.</div>`; $("rv-upager").innerHTML = ""; return; }
+  const active = d.users.filter((u) => u.plan !== "free" || u.businesses > 0 || u.viewsThisMonth > 0);
+  const r = pageSlice(active, reviewsUsers, "rv-utable", "rv-upager");
+  if (!r) return;
   wrap.innerHTML = `<table><thead><tr>
       <th>Email</th><th>Plan</th><th>Platform</th><th class="right">Views / quota</th><th class="right">Businesses</th><th>Joined</th>
-    </tr></thead><tbody>${d.users.map((u) => `<tr class="clickable" data-id="${u.id}">
+    </tr></thead><tbody>${r.slice.map((u) => `<tr class="clickable" data-id="${u.id}">
       <td>${esc(u.email)}</td>
       <td>${planBadge(u.plan)}</td>
       <td>${platformBadge(u.platform)}</td>
@@ -878,11 +948,10 @@ async function loadReviewsUsers() {
       <td class="right">${fmt(u.businesses)}</td>
       <td>${date(u.createdAt)}</td>
     </tr>`).join("")}</tbody></table>`;
-  wrap.querySelectorAll("tr.clickable").forEach((r) => r.onclick = () => openUser(r.dataset.id));
-  const pages = Math.max(1, Math.ceil(d.total / d.pageSize));
-  $("rv-upager").innerHTML = `<span>${d.total} user(s) · page ${d.page}/${pages}</span>
-    <button class="btn btn-line btn-sm" ${d.page<=1?"disabled":""} id="rv-prev">← Prev</button>
-    <button class="btn btn-line btn-sm" ${d.page>=pages?"disabled":""} id="rv-next">Next →</button>`;
+  wrap.querySelectorAll("tr.clickable").forEach((r) => r.onclick = () => openUser(r.dataset.id, "reviews"));
+  $("rv-upager").innerHTML = `<span>${r.filtered.length} user(s) · page ${reviewsUsers.page}/${r.pages}</span>
+    <button class="btn btn-line btn-sm" ${reviewsUsers.page<=1?"disabled":""} id="rv-prev">← Prev</button>
+    <button class="btn btn-line btn-sm" ${reviewsUsers.page>=r.pages?"disabled":""} id="rv-next">Next →</button>`;
   if ($("rv-prev")) $("rv-prev").onclick = () => { reviewsUsers.page--; loadReviewsUsers(); };
   if ($("rv-next")) $("rv-next").onclick = () => { reviewsUsers.page++; loadReviewsUsers(); };
 }
@@ -1122,6 +1191,36 @@ function igFunnelPanel(f, r) {
     <div class="kv"><span>On Free right now</span><strong>${fmt(Math.max(0, accounts - paying))}</strong></div>
     <div class="kv"><span>Previews that failed</span><strong>${fmt(f.failed)}</strong></div></div>`;
 }
+let instagramUsers = { search: "", page: 1, pageSize: 25 };
+// "Active" = paid on Instagram, or free with at least one feed (the only
+// domain signal this endpoint has — mirrors the free-activity rule used
+// elsewhere: paid always counts, free counts only with something to show for it).
+async function loadInstagramUsers(feedRows) {
+  const wrap = $("ig-utable"); if (!wrap) return;
+  let d;
+  try { d = await acct("/users?pageSize=1000", null, "instagram"); }
+  catch (e) { wrap.innerHTML = `<div class="empty">Couldn't load users: ${esc(e.message)}</div>`; if ($("ig-upager")) $("ig-upager").innerHTML = ""; return; }
+  const feedCount = new Map();
+  (feedRows || []).forEach((f) => feedCount.set(f.userId, (feedCount.get(f.userId) || 0) + 1));
+  const active = d.users.filter((u) => u.plan !== "free" || feedCount.has(u.id));
+  const r = pageSlice(active, instagramUsers, "ig-utable", "ig-upager");
+  if (!r) return;
+  wrap.innerHTML = `<table><thead><tr>
+      <th>Email</th><th>Plan</th><th>Platform</th><th class="right">Feeds</th><th>Joined</th>
+    </tr></thead><tbody>${r.slice.map((u) => `<tr class="clickable" data-id="${u.id}">
+      <td>${esc(u.email)}</td>
+      <td>${planBadge(u.plan)}</td>
+      <td>${platformBadge(u.platform)}</td>
+      <td class="right">${fmt(feedCount.get(u.id) || 0)}</td>
+      <td>${date(u.createdAt)}</td>
+    </tr>`).join("")}</tbody></table>`;
+  wrap.querySelectorAll("tr.clickable").forEach((row) => row.onclick = () => openUser(row.dataset.id, "instagram"));
+  $("ig-upager").innerHTML = `<span>${r.filtered.length} user(s) · page ${instagramUsers.page}/${r.pages}</span>
+    <button class="btn btn-line btn-sm" ${instagramUsers.page<=1?"disabled":""} id="ig-uprev">← Prev</button>
+    <button class="btn btn-line btn-sm" ${instagramUsers.page>=r.pages?"disabled":""} id="ig-unext">Next →</button>`;
+  if ($("ig-uprev")) $("ig-uprev").onclick = () => { instagramUsers.page--; loadInstagramUsers(feedRows); };
+  if ($("ig-unext")) $("ig-unext").onclick = () => { instagramUsers.page++; loadInstagramUsers(feedRows); };
+}
 async function renderInstagram(head) {
   const rs = await Promise.allSettled([
     acct("/overview", null, "instagram"), api("/instagram/admin/overview"),
@@ -1134,6 +1233,15 @@ async function renderInstagram(head) {
   const fn = dom && dom.funnel30d ? dom.funnel30d : null;
   $("view").innerHTML = `
     ${head("Instagram feeds, and where people stop between opening the plugin and paying.")}
+
+    <div class="sec-title" style="margin-top:0">Users</div>
+    <div class="toolbar">
+      <input class="search" id="ig-search" placeholder="Search users by email…" value="${esc(instagramUsers.search)}" />
+      <button class="btn btn-line btn-sm" id="ig-refresh">Refresh</button>
+    </div>
+    <div class="tablewrap" id="ig-utable"><div class="empty">Loading…</div></div>
+    <div class="pager" id="ig-upager" style="margin-bottom:24px"></div>
+
     <div class="kpis">
       ${bill ? `<div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
       <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${planBreakdown(bill.plans).replace(/^\S+\s·\s/, "")}</div></div>
@@ -1271,6 +1379,10 @@ async function renderInstagram(head) {
       <td class="right">${g.claimedAt ? "" : `<button class="gift-del" data-token="${esc(g.token)}" style="width:auto;padding:4px 10px">Revoke</button>`}</td>
     </tr>`).join("")}</tbody></table>` : `<div class="empty">No gift codes yet.</div>`}</div>` : unavailable("Gift codes", rs[4])}`;
   if ($("ig-days")) $("ig-days").onchange = (e) => { igDays = Number(e.target.value); renderInstagram(head); };
+  let igUTimer;
+  if ($("ig-search")) $("ig-search").oninput = (e) => { clearTimeout(igUTimer); igUTimer = setTimeout(() => { instagramUsers.search = e.target.value.trim(); instagramUsers.page = 1; loadInstagramUsers(feeds ? feeds.feeds : []); }, 300); };
+  if ($("ig-refresh")) $("ig-refresh").onclick = () => loadInstagramUsers(feeds ? feeds.feeds : []);
+  loadInstagramUsers(feeds ? feeds.feeds : []);
 
   if ($("gift-gen")) $("gift-gen").onclick = async () => {
     const btn = $("gift-gen"), out = $("gift-out");
