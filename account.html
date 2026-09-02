@@ -49,10 +49,18 @@
     .switch { text-align:center; font-size:13.5px; color:var(--text-2); margin-top:18px; }
     .switch a { color:var(--accent); font-weight:600; cursor:pointer; }
     .badge { display:inline-flex; padding:3px 12px; border-radius:99px; font-size:12px; font-weight:800; }
-    .b-free { background:var(--surface-2); color:var(--text-2); } .b-pro { background:#f1edff; color:var(--pro); } .b-ultra { background:linear-gradient(90deg,var(--accent),var(--pro)); color:#fff; }
+    .b-free { background:var(--surface-2); color:var(--text-2); } .b-starter,.b-pro { background:#f1edff; color:var(--pro); } .b-ultra { background:linear-gradient(90deg,var(--accent),var(--pro)); color:#fff; }
     .meter { height:8px; border-radius:99px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden; margin-top:8px; }
     .meter span { display:block; height:100%; background:var(--accent); border-radius:99px; }
     .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+    .inv-row { display:flex; align-items:center; justify-content:space-between; gap:12px;
+               padding:11px 0; border-top:1px solid var(--border); }
+    .inv-row:first-child { border-top:0; }
+    .inv-num { font-weight:600; font-size:13.5px; }
+    .inv-meta { display:block; color:var(--muted); font-size:12.5px; margin-top:2px; }
+    .inv-btn { padding:7px 12px; font-size:12.5px; }
+    .inv-wait { color:var(--muted); font-size:12.5px; text-align:right; }
+    @media (max-width:520px) { .inv-row { flex-direction:column; align-items:flex-start; } }
     .actions .btn { width:auto; flex:1; margin-top:0; }
     .cycle { display:flex; width:100%; gap:4px; padding:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:99px; margin-bottom:2px; }
     .cycle-opt { flex:1; border:0; background:transparent; color:var(--text-2); font:inherit; font-size:12.5px; font-weight:700; padding:8px 10px; border-radius:99px; cursor:pointer; }
@@ -102,7 +110,7 @@
 
     <div id="quota-banner" class="quota-alert">
       <strong>Your widget is showing fewer reviews</strong>
-      <p>You've used all <span id="qb-limit">300</span> free widget views this month, so your widget now shows <b>3 reviews</b> instead of your full set. It stays live on your site. Upgrade to show them all and remove the watermark.</p>
+      <p>You've used all <span id="qb-limit">300</span> widget views included in your plan this month, so your widget now shows <b>3 reviews</b> instead of your full set. It stays live on your site. Upgrade to show them all.</p>
       <button class="btn btn-blue" id="quota-up">Upgrade to Pro ($9/mo)</button>
     </div>
 
@@ -118,6 +126,12 @@
           <div class="row"><h3>Widget views this month</h3><strong id="d-views">-</strong></div>
           <div class="meter"><span id="d-meter" style="width:0%"></span></div>
           <p class="muted" id="d-limit"></p>
+        </div>
+
+        <div class="card" id="d-inv-card" style="display:none">
+          <h3>Invoices</h3>
+          <p class="muted" id="d-inv-copy">Every payment you make has an invoice here, ready to download as a PDF.</p>
+          <div id="d-inv-list"></div>
         </div>
       </div>
 
@@ -149,6 +163,8 @@ const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net"
 // Checkout sends a plan CHOICE; the backend resolves the live Stripe price id
 // from its env (single source of truth). Yearly plans give 2 months free.
 const PLAN_COPY = {
+  starter:    { label: "Starter", price: "$2.99/mo" },
+  starterYearly:{ label: "Starter", price: "$29.90/yr" },
   pro:        { label: "Pro",    price: "$9/mo"  },
   proYearly:  { label: "Pro",    price: "$90/yr" },
   ultra:      { label: "Agency", price: "$29/mo" },
@@ -259,17 +275,25 @@ async function load() {
       actions.innerHTML = "";
       const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
       // Monthly / yearly toggle — yearly gives 2 months free. Only where upgrading is possible.
-      if (plan === "free" || plan === "pro") {
+      if (plan === "free" || plan === "starter" || plan === "pro") {
         const t = document.createElement("div"); t.className = "cycle";
         const seg = (val, txt) => { const s = document.createElement("button"); s.type = "button"; s.className = "cycle-opt" + (cycle === val ? " on" : ""); s.textContent = txt; s.onclick = () => { cycle = val; renderBilling(); }; t.appendChild(s); };
         seg("monthly", "Monthly"); seg("yearly", "Yearly · 2 months free");
         actions.appendChild(t);
       }
+      const starterChoice = cycle === "yearly" ? "starterYearly" : "starter";
       const proChoice = cycle === "yearly" ? "proYearly" : "pro";
       const agencyChoice = cycle === "yearly" ? "ultraYearly" : "ultra";
       if (plan === "free") {
+        mk(`Start Starter (${PLAN_COPY[starterChoice].price})`, "btn-line", checkout(starterChoice));
         mk(`Upgrade to Pro (${PLAN_COPY[proChoice].price})`, "btn-line", checkout(proChoice));
         mk(`Go Agency (${PLAN_COPY[agencyChoice].price})`, "btn-blue", checkout(agencyChoice));
+      } else if (plan === "starter") {
+        mk(`Upgrade to Pro (${PLAN_COPY[proChoice].price})`, "btn-line", checkout(proChoice));
+        mk(`Go Agency (${PLAN_COPY[agencyChoice].price})`, "btn-blue", checkout(agencyChoice));
+        if (interval === "month") mk("Switch to yearly · 2 months free", "btn-line", switchInterval("year"));
+        else if (interval === "year") mk("Switch to monthly", "btn-line", switchInterval("month"));
+        mk("Manage / cancel billing", "btn-line", portal);
       } else if (plan === "pro") {
         mk(`Upgrade to Agency (${PLAN_COPY[agencyChoice].price})`, "btn-blue", checkout(agencyChoice));
         if (interval === "month") mk("Switch to yearly · 2 months free", "btn-line", switchInterval("year"));
@@ -282,6 +306,7 @@ async function load() {
       }
     }
     renderBilling();
+    loadInvoices();
 
     try {
       const u = await api("/track/usage");
@@ -290,20 +315,82 @@ async function load() {
       const pct = u.limit > 0 ? Math.min(100, (u.views / u.limit) * 100) : 0;
       const m = $("d-meter"); m.style.width = pct + "%";
       m.style.background = pct > 90 ? "var(--error)" : pct > 70 ? "#d97706" : "var(--accent)";
-      // Over the free cap → the widget degrades to 3 reviews (it is never hidden).
-      // Only free plans degrade, so only nudge them; paid keeps its full set.
-      const over = plan === "free" && u.limit > 0 && u.views > u.limit;
+      // Over the cap → the widget degrades to 3 reviews (it is never hidden).
+      // Only Free/Starter degrade, so only nudge those; Pro/Agency keep their full set.
+      const over = (plan === "free" || plan === "starter") && u.limit > 0 && u.views > u.limit;
       $("quota-banner").style.display = over ? "block" : "none";
       if (over) {
         $("qb-limit").textContent = u.limit.toLocaleString();
-        $("quota-up").textContent = plan === "free" ? "Upgrade to Pro ($9/mo)" : "Upgrade to Agency ($29/mo)";
-        $("quota-up").onclick = checkout(plan === "free" ? "pro" : "ultra");
+        $("quota-up").textContent = plan === "free" ? "Upgrade to Starter ($2.99/mo)" : "Upgrade to Pro ($9/mo)";
+        $("quota-up").onclick = checkout(plan === "free" ? "starter" : "pro");
       }
     } catch (e) { $("d-limit").textContent = "Usage unavailable right now."; }
   } catch (e) {
     localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
   }
 }
+// ── Invoices ────────────────────────────────────────────────────────────────
+// The document route is auth-scoped, so a plain <a href> would 401. Fetch it
+// with the token and hand the browser a blob to open in a new tab, where its
+// own "Download PDF" button prints it.
+async function openInvoice(number, btn) {
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = "Opening…";
+  try {
+    const res = await fetch(API + "/billing/invoices/" + encodeURIComponent(number), {
+      headers: { Authorization: "Bearer " + localStorage.getItem(TKEY) },
+    });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      throw new Error(d.error || "Could not open that invoice");
+    }
+    const url = URL.createObjectURL(new Blob([await res.text()], { type: "text/html" }));
+    window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (e) {
+    showErr("dash-err", e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = label;
+  }
+}
+
+async function loadInvoices() {
+  const card = $("d-inv-card"), list = $("d-inv-list");
+  try {
+    const { invoices, supportEmail } = await api("/billing/invoices?product=reviews");
+    if (!invoices.length) { card.style.display = "none"; return; }
+    card.style.display = "block";
+
+    // A held invoice is a real, numbered one whose document needs our intracom
+    // VAT number. Show it rather than hiding it, so the purchase is visibly on
+    // file and the customer knows exactly who to ask.
+    const held = invoices.some((i) => !i.available);
+    $("d-inv-copy").textContent = held
+      ? "Every payment you make has an invoice here. One of them needs our EU VAT number, which is being attributed."
+      : "Every payment you make has an invoice here, ready to download as a PDF.";
+
+    list.innerHTML = invoices.map((inv) => {
+      const d = new Date(inv.supplyDate).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+      const amt = (inv.amountCents / 100).toFixed(2) + " " + inv.currency;
+      return `<div class="inv-row">
+        <div>
+          <span class="inv-num">${inv.number}</span>
+          <span class="inv-meta">${d} · ${amt}</span>
+        </div>
+        ${inv.available
+          ? `<button class="btn btn-line inv-btn" data-inv="${inv.number}">Download PDF</button>`
+          : `<span class="inv-wait">Contact <a href="mailto:${supportEmail}?subject=Invoice%20${inv.number}" style="color:var(--accent)">${supportEmail}</a></span>`}
+      </div>`;
+    }).join("");
+
+    list.querySelectorAll("[data-inv]").forEach((b) => {
+      b.onclick = () => openInvoice(b.dataset.inv, b);
+    });
+  } catch (e) {
+    card.style.display = "none";
+  }
+}
+
 $("d-signout").onclick = () => { localStorage.removeItem(TKEY); load(); };
 $("d-changepass").onclick = async () => {
   const btn = $("d-changepass");

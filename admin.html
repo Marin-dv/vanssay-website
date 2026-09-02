@@ -41,6 +41,18 @@
     .err { background:#fdecec; color:var(--error); border-radius:9px; padding:9px 13px; font-size:12.5px; margin-top:12px; display:none; }
     .ok { background:#e9f7ef; color:var(--green); border-radius:9px; padding:9px 13px; font-size:12.5px; margin-top:12px; display:none; }
 
+    /* ── Alerts (diagnostics warnings) ── */
+    .alerts { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+    .alert { display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:11px; border:1px solid var(--border); background:var(--surface); font-size:13px; }
+    .alert strong { display:block; font-size:13.5px; }
+    .alert span.a-detail { color:var(--text-2); }
+    .alert.a-critical { border-color:#f5c2c2; background:#fdecec; }
+    .alert.a-critical strong { color:var(--error); }
+    .alert.a-warning { border-color:#f3ddb4; background:#fdf5e7; }
+    .alert.a-warning strong { color:var(--amber); }
+    .alert.a-ok { border-color:#bfe6cd; background:#e9f7ef; }
+    .alert.a-ok strong { color:var(--green); }
+
     /* ── Shell ── */
     .shell { display:none; min-height:100vh; grid-template-columns:236px 1fr; }
     aside { background:var(--surface); border-right:1px solid var(--border); padding:20px 14px; position:sticky; top:0; height:100vh; display:flex; flex-direction:column; gap:2px; }
@@ -169,6 +181,7 @@
     <button class="navlink" data-tab="subs"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span> Subscriptions</button>
     <button class="navlink" data-tab="expenses"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span> Expenses</button>
     <button class="navlink" data-tab="diag"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span> Diagnostics</button>
+    <button class="navlink" data-tab="site"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span> Website</button>
     <div class="navsep">Plugins</div>
     <div id="prod-nav"></div>
     <div class="aside-foot">
@@ -274,6 +287,8 @@ async function boot() {
     $("gate").classList.add("hidden");
     $("shell").style.display = "grid";
     $("admin-email").textContent = me.email;
+    // This browser is mine — take it out of the website analytics for good.
+    try { localStorage.setItem("vanssay.notrack", "1"); } catch (e) { /* storage blocked */ }
     switchTab("overview");
   } catch (e) {
     $("shell").style.display = "none";
@@ -292,7 +307,8 @@ function switchTab(tab) {
   document.querySelectorAll(".navlink").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
   $("view").innerHTML = `<div class="empty">Loading…</div>`;
   if (tab.startsWith("prod:")) return renderProduct(tab.slice(5));
-  ({ overview: renderOverview, users: renderUsers, subs: renderSubs, expenses: renderExpenses, diag: renderDiagnostics }[tab])();
+  ({ overview: renderOverview, users: renderUsers, subs: renderSubs, expenses: renderExpenses,
+     diag: renderDiagnostics, site: renderWebsite }[tab])();
 }
 
 /* ── Shared pieces ── */
@@ -305,6 +321,50 @@ function planRow(label, n, total) {
   const pct = total ? Math.round((n/total)*100) : 0;
   return `<div style="margin-bottom:10px"><div class="kv" style="border:none;padding-bottom:3px"><span>${esc(label)}</span><strong>${fmt(n)} · ${pct}%</strong></div>
     <div class="meter"><span style="width:${pct}%"></span></div></div>`;
+}
+// Mirrors backend/src/routes/preview.ts's FREE_REASONS — kept in sync by hand.
+const FREE_REASON_LABELS = {
+  too_expensive: "Too expensive",
+  just_trying: "Just trying it out",
+  not_ready: "Not ready to commit",
+  dont_need_features: "Don't need the extra features",
+  client_project: "Deciding for a client",
+  other: "Other",
+};
+// Mirrors backend/src/routes/preview.ts's CLIENT_FOLLOWUP_OPTIONS.
+const CLIENT_FOLLOWUP_LABELS = {
+  bill_client: "Bill the client directly",
+  flat_rate_multi_site: "Flat rate for multiple client sites",
+  commission: "Commission/referral fee when the client pays",
+};
+function freeReasonsPanel(d) {
+  if (!d) return "";
+  const total = d.counts.reduce((s, c) => s + c.count, 0);
+  const withDetail = d.recent.filter((r) => r.detail);
+  const followUpTotal = Object.values(d.followUpCounts || {}).reduce((s, n) => s + n, 0);
+  return `<div class="panel"><h3>Why people picked Free</h3>
+    ${total ? d.counts.map((c) => planRow(FREE_REASON_LABELS[c.reason] || c.reason, c.count, total)).join("") : `<div class="empty">No answers yet.</div>`}
+    ${followUpTotal ? `<div class="sec-title" style="margin-top:14px">"Deciding for a client" — what would help them convert</div>
+      ${Object.entries(CLIENT_FOLLOWUP_LABELS).map(([k, label]) => planRow(label, d.followUpCounts[k] || 0, followUpTotal)).join("")}` : ""}
+    ${withDetail.length ? `<div class="sec-title" style="margin-top:14px">Free-text answers ("Other" / "Too expensive")</div>
+      <div class="tablewrap"><table><thead><tr><th>When</th><th>Reason</th><th>Business previewed</th><th>Detail</th></tr></thead><tbody>
+        ${withDetail.slice(0, 20).map((r) => `<tr>
+          <td>${date(r.createdAt)}</td><td>${esc(FREE_REASON_LABELS[r.reason] || r.reason)}</td><td class="truncate">${esc(r.businessName || "-")}</td><td>${esc(r.detail)}</td>
+        </tr>`).join("")}
+      </tbody></table></div>` : ""}
+  </div>`;
+}
+function previewTriesPanel(d) {
+  if (!d) return "";
+  const rate = d.distinctBusinesses ? ((d.converted / d.distinctBusinesses) * 100).toFixed(1) : "0";
+  return `<div class="panel"><h3>Tried it without an account</h3>
+    <div class="kpis" style="margin-bottom:0">
+      <div class="kpi"><div class="k-label">Previews (all-time)</div><div class="k-val">${fmt(d.total)}</div></div>
+      <div class="kpi"><div class="k-label">Previews (30d)</div><div class="k-val">${fmt(d.last30d)}</div></div>
+      <div class="kpi"><div class="k-label">Distinct businesses</div><div class="k-val">${fmt(d.distinctBusinesses)}</div></div>
+      <div class="kpi"><div class="k-label">Later converted</div><div class="k-val">${fmt(d.converted)}</div><div class="k-sub">${rate}% of previewed businesses</div></div>
+    </div>
+  </div>`;
 }
 function planSplitPanel(bill) {
   if (!bill) return "";
@@ -798,9 +858,72 @@ function checkRow(c) {
     <span style="text-align:right;color:var(--text-2)">${esc(c.detail)} · <span class="mono">${fmt(c.ms)}ms</span></span></div>`;
 }
 
+/* Uptime as a human reads it: "3d 4h", not 273600 seconds. */
+function uptime(sec) {
+  sec = Number(sec || 0);
+  const d = Math.floor(sec / 86400), h = Math.floor((sec % 86400) / 3600), m = Math.floor((sec % 3600) / 60);
+  return d ? d + "d " + h + "h" : h ? h + "h " + m + "m" : m + "m";
+}
+
+const alertRow = (level, title, detail) =>
+  `<div class="alert a-${esc(level)}"><span>${level === "critical" ? "🔴" : level === "warning" ? "🟠" : "🟢"}</span>
+    <div><strong>${esc(title)}</strong><span class="a-detail">${esc(detail)}</span></div></div>`;
+
+/* Router backend load. The business panels can't show this: a throttled /check
+   answers 200 with a clean no-op, so an overwhelmed server looks like a quiet
+   one everywhere except here. Counters are in-process — a restart zeroes them,
+   and they describe this instance only. */
+let diagTimer = null;
+async function routerDiag() {
+  const el = $("rdiag");
+  if (!el) return;
+  let d;
+  try { d = await api("/router/admin/diagnostics"); }
+  catch (e) { el.innerHTML = `<div class="empty">Router health unavailable: ${esc(e.message)}</div>`; return; }
+
+  const w = d.windows["5m"], now = d.windows["1m"], h = d.host;
+  const alerts = d.warnings.length
+    ? d.warnings.map((a) => alertRow(a.level, a.title, a.detail)).join("")
+    : alertRow("ok", "Keeping up", "No saturation, no dropped redirects and no failing dependency in the last 5 minutes.");
+
+  el.innerHTML = `
+    <div class="sec-title" style="margin-top:0">Router · live load <span class="muted" style="font-weight:500">· last 5 min, refreshing</span></div>
+    <div class="alerts">${alerts}</div>
+    <div class="kpis">
+      <div class="kpi"><div class="k-label">Requests / min</div><div class="k-val">${fmt(w.perMinute)}</div>
+        <div class="k-sub">${fmt(now.perMinute)} this minute · ${fmt(w.check)} /check in 5min</div></div>
+      <div class="kpi"><div class="k-label">Response time</div><div class="k-val">${fmt(w.avgMs)}ms</div>
+        <div class="k-sub">worst ${fmt(w.maxMs)}ms · ${fmt(w.slow)} over 1s</div></div>
+      <div class="kpi"><div class="k-label">Event-loop lag</div><div class="k-val">${fmt(w.lagMaxMs)}ms</div>
+        <div class="k-sub">avg ${fmt(w.lagAvgMs)}ms · time spent unable to answer</div></div>
+      <div class="kpi"><div class="k-label">CPU</div><div class="k-val">${fmt(w.cpuPercent)}%</div>
+        <div class="k-sub">of one core · ${fmt(d.process.rssMb)}MB resident</div></div>
+      <div class="kpi"><div class="k-label">VPS load</div><div class="k-val">${Number(h.load1).toFixed(2)}</div>
+        <div class="k-sub">${fmt(h.cores)} cores · ${fmt(h.freeMemMb)}MB free of ${fmt(h.totalMemMb)}MB</div></div>
+    </div>
+    <div class="grid-eq" style="margin-bottom:16px">
+      <div class="panel"><h3>Health</h3>
+        ${d.checks.map(checkRow).join("")}
+        <p class="note">Up ${uptime(d.process.uptimeSeconds)} · node ${esc(d.process.node)} · read ${dt(d.at)}</p></div>
+      <div class="panel"><h3>Load by window</h3>
+        <div class="tablewrap"><table><thead><tr>
+          <th>Window</th><th class="right">Req</th><th class="right">/check</th><th class="right">Throttled</th>
+          <th class="right">429</th><th class="right">5xx</th><th class="right">Avg</th>
+        </tr></thead><tbody>${["1m", "5m", "60m"].map((k) => {
+          const x = d.windows[k];
+          return `<tr><td>${k}</td><td class="right">${fmt(x.requests)}</td><td class="right">${fmt(x.check)}</td>
+            <td class="right">${x.checkThrottled ? `<strong style="color:var(--amber)">${fmt(x.checkThrottled)}</strong>` : "0"}</td>
+            <td class="right">${fmt(x.rateLimited)}</td><td class="right">${fmt(x.serverErrors)}</td>
+            <td class="right">${fmt(x.avgMs)}ms</td></tr>`;
+        }).join("")}</tbody></table></div>
+        <p class="note">Throttled = a visitor's /check refused by the ${fmt(d.limits.checkRateLimitPerMinute)}/min per-IP cap and answered with a silent no-op: their redirect never ran. Counters reset when the container restarts.</p></div>
+    </div>`;
+}
+
 async function renderDiagnostics() {
   $("view").innerHTML = `
-    <div class="page-head"><div><h2>Diagnostics</h2><p>Live health checks, and the onboarding failures that used to leave no trace.</p></div></div>
+    <div class="page-head"><div><h2>Diagnostics</h2><p>Live health checks, whether the Router backend is keeping up, and the onboarding failures that used to leave no trace.</p></div></div>
+    <div id="rdiag"><div class="empty">Loading Router health…</div></div>
     <div class="grid-eq" style="margin-bottom:16px">
       <div class="panel"><h3>Prod health</h3>
         <p class="note" style="padding:0 0 10px">Real calls: a Places search and a Stripe read. Press it, don't poll it.</p>
@@ -840,6 +963,15 @@ async function renderDiagnostics() {
      </div>
      <p class="note truncate" style="max-width:100%">Target: ${esc(d.url)}</p>`);
 
+  // Router load refreshes on its own while this tab is open — a saturation
+  // signal you have to remember to reload is a signal you never see.
+  routerDiag();
+  clearInterval(diagTimer);
+  diagTimer = setInterval(() => {
+    if (curTab !== "diag") return clearInterval(diagTimer);
+    routerDiag();
+  }, 15000);
+
   let d;
   try { d = await api("/admin/diagnostics"); }
   catch (e) { $("diag").innerHTML = `<div class="empty">Signals unavailable: ${esc(e.message)}</div>`; return; }
@@ -871,6 +1003,76 @@ async function renderDiagnostics() {
       <td>${dt(r.createdAt)}</td><td>${issueBadge(r.kind)}</td><td>${esc(r.platform)}</td>
       <td>${esc(r.email)}</td><td class="truncate mono">${esc(r.sourceId || "-")}</td>
     </tr>`).join("")}</tbody></table>` : `<div class="empty">No events recorded yet.</div>`}</div>`;
+}
+
+/* ── Website traffic ───────────────────────────────────────────────────────────
+   vanssay.net's own readers, from the beacon in assets/track.js. Owner visits
+   are dropped at write time (browser opt-out flag + SITE_EXCLUDE_IPS), so what
+   lands here is other people. */
+let siteDays = 30;
+async function renderWebsite() {
+  const ranges = [7, 30, 90];
+  $("view").innerHTML = `
+    <div class="page-head">
+      <div><h2>Website</h2><p>Page views on vanssay.net, minus mine. No cookies, no third party — the counters live in our own database.</p></div>
+      <div style="display:flex;gap:6px">${ranges.map((n) =>
+        `<button class="btn btn-sm ${n === siteDays ? "btn-blue" : "btn-line"}" data-days="${n}">${n}d</button>`).join("")}</div>
+    </div>
+    <div id="wsite"><div class="empty">Loading…</div></div>`;
+
+  document.querySelectorAll("[data-days]").forEach((b) => b.onclick = () => { siteDays = Number(b.dataset.days); renderWebsite(); });
+
+  let d;
+  try { d = await api(`/admin/site-traffic?days=${siteDays}`); }
+  catch (e) { $("wsite").innerHTML = `<div class="empty">Traffic unavailable: ${esc(e.message)}</div>`; return; }
+
+  const delta = (now, before) => {
+    if (!before) return now ? `first ${siteDays} days with data` : "nothing yet";
+    const pc = Math.round(((now - before) / before) * 100);
+    return `${pc >= 0 ? "+" : ""}${pc}% vs previous ${siteDays}d`;
+  };
+  const best = d.daily.reduce((a, b) => (b.views > a.views ? b : a), { day: null, views: 0 });
+  const topSource = d.referrers.find((r) => r.host !== "direct");
+  const directShare = (() => {
+    const total = d.referrers.reduce((s, r) => s + r.views, 0);
+    const direct = (d.referrers.find((r) => r.host === "direct") || {}).views || 0;
+    return total ? Math.round((direct / total) * 100) : 0;
+  })();
+
+  // Label every ~5th day: 90 ticks would be unreadable, and no ticks unreadable too.
+  const step = Math.max(1, Math.ceil(d.daily.length / 6));
+  const chart = barChart(d.daily.map((x, i) => ({
+    v: x.views,
+    tip: `${x.day}: ${x.views} views · ${x.visitors} visitors`,
+    label: i % step === 0 ? x.day.slice(5) : "",
+  })));
+
+  $("wsite").innerHTML = `
+    <div class="kpis">
+      <div class="kpi hero"><div class="k-label">Page views · ${siteDays}d</div><div class="k-val">${fmt(d.totals.views)}</div>
+        <div class="k-sub">${esc(delta(d.totals.views, d.previous.views))}</div></div>
+      <div class="kpi"><div class="k-label">Visitors</div><div class="k-val">${fmt(d.totals.visitors)}</div>
+        <div class="k-sub">daily unique · ${esc(delta(d.totals.visitors, d.previous.visitors))}</div></div>
+      <div class="kpi"><div class="k-label">Busiest day</div><div class="k-val">${fmt(best.views)}</div>
+        <div class="k-sub">${best.day ? date(best.day) : "-"}</div></div>
+      <div class="kpi"><div class="k-label">Top source</div><div class="k-val" style="font-size:20px">${esc(topSource ? topSource.host : "—")}</div>
+        <div class="k-sub">${topSource ? fmt(topSource.views) + " views · " : ""}${directShare}% arrive direct</div></div>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px"><h3>Views per day</h3>${chart}</div>
+
+    <div class="grid-eq">
+      <div class="panel"><h3>Pages</h3>
+        <div class="tablewrap">${d.pages.length ? `<table><thead><tr><th>Path</th><th class="right">Views</th><th class="right">Visitors</th></tr></thead>
+          <tbody>${d.pages.map((x) => `<tr><td class="mono truncate">${esc(x.path)}</td><td class="right">${fmt(x.views)}</td><td class="right">${fmt(x.visitors)}</td></tr>`).join("")}</tbody></table>`
+          : `<div class="empty">No page views recorded yet.</div>`}</div></div>
+      <div class="panel"><h3>Where they came from</h3>
+        <div class="tablewrap">${d.referrers.length ? `<table><thead><tr><th>Source</th><th class="right">Views</th></tr></thead>
+          <tbody>${d.referrers.map((x) => `<tr><td>${x.host === "direct" ? "<span class=\"muted\">Direct / no referrer</span>" : esc(x.host)}</td><td class="right">${fmt(x.views)}</td></tr>`).join("")}</tbody></table>`
+          : `<div class="empty">No referrers recorded yet.</div>`}</div></div>
+    </div>
+
+    <p class="note" style="margin-top:14px">Your own visits are excluded: signing into this admin flags the browser permanently (add <span class="mono">?notrack=1</span> to any page to flag another one), and ${d.excludedIps ? fmt(d.excludedIps) + " IP" + (d.excludedIps > 1 ? "s are" : " is") : "no IP is"} excluded server-side via <span class="mono">SITE_EXCLUDE_IPS</span>. Known bots are dropped too. "Visitors" counts once per day per person — the id is salted and rebuilt daily, so nobody is followed across days.</p>`;
 }
 
 /* ── Plugin pages ── */
@@ -958,9 +1160,9 @@ async function loadReviewsUsers() {
 async function renderReviews(head) {
   const p = PROD.reviews;
   const rs = await Promise.allSettled([
-    acct("/overview", null, "reviews"), api("/admin/pages?sort=" + pagesSort), api("/admin/businesses"), api("/admin/cache"),
+    acct("/overview", null, "reviews"), api("/admin/pages?sort=" + pagesSort), api("/admin/businesses"), api("/admin/cache"), api("/admin/free-reasons"), api("/admin/preview-tries"),
   ]);
-  const [bill, pages, biz, cache] = rs.map(val);
+  const [bill, pages, biz, cache, freeReasons, previewTries] = rs.map(val);
   $("view").innerHTML = `
     ${head("Google + Trustpilot reviews widget, usage, embeds and sources.")}
 
@@ -984,6 +1186,10 @@ async function renderReviews(head) {
       ${bill ? `<div class="panel"><h3>New signups · last 12 months</h3>
         ${barChart(bill.signups.map((s) => ({ v: s.count, tip: `${s.month}: ${s.count}`, label: s.month.slice(5) })))}</div>` : ""}
       ${planSplitPanel(bill)}
+    </div>
+    <div class="grid-2" style="margin-bottom:16px">
+      ${previewTries ? previewTriesPanel(previewTries) : `<div class="panel">${unavailable("Preview tries", rs[5])}</div>`}
+      ${freeReasons ? freeReasonsPanel(freeReasons) : `<div class="panel">${unavailable("Why Free", rs[4])}</div>`}
     </div>
 
     <div class="toolbar"><div class="sec-title" style="margin:0">Embeds & “Powered by” clicks</div>
@@ -1245,7 +1451,7 @@ async function renderInstagram(head) {
     <div class="kpis">
       ${bill ? `<div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
       <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${planBreakdown(bill.plans).replace(/^\S+\s·\s/, "")}</div></div>
-      ${bill.revenue.lifetimeRevenue ? `<div class="kpi"><div class="k-label">Lifetime · one-time</div><div class="k-val">${money(bill.revenue.lifetimeRevenue)}</div><div class="k-sub">${fmt(bill.revenue.lifetimeCount)} × ${money(bill.revenue.lifetimeUnitPrice)} · not in MRR</div></div>` : ""}` : ""}
+      ${bill.revenue.lifetimeRevenue ? `<div class="kpi"><div class="k-label">Lifetime · one-time</div><div class="k-val">${money(bill.revenue.lifetimeRevenue)}</div><div class="k-sub">${fmt(bill.revenue.lifetimeCount)} sales · ${money(bill.revenue.lifetimeUnitPrice)} today${(bill.revenue.lifetimePricedFromInvoice ?? bill.revenue.lifetimeCount) < bill.revenue.lifetimeCount ? " · some estimated" : ""} · not in MRR</div></div>` : ""}` : ""}
       ${dom ? `<div class="kpi"><div class="k-label">Feeds</div><div class="k-val">${fmt(dom.feeds)}</div><div class="k-sub">${fmt(dom.cachedHandles)} handles cached</div></div>` : ""}
       ${fn ? `<div class="kpi"><div class="k-label">Opened (30d)</div><div class="k-val">${fmt(fn.opened)}</div><div class="k-sub">${fmt(fn.previewed)} saw a feed</div></div>
       <div class="kpi"><div class="k-label">Reached checkout</div><div class="k-val">${fmt(fn.checkout)}</div><div class="k-sub">${fmt(fn.paywall)} saw the paywall</div></div>
