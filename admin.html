@@ -152,6 +152,23 @@
     .meter { height:7px; border-radius:99px; background:var(--surface-2); overflow:hidden; }
     .meter span { display:block; height:100%; background:var(--accent); }
 
+    /* ── Compliance calendar ── */
+    .todo { display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--border); }
+    .todo:last-child { border-bottom:none; }
+    .todo input[type=checkbox] { width:17px; height:17px; margin-top:1px; flex:none; accent-color:var(--accent); cursor:pointer; }
+    .todo .t-main { flex:1; min-width:0; }
+    .todo .t-title { font-weight:700; font-size:13.5px; }
+    .todo .t-detail { color:var(--text-2); font-size:12.5px; margin-top:3px; }
+    .todo .t-extra { font-size:12px; color:var(--amber); font-weight:600; margin-top:3px; }
+    .todo .t-when { flex:none; text-align:right; font-size:12.5px; font-weight:800; white-space:nowrap; }
+    .todo .t-when small { display:block; font-weight:600; font-size:11.5px; color:var(--muted); }
+    .todo.is-done .t-title { color:var(--muted); text-decoration:line-through; }
+    .todo.is-done .t-detail, .todo.is-done .t-when { color:var(--muted); }
+    .t-over { color:var(--error); } .t-soon { color:var(--amber); } .t-far { color:var(--text-2); }
+    .meter.warn span { background:var(--amber); } .meter.bad span { background:var(--error); }
+    details.fold { margin-top:14px; }
+    details.fold > summary { cursor:pointer; font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:700; padding:6px 0; }
+
     /* ── Modal ── */
     .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; justify-content:flex-end; z-index:50; }
     .modal { width:560px; max-width:100%; background:var(--bg); height:100%; overflow-y:auto; padding:26px 28px; box-shadow:-10px 0 40px rgba(0,0,0,.2); animation:slidein .18s ease; }
@@ -202,6 +219,7 @@
     <button class="navlink" data-tab="users"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span> Users</button>
     <button class="navlink" data-tab="subs"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span> Subscriptions</button>
     <button class="navlink" data-tab="expenses"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span> Expenses</button>
+    <button class="navlink" data-tab="compliance"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg></span> Compliance</button>
     <button class="navlink" data-tab="diag"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span> Diagnostics</button>
     <button class="navlink" data-tab="site"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span> Website</button>
     <div class="navsep">Plugins</div>
@@ -345,7 +363,7 @@ function switchTab(tab) {
   $("view").innerHTML = `<div class="empty">Loading…</div>`;
   if (tab.startsWith("prod:")) return renderProduct(tab.slice(5));
   ({ overview: renderOverview, users: renderUsers, subs: renderSubs, expenses: renderExpenses,
-     diag: renderDiagnostics, site: renderWebsite }[tab])();
+     compliance: renderCompliance, diag: renderDiagnostics, site: renderWebsite }[tab])();
 }
 
 /* ── Shared pieces ── */
@@ -1068,6 +1086,217 @@ async function renderExpenses() {
     </tr>`).join("")}</tbody></table>` : `<div class="empty">No scrapes recorded yet.</div>`}</div>
     <p class="note">* estimated from the per-item price. Only paid-plan review fetches hit Apify: free Trustpilot uses the self-hosted scraper and free Google uses the Places API (Google's $200/mo credit), both $0. Every Instagram scrape is paid.</p>
     ${!ig ? `<p class="note">Instagram spend unavailable: ${esc(why(rs[1]) || "no data")}</p>` : ""}`;
+}
+
+/* ── Compliance ────────────────────────────────────────────────────────────────
+   The French filing calendar for the micro-entreprise. This page holds no
+   schedule of its own: the backend computes every date from the rules and reads
+   every euro out of the invoices table, so a deadline here cannot be stale and a
+   turnover figure cannot disagree with the invoices behind it. Ticking a row is
+   the only thing the page ever writes. */
+const eur = (c) => "€" + (Number(c || 0) / 100).toLocaleString(undefined, {
+  minimumFractionDigits: Number(c || 0) % 100 ? 2 : 0, maximumFractionDigits: 2 });
+const dayDiff = (a, b) => Math.round((new Date(a + "T00:00:00Z") - new Date(b + "T00:00:00Z")) / 86_400_000);
+const dueDate = (d) => new Date(d + "T00:00:00Z").toLocaleDateString(undefined, { day:"numeric", month:"short", year:"numeric" });
+
+/* How late or how soon, in the terms that decide whether you act today. `sort`
+   is what the list is ordered by, so overdue never hides under a done row. */
+function dueTone(item, today) {
+  if (item.done) return { tone:"", label:"Filed", sort:3 };
+  const d = dayDiff(item.due, today);
+  if (d < 0) return { tone:"t-over", label:`${-d} day${-d === 1 ? "" : "s"} late`, sort:0 };
+  if (d === 0) return { tone:"t-over", label:"Today", sort:0 };
+  if (d <= 45) return { tone:"t-soon", label:`in ${d} days`, sort:1 };
+  return { tone:"t-far", label:`in ${d} days`, sort:2 };
+}
+
+/* The three sources of obligations flattened into one list of things to do. */
+function complianceItems(d) {
+  const items = [];
+
+  for (const p of d.urssaf.periods) {
+    items.push({
+      key: p.key, group: "URSSAF",
+      title: `URSSAF — declare turnover · ${p.label}`,
+      detail: p.open
+        ? `Period still running: ${eur(p.eurCents)} banked so far over ${p.count} invoice(s).`
+        : `${eur(p.eurCents)} to declare over ${p.count} invoice(s).${p.first ? " Covers everything since the start of activity." : ""}`
+          + " Declare even if it is €0 — a missing declaration is a penalty on its own.",
+      extra: p.missingEur ? `${p.missingEur} invoice(s) carry no settled EUR figure — convert those by hand before declaring.` : "",
+      due: p.due, dueApprox: false, link: d.links.urssaf, done: p.done, doneAt: p.doneAt,
+    });
+  }
+
+  for (const m of d.des.months) {
+    items.push({
+      key: m.key, group: "DES",
+      title: `DES — EU B2B services supplied in ${m.label}`,
+      detail: `${eur(m.eurCents)} to ${m.partners.length} EU customer(s): `
+        + m.partners.map((p) => `${p.vatId} ${eur(p.eurCents)}`).join(" · ")
+        + ". Filed at douane.gouv.fr; paper filing is allowed under the franchise.",
+      extra: m.missingEur ? `${m.missingEur} of these have no settled EUR figure.` : "",
+      due: m.due, dueApprox: m.dueApprox, link: d.links.douane, done: m.done, doneAt: m.doneAt,
+    });
+  }
+
+  for (const f of d.fixed) {
+    items.push({
+      key: f.key, group: f.oneOff ? "One-off" : "Annual",
+      title: f.title, detail: f.detail, extra: "",
+      due: f.due, dueApprox: f.dueApprox, link: f.link, done: f.done, doneAt: f.doneAt,
+    });
+  }
+
+  return items;
+}
+
+function todoRow(item, today) {
+  const t = dueTone(item, today);
+  return `<div class="todo ${item.done ? "is-done" : ""}">
+    <input type="checkbox" data-task="${esc(item.key)}" ${item.done ? "checked" : ""} title="Tick once actually filed" />
+    <div class="t-main">
+      <div class="t-title"><span class="badge b-other" style="margin-right:7px">${esc(item.group)}</span>${esc(item.title)}</div>
+      <div class="t-detail">${esc(item.detail)} <a href="${esc(item.link)}" target="_blank" rel="noopener">open the portal →</a></div>
+      ${item.extra ? `<div class="t-extra">⚠ ${esc(item.extra)}</div>` : ""}
+      ${item.done && item.doneAt ? `<div class="t-detail">Ticked ${esc(dt(item.doneAt))}.</div>` : ""}
+    </div>
+    <div class="t-when ${t.tone}">${esc(t.label)}
+      <small>${item.dueApprox ? "on or before " : ""}${esc(dueDate(item.due))}</small></div>
+  </div>`;
+}
+
+/* A ceiling and how close the year is to it. */
+function meterRow(label, cents, thresholdEur, note) {
+  const pct = thresholdEur ? Math.min(100, Math.round((cents / 100 / thresholdEur) * 100)) : 0;
+  const cls = pct >= 90 ? "bad" : pct >= 70 ? "warn" : "";
+  return `<div style="margin-bottom:14px">
+    <div class="kv" style="border:none;padding-bottom:3px"><span>${esc(label)}</span>
+      <strong>${eur(cents)} · ${pct}% of ${eur(thresholdEur * 100)}</strong></div>
+    <div class="meter ${cls}"><span style="width:${pct}%"></span></div>
+    <p class="note" style="padding:5px 0 0">${note}</p></div>`;
+}
+
+async function renderCompliance() {
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Compliance</h2>
+      <p>Every French filing the business owes. Dates are computed from the rules; turnover is read from the invoice table. Tick a row only once it is really filed.</p></div></div>
+    <div id="cp"><div class="empty">Loading…</div></div>`;
+
+  let d;
+  try { d = await api("/admin/compliance"); }
+  catch (e) { $("cp").innerHTML = `<div class="empty">Couldn't load: ${esc(e.message)}</div>`; return; }
+
+  const today = d.today;
+  const items = complianceItems(d).sort((a, b) => {
+    const ta = dueTone(a, today), tb = dueTone(b, today);
+    return ta.sort - tb.sort || a.due.localeCompare(b.due);
+  });
+  const open = items.filter((i) => !i.done);
+  const done = items.filter((i) => i.done);
+  const overdue = open.filter((i) => dayDiff(i.due, today) < 0);
+  const next = open[0] || null;
+
+  // The quarter being lived in right now — its figure is partial by definition.
+  const current = d.urssaf.periods.find((p) => p.open) || d.urssaf.periods[d.urssaf.periods.length - 1];
+
+  const alerts = [];
+  if (overdue.length) alerts.push(alertRow("critical", `${overdue.length} filing${overdue.length === 1 ? "" : "s"} overdue`,
+    overdue.map((i) => i.title).join(" · ")));
+  if (!d.flags.sellerVatSet) alerts.push(alertRow("critical", "No intracom VAT number in the backend env",
+    "INVOICE_SELLER_VAT is empty, so every EU B2B invoice is held unrendered."));
+  if (d.flags.blockedInvoices) alerts.push(alertRow("warning", `${d.flags.blockedInvoices} invoice(s) still blocked`,
+    "Reverse-charge documents waiting on the seller VAT number. Run unblockPending() once it is set."));
+  if (d.flags.invoicesWithoutEur) alerts.push(alertRow("warning", `${d.flags.invoicesWithoutEur} invoice(s) have no settled EUR amount`,
+    "Stripe returned no EUR balance transaction for these. They are excluded from the euro totals below and must be converted by hand."));
+  if (!alerts.length) alerts.push(alertRow("ok", "Nothing overdue", "Every filing due so far is ticked, and the invoicing chain is complete."));
+
+  $("cp").innerHTML = `
+    <div class="err" id="cp-err"></div>
+    <div class="alerts">${alerts.join("")}</div>
+
+    <div class="kpis">
+      <div class="kpi hero"><div class="k-label">Next filing</div>
+        <div class="k-val" style="font-size:19px;line-height:1.35">${next ? esc(next.title) : "Nothing pending"}</div>
+        <div class="k-sub">${next ? esc(dueTone(next, today).label) + " · " + esc(dueDate(next.due)) : "everything ticked"}</div></div>
+      <div class="kpi"><div class="k-label">Overdue</div><div class="k-val" ${overdue.length ? 'style="color:var(--error)"' : ""}>${fmt(overdue.length)}</div>
+        <div class="k-sub">${fmt(open.length)} open in total</div></div>
+      <div class="kpi"><div class="k-label">Current period</div><div class="k-val">${eur(current.eurCents)}</div>
+        <div class="k-sub">${esc(current.label)} · declare by ${esc(dueDate(current.due))}</div></div>
+      <div class="kpi"><div class="k-label">Turnover ${fmt(d.watch.year)}</div><div class="k-val">${eur(d.watch.ytd.eurCents)}</div>
+        <div class="k-sub">${fmt(d.watch.ytd.count)} invoice(s) this year</div></div>
+    </div>
+
+    <div class="panel" style="margin-bottom:16px">
+      <h3>To file${open.length ? ` <span class="muted" style="font-weight:600">· ${fmt(open.length)}</span>` : ""}</h3>
+      ${open.length ? open.map((i) => todoRow(i, today)).join("") : `<div class="empty">Nothing outstanding.</div>`}
+      ${done.length ? `<details class="fold"><summary>Filed · ${fmt(done.length)}</summary>
+        ${done.map((i) => todoRow(i, today)).join("")}</details>` : ""}
+    </div>
+
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="panel"><h3>URSSAF · quarterly turnover</h3>
+        <div class="tablewrap"><table><thead><tr>
+          <th>Period</th><th class="right">Turnover</th><th class="right">Inv.</th><th>Declare by</th><th>Status</th>
+        </tr></thead><tbody>${d.urssaf.periods.map((p) => `<tr>
+          <td>${esc(p.label)}${p.first ? ` <span class="badge b-pro">1st</span>` : ""}</td>
+          <td class="right">${eur(p.eurCents)}${p.missingEur ? `<span class="muted-sm bad"> +${p.missingEur}?</span>` : ""}</td>
+          <td class="right">${fmt(p.count)}</td>
+          <td>${esc(dueDate(p.due))}</td>
+          <td>${p.done ? `<span class="badge b-active">Filed</span>`
+              : p.open ? `<span class="badge b-other">Running</span>`
+              : dayDiff(p.due, today) < 0 ? `<span class="badge b-canceled">Late</span>`
+              : `<span class="badge b-free">Due</span>`}</td>
+        </tr>`).join("")}</tbody></table></div>
+        <p class="note">Quarterly declarations. The first one is deferred by law: it covers everything from ${esc(dueDate(d.identity.activityStart))} and is filed at the following quarter's deadline. A €0 quarter still has to be declared.</p></div>
+
+      <div class="panel"><h3>DES · EU B2B services</h3>
+        ${d.des.months.length ? `<div class="tablewrap"><table><thead><tr>
+          <th>Month</th><th>Customers</th><th class="right">Amount</th><th>File by</th><th>Status</th>
+        </tr></thead><tbody>${d.des.months.map((m) => `<tr>
+          <td>${esc(m.label)}</td>
+          <td><div class="badges">${m.partners.map((p) => `<span class="badge b-other" title="${esc((p.name || "") + " · " + eur(p.eurCents))}">${flag(p.country)} ${esc(p.vatId)}</span>`).join("")}</div></td>
+          <td class="right">${eur(m.eurCents)}</td>
+          <td>${esc(dueDate(m.due))}</td>
+          <td>${m.done ? `<span class="badge b-active">Filed</span>`
+              : dayDiff(m.due, today) < 0 ? `<span class="badge b-canceled">Late</span>`
+              : `<span class="badge b-free">Due</span>`}</td>
+        </tr>`).join("")}</tbody></table></div>`
+        : `<div class="empty">No EU B2B sale yet — nothing to file.</div>`}
+        <p class="note">One filing per month in which a reverse-charge service was supplied, within 10 working days of the month end. The dates shown skip weekends only, so a public holiday can push the real deadline later. Nothing is owed for months with no EU B2B sale.</p></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel"><h3>Ceilings to watch</h3>
+        ${meterRow(`Turnover ${d.watch.year} vs franchise en base`, d.watch.ytd.eurCents, d.watch.franchiseThresholdEur,
+          `Cross it and Vanssay starts charging real VAT. Tolerance runs to ${esc(eur(d.watch.franchiseToleranceEur * 100))}. <strong>Confirm this figure each January</strong> — the unified €25,000 threshold was voted and then suspended, so the law can move it without anything here breaking.`)}
+        ${meterRow("EU B2C digital services", d.watch.euB2c.eurCents, d.watch.euB2cThresholdEur,
+          `Sales to EU <em>consumers</em> (no VAT number). Above this, VAT is due in the buyer's country and needs an OSS registration — Stripe is not the merchant of record, so it lands on us.`)}
+        ${meterRow("Dedicated bank account trigger", d.watch.ytd.eurCents, d.watch.bankAccountThresholdEur,
+          `Two consecutive years over this and a separate business account becomes mandatory.`)}
+      </div>
+
+      <div class="panel"><h3>Identity on file</h3>
+        <div class="kv"><span>Legal name</span><strong>${esc(d.identity.legalName)}</strong></div>
+        <div class="kv"><span>SIREN</span><span class="mono">${esc(d.identity.siren)}</span></div>
+        <div class="kv"><span>SIRET</span><span class="mono">${esc(d.identity.siret)}</span></div>
+        <div class="kv"><span>Intracom VAT</span><span class="mono">${d.identity.vat ? esc(d.identity.vat) : `<span style="color:var(--error)">not set</span>`}</span></div>
+        <div class="kv"><span>Start of activity</span><span>${esc(dueDate(d.identity.activityStart))}</span></div>
+        <div class="kv"><span>URSSAF periodicity</span><span>${esc(d.identity.periodicity)}</span></div>
+        <p class="note">These come from the backend's INVOICE_SELLER_* env, which is the same snapshot frozen onto every issued invoice. Change them there, never here.</p>
+      </div>
+    </div>`;
+
+  $("cp").querySelectorAll("[data-task]").forEach((box) => box.onchange = async () => {
+    const wanted = box.checked;
+    box.disabled = true;
+    try {
+      await api("/admin/compliance/task", { method: "POST", body: { key: box.dataset.task, done: wanted } });
+      await renderCompliance();
+    } catch (e) {
+      box.checked = !wanted; box.disabled = false;
+      showErr("cp-err", e.message);
+    }
+  });
 }
 
 /* ── Diagnostics ───────────────────────────────────────────────────────────────
