@@ -111,7 +111,7 @@
     .lc-hot { opacity:0; }
     .lc-tip { position:absolute; pointer-events:none; opacity:0; transition:opacity .12s ease; z-index:6;
               background:#18181b; color:#fff; font-size:11.5px; line-height:1.6; padding:8px 10px;
-              border-radius:7px; white-space:nowrap; transform:translate(-50%,-100%); box-shadow:var(--shadow-md); }
+              border-radius:7px; white-space:nowrap; transform:translate(-50%,0); box-shadow:var(--shadow-md); }
     .lc-tip .h { font-weight:700; margin-bottom:3px; }
     .lc-tip .r { display:flex; align-items:center; gap:8px; }
     .lc-tip .r span { flex:1; color:rgba(255,255,255,.7); }
@@ -354,12 +354,14 @@ function barChart(items) { // [{v, tip, label}]
   return `<div class="chart">${items.map((i) => `<div class="bar" style="height:${Math.round((i.v/max)*100)}%" data-tip="${esc(i.tip)}"></div>`).join("")}</div>
     <div class="chart-x">${items.map((i) => `<span>${esc(i.label)}</span>`).join("")}</div>`;
 }
-/* Money collected per month, as curves: one per plugin that has ever sold, plus
-   the total. Every series is dollars, so they share one axis — a second scale
-   would let any two of them be drawn into any relationship you like.
+/* Money collected, drawn as lines. Two charts share this code: the per-bucket
+   sales curves, and the running total underneath them. Both are dollars on
+   their own single axis — a cumulative figure and a daily one on one pair of
+   axes would let any two of them be drawn into any relationship you like.
 
-   Held in module scope so the hover layer can be bound after innerHTML. */
-let salesState = null;
+   State is per chart id, because the hover layer is bound after innerHTML and
+   there is now more than one chart on the page. */
+const chartStates = {};
 
 // Round a maximum up to something a person would choose for an axis.
 function niceCeil(v) {
@@ -376,25 +378,20 @@ function linePath(pts) {
   return pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
 }
 
-function salesChart(d) {
-  const sold = PRODUCTS.filter((p) => d.series.some((m) => m.byProduct[p.key]));
+/* One line chart. `lines` is [{ label, color, w, vals }] in cents, all the same
+   length as d.series. */
+function lineChart(id, d, lines, opt) {
+  const o = opt || {};
   const n = d.series.length;
   const byDay = d.granularity === "day";
-  // With one selling plugin its curve IS the total; two identical lines would
-  // only make the chart look busier than the business is.
-  const lines = (sold.length > 1
-    ? [{ label: "Total", color: "#18181b", w: 2.75, vals: d.series.map((m) => m.cents) }]
-    : []
-  ).concat(sold.map((p) => ({ label: p.label, color: p.color, w: 2, vals: d.series.map((m) => m.byProduct[p.key] || 0) })));
+  if (!lines.length || !n) return `<div class="empty">No sales recorded yet.</div>`;
 
-  if (!lines.length) return `<div class="empty">No sales recorded yet.</div>`;
-
-  const W = 760, H = 252, T = 14, B = 28, LEFT = 56;
+  const W = 760, H = o.h || 252, T = 14, B = 28, LEFT = 56;
   // Room on the right for direct labels, but only while there are few enough to
   // read AND the last bucket says something about each series — on a daily
   // chart most days are zero, so they would all stack on the baseline pointing
   // at nothing. The legend does that job better.
-  const direct = lines.length <= 4 && !byDay;
+  const direct = lines.length > 1 && lines.length <= 4 && !byDay;
   const RIGHT = direct ? 104 : 16;
   const iw = W - LEFT - RIGHT, ih = H - T - B;
   const top = niceCeil(Math.max(1, ...lines.map((l) => Math.max(...l.vals))) * 1.08);
@@ -404,37 +401,57 @@ function salesChart(d) {
   const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * top);
   const step = Math.max(1, Math.ceil(n / (byDay ? 7 : 12)));
 
-  // Direct labels, pushed apart so a tight month cannot overlap two of them.
-  const ends = lines.map((l, i) => ({ i, y: Y(l.vals[n-1]), label: l.label, color: l.color }))
-    .sort((a, b) => a.y - b.y);
+  // Direct labels, pushed apart so two close series cannot overlap.
+  const ends = lines.map((l, i) => ({ i, y: Y(l.vals[n-1]), label: l.label, color: l.color })).sort((a, b) => a.y - b.y);
   for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i-1].y < 14) ends[i].y = ends[i-1].y + 14;
 
-  salesState = { d, lines, n, W, X, Y, LEFT, RIGHT, T, ih };
+  chartStates[id] = { d, lines, n, W, H, X, Y, LEFT, RIGHT, T, ih, running: !!o.running };
 
-  return `<div class="lchart" id="lchart">
-    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Sales per month, in dollars, per plugin and in total">
+  return `<div class="lchart" id="${id}">
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.alt || "Money collected over time, in dollars")}">
       ${ticks.map((t) => `<line class="lc-grid" x1="${LEFT}" x2="${W - RIGHT}" y1="${Y(t).toFixed(1)}" y2="${Y(t).toFixed(1)}"/>
         <text class="lc-axis" x="${LEFT - 8}" y="${(Y(t) + 3.5).toFixed(1)}" text-anchor="end">${esc(moneyCents(t))}</text>`).join("")}
       ${d.series.map((m, i) => i % step === 0 || i === n - 1
         ? `<text class="lc-axis" x="${X(i).toFixed(1)}" y="${H - 9}" text-anchor="middle">${esc(bucketLabel(m.key))}</text>` : "").join("")}
-      <line class="lc-cross" id="lc-cross" y1="${T}" y2="${T + ih}" x1="0" x2="0"/>
+      <line class="lc-cross" data-cross y1="${T}" y2="${T + ih}" x1="0" x2="0"/>
       ${lines.map((l) => `<path d="${linePath(l.vals.map((v, i) => [X(i), Y(v)]))}" fill="none" stroke="${l.color}"
         stroke-width="${l.w}" stroke-linecap="round" stroke-linejoin="round"/>`).join("")}
-      ${lines.map((l, i) => `<circle class="lc-dot lc-hot" id="lc-hot-${i}" r="5.5" fill="${l.color}" cx="0" cy="0"/>`).join("")}
+      ${lines.map((l, i) => `<circle class="lc-dot lc-hot" data-hot="${i}" r="5.5" fill="${l.color}" cx="0" cy="0"/>`).join("")}
       ${direct ? ends.map((e) => `<circle cx="${W - RIGHT + 22}" cy="${e.y.toFixed(1)}" r="4" fill="${e.color}"/>
         <text class="lc-axis" x="${W - RIGHT + 31}" y="${(e.y + 3.5).toFixed(1)}" style="fill:var(--text-2);font-weight:600">${esc(e.label)}</text>`).join("") : ""}
-      <rect id="lc-hit" x="${LEFT}" y="${T}" width="${iw}" height="${ih}" fill="transparent"/>
     </svg>
-    <div class="lc-tip" id="lc-tip"></div>
+    <div class="lc-tip" data-tipbox></div>
   </div>
-  <div class="legend">${lines.map((l) => `<span><i style="background:${l.color}"></i>${esc(l.label)}</span>`).join("")}</div>
-  <details class="lc-table"><summary>Show the numbers (buckets with a sale)</summary>
-    <div class="tablewrap"><table><thead><tr><th>Month</th><th class="right">Payments</th>
+  ${lines.length > 1 ? `<div class="legend">${lines.map((l) => `<span><i style="background:${l.color}"></i>${esc(l.label)}</span>`).join("")}</div>` : ""}`;
+}
+
+/* Per-bucket sales: one line per plugin that has ever sold, plus the total. */
+function salesChart(d) {
+  const sold = PRODUCTS.filter((p) => d.series.some((m) => m.byProduct[p.key]));
+  // With one selling plugin its curve IS the total; two identical lines would
+  // only make the chart look busier than the business is.
+  const lines = (sold.length > 1
+    ? [{ label: "Total", color: "#18181b", w: 2.75, vals: d.series.map((m) => m.cents) }]
+    : []
+  ).concat(sold.map((p) => ({ label: p.label, color: p.color, w: 2, vals: d.series.map((m) => m.byProduct[p.key] || 0) })));
+
+  return lineChart("lc-sales", d, lines, { alt: "Sales per bucket, in dollars, per plugin and in total" })
+    + `<details class="lc-table"><summary>Show the numbers (buckets with a sale)</summary>
+    <div class="tablewrap"><table><thead><tr><th>When</th><th class="right">Payments</th>
       ${lines.map((l) => `<th class="right">${esc(l.label)}</th>`).join("")}</tr></thead>
-      <tbody>${d.series.filter((m) => m.count).map((m) => `<tr><td>${esc(bucketLabel(m.key, true))}</td><td class="right">${fmt(m.count)}</td>
-        ${lines.map((l) => `<td class="right">${esc(moneyCents(l.vals[d.series.indexOf(m)]))}</td>`).join("")}</tr>`).join("")}</tbody>
+      <tbody>${d.series.map((m, i) => m.count ? `<tr><td>${esc(bucketLabel(m.key, true))}</td><td class="right">${fmt(m.count)}</td>
+        ${lines.map((l) => `<td class="right">${esc(moneyCents(l.vals[i]))}</td>`).join("")}</tr>` : "").join("")}</tbody>
     </table></div>
   </details>`;
+}
+
+/* The same money, added up as it came in. Daily sales are spikes off a zero
+   floor — this is the line that answers "are we going anywhere". */
+function cumulativeChart(d) {
+  let run = 0;
+  const vals = d.series.map((m) => (run += m.cents));
+  return lineChart("lc-cum", d, [{ label: "Collected", color: "#18181b", w: 2.5, vals }],
+    { h: 208, running: true, alt: "Money collected to date, in dollars" });
 }
 
 /* The sales panel fetches its own window, so changing the range re-reads one
@@ -448,10 +465,10 @@ async function loadSales() {
   try { d = await api("/admin/sales" + (salesRange === "all" ? "" : "?days=" + salesRange)); }
   catch (e) { el.innerHTML = `<h3>Sales</h3><div class="empty">Sales unavailable: ${esc(e.message)}</div>`; return; }
 
-  const window_ = salesRange === "all" ? "all time" : "last " + salesRange + " days";
+  const win = salesRange === "all" ? "all time" : "last " + salesRange + " days";
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:6px">
-      <h3 style="margin:0">Sales · ${esc(window_)}
+      <h3 style="margin:0">Sales · ${esc(win)}
         <span style="font-weight:600;color:var(--muted);font-size:12px">${moneyCents(d.totals.cents)} collected · ${fmt(d.totals.count)} payments · ${fmt(d.totals.buyers)} buyers · by ${d.granularity}</span></h3>
       <div style="display:flex;gap:6px">${SALES_RANGES.map(([v, label]) =>
         `<button class="btn btn-sm ${String(salesRange) === v ? "btn-blue" : "btn-line"}" data-range="${v}">${esc(label)}</button>`).join("")}</div>
@@ -465,16 +482,26 @@ async function loadSales() {
     salesRange = b.dataset.range === "all" ? "all" : b.dataset.range;
     loadSales();
   });
-  bindSalesChart();
+  bindChart("lc-sales");
+
+  const cum = $("cumpanel");
+  if (cum) {
+    cum.innerHTML = `<h3>${d.allTime ? "Collected to date" : "Running total · " + esc(win)}
+      <span style="font-weight:600;color:var(--muted);font-size:12px">${moneyCents(d.totals.cents)}${d.allTime ? " since the first sale" : " over this window"}</span></h3>
+      ${cumulativeChart(d)}`;
+    bindChart("lc-cum");
+  }
 }
 
 /* Crosshair + one tooltip for the whole bucket. Bound after the panel's HTML
    lands, because that is when the nodes exist. */
-function bindSalesChart() {
-  const st = salesState, wrap = $("lchart");
+function bindChart(id) {
+  const st = chartStates[id], wrap = $(id);
   if (!st || !wrap) return;
-  const svg = wrap.querySelector("svg"), tip = $("lc-tip"), cross = $("lc-cross");
-  const hots = st.lines.map((l, i) => $("lc-hot-" + i));
+  const svg = wrap.querySelector("svg");
+  const tip = wrap.querySelector("[data-tipbox]");
+  const cross = wrap.querySelector("[data-cross]");
+  const hots = st.lines.map((l, i) => wrap.querySelector(`[data-hot="${i}"]`));
 
   const show = (i) => {
     const x = st.X(i);
@@ -483,36 +510,37 @@ function bindSalesChart() {
       h.setAttribute("cx", x); h.setAttribute("cy", st.Y(st.lines[k].vals[i])); h.style.opacity = "1";
     });
     const m = st.d.series[i];
-    tip.innerHTML = `<div class="h">${esc(bucketLabel(m.key, true))}${m.count ? " · " + fmt(m.count) + " payment" + (m.count === 1 ? "" : "s") : ""}</div>`
-      + (m.count
-        ? st.lines.filter((l) => l.vals[i] || l.label === "Total")
-            .map((l) => `<div class="r"><i style="background:${l.color}"></i><span>${esc(l.label)}</span><b>${esc(moneyCents(l.vals[i]))}</b></div>`).join("")
-        : `<div class="r"><span>No sales</span></div>`);
-    // Percent of the SVG's own width, so the tooltip follows the chart at any
-    // panel size without measuring anything. Near either end it anchors to its
-    // own edge instead of its centre, or it would hang off the panel.
+    // The running total has a value on every bucket, including the quiet ones;
+    // the per-bucket chart genuinely has nothing to say about a day with no sale.
+    const rows = st.running || m.count
+      ? st.lines.filter((l) => st.running || l.vals[i] || l.label === "Total")
+          .map((l) => `<div class="r"><i style="background:${l.color}"></i><span>${esc(l.label)}</span><b>${esc(moneyCents(l.vals[i]))}</b></div>`).join("")
+      : `<div class="r"><span>No sales</span></div>`;
+    tip.innerHTML = `<div class="h">${esc(bucketLabel(m.key, true))}${m.count ? " · " + fmt(m.count) + " payment" + (m.count === 1 ? "" : "s") : ""}</div>` + rows;
+    // Percent of the SVG's own box, so the tooltip follows the chart at any panel
+    // size without measuring anything. It hangs from the TOP of the crosshair:
+    // at the bottom it sat over the lines it was describing. Near either end it
+    // anchors to its own edge instead of its centre, or it would overhang.
     const pct = (x / st.W) * 100;
     tip.style.left = pct + "%";
-    tip.style.top = (st.T + st.ih) * 100 / 252 + "%";
-    tip.style.transform = pct < 16 ? "translate(0,-100%)" : pct > 84 ? "translate(-100%,-100%)" : "translate(-50%,-100%)";
+    tip.style.top = (st.T * 100) / st.H + "%";
+    tip.style.transform = pct < 16 ? "translate(0,0)" : pct > 84 ? "translate(-100%,0)" : "translate(-50%,0)";
     tip.style.opacity = "1";
   };
   const hide = () => {
     cross.style.opacity = "0"; tip.style.opacity = "0";
     hots.forEach((h) => h.style.opacity = "0");
   };
-
   const move = (ev) => {
     const r = svg.getBoundingClientRect();
     const vx = ((ev.clientX - r.left) / r.width) * st.W;
     const f = st.n === 1 ? 0 : (vx - st.LEFT) / (st.W - st.LEFT - st.RIGHT);
     show(Math.max(0, Math.min(st.n - 1, Math.round(f * (st.n - 1)))));
   };
-  // The hit area is the plot, but the pointer should keep reading while it
-  // wanders over a curve near the edge — so listen on the whole svg.
   svg.addEventListener("pointermove", move);
   svg.addEventListener("pointerleave", hide);
 }
+
 function planRow(label, n, total) {
   const pct = total ? Math.round((n/total)*100) : 0;
   return `<div style="margin-bottom:10px"><div class="kv" style="border:none;padding-bottom:3px"><span>${esc(label)}</span><strong>${fmt(n)} · ${pct}%</strong></div>
@@ -669,9 +697,7 @@ async function renderOverview() {
 
     <p class="note" style="margin-bottom:16px">MRR counts subscriptions only. Lifetime is one-time revenue shown separately, valued at today's price. Gifted accounts have access but pay nothing, so they're excluded from both.</p>
 
-    <div class="panel" style="margin-bottom:16px" id="salespanel"><div class="empty">Loading…</div></div>
-
-    <div class="grid-2">
+    <div class="grid-2" style="margin-bottom:16px">
       <div class="panel">
         <h3>New signups · last 12 months (all plugins share one account base)</h3>
         ${barChart(anyBill.signups.map((s) => ({ v: s.count, tip: `${s.month}: ${s.count}`, label: s.month.slice(5) })))}
@@ -681,7 +707,10 @@ async function renderOverview() {
         ${PRODUCTS.map((p) => bills[p.key] ? planRow(`${p.icon} ${p.label}`, bills[p.key].revenue.mrr, totMRR) : "").join("")}
         <div class="kv" style="margin-top:10px"><span>Total</span><strong>${money(totMRR)} / mo</strong></div>
       </div>
-    </div>`;
+    </div>
+
+    <div class="panel" style="margin-bottom:16px" id="salespanel"><div class="empty">Loading…</div></div>
+    <div class="panel" id="cumpanel"></div>`;
   ov.querySelectorAll("[data-open]").forEach((a) => a.onclick = (e) => { e.preventDefault(); switchTab("prod:" + a.dataset.open); });
   loadSales();
 }
