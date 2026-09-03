@@ -100,17 +100,28 @@
     .bar:hover::after { content:attr(data-tip); position:absolute; bottom:100%; left:50%; transform:translateX(-50%); background:#18181b; color:#fff; font-size:11px; padding:4px 8px; border-radius:6px; white-space:nowrap; margin-bottom:5px; z-index:5; }
     .chart-x { display:flex; gap:6px; margin-top:6px; }
     .chart-x span { flex:1; text-align:center; font-size:10px; color:var(--muted); overflow:hidden; }
-    /* Stacked bars: one column per month, one segment per plugin, so the shape
-       of the revenue and where it comes from read in the same glance. */
-    .schart { display:flex; align-items:flex-end; gap:8px; height:190px; }
-    .sbar { flex:1; display:flex; flex-direction:column-reverse; justify-content:flex-start; min-height:3px; position:relative; }
-    .sbar .stack { display:flex; flex-direction:column-reverse; border-radius:5px 5px 0 0; overflow:hidden; }
-    .sbar .seg { min-height:2px; }
-    .sbar .zero { height:3px; background:var(--border); border-radius:2px; }
-    .sbar:hover::after { content:attr(data-tip); position:absolute; bottom:100%; left:50%; transform:translateX(-50%); background:#18181b; color:#fff; font-size:11px; line-height:1.5; padding:6px 9px; border-radius:6px; white-space:pre; margin-bottom:6px; z-index:5; text-align:left; }
+    /* Sales curves: one line per plugin plus the total, all in dollars on one
+       axis. Hover reads a whole month at once, which a per-bar tooltip cannot. */
+    .lchart { position:relative; }
+    .lchart svg { display:block; width:100%; height:auto; overflow:visible; touch-action:none; }
+    .lc-grid { stroke:var(--border); stroke-width:1; }
+    .lc-axis { fill:var(--muted); font-size:10px; font-family:'Inter',sans-serif; }
+    .lc-cross { stroke:var(--muted); stroke-width:1; stroke-dasharray:3 3; opacity:0; }
+    .lc-dot { stroke:var(--surface); stroke-width:2; }
+    .lc-hot { opacity:0; }
+    .lc-tip { position:absolute; pointer-events:none; opacity:0; transition:opacity .12s ease; z-index:6;
+              background:#18181b; color:#fff; font-size:11.5px; line-height:1.6; padding:8px 10px;
+              border-radius:7px; white-space:nowrap; transform:translate(-50%,-100%); box-shadow:var(--shadow-md); }
+    .lc-tip .h { font-weight:700; margin-bottom:3px; }
+    .lc-tip .r { display:flex; align-items:center; gap:8px; }
+    .lc-tip .r span { flex:1; color:rgba(255,255,255,.7); }
+    .lc-tip .r b { font-variant-numeric:tabular-nums; }
+    .lc-tip i, .legend i { width:9px; height:9px; border-radius:3px; display:inline-block; flex:none; }
     .legend { display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:12px; font-size:11.5px; color:var(--text-2); }
     .legend span { display:inline-flex; align-items:center; gap:6px; }
-    .legend i { width:9px; height:9px; border-radius:3px; display:inline-block; }
+    .lc-table { margin-top:12px; font-size:12px; color:var(--text-2); }
+    .lc-table summary { cursor:pointer; color:var(--muted); font-weight:600; }
+    .lc-table table { margin-top:8px; }
 
     /* ── Tables ── */
     .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
@@ -236,6 +247,12 @@ const money = (n) => "$" + Number(n || 0).toLocaleString();
 // not read as "$89.5" — and $1,200.00 must not carry two pointless zeros.
 const moneyCents = (c) => "$" + (Number(c || 0) / 100).toLocaleString(undefined, {
   minimumFractionDigits: Number(c || 0) % 100 ? 2 : 0, maximumFractionDigits: 2 });
+// "2026-08" is a key, not a label. Charts and tooltips show the month the
+// way a person says it.
+const monthLabel = (m) => {
+  const [y, mo] = String(m).split("-");
+  return new Date(Date.UTC(Number(y), Number(mo) - 1, 1)).toLocaleDateString(undefined, { month: "short", year: "numeric" });
+};
 const date = (d) => d ? new Date(d).toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" }) : "-";
 const dt = (d) => d ? new Date(d).toLocaleString(undefined, { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }) : "-";
 // Apify costs are tiny (fractions of a cent → a few $); show enough precision to be useful.
@@ -332,35 +349,147 @@ function barChart(items) { // [{v, tip, label}]
   return `<div class="chart">${items.map((i) => `<div class="bar" style="height:${Math.round((i.v/max)*100)}%" data-tip="${esc(i.tip)}"></div>`).join("")}</div>
     <div class="chart-x">${items.map((i) => `<span>${esc(i.label)}</span>`).join("")}</div>`;
 }
-/* Money collected per month, stacked by plugin. Cash actually invoiced — not
-   MRR, which is only a snapshot of what recurs today. */
-const monthLabel = (m) => {
-  const [y, mo] = String(m).split("-");
-  return new Date(Date.UTC(Number(y), Number(mo) - 1, 1)).toLocaleDateString(undefined, { month: "short", year: "numeric" });
-};
+/* Money collected per month, as curves: one per plugin that has ever sold, plus
+   the total. Every series is dollars, so they share one axis — a second scale
+   would let any two of them be drawn into any relationship you like.
+
+   Held in module scope so the hover layer can be bound after innerHTML. */
+let salesState = null;
+
+// Round a maximum up to something a person would choose for an axis.
+function niceCeil(v) {
+  if (v <= 0) return 1;
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  const f = v / p;
+  return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+}
+
+/* Monotone cubic (Fritsch–Carlson). A plain Catmull-Rom overshoots between
+   points, which on this chart would draw a month dipping below zero dollars or
+   above a peak that never happened. */
+function curvePath(pts) {
+  const n = pts.length;
+  if (!n) return "";
+  if (n === 1) return `M${pts[0][0]},${pts[0][1]}`;
+  const dx = [], dy = [], sl = [], m = [];
+  for (let i = 0; i < n - 1; i++) { dx[i] = pts[i+1][0] - pts[i][0]; dy[i] = pts[i+1][1] - pts[i][1]; sl[i] = dy[i] / dx[i]; }
+  m[0] = sl[0];
+  for (let i = 1; i < n - 1; i++) m[i] = sl[i-1] * sl[i] <= 0 ? 0 : (sl[i-1] + sl[i]) / 2;
+  m[n-1] = sl[n-2];
+  for (let i = 0; i < n - 1; i++) {
+    if (sl[i] === 0) { m[i] = 0; m[i+1] = 0; continue; }
+    const a = m[i] / sl[i], b = m[i+1] / sl[i], h = Math.hypot(a, b);
+    if (h > 3) { m[i] = 3 * a / h * sl[i]; m[i+1] = 3 * b / h * sl[i]; }
+  }
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 0; i < n - 1; i++) {
+    const t = dx[i] / 3;
+    d += `C${pts[i][0]+t},${pts[i][1]+m[i]*t} ${pts[i+1][0]-t},${pts[i+1][1]-m[i+1]*t} ${pts[i+1][0]},${pts[i+1][1]}`;
+  }
+  return d;
+}
+
 function salesChart(d) {
-  const max = Math.max(1, ...d.series.map((m) => m.cents));
-  const keys = PRODUCTS.filter((p) => d.series.some((m) => m.byProduct[p.key]));
-  // A product that has never been invoiced would only add a dead legend entry.
-  const step = Math.max(1, Math.ceil(d.series.length / 12));
-  const gap = d.series.length > 24 ? 3 : d.series.length > 14 ? 5 : 8;
-  const bars = d.series.map((m, i) => {
-    const lines = keys.filter((p) => m.byProduct[p.key])
-      .map((p) => `${p.label}: ${moneyCents(m.byProduct[p.key])}`);
-    const tip = [`${monthLabel(m.month)} · ${moneyCents(m.cents)}`, `${m.count} payment${m.count === 1 ? "" : "s"}`, ...lines].join("\n");
-    const h = Math.round((m.cents / max) * 100);
-    const inner = m.cents
-      ? `<div class="stack" style="height:${h}%">${keys.map((p) => {
-          const c = m.byProduct[p.key] || 0;
-          return c ? `<div class="seg" style="height:${(c / m.cents) * 100}%;background:${p.color}"></div>` : "";
-        }).join("")}</div>`
-      : `<div class="zero"></div>`;
-    return `<div class="sbar" data-tip="${esc(tip)}">${inner}</div>`;
-  }).join("");
-  return `<div class="schart" style="gap:${gap}px">${bars}</div>
-    <div class="chart-x" style="gap:${gap}px">${d.series.map((m, i) =>
-      `<span>${i % step === 0 ? esc(monthLabel(m.month)) : ""}</span>`).join("")}</div>
-    <div class="legend">${keys.map((p) => `<span><i style="background:${p.color}"></i>${esc(p.label)}</span>`).join("")}</div>`;
+  const sold = PRODUCTS.filter((p) => d.series.some((m) => m.byProduct[p.key]));
+  const n = d.series.length;
+  // With one selling plugin its curve IS the total; two identical lines would
+  // only make the chart look busier than the business is.
+  const lines = (sold.length > 1
+    ? [{ label: "Total", color: "#18181b", w: 2.75, vals: d.series.map((m) => m.cents) }]
+    : []
+  ).concat(sold.map((p) => ({ label: p.label, color: p.color, w: 2, vals: d.series.map((m) => m.byProduct[p.key] || 0) })));
+
+  if (!lines.length) return `<div class="empty">No sales recorded yet.</div>`;
+
+  const W = 760, H = 252, T = 14, B = 28, LEFT = 56;
+  // Room on the right for direct labels, but only while there are few enough
+  // for them to be read rather than untangled.
+  const direct = lines.length <= 4;
+  const RIGHT = direct ? 104 : 16;
+  const iw = W - LEFT - RIGHT, ih = H - T - B;
+  const top = niceCeil(Math.max(1, ...lines.map((l) => Math.max(...l.vals))) * 1.08);
+  const X = (i) => LEFT + (n === 1 ? iw / 2 : (i / (n - 1)) * iw);
+  const Y = (c) => T + ih - (c / top) * ih;
+
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * top);
+  const step = Math.max(1, Math.ceil(n / 12));
+
+  // Direct labels, pushed apart so a tight month cannot overlap two of them.
+  const ends = lines.map((l, i) => ({ i, y: Y(l.vals[n-1]), label: l.label, color: l.color }))
+    .sort((a, b) => a.y - b.y);
+  for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i-1].y < 14) ends[i].y = ends[i-1].y + 14;
+
+  salesState = { d, lines, n, W, X, Y, LEFT, RIGHT, T, ih };
+
+  return `<div class="lchart" id="lchart">
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Sales per month, in dollars, per plugin and in total">
+      ${ticks.map((t) => `<line class="lc-grid" x1="${LEFT}" x2="${W - RIGHT}" y1="${Y(t).toFixed(1)}" y2="${Y(t).toFixed(1)}"/>
+        <text class="lc-axis" x="${LEFT - 8}" y="${(Y(t) + 3.5).toFixed(1)}" text-anchor="end">${esc(moneyCents(t))}</text>`).join("")}
+      ${d.series.map((m, i) => i % step === 0 || i === n - 1
+        ? `<text class="lc-axis" x="${X(i).toFixed(1)}" y="${H - 9}" text-anchor="middle">${esc(monthLabel(m.month))}</text>` : "").join("")}
+      <line class="lc-cross" id="lc-cross" y1="${T}" y2="${T + ih}" x1="0" x2="0"/>
+      ${lines.map((l) => `<path d="${curvePath(l.vals.map((v, i) => [X(i), Y(v)]))}" fill="none" stroke="${l.color}"
+        stroke-width="${l.w}" stroke-linecap="round" stroke-linejoin="round"/>`).join("")}
+      ${n <= 24 ? lines.map((l) => l.vals.map((v, i) =>
+        `<circle class="lc-dot" cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="4" fill="${l.color}"/>`).join("")).join("") : ""}
+      ${lines.map((l, i) => `<circle class="lc-dot lc-hot" id="lc-hot-${i}" r="5.5" fill="${l.color}" cx="0" cy="0"/>`).join("")}
+      ${direct ? ends.map((e) => `<circle cx="${W - RIGHT + 22}" cy="${e.y.toFixed(1)}" r="4" fill="${e.color}"/>
+        <text class="lc-axis" x="${W - RIGHT + 31}" y="${(e.y + 3.5).toFixed(1)}" style="fill:var(--text-2);font-weight:600">${esc(e.label)}</text>`).join("") : ""}
+      <rect id="lc-hit" x="${LEFT}" y="${T}" width="${iw}" height="${ih}" fill="transparent"/>
+    </svg>
+    <div class="lc-tip" id="lc-tip"></div>
+  </div>
+  <div class="legend">${lines.map((l) => `<span><i style="background:${l.color}"></i>${esc(l.label)}</span>`).join("")}</div>
+  <details class="lc-table"><summary>Show the numbers</summary>
+    <div class="tablewrap"><table><thead><tr><th>Month</th><th class="right">Payments</th>
+      ${lines.map((l) => `<th class="right">${esc(l.label)}</th>`).join("")}</tr></thead>
+      <tbody>${d.series.map((m, i) => `<tr><td>${esc(monthLabel(m.month))}</td><td class="right">${fmt(m.count)}</td>
+        ${lines.map((l) => `<td class="right">${esc(moneyCents(l.vals[i]))}</td>`).join("")}</tr>`).join("")}</tbody>
+    </table></div>
+  </details>`;
+}
+
+/* Crosshair + one tooltip for the whole month. Bound after the panel's HTML
+   lands, because that is when the nodes exist. */
+function bindSalesChart() {
+  const st = salesState, wrap = $("lchart");
+  if (!st || !wrap) return;
+  const svg = wrap.querySelector("svg"), tip = $("lc-tip"), cross = $("lc-cross");
+  const hots = st.lines.map((l, i) => $("lc-hot-" + i));
+
+  const show = (i) => {
+    const x = st.X(i);
+    cross.setAttribute("x1", x); cross.setAttribute("x2", x); cross.style.opacity = "1";
+    hots.forEach((h, k) => {
+      h.setAttribute("cx", x); h.setAttribute("cy", st.Y(st.lines[k].vals[i])); h.style.opacity = "1";
+    });
+    const m = st.d.series[i];
+    tip.innerHTML = `<div class="h">${esc(monthLabel(m.month))} · ${fmt(m.count)} payment${m.count === 1 ? "" : "s"}</div>`
+      + st.lines.map((l) => `<div class="r"><i style="background:${l.color}"></i><span>${esc(l.label)}</span><b>${esc(moneyCents(l.vals[i]))}</b></div>`).join("");
+    // Percent of the SVG's own width, so the tooltip follows the chart at any
+    // panel size without measuring anything. Near either end it anchors to its
+    // own edge instead of its centre, or it would hang off the panel.
+    const pct = (x / st.W) * 100;
+    tip.style.left = pct + "%";
+    tip.style.top = (st.T + st.ih) * 100 / 252 + "%";
+    tip.style.transform = pct < 16 ? "translate(0,-100%)" : pct > 84 ? "translate(-100%,-100%)" : "translate(-50%,-100%)";
+    tip.style.opacity = "1";
+  };
+  const hide = () => {
+    cross.style.opacity = "0"; tip.style.opacity = "0";
+    hots.forEach((h) => h.style.opacity = "0");
+  };
+
+  const move = (ev) => {
+    const r = svg.getBoundingClientRect();
+    const vx = ((ev.clientX - r.left) / r.width) * st.W;
+    const f = st.n === 1 ? 0 : (vx - st.LEFT) / (st.W - st.LEFT - st.RIGHT);
+    show(Math.max(0, Math.min(st.n - 1, Math.round(f * (st.n - 1)))));
+  };
+  // The hit area is the plot, but the pointer should keep reading while it
+  // wanders over a curve near the edge — so listen on the whole svg.
+  svg.addEventListener("pointermove", move);
+  svg.addEventListener("pointerleave", hide);
 }
 function planRow(label, n, total) {
   const pct = total ? Math.round((n/total)*100) : 0;
@@ -542,6 +671,7 @@ async function renderOverview() {
     </div>
     <p class="note">MRR counts subscriptions only. Lifetime is one-time revenue shown separately, valued at today's price. Gifted accounts have access but pay nothing, so they're excluded from both.</p>`;
   ov.querySelectorAll("[data-open]").forEach((a) => a.onclick = (e) => { e.preventDefault(); switchTab("prod:" + a.dataset.open); });
+  bindSalesChart();
 }
 
 /* ── Users, one global account list ──
