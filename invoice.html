@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice | Vanssay</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+  <link rel="apple-touch-icon" href="/favicon-180.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#fafafa;--surface:#fff;--surface-2:#f4f4f5;--border:#e4e4e7;--text:#18181b;
+      --text-2:#52525b;--muted:#a1a1aa;--accent:#0e7afe;--accent-2:#7c5cff;--error:#dc2626;
+      --shadow-md:0 8px 30px rgba(0,0,0,.08)}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    main{max-width:920px;margin:0 auto;padding:28px 20px 64px}
+    .bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+    .bar .grow{flex:1}
+    .num{font-weight:800;font-size:17px;letter-spacing:-.01em}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;
+      border-radius:11px;font:inherit;font-size:14px;font-weight:700;border:1px solid transparent;cursor:pointer}
+    .btn-blue{background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#fff}
+    .btn-line{background:var(--surface);border-color:var(--border);color:var(--text)}
+    .btn[disabled]{opacity:.55;cursor:default}
+    .hint{color:var(--muted);font-size:12.5px;margin:-8px 0 16px}
+    .paper{background:var(--surface);border:1px solid var(--border);border-radius:18px;
+      box-shadow:var(--shadow-md);overflow:hidden}
+    iframe{display:block;width:100%;border:0;min-height:60vh;background:#fff}
+    .state{padding:56px 28px;text-align:center;color:var(--text-2)}
+    .state h1{font-size:20px;font-weight:800;margin-bottom:8px;color:var(--text)}
+    .state a{color:var(--accent);font-weight:600}
+    .spinner{width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--accent);
+      border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+<main>
+  <div class="bar" id="bar" style="display:none">
+    <span class="num" id="num"></span>
+    <span class="grow"></span>
+    <button class="btn btn-line" id="back">Back to my account</button>
+    <button class="btn btn-blue" id="dl">Download PDF</button>
+  </div>
+  <p class="hint" id="hint" style="display:none">In the print dialog, choose <strong>Save as PDF</strong> as the destination.</p>
+
+  <div class="paper">
+    <div class="state" id="state"><div class="spinner"></div><p>Loading your invoice…</p></div>
+    <iframe id="doc" title="Invoice" style="display:none"></iframe>
+  </div>
+</main>
+
+<script>
+// The invoice document lives behind an auth-scoped API route, so it cannot be a
+// plain link: an invoice number must never be guessable into someone else's
+// billing details. This page fetches it with the caller's token and shows it in
+// a same-origin iframe, which keeps the URL readable (vanssay.net/invoice?n=…)
+// and lets "Download PDF" print just the document.
+var API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
+
+// Every plugin stores its own session under its own key, but all of them are
+// issued by the same Accounts service, so any of them opens any invoice the
+// account owns. `k` names the one the caller came from; the rest are fallbacks
+// for someone who lands here with a link.
+var TOKEN_KEYS = ["vanssay.token", "instagram.token", "geoblock.token", "router.token", "maintenance.token"];
+
+var $ = function (id) { return document.getElementById(id); };
+var params = new URLSearchParams(location.search);
+var number = (params.get("n") || "").trim();
+var preferred = params.get("k");
+
+// Arriving straight from a plugin, with the session in the link.
+if (location.hash.indexOf("#token=") === 0) {
+  localStorage.setItem(preferred && TOKEN_KEYS.indexOf(preferred) >= 0 ? preferred : "vanssay.token",
+                       decodeURIComponent(location.hash.slice(7).split("&")[0]));
+  history.replaceState(null, "", location.pathname + location.search);
+}
+
+function accountHref() {
+  return { "instagram.token": "instagram-account", "geoblock.token": "geoblock-account",
+           "router.token": "router-account", "maintenance.token": "maintenance-account" }[preferred] || "account";
+}
+
+function fail(title, html) {
+  $("state").innerHTML = "<h1>" + title + "</h1><p>" + html + "</p>";
+}
+
+function tokens() {
+  var keys = preferred ? [preferred].concat(TOKEN_KEYS) : TOKEN_KEYS.slice();
+  var seen = {}, out = [];
+  keys.forEach(function (k) {
+    var t = localStorage.getItem(k);
+    if (t && !seen[t]) { seen[t] = 1; out.push(t); }
+  });
+  return out;
+}
+
+/** Try each session we hold; the first one that owns the invoice wins. */
+function fetchDoc(list, i) {
+  if (i >= list.length) {
+    return Promise.reject(new Error(list.length ? "notfound" : "noauth"));
+  }
+  return fetch(API + "/billing/invoices/" + encodeURIComponent(number), {
+    headers: { Authorization: "Bearer " + list[i] },
+  }).then(function (res) {
+    if (res.ok) return res.text();
+    if (res.status === 401 || res.status === 403 || res.status === 404) return fetchDoc(list, i + 1);
+    return res.json().catch(function () { return {}; }).then(function (d) {
+      throw new Error(d.error || "Could not open that invoice");
+    });
+  });
+}
+
+function show(html) {
+  var frame = $("doc");
+  frame.srcdoc = html;
+  frame.onload = function () {
+    var doc = frame.contentDocument;
+    if (!doc) return;
+    // The document ships with its own print bar; this page provides the buttons,
+    // so drop the duplicate.
+    Array.prototype.forEach.call(doc.querySelectorAll(".bar"), function (el) { el.parentNode.removeChild(el); });
+    doc.documentElement.style.background = "#fff";
+    if (doc.body) doc.body.style.background = "#fff";
+    $("state").style.display = "none";
+    frame.style.display = "block";
+    $("bar").style.display = "flex";
+    $("hint").style.display = "block";
+    if (doc.title) document.title = doc.title;
+
+    // Grow the frame to fit the document, so the page scrolls rather than the
+    // frame. Only measurable once the frame is on screen: a display:none
+    // element has no layout, and its scrollHeight reads 0.
+    var fit = function () {
+      var d = frame.contentDocument;
+      if (!d) return;
+      frame.style.height = "0px";
+      var h = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0);
+      frame.style.height = (h + 24) + "px";
+    };
+    // The frame has only just stopped being display:none, so its inner document
+    // has not been laid out yet. Watch it instead of guessing when it is ready.
+    if (window.ResizeObserver && doc.documentElement) {
+      new ResizeObserver(fit).observe(doc.documentElement);
+    }
+    setTimeout(fit, 0);
+    setTimeout(fit, 250);
+    // The document is A4-wide above 820px and reflows below it, so its height
+    // changes with the viewport.
+    window.addEventListener("resize", fit);
+    if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(fit).catch(function () {});
+  };
+}
+
+$("dl").onclick = function () {
+  var w = $("doc").contentWindow;
+  if (!w) return;
+  w.focus();
+  w.print();
+};
+$("back").onclick = function () { location.href = accountHref(); };
+
+if (!number) {
+  fail("No invoice asked for", 'Open an invoice from <a href="accounts">your account</a>.');
+} else {
+  $("num").textContent = "Invoice " + number;
+  fetchDoc(tokens(), 0)
+    .then(show)
+    .catch(function (e) {
+      if (e.message === "noauth") {
+        fail("Please sign in", 'Sign in to <a href="accounts">your Vanssay account</a>, then open the invoice from there.');
+      } else if (e.message === "notfound") {
+        fail("Invoice not found", 'This invoice does not belong to the account you are signed in as. Open it from <a href="accounts">your account</a>, or write to <a href="mailto:support@vanssay.net">support@vanssay.net</a>.');
+      } else {
+        fail("Could not open that invoice", e.message + ' Write to <a href="mailto:support@vanssay.net">support@vanssay.net</a> and we will send it to you.');
+      }
+    });
+}
+</script>
+</body>
+</html>

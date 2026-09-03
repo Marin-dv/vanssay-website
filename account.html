@@ -53,14 +53,6 @@
     .meter { height:8px; border-radius:99px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden; margin-top:8px; }
     .meter span { display:block; height:100%; background:var(--accent); border-radius:99px; }
     .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
-    .inv-row { display:flex; align-items:center; justify-content:space-between; gap:12px;
-               padding:11px 0; border-top:1px solid var(--border); }
-    .inv-row:first-child { border-top:0; }
-    .inv-num { font-weight:600; font-size:13.5px; }
-    .inv-meta { display:block; color:var(--muted); font-size:12.5px; margin-top:2px; }
-    .inv-btn { padding:7px 12px; font-size:12.5px; }
-    .inv-wait { color:var(--muted); font-size:12.5px; text-align:right; }
-    @media (max-width:520px) { .inv-row { flex-direction:column; align-items:flex-start; } }
     .actions .btn { width:auto; flex:1; margin-top:0; }
     .cycle { display:flex; width:100%; gap:4px; padding:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:99px; margin-bottom:2px; }
     .cycle-opt { flex:1; border:0; background:transparent; color:var(--text-2); font:inherit; font-size:12.5px; font-weight:700; padding:8px 10px; border-radius:99px; cursor:pointer; }
@@ -128,11 +120,7 @@
           <p class="muted" id="d-limit"></p>
         </div>
 
-        <div class="card" id="d-inv-card" style="display:none">
-          <h3>Invoices</h3>
-          <p class="muted" id="d-inv-copy">Every payment you make has an invoice here, ready to download as a PDF.</p>
-          <div id="d-inv-list"></div>
-        </div>
+        <div id="d-invoices" style="display:none"></div>
       </div>
 
       <div class="col">
@@ -158,6 +146,7 @@
   </div>
 </main>
 
+<script src="assets/invoices.js"></script>
 <script>
 const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
 // Checkout sends a plan CHOICE; the backend resolves the live Stripe price id
@@ -306,7 +295,7 @@ async function load() {
       }
     }
     renderBilling();
-    loadInvoices();
+    VanssayInvoices.mount({ apiBase: API, tokenKey: TKEY, product: "reviews", mountId: "d-invoices" });
 
     try {
       const u = await api("/track/usage");
@@ -329,68 +318,6 @@ async function load() {
     localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
   }
 }
-// ── Invoices ────────────────────────────────────────────────────────────────
-// The document route is auth-scoped, so a plain <a href> would 401. Fetch it
-// with the token and hand the browser a blob to open in a new tab, where its
-// own "Download PDF" button prints it.
-async function openInvoice(number, btn) {
-  const label = btn.textContent;
-  btn.disabled = true; btn.textContent = "Opening…";
-  try {
-    const res = await fetch(API + "/billing/invoices/" + encodeURIComponent(number), {
-      headers: { Authorization: "Bearer " + localStorage.getItem(TKEY) },
-    });
-    if (!res.ok) {
-      const d = await res.json().catch(() => ({}));
-      throw new Error(d.error || "Could not open that invoice");
-    }
-    const url = URL.createObjectURL(new Blob([await res.text()], { type: "text/html" }));
-    window.open(url, "_blank");
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
-  } catch (e) {
-    showErr("dash-err", e.message);
-  } finally {
-    btn.disabled = false; btn.textContent = label;
-  }
-}
-
-async function loadInvoices() {
-  const card = $("d-inv-card"), list = $("d-inv-list");
-  try {
-    const { invoices, supportEmail } = await api("/billing/invoices?product=reviews");
-    if (!invoices.length) { card.style.display = "none"; return; }
-    card.style.display = "block";
-
-    // A held invoice is a real, numbered one whose document needs our intracom
-    // VAT number. Show it rather than hiding it, so the purchase is visibly on
-    // file and the customer knows exactly who to ask.
-    const held = invoices.some((i) => !i.available);
-    $("d-inv-copy").textContent = held
-      ? "Every payment you make has an invoice here. One of them needs our EU VAT number, which is being attributed."
-      : "Every payment you make has an invoice here, ready to download as a PDF.";
-
-    list.innerHTML = invoices.map((inv) => {
-      const d = new Date(inv.supplyDate).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
-      const amt = (inv.amountCents / 100).toFixed(2) + " " + inv.currency;
-      return `<div class="inv-row">
-        <div>
-          <span class="inv-num">${inv.number}</span>
-          <span class="inv-meta">${d} · ${amt}</span>
-        </div>
-        ${inv.available
-          ? `<button class="btn btn-line inv-btn" data-inv="${inv.number}">Download PDF</button>`
-          : `<span class="inv-wait">Contact <a href="mailto:${supportEmail}?subject=Invoice%20${inv.number}" style="color:var(--accent)">${supportEmail}</a></span>`}
-      </div>`;
-    }).join("");
-
-    list.querySelectorAll("[data-inv]").forEach((b) => {
-      b.onclick = () => openInvoice(b.dataset.inv, b);
-    });
-  } catch (e) {
-    card.style.display = "none";
-  }
-}
-
 $("d-signout").onclick = () => { localStorage.removeItem(TKEY); load(); };
 $("d-changepass").onclick = async () => {
   const btn = $("d-changepass");

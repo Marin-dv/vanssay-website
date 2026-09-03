@@ -99,6 +99,8 @@
       <div class="plugins" id="d-plugins"></div>
     </div>
 
+    <div id="d-invoices" style="display:none"></div>
+
     <div class="card">
       <h3>Profile</h3>
       <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
@@ -113,6 +115,7 @@
   </div>
 </main>
 
+<script src="assets/invoices.js"></script>
 <script>
 const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
 // Shared token: this is the same Accounts identity used by every plugin account
@@ -245,6 +248,9 @@ async function load() {
         '<span class="right">' + planBadge(p.product, plan, lifetime) + '<span class="open">Manage →</span></span>';
       wrap.appendChild(row);
     });
+
+    // Every invoice the account holds, across plugins: the series is shared.
+    VanssayInvoices.mount({ apiBase: API, tokenKey: TKEY, mountId: "d-invoices" });
   } catch (e) {
     localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
   }

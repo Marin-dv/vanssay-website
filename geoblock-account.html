@@ -101,6 +101,8 @@
           <ul class="feats" id="d-feats"></ul>
           <p class="muted" style="margin-top:12px">Set your blocked countries, VPN detection and block screen right inside the <strong>Bouncer</strong> plugin in Framer.</p>
         </div>
+
+        <div id="d-invoices" style="display:none"></div>
       </div>
 
       <div class="col">
@@ -120,6 +122,7 @@
   </div>
 </main>
 
+<script src="assets/invoices.js"></script>
 <script>
 // Identity AND billing are owned by the central Accounts service (the reviews
 // backend). Auth, /auth/me and /billing all run there; billing is scoped to this
@@ -220,6 +223,7 @@ async function load() {
     badge.className = "badge b-" + plan;
     $("d-renew").textContent = plan === "free" ? "Free forever. Upgrade anytime." : "Active subscription.";
     $("d-feats").innerHTML = (FEATS[plan] || FEATS.free).map((f) => "<li>" + f + "</li>").join("");
+    VanssayInvoices.mount({ apiBase: AUTH_API, tokenKey: TKEY, product: PRODUCT, mountId: "d-invoices" });
 
     const actions = $("d-billing"); actions.innerHTML = "";
     const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
