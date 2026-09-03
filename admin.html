@@ -247,12 +247,17 @@ const money = (n) => "$" + Number(n || 0).toLocaleString();
 // not read as "$89.5" — and $1,200.00 must not carry two pointless zeros.
 const moneyCents = (c) => "$" + (Number(c || 0) / 100).toLocaleString(undefined, {
   minimumFractionDigits: Number(c || 0) % 100 ? 2 : 0, maximumFractionDigits: 2 });
-// "2026-08" is a key, not a label. Charts and tooltips show the month the
-// way a person says it.
+// "2026-08" / "2026-08-19" are keys, not labels. Charts and tooltips show the
+// bucket the way a person says it; `full` adds the year, which an axis tick has
+// no room for but a tooltip should always carry.
 const monthLabel = (m) => {
   const [y, mo] = String(m).split("-");
   return new Date(Date.UTC(Number(y), Number(mo) - 1, 1)).toLocaleDateString(undefined, { month: "short", year: "numeric" });
 };
+const bucketLabel = (k, full) => String(k).length > 7
+  ? new Date(String(k) + "T00:00:00Z").toLocaleDateString(undefined,
+      full ? { day: "numeric", month: "short", year: "numeric" } : { day: "numeric", month: "short" })
+  : monthLabel(k);
 const date = (d) => d ? new Date(d).toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" }) : "-";
 const dt = (d) => d ? new Date(d).toLocaleString(undefined, { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }) : "-";
 // Apify costs are tiny (fractions of a cent → a few $); show enough precision to be useful.
@@ -364,34 +369,17 @@ function niceCeil(v) {
   return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
 }
 
-/* Monotone cubic (Fritsch–Carlson). A plain Catmull-Rom overshoots between
-   points, which on this chart would draw a month dipping below zero dollars or
-   above a peak that never happened. */
-function curvePath(pts) {
-  const n = pts.length;
-  if (!n) return "";
-  if (n === 1) return `M${pts[0][0]},${pts[0][1]}`;
-  const dx = [], dy = [], sl = [], m = [];
-  for (let i = 0; i < n - 1; i++) { dx[i] = pts[i+1][0] - pts[i][0]; dy[i] = pts[i+1][1] - pts[i][1]; sl[i] = dy[i] / dx[i]; }
-  m[0] = sl[0];
-  for (let i = 1; i < n - 1; i++) m[i] = sl[i-1] * sl[i] <= 0 ? 0 : (sl[i-1] + sl[i]) / 2;
-  m[n-1] = sl[n-2];
-  for (let i = 0; i < n - 1; i++) {
-    if (sl[i] === 0) { m[i] = 0; m[i+1] = 0; continue; }
-    const a = m[i] / sl[i], b = m[i+1] / sl[i], h = Math.hypot(a, b);
-    if (h > 3) { m[i] = 3 * a / h * sl[i]; m[i+1] = 3 * b / h * sl[i]; }
-  }
-  let d = `M${pts[0][0]},${pts[0][1]}`;
-  for (let i = 0; i < n - 1; i++) {
-    const t = dx[i] / 3;
-    d += `C${pts[i][0]+t},${pts[i][1]+m[i]*t} ${pts[i+1][0]-t},${pts[i+1][1]-m[i+1]*t} ${pts[i+1][0]},${pts[i+1][1]}`;
-  }
-  return d;
+/* Straight segments between the points that exist. A spline invents a shape
+   between two days that nothing was measured on — it looks considered and says
+   something untrue, which is the worst trade a chart can make. */
+function linePath(pts) {
+  return pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
 }
 
 function salesChart(d) {
   const sold = PRODUCTS.filter((p) => d.series.some((m) => m.byProduct[p.key]));
   const n = d.series.length;
+  const byDay = d.granularity === "day";
   // With one selling plugin its curve IS the total; two identical lines would
   // only make the chart look busier than the business is.
   const lines = (sold.length > 1
@@ -402,9 +390,11 @@ function salesChart(d) {
   if (!lines.length) return `<div class="empty">No sales recorded yet.</div>`;
 
   const W = 760, H = 252, T = 14, B = 28, LEFT = 56;
-  // Room on the right for direct labels, but only while there are few enough
-  // for them to be read rather than untangled.
-  const direct = lines.length <= 4;
+  // Room on the right for direct labels, but only while there are few enough to
+  // read AND the last bucket says something about each series — on a daily
+  // chart most days are zero, so they would all stack on the baseline pointing
+  // at nothing. The legend does that job better.
+  const direct = lines.length <= 4 && !byDay;
   const RIGHT = direct ? 104 : 16;
   const iw = W - LEFT - RIGHT, ih = H - T - B;
   const top = niceCeil(Math.max(1, ...lines.map((l) => Math.max(...l.vals))) * 1.08);
@@ -412,7 +402,7 @@ function salesChart(d) {
   const Y = (c) => T + ih - (c / top) * ih;
 
   const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => f * top);
-  const step = Math.max(1, Math.ceil(n / 12));
+  const step = Math.max(1, Math.ceil(n / (byDay ? 7 : 12)));
 
   // Direct labels, pushed apart so a tight month cannot overlap two of them.
   const ends = lines.map((l, i) => ({ i, y: Y(l.vals[n-1]), label: l.label, color: l.color }))
@@ -426,12 +416,10 @@ function salesChart(d) {
       ${ticks.map((t) => `<line class="lc-grid" x1="${LEFT}" x2="${W - RIGHT}" y1="${Y(t).toFixed(1)}" y2="${Y(t).toFixed(1)}"/>
         <text class="lc-axis" x="${LEFT - 8}" y="${(Y(t) + 3.5).toFixed(1)}" text-anchor="end">${esc(moneyCents(t))}</text>`).join("")}
       ${d.series.map((m, i) => i % step === 0 || i === n - 1
-        ? `<text class="lc-axis" x="${X(i).toFixed(1)}" y="${H - 9}" text-anchor="middle">${esc(monthLabel(m.month))}</text>` : "").join("")}
+        ? `<text class="lc-axis" x="${X(i).toFixed(1)}" y="${H - 9}" text-anchor="middle">${esc(bucketLabel(m.key))}</text>` : "").join("")}
       <line class="lc-cross" id="lc-cross" y1="${T}" y2="${T + ih}" x1="0" x2="0"/>
-      ${lines.map((l) => `<path d="${curvePath(l.vals.map((v, i) => [X(i), Y(v)]))}" fill="none" stroke="${l.color}"
+      ${lines.map((l) => `<path d="${linePath(l.vals.map((v, i) => [X(i), Y(v)]))}" fill="none" stroke="${l.color}"
         stroke-width="${l.w}" stroke-linecap="round" stroke-linejoin="round"/>`).join("")}
-      ${n <= 24 ? lines.map((l) => l.vals.map((v, i) =>
-        `<circle class="lc-dot" cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="4" fill="${l.color}"/>`).join("")).join("") : ""}
       ${lines.map((l, i) => `<circle class="lc-dot lc-hot" id="lc-hot-${i}" r="5.5" fill="${l.color}" cx="0" cy="0"/>`).join("")}
       ${direct ? ends.map((e) => `<circle cx="${W - RIGHT + 22}" cy="${e.y.toFixed(1)}" r="4" fill="${e.color}"/>
         <text class="lc-axis" x="${W - RIGHT + 31}" y="${(e.y + 3.5).toFixed(1)}" style="fill:var(--text-2);font-weight:600">${esc(e.label)}</text>`).join("") : ""}
@@ -440,16 +428,47 @@ function salesChart(d) {
     <div class="lc-tip" id="lc-tip"></div>
   </div>
   <div class="legend">${lines.map((l) => `<span><i style="background:${l.color}"></i>${esc(l.label)}</span>`).join("")}</div>
-  <details class="lc-table"><summary>Show the numbers</summary>
+  <details class="lc-table"><summary>Show the numbers (buckets with a sale)</summary>
     <div class="tablewrap"><table><thead><tr><th>Month</th><th class="right">Payments</th>
       ${lines.map((l) => `<th class="right">${esc(l.label)}</th>`).join("")}</tr></thead>
-      <tbody>${d.series.map((m, i) => `<tr><td>${esc(monthLabel(m.month))}</td><td class="right">${fmt(m.count)}</td>
-        ${lines.map((l) => `<td class="right">${esc(moneyCents(l.vals[i]))}</td>`).join("")}</tr>`).join("")}</tbody>
+      <tbody>${d.series.filter((m) => m.count).map((m) => `<tr><td>${esc(bucketLabel(m.key, true))}</td><td class="right">${fmt(m.count)}</td>
+        ${lines.map((l) => `<td class="right">${esc(moneyCents(l.vals[d.series.indexOf(m)]))}</td>`).join("")}</tr>`).join("")}</tbody>
     </table></div>
   </details>`;
 }
 
-/* Crosshair + one tooltip for the whole month. Bound after the panel's HTML
+/* The sales panel fetches its own window, so changing the range re-reads one
+   endpoint instead of the whole overview. */
+let salesRange = "all"; // "all" | number of days
+const SALES_RANGES = [["30", "30 days"], ["90", "90 days"], ["all", "All time"]];
+async function loadSales() {
+  const el = $("salespanel");
+  if (!el) return;
+  let d;
+  try { d = await api("/admin/sales" + (salesRange === "all" ? "" : "?days=" + salesRange)); }
+  catch (e) { el.innerHTML = `<h3>Sales</h3><div class="empty">Sales unavailable: ${esc(e.message)}</div>`; return; }
+
+  const window_ = salesRange === "all" ? "all time" : "last " + salesRange + " days";
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+      <h3 style="margin:0">Sales · ${esc(window_)}
+        <span style="font-weight:600;color:var(--muted);font-size:12px">${moneyCents(d.totals.cents)} collected · ${fmt(d.totals.count)} payments · ${fmt(d.totals.buyers)} buyers · by ${d.granularity}</span></h3>
+      <div style="display:flex;gap:6px">${SALES_RANGES.map(([v, label]) =>
+        `<button class="btn btn-sm ${String(salesRange) === v ? "btn-blue" : "btn-line"}" data-range="${v}">${esc(label)}</button>`).join("")}</div>
+    </div>
+    ${salesChart(d)}
+    <div class="kv" style="margin-top:12px"><span>This month so far</span><strong>${moneyCents(d.thisMonth.cents)} · ${fmt(d.thisMonth.count)} payment${d.thisMonth.count === 1 ? "" : "s"}</strong></div>
+    <div class="kv"><span>Last month</span><strong>${moneyCents(d.lastMonth.cents)} · ${fmt(d.lastMonth.count)} payment${d.lastMonth.count === 1 ? "" : "s"}</strong></div>
+    <p class="note" style="margin-top:10px">Cash actually invoiced, by the date it was paid — new subscriptions, renewals and one-time Lifetime sales alike. Different from MRR above, which is a snapshot of what recurs today.${d.mixedCurrencies ? " ⚠️ Invoices in more than one currency are being summed as if they were one." : ""}</p>`;
+
+  el.querySelectorAll("[data-range]").forEach((b) => b.onclick = () => {
+    salesRange = b.dataset.range === "all" ? "all" : b.dataset.range;
+    loadSales();
+  });
+  bindSalesChart();
+}
+
+/* Crosshair + one tooltip for the whole bucket. Bound after the panel's HTML
    lands, because that is when the nodes exist. */
 function bindSalesChart() {
   const st = salesState, wrap = $("lchart");
@@ -464,8 +483,11 @@ function bindSalesChart() {
       h.setAttribute("cx", x); h.setAttribute("cy", st.Y(st.lines[k].vals[i])); h.style.opacity = "1";
     });
     const m = st.d.series[i];
-    tip.innerHTML = `<div class="h">${esc(monthLabel(m.month))} · ${fmt(m.count)} payment${m.count === 1 ? "" : "s"}</div>`
-      + st.lines.map((l) => `<div class="r"><i style="background:${l.color}"></i><span>${esc(l.label)}</span><b>${esc(moneyCents(l.vals[i]))}</b></div>`).join("");
+    tip.innerHTML = `<div class="h">${esc(bucketLabel(m.key, true))}${m.count ? " · " + fmt(m.count) + " payment" + (m.count === 1 ? "" : "s") : ""}</div>`
+      + (m.count
+        ? st.lines.filter((l) => l.vals[i] || l.label === "Total")
+            .map((l) => `<div class="r"><i style="background:${l.color}"></i><span>${esc(l.label)}</span><b>${esc(moneyCents(l.vals[i]))}</b></div>`).join("")
+        : `<div class="r"><span>No sales</span></div>`);
     // Percent of the SVG's own width, so the tooltip follows the chart at any
     // panel size without measuring anything. Near either end it anchors to its
     // own edge instead of its centre, or it would hang off the panel.
@@ -568,16 +590,12 @@ async function renderOverview() {
   const ov = $("ov");
 
   // Billing per product (Accounts) + domain overview per plugin backend.
-  // Sales is deliberately NOT product-scoped: it reads every invoice at once,
-  // so it is one request rather than one per plugin.
   const rs = await Promise.allSettled([
     ...PRODUCTS.map((p) => acct("/overview", null, p.key)),
     ...PRODUCTS.map((p) => p.base ? api(p.base + "/admin/overview") : Promise.resolve(null)),
-    api("/admin/sales"),
   ]);
   const bills = {}, doms = {};
   PRODUCTS.forEach((p, i) => { bills[p.key] = val(rs[i]); doms[p.key] = val(rs[PRODUCTS.length + i]); });
-  const sales = val(rs[PRODUCTS.length * 2]);
 
   const okBills = PRODUCTS.map((p) => bills[p.key]).filter(Boolean);
   if (!okBills.length) { ov.innerHTML = unavailable("Accounts service", rs[0]); return; }
@@ -649,14 +667,9 @@ async function renderOverview() {
       }).join("")}
     </div>
 
-    <div class="panel" style="margin-bottom:16px">
-      <h3>Sales · ${!sales ? "" : sales.allTime ? "all time" : "last " + sales.months + " months"}${sales ? ` <span style="font-weight:600;color:var(--muted);font-size:12px">${moneyCents(sales.totals.cents)} collected · ${fmt(sales.totals.count)} payments · ${fmt(sales.totals.buyers)} buyers${sales.firstSale ? " · first sale " + esc(date(sales.firstSale)) : ""}</span>` : ""}</h3>
-      ${sales ? `${salesChart(sales)}
-        <div class="kv" style="margin-top:12px"><span>This month so far</span><strong>${moneyCents(sales.thisMonth.cents)} · ${fmt(sales.thisMonth.count)} payment${sales.thisMonth.count === 1 ? "" : "s"}</strong></div>
-        <div class="kv"><span>Last month</span><strong>${moneyCents(sales.lastMonth.cents)} · ${fmt(sales.lastMonth.count)} payment${sales.lastMonth.count === 1 ? "" : "s"}</strong></div>
-        <p class="note" style="margin-top:10px">Cash actually invoiced, by the date it was paid — new subscriptions, renewals and one-time Lifetime sales alike. Different from MRR above, which is a snapshot of what recurs today.${sales.mixedCurrencies ? " ⚠️ Invoices in more than one currency are being summed as if they were one." : ""}</p>`
-      : unavailable("Sales", rs[PRODUCTS.length * 2])}
-    </div>
+    <p class="note" style="margin-bottom:16px">MRR counts subscriptions only. Lifetime is one-time revenue shown separately, valued at today's price. Gifted accounts have access but pay nothing, so they're excluded from both.</p>
+
+    <div class="panel" style="margin-bottom:16px" id="salespanel"><div class="empty">Loading…</div></div>
 
     <div class="grid-2">
       <div class="panel">
@@ -668,10 +681,9 @@ async function renderOverview() {
         ${PRODUCTS.map((p) => bills[p.key] ? planRow(`${p.icon} ${p.label}`, bills[p.key].revenue.mrr, totMRR) : "").join("")}
         <div class="kv" style="margin-top:10px"><span>Total</span><strong>${money(totMRR)} / mo</strong></div>
       </div>
-    </div>
-    <p class="note">MRR counts subscriptions only. Lifetime is one-time revenue shown separately, valued at today's price. Gifted accounts have access but pay nothing, so they're excluded from both.</p>`;
+    </div>`;
   ov.querySelectorAll("[data-open]").forEach((a) => a.onclick = (e) => { e.preventDefault(); switchTab("prod:" + a.dataset.open); });
-  bindSalesChart();
+  loadSales();
 }
 
 /* ── Users, one global account list ──
