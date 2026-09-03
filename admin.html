@@ -100,6 +100,17 @@
     .bar:hover::after { content:attr(data-tip); position:absolute; bottom:100%; left:50%; transform:translateX(-50%); background:#18181b; color:#fff; font-size:11px; padding:4px 8px; border-radius:6px; white-space:nowrap; margin-bottom:5px; z-index:5; }
     .chart-x { display:flex; gap:6px; margin-top:6px; }
     .chart-x span { flex:1; text-align:center; font-size:10px; color:var(--muted); overflow:hidden; }
+    /* Stacked bars: one column per month, one segment per plugin, so the shape
+       of the revenue and where it comes from read in the same glance. */
+    .schart { display:flex; align-items:flex-end; gap:8px; height:190px; }
+    .sbar { flex:1; display:flex; flex-direction:column-reverse; justify-content:flex-start; min-height:3px; position:relative; }
+    .sbar .stack { display:flex; flex-direction:column-reverse; border-radius:5px 5px 0 0; overflow:hidden; }
+    .sbar .seg { min-height:2px; }
+    .sbar .zero { height:3px; background:var(--border); border-radius:2px; }
+    .sbar:hover::after { content:attr(data-tip); position:absolute; bottom:100%; left:50%; transform:translateX(-50%); background:#18181b; color:#fff; font-size:11px; line-height:1.5; padding:6px 9px; border-radius:6px; white-space:pre; margin-bottom:6px; z-index:5; text-align:left; }
+    .legend { display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:12px; font-size:11.5px; color:var(--text-2); }
+    .legend span { display:inline-flex; align-items:center; gap:6px; }
+    .legend i { width:9px; height:9px; border-radius:3px; display:inline-block; }
 
     /* ── Tables ── */
     .toolbar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
@@ -209,11 +220,11 @@ const TKEY = "vanssay.token";
 // blockers key off a site config, Instagram off a connected feed. Reviews is
 // not listed because its own /users payload already carries businesses + views.
 const PRODUCTS = [
-  { key: "reviews",     label: "Reviews",     icon: "⭐", base: "",             cache: true,  activity: null },
-  { key: "geoblock",    label: "Bouncer",     icon: "🛡️", base: "/geoblock",    cache: true,  activity: ["/admin/sites", "sites"] },
-  { key: "router",      label: "Router",      icon: "🧭", base: "/router",      cache: true,  activity: ["/admin/sites", "sites"] },
-  { key: "instagram",   label: "Instagram",   icon: "📸", base: "/instagram",   cache: false, activity: ["/admin/feeds", "feeds"] },
-  { key: "maintenance", label: "Maintenance", icon: "🚧", base: "/maintenance", cache: false, activity: ["/admin/sites", "sites"] },
+  { key: "reviews",     label: "Reviews",     icon: "⭐", base: "",             cache: true,  activity: null, color: "#2b50ff" },
+  { key: "geoblock",    label: "Bouncer",     icon: "🛡️", base: "/geoblock",    cache: true,  activity: ["/admin/sites", "sites"], color: "#16a34a" },
+  { key: "router",      label: "Router",      icon: "🧭", base: "/router",      cache: true,  activity: ["/admin/sites", "sites"], color: "#7c3aed" },
+  { key: "instagram",   label: "Instagram",   icon: "📸", base: "/instagram",   cache: false, activity: ["/admin/feeds", "feeds"], color: "#e0457b" },
+  { key: "maintenance", label: "Maintenance", icon: "🚧", base: "/maintenance", cache: false, activity: ["/admin/sites", "sites"], color: "#0891b2" },
 ];
 const PROD = Object.fromEntries(PRODUCTS.map((p) => [p.key, p]));
 
@@ -221,6 +232,10 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c]));
 const fmt = (n) => Number(n || 0).toLocaleString();
 const money = (n) => "$" + Number(n || 0).toLocaleString();
+// Invoiced amounts are cents and rarely land on a whole dollar, so $89.50 must
+// not read as "$89.5" — and $1,200.00 must not carry two pointless zeros.
+const moneyCents = (c) => "$" + (Number(c || 0) / 100).toLocaleString(undefined, {
+  minimumFractionDigits: Number(c || 0) % 100 ? 2 : 0, maximumFractionDigits: 2 });
 const date = (d) => d ? new Date(d).toLocaleDateString(undefined, { year:"numeric", month:"short", day:"numeric" }) : "-";
 const dt = (d) => d ? new Date(d).toLocaleString(undefined, { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }) : "-";
 // Apify costs are tiny (fractions of a cent → a few $); show enough precision to be useful.
@@ -317,6 +332,31 @@ function barChart(items) { // [{v, tip, label}]
   return `<div class="chart">${items.map((i) => `<div class="bar" style="height:${Math.round((i.v/max)*100)}%" data-tip="${esc(i.tip)}"></div>`).join("")}</div>
     <div class="chart-x">${items.map((i) => `<span>${esc(i.label)}</span>`).join("")}</div>`;
 }
+/* Money collected per month, stacked by plugin. Cash actually invoiced — not
+   MRR, which is only a snapshot of what recurs today. */
+function salesChart(d) {
+  const max = Math.max(1, ...d.series.map((m) => m.cents));
+  const keys = PRODUCTS.filter((p) => d.series.some((m) => m.byProduct[p.key]));
+  // A product that has never been invoiced would only add a dead legend entry.
+  const step = Math.max(1, Math.ceil(d.series.length / 12));
+  const bars = d.series.map((m, i) => {
+    const lines = keys.filter((p) => m.byProduct[p.key])
+      .map((p) => `${p.label}: ${moneyCents(m.byProduct[p.key])}`);
+    const tip = [`${m.month} · ${moneyCents(m.cents)}`, `${m.count} payment${m.count === 1 ? "" : "s"}`, ...lines].join("\n");
+    const h = Math.round((m.cents / max) * 100);
+    const inner = m.cents
+      ? `<div class="stack" style="height:${h}%">${keys.map((p) => {
+          const c = m.byProduct[p.key] || 0;
+          return c ? `<div class="seg" style="height:${(c / m.cents) * 100}%;background:${p.color}"></div>` : "";
+        }).join("")}</div>`
+      : `<div class="zero"></div>`;
+    return `<div class="sbar" data-tip="${esc(tip)}">${inner}</div>`;
+  }).join("");
+  return `<div class="schart">${bars}</div>
+    <div class="chart-x" style="gap:8px">${d.series.map((m, i) =>
+      `<span>${i % step === 0 ? esc(m.month.slice(2).replace("-", "/")) : ""}</span>`).join("")}</div>
+    <div class="legend">${keys.map((p) => `<span><i style="background:${p.color}"></i>${esc(p.label)}</span>`).join("")}</div>`;
+}
 function planRow(label, n, total) {
   const pct = total ? Math.round((n/total)*100) : 0;
   return `<div style="margin-bottom:10px"><div class="kv" style="border:none;padding-bottom:3px"><span>${esc(label)}</span><strong>${fmt(n)} · ${pct}%</strong></div>
@@ -394,12 +434,16 @@ async function renderOverview() {
   const ov = $("ov");
 
   // Billing per product (Accounts) + domain overview per plugin backend.
+  // Sales is deliberately NOT product-scoped: it reads every invoice at once,
+  // so it is one request rather than one per plugin.
   const rs = await Promise.allSettled([
     ...PRODUCTS.map((p) => acct("/overview", null, p.key)),
     ...PRODUCTS.map((p) => p.base ? api(p.base + "/admin/overview") : Promise.resolve(null)),
+    api("/admin/sales?months=12"),
   ]);
   const bills = {}, doms = {};
   PRODUCTS.forEach((p, i) => { bills[p.key] = val(rs[i]); doms[p.key] = val(rs[PRODUCTS.length + i]); });
+  const sales = val(rs[PRODUCTS.length * 2]);
 
   const okBills = PRODUCTS.map((p) => bills[p.key]).filter(Boolean);
   if (!okBills.length) { ov.innerHTML = unavailable("Accounts service", rs[0]); return; }
@@ -469,6 +513,15 @@ async function renderOverview() {
           ${domainKv(p).map(([k, x]) => `<div class="kv"><span>${k}</span><strong>${x}</strong></div>`).join("")}
         </div>`;
       }).join("")}
+    </div>
+
+    <div class="panel" style="margin-bottom:16px">
+      <h3>Sales · last 12 months${sales ? ` <span style="font-weight:600;color:var(--muted);font-size:12px">${moneyCents(sales.totals.cents)} collected · ${fmt(sales.totals.count)} payments · ${fmt(sales.totals.buyers)} buyers</span>` : ""}</h3>
+      ${sales ? `${salesChart(sales)}
+        <div class="kv" style="margin-top:12px"><span>This month so far</span><strong>${moneyCents(sales.thisMonth.cents)} · ${fmt(sales.thisMonth.count)} payment${sales.thisMonth.count === 1 ? "" : "s"}</strong></div>
+        <div class="kv"><span>Last month</span><strong>${moneyCents(sales.lastMonth.cents)} · ${fmt(sales.lastMonth.count)} payment${sales.lastMonth.count === 1 ? "" : "s"}</strong></div>
+        <p class="note" style="margin-top:10px">Cash actually invoiced, by the date it was paid — new subscriptions, renewals and one-time Lifetime sales alike. Different from MRR above, which is a snapshot of what recurs today.${sales.mixedCurrencies ? " ⚠️ Invoices in more than one currency are being summed as if they were one." : ""}</p>`
+      : unavailable("Sales", rs[PRODUCTS.length * 2])}
     </div>
 
     <div class="grid-2">
@@ -1025,6 +1078,10 @@ async function renderWebsite() {
   let d;
   try { d = await api(`/admin/site-traffic?days=${siteDays}`); }
   catch (e) { $("wsite").innerHTML = `<div class="empty">Traffic unavailable: ${esc(e.message)}</div>`; return; }
+  // Suggestions are not traffic, but they come from the same site and belong on
+  // the same page. Fetched separately so a failure costs the panel, not the tab.
+  let sug = null;
+  try { sug = await api("/admin/suggestions?limit=200"); } catch (e) { /* panel says so */ }
 
   const delta = (now, before) => {
     if (!before) return now ? `first ${siteDays} days with data` : "nothing yet";
@@ -1072,7 +1129,39 @@ async function renderWebsite() {
           : `<div class="empty">No referrers recorded yet.</div>`}</div></div>
     </div>
 
-    <p class="note" style="margin-top:14px">Your own visits are excluded: signing into this admin flags the browser permanently (add <span class="mono">?notrack=1</span> to any page to flag another one), and ${d.excludedIps ? fmt(d.excludedIps) + " IP" + (d.excludedIps > 1 ? "s are" : " is") : "no IP is"} excluded server-side via <span class="mono">SITE_EXCLUDE_IPS</span>. Known bots are dropped too. "Visitors" counts once per day per person — the id is salted and rebuilt daily, so nobody is followed across days.</p>`;
+    <p class="note" style="margin-top:14px">Your own visits are excluded: signing into this admin flags the browser permanently (add <span class="mono">?notrack=1</span> to any page to flag another one), and ${d.excludedIps ? fmt(d.excludedIps) + " IP" + (d.excludedIps > 1 ? "s are" : " is") : "no IP is"} excluded server-side via <span class="mono">SITE_EXCLUDE_IPS</span>. Known bots are dropped too. "Visitors" counts once per day per person — the id is salted and rebuilt daily, so nobody is followed across days.</p>
+
+    ${suggestionsPanel(sug)}`;
+}
+
+
+/* "Suggest a plugin" answers from vanssay.net — the only place people who never
+   signed up get to tell us what is missing. */
+const SUGGEST_PLATFORM_LABELS = { framer: "Framer", webflow: "Webflow", both: "Both", other: "Other / not sure", unsaid: "Not said" };
+function suggestionsPanel(d) {
+  if (!d) return `<div class="panel"><h3>Plugin suggestions</h3><div class="empty">Suggestions unavailable.</div></div>`;
+  const platTotal = d.platforms.reduce((s, p) => s + p.count, 0);
+  return `<div class="panel" style="margin-top:16px">
+    <h3>💡 Plugin suggestions <span style="font-weight:600;color:var(--muted);font-size:12px">from the site's “Suggest a plugin” form</span></h3>
+    <div class="kpis" style="margin-bottom:14px">
+      <div class="kpi"><div class="k-label">Suggestions</div><div class="k-val">${fmt(d.total)}</div></div>
+      <div class="kpi"><div class="k-label">Last 30 days</div><div class="k-val">${fmt(d.last30d)}</div></div>
+      <div class="kpi"><div class="k-label">Left an email</div><div class="k-val">${fmt(d.withEmail)}</div>
+        <div class="k-sub">${d.total ? Math.round((d.withEmail/d.total)*100) : 0}% want to be told when it ships</div></div>
+    </div>
+    ${platTotal ? `<div class="sec-title">Which builder they're on</div>
+      ${d.platforms.sort((a,b) => b.count - a.count).map((p) => planRow(SUGGEST_PLATFORM_LABELS[p.platform] || p.platform, p.count, platTotal)).join("")}` : ""}
+    <div class="sec-title">What they asked for</div>
+    <div class="tablewrap">${d.recent.length ? `<table><thead><tr><th>When</th><th>Idea</th><th>What it should do</th><th>Builder</th><th>Email</th></tr></thead>
+      <tbody>${d.recent.map((r) => `<tr>
+        <td>${date(r.createdAt)}</td>
+        <td><strong>${esc(r.title)}</strong></td>
+        <td style="white-space:pre-wrap;max-width:420px">${esc(r.detail)}</td>
+        <td>${esc(SUGGEST_PLATFORM_LABELS[r.platform] || "—")}</td>
+        <td>${r.email ? `<a href="mailto:${esc(r.email)}">${esc(r.email)}</a>` : `<span class="muted">anonymous</span>`}</td>
+      </tr>`).join("")}</tbody></table>`
+      : `<div class="empty">Nobody has suggested a plugin yet.</div>`}</div>
+  </div>`;
 }
 
 /* ── Plugin pages ── */

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Suggest a plugin | Vanssay</title>
+<meta name="description" content="Tell us which Framer or Webflow plugin you wish existed. We build the ones people actually ask for, and we'll email you when yours ships." />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+<link rel="apple-touch-icon" href="/favicon-180.png" />
+<link rel="stylesheet" href="assets/site.css" />
+<style>
+  .s-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:start;margin-top:18px}
+  @media(max-width:820px){.s-grid{grid-template-columns:1fr;gap:32px}}
+  .c-card{background:var(--surface);border:1px solid var(--line-soft);border-radius:14px;padding:26px}
+  .c-card h3{font-size:18px;margin-bottom:6px}
+  .c-list{list-style:none;display:flex;flex-direction:column;gap:18px;margin-top:14px}
+  .c-row{display:flex;gap:13px;align-items:flex-start}
+  .c-row b{display:block;font-size:14px}
+  .c-row span.t{font-size:13.5px;color:var(--ink-2)}
+  .c-row a{color:var(--accent);font-weight:600}
+  .num{flex:none;width:24px;height:24px;border-radius:99px;background:var(--accent);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center;margin-top:1px}
+  form label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
+  form input,form select,form textarea{width:100%;padding:11px 13px;border:1px solid var(--line-soft);border-radius:8px;font:inherit;font-size:14px;background:var(--paper);color:var(--ink);outline:none}
+  form input:focus,form select:focus,form textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  form textarea{resize:vertical;min-height:130px}
+  form .btn{margin-top:20px;width:100%}
+  form .btn[disabled]{opacity:.6;cursor:default}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  .c-note{font-size:12.5px;color:var(--muted);margin-top:12px;text-align:center}
+  .msg{margin-top:14px;padding:11px 13px;border-radius:8px;font-size:13.5px;display:none}
+  .msg.err{display:block;background:#fdecec;border:1px solid #f6c8c8;color:#a51b1b}
+  .done{text-align:center;padding:14px 0}
+  .done .tick{width:52px;height:52px;border-radius:99px;background:var(--accent);color:#fff;font-size:26px;display:grid;place-items:center;margin:0 auto 16px}
+  .done h3{font-size:20px;margin-bottom:8px}
+  .done p{font-size:14px;color:var(--ink-2)}
+</style>
+<script defer src="assets/track.js"></script>
+</head>
+<body>
+
+<nav><div class="nav-in">
+  <a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+  <div class="nav-links">
+    <span class="dd" tabindex="0"><span class="dd-t">Plugins</span>
+      <span class="dd-menu">
+        <a href="reviews">Reviews <span class="s">Live</span></a>
+        <a href="geoblock">Bouncer <span class="s">Live</span></a>
+        <a href="router">Router <span class="s">Live</span></a>
+        <a href="instagram">Instagram Feed <span class="s">Live</span></a>
+        <a href="maintenance">Maintenance <span class="s">Live</span></a>
+      </span>
+    </span>
+    <a href="contact">Contact</a>
+    <a href="accounts">Account</a>
+  </div>
+  <a class="btn btn-dark btn-sm" href="accounts">Your account &rarr;</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="split split-25">
+    <div class="eyebrow"><b>Tell us<br/>what's missing</b><br/><br/>We build what people ask for</div>
+    <div>
+      <h1>Suggest a <span class="acc">plugin.</span></h1>
+      <p class="lead" style="margin-top:22px">Every Vanssay plugin exists because somebody needed it and said so. If you keep hitting the same wall on your site, describe it here &mdash; no account, no signup, one minute.</p>
+    </div>
+  </div>
+</div></header>
+
+<section style="padding-top:20px"><div class="wrap">
+  <div class="s-grid">
+
+    <div class="c-card">
+      <h3>How this goes</h3>
+      <ul class="c-list">
+        <li class="c-row"><span class="num">1</span><div><b>You describe the problem</b><span class="t">Not the feature list &mdash; the thing you can't do on your site today.</span></div></li>
+        <li class="c-row"><span class="num">2</span><div><b>We read every one</b><span class="t">It's one person building these. Your suggestion lands on the same screen as the revenue numbers.</span></div></li>
+        <li class="c-row"><span class="num">3</span><div><b>Asked for often enough, it gets built</b><span class="t">Leave an email and you'll hear from us the day it ships &mdash; nothing else, ever.</span></div></li>
+      </ul>
+      <p class="hint" style="margin-top:18px">Need help with a plugin you already use? That's <a href="contact">support</a>, and it's faster.</p>
+    </div>
+
+    <div class="c-card" id="card">
+      <h3>Your idea</h3>
+      <p class="small muted" style="margin-bottom:6px">Sent straight to us. The email is optional.</p>
+      <form id="sform">
+        <label for="title">What would you call it?</label>
+        <input id="title" type="text" maxlength="120" placeholder="e.g. Cookie banner that doesn't look terrible" required />
+
+        <label for="detail">What should it do, and what are you stuck on today?</label>
+        <textarea id="detail" maxlength="4000" placeholder="I run a shop on Framer and I can't&hellip;" required></textarea>
+
+        <label for="platform">What do you build with?</label>
+        <select id="platform">
+          <option value="framer">Framer</option>
+          <option value="webflow">Webflow</option>
+          <option value="both">Both</option>
+          <option value="other">Something else / not sure</option>
+        </select>
+
+        <label for="email">Your email <span style="text-transform:none;letter-spacing:0;font-family:inherit">(optional &mdash; only to tell you when it ships)</span></label>
+        <input id="email" type="email" maxlength="255" placeholder="you@company.com" />
+
+        <button class="btn btn-accent" type="submit" id="send">Send suggestion &rarr;</button>
+        <div class="msg err" id="err"></div>
+        <p class="c-note">Or write to <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a></p>
+      </form>
+    </div>
+
+  </div>
+</div></section>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-logo"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#fff"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</div>
+    <div class="split split-30">
+      <div>
+        <span class="eyebrow" style="color:rgba(255,255,255,.55)">The promise</span>
+        <h2 style="margin-top:12px">One <span class="acc">promise.</span></h2>
+        <p>Every Vanssay plugin is built to be installed in one click and forgotten: no servers to run, no API keys to paste, no code to maintain.</p>
+      </div>
+      <div class="who">
+        <span>Keys stay server-side</span><span>One-click install</span><span>Matches your brand</span><span>Free tier on everything</span>
+      </div>
+    </div>
+    <div class="foot-links">
+      <span>&copy; 2026 Vanssay &middot; <a href="privacy">Privacy</a> &middot; <a href="terms">Terms</a></span>
+      <span>Framer plugins &middot; <a href="mailto:support@vanssay.net">support@vanssay.net</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  var API = "https://api.vanssay.net";
+  var form = document.getElementById("sform");
+  var err = document.getElementById("err");
+  var btn = document.getElementById("send");
+  var SEND = "Send suggestion →";
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var title = document.getElementById("title").value.trim();
+    var detail = document.getElementById("detail").value.trim();
+    if (!title || !detail) { fail("Tell us what it is and what it should do."); return; }
+
+    err.style.display = "none";
+    btn.disabled = true;
+    btn.textContent = "Sending…";
+
+    fetch(API + "/site/suggestion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: title,
+        detail: detail,
+        platform: document.getElementById("platform").value,
+        email: document.getElementById("email").value.trim()
+      })
+    })
+      .then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (j) {
+          if (!r.ok) throw new Error(j.error || "Something went wrong. Try again in a moment.");
+          return j;
+        });
+      })
+      .then(function () { thanks(title); })
+      .catch(function (e) { fail(e.message || "Couldn't send that — check your connection and try again."); });
+  });
+
+  function fail(m) {
+    err.textContent = m;
+    err.style.display = "block";
+    btn.disabled = false;
+    btn.textContent = SEND;
+  }
+
+  // Replace the form rather than clearing it: the idea is sent, and a blank
+  // form invites the same person to send it twice.
+  function thanks(title) {
+    var safe = title.replace(/[&<>"]/g, "");
+    document.getElementById("card").innerHTML =
+      '<div class="done"><div class="tick">✓</div>' +
+      '<h3>Got it — thank you.</h3>' +
+      '<p>“' + safe + '” is on the list. If you left an email, you will hear from us the day it ships.</p>' +
+      '<p style="margin-top:18px"><a class="btn btn-dark btn-sm" href="/">Back to the plugins →</a></p></div>';
+  }
+</script>
+
+</body>
+</html>
