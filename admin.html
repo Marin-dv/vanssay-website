@@ -334,15 +334,20 @@ function barChart(items) { // [{v, tip, label}]
 }
 /* Money collected per month, stacked by plugin. Cash actually invoiced — not
    MRR, which is only a snapshot of what recurs today. */
+const monthLabel = (m) => {
+  const [y, mo] = String(m).split("-");
+  return new Date(Date.UTC(Number(y), Number(mo) - 1, 1)).toLocaleDateString(undefined, { month: "short", year: "numeric" });
+};
 function salesChart(d) {
   const max = Math.max(1, ...d.series.map((m) => m.cents));
   const keys = PRODUCTS.filter((p) => d.series.some((m) => m.byProduct[p.key]));
   // A product that has never been invoiced would only add a dead legend entry.
   const step = Math.max(1, Math.ceil(d.series.length / 12));
+  const gap = d.series.length > 24 ? 3 : d.series.length > 14 ? 5 : 8;
   const bars = d.series.map((m, i) => {
     const lines = keys.filter((p) => m.byProduct[p.key])
       .map((p) => `${p.label}: ${moneyCents(m.byProduct[p.key])}`);
-    const tip = [`${m.month} · ${moneyCents(m.cents)}`, `${m.count} payment${m.count === 1 ? "" : "s"}`, ...lines].join("\n");
+    const tip = [`${monthLabel(m.month)} · ${moneyCents(m.cents)}`, `${m.count} payment${m.count === 1 ? "" : "s"}`, ...lines].join("\n");
     const h = Math.round((m.cents / max) * 100);
     const inner = m.cents
       ? `<div class="stack" style="height:${h}%">${keys.map((p) => {
@@ -352,9 +357,9 @@ function salesChart(d) {
       : `<div class="zero"></div>`;
     return `<div class="sbar" data-tip="${esc(tip)}">${inner}</div>`;
   }).join("");
-  return `<div class="schart">${bars}</div>
-    <div class="chart-x" style="gap:8px">${d.series.map((m, i) =>
-      `<span>${i % step === 0 ? esc(m.month.slice(2).replace("-", "/")) : ""}</span>`).join("")}</div>
+  return `<div class="schart" style="gap:${gap}px">${bars}</div>
+    <div class="chart-x" style="gap:${gap}px">${d.series.map((m, i) =>
+      `<span>${i % step === 0 ? esc(monthLabel(m.month)) : ""}</span>`).join("")}</div>
     <div class="legend">${keys.map((p) => `<span><i style="background:${p.color}"></i>${esc(p.label)}</span>`).join("")}</div>`;
 }
 function planRow(label, n, total) {
@@ -439,7 +444,7 @@ async function renderOverview() {
   const rs = await Promise.allSettled([
     ...PRODUCTS.map((p) => acct("/overview", null, p.key)),
     ...PRODUCTS.map((p) => p.base ? api(p.base + "/admin/overview") : Promise.resolve(null)),
-    api("/admin/sales?months=12"),
+    api("/admin/sales"),
   ]);
   const bills = {}, doms = {};
   PRODUCTS.forEach((p, i) => { bills[p.key] = val(rs[i]); doms[p.key] = val(rs[PRODUCTS.length + i]); });
@@ -516,7 +521,7 @@ async function renderOverview() {
     </div>
 
     <div class="panel" style="margin-bottom:16px">
-      <h3>Sales · last 12 months${sales ? ` <span style="font-weight:600;color:var(--muted);font-size:12px">${moneyCents(sales.totals.cents)} collected · ${fmt(sales.totals.count)} payments · ${fmt(sales.totals.buyers)} buyers</span>` : ""}</h3>
+      <h3>Sales · ${!sales ? "" : sales.allTime ? "all time" : "last " + sales.months + " months"}${sales ? ` <span style="font-weight:600;color:var(--muted);font-size:12px">${moneyCents(sales.totals.cents)} collected · ${fmt(sales.totals.count)} payments · ${fmt(sales.totals.buyers)} buyers${sales.firstSale ? " · first sale " + esc(date(sales.firstSale)) : ""}</span>` : ""}</h3>
       ${sales ? `${salesChart(sales)}
         <div class="kv" style="margin-top:12px"><span>This month so far</span><strong>${moneyCents(sales.thisMonth.cents)} · ${fmt(sales.thisMonth.count)} payment${sales.thisMonth.count === 1 ? "" : "s"}</strong></div>
         <div class="kv"><span>Last month</span><strong>${moneyCents(sales.lastMonth.cents)} · ${fmt(sales.lastMonth.count)} payment${sales.lastMonth.count === 1 ? "" : "s"}</strong></div>
