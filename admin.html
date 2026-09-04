@@ -280,6 +280,19 @@ const date = (d) => d ? new Date(d).toLocaleDateString(undefined, { year:"numeri
 const dt = (d) => d ? new Date(d).toLocaleString(undefined, { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" }) : "-";
 // Apify costs are tiny (fractions of a cent → a few $); show enough precision to be useful.
 const usd = (n) => { n = Number(n || 0); return "$" + (n >= 1 ? n.toFixed(2) : n.toFixed(4)); };
+/* Views against the owner's monthly allowance. The cap is NOT enforced in the
+   serving path yet — this exists so the first account to reach one is visible
+   before there is a rule about what happens next. `limit` 0 means unlimited. */
+const viewsOfCap = (views, limit, meter) => {
+  views = Number(views || 0);
+  limit = Number(limit || 0);
+  if (!limit) return `${fmt(views)} <span class="muted">/ ∞</span>`;
+  const pct = Math.min(100, (views / limit) * 100);
+  const tone = pct >= 100 ? " bad" : pct >= 75 ? " warn" : "";
+  const label = `${fmt(views)} <span class="muted">/ ${fmt(limit)}</span>`;
+  if (!meter) return label;
+  return `${label}<div class="meter${tone}" style="margin-top:5px"><span style="width:${pct.toFixed(1)}%"></span></div>`;
+};
 // A Trustpilot URL's useful part (the business slug) sits at the END, so an
 // ellipsis hid exactly what we needed. Render it whole, wrapped and clickable.
 const tpLink = (url) => url
@@ -862,8 +875,12 @@ async function openUser(id, force) {
         <div class="kpi"><div class="k-label">Widget views (all months)</div><div class="k-val">${fmt(totalViews)}</div></div>
         <div class="kpi"><div class="k-label">“Powered by” clicks</div><div class="k-val">${fmt(totalClicks)}</div></div>
       </div>`;
+  const igViewsMonth = igDetail ? igDetail.feeds.reduce((s, f) => s + (f.views || 0), 0) : 0;
+  const igViewsLive = igDetail ? igDetail.feeds.reduce((s, f) => s + (f.liveViews || 0), 0) : 0;
   const igMinistat = igDetail ? `<div class="ministat" style="margin-bottom:14px">
         <div class="kpi"><div class="k-label">Feeds</div><div class="k-val">${fmt(igDetail.feeds.length)}</div></div>
+        <div class="kpi"><div class="k-label">Views this month</div><div class="k-val">${fmt(igViewsMonth)}</div><div class="k-sub">${igDetail.viewLimit ? fmt(igDetail.viewLimit) + " / feed" : "no cap"}</div></div>
+        <div class="kpi"><div class="k-label">On live sites (all-time)</div><div class="k-val">${fmt(igViewsLive)}</div></div>
         <div class="kpi"><div class="k-label">Scrape cost (all-time)</div><div class="k-val">${usd(igDetail.cost.costUsd)}</div></div>
       </div>` : "";
 
@@ -882,8 +899,12 @@ async function openUser(id, force) {
 
   const igSections = igDetail ? `
     <div class="sec-title">Instagram · feeds (${igDetail.feeds.length})</div>
-    <div class="card" style="padding:0;overflow:hidden">${igDetail.feeds.length ? `<table><thead><tr><th>Handle</th><th>Layout</th><th>Mode</th><th>Created</th></tr></thead><tbody>
-      ${igDetail.feeds.map((f)=>`<tr><td>@${esc(f.handle)}</td><td>${esc(f.layout)}</td><td>${esc(f.mode)}</td><td>${date(f.createdAt)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No feeds created.</div>`}</div>
+    <div class="card" style="padding:0;overflow:hidden">${igDetail.feeds.length ? `<table><thead><tr><th>Handle</th><th>Layout</th><th>Mode</th><th class="right">Views · mo</th><th class="right">All-time</th><th class="right">Live</th><th>Created</th></tr></thead><tbody>
+      ${igDetail.feeds.map((f)=>`<tr><td>@${esc(f.handle)}</td><td>${esc(f.layout)}</td><td>${esc(f.mode)}</td><td class="right">${viewsOfCap(f.views, igDetail.viewLimit, false)}</td><td class="right">${fmt(f.viewsTotal)}</td><td class="right">${fmt(f.liveViews)}${!f.liveViews && f.viewsTotal ? ' <span class="badge b-other">canvas only</span>' : ""}</td><td>${date(f.createdAt)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No feeds created.</div>`}</div>
+
+    <div class="sec-title">Instagram · view history</div>
+    <div class="card" style="padding:0;overflow:hidden">${(igDetail.views || []).length ? `<table><thead><tr><th>Month</th><th class="right">Views</th></tr></thead><tbody>
+      ${igDetail.views.map((vw)=>`<tr><td>${esc(vw.period)}</td><td class="right">${fmt(vw.views)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No views recorded.</div>`}</div>
 
     <div class="sec-title">Instagram · live sites (${igDetail.liveSites.length})</div>
     <div class="card" style="padding:0;overflow:hidden">${igDetail.liveSites.length ? `<table><thead><tr><th>Site</th><th>Feed</th><th class="right">Loads</th><th>Last seen</th></tr></thead><tbody>
@@ -1901,17 +1922,24 @@ async function loadInstagramUsers(feedRows) {
   try { d = await acct("/users?pageSize=1000", null, "instagram"); }
   catch (e) { wrap.innerHTML = `<div class="empty">Couldn't load users: ${esc(e.message)}</div>`; if ($("ig-upager")) $("ig-upager").innerHTML = ""; return; }
   const feedCount = new Map();
-  (feedRows || []).forEach((f) => feedCount.set(f.userId, (feedCount.get(f.userId) || 0) + 1));
+  // Views this month, summed over the user's feeds — same source as the Feeds
+  // table, so the two always agree.
+  const feedViews = new Map();
+  (feedRows || []).forEach((f) => {
+    feedCount.set(f.userId, (feedCount.get(f.userId) || 0) + 1);
+    feedViews.set(f.userId, (feedViews.get(f.userId) || 0) + (f.views || 0));
+  });
   const active = d.users.filter((u) => u.plan !== "free" || feedCount.has(u.id));
   const r = pageSlice(active, instagramUsers, "ig-utable", "ig-upager");
   if (!r) return;
   wrap.innerHTML = `<table><thead><tr>
-      <th>Email</th><th>Plan</th><th>Platform</th><th class="right">Feeds</th><th>Joined</th>
+      <th>Email</th><th>Plan</th><th>Platform</th><th class="right">Feeds</th><th class="right">Views · this month</th><th>Joined</th>
     </tr></thead><tbody>${r.slice.map((u) => `<tr class="clickable" data-id="${u.id}">
       <td>${esc(u.email)}</td>
       <td>${planBadge(u.plan)}</td>
       <td>${platformBadge(u.platform)}</td>
       <td class="right">${fmt(feedCount.get(u.id) || 0)}</td>
+      <td class="right">${fmt(feedViews.get(u.id) || 0)}</td>
       <td>${date(u.createdAt)}</td>
     </tr>`).join("")}</tbody></table>`;
   wrap.querySelectorAll("tr.clickable").forEach((row) => row.onclick = () => openUser(row.dataset.id, "instagram"));
@@ -1946,7 +1974,8 @@ async function renderInstagram(head) {
       ${bill ? `<div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
       <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${planBreakdown(bill.plans).replace(/^\S+\s·\s/, "")}</div></div>
       ${bill.revenue.lifetimeRevenue ? `<div class="kpi"><div class="k-label">Lifetime · one-time</div><div class="k-val">${money(bill.revenue.lifetimeRevenue)}</div><div class="k-sub">${fmt(bill.revenue.lifetimeCount)} sales · ${money(bill.revenue.lifetimeUnitPrice)} today${(bill.revenue.lifetimePricedActual ?? bill.revenue.lifetimeCount) < bill.revenue.lifetimeCount ? " · some estimated" : ""} · not in MRR</div></div>` : ""}` : ""}
-      ${dom ? `<div class="kpi"><div class="k-label">Feeds</div><div class="k-val">${fmt(dom.feeds)}</div><div class="k-sub">${fmt(dom.cachedHandles)} handles cached</div></div>` : ""}
+      ${dom ? `<div class="kpi"><div class="k-label">Feeds</div><div class="k-val">${fmt(dom.feeds)}</div><div class="k-sub">${fmt(dom.cachedHandles)} handles cached</div></div>
+      <div class="kpi"><div class="k-label">Views this month</div><div class="k-val">${fmt(dom.viewsThisMonth)}</div><div class="k-sub">every widget render · canvas included</div></div>` : ""}
       ${fn ? `<div class="kpi"><div class="k-label">Opened (30d)</div><div class="k-val">${fmt(fn.opened)}</div><div class="k-sub">${fmt(fn.previewed)} saw a feed</div></div>
       <div class="kpi"><div class="k-label">Reached checkout</div><div class="k-val">${fmt(fn.checkout)}</div><div class="k-sub">${fmt(fn.paywall)} saw the paywall</div></div>
       <div class="kpi"><div class="k-label">Signed up</div><div class="k-val">${fmt(funnel ? funnel.accounts : fn.unlocked)}</div><div class="k-sub">${fn.opened ? (((funnel ? funnel.accounts : fn.unlocked) / fn.opened) * 100).toFixed(1) : "0"}% of opens · free included</div></div>
@@ -1977,12 +2006,24 @@ async function renderInstagram(head) {
     </tr>`).join("")}</tbody></table>` : `<div class="empty">No plugin sessions recorded yet.</div>`}</div>` : unavailable("Visitors", rs[2])}
 
     <div class="sec-title">Feeds</div>
-    ${feeds ? `<div class="tablewrap">${feeds.feeds.length ? `<table><thead><tr>
-      <th>Owner</th><th>Handle</th><th>Layout</th><th>Mode</th><th>Created</th>
+    ${feeds ? `<div class="tablewrap" style="margin-bottom:6px">${feeds.feeds.length ? `<table><thead><tr>
+      <th>Owner</th><th>Handle</th><th>Layout</th><th>Mode</th>
+      <th class="right">Views · this month</th><th class="right">All-time</th><th class="right">On live sites</th><th>Created</th>
     </tr></thead><tbody>${feeds.feeds.map((f) => `<tr>
       <td>${f.email ? esc(f.email) : shortId(f.userId)}</td><td>@${esc(f.handle)}</td>
-      <td>${esc(f.layout)}</td><td>${esc(f.mode)}</td><td>${date(f.createdAt)}</td>
-    </tr>`).join("")}</tbody></table>` : `<div class="empty">No feeds created yet.</div>`}</div>` : unavailable("Feeds", rs[3])}
+      <td>${esc(f.layout)}</td><td>${esc(f.mode)}</td>
+      <td class="right">${viewsOfCap(f.views, f.viewLimit, true)}</td><td class="right">${fmt(f.viewsTotal)}</td>
+      <td class="right">${fmt(f.liveViews)}${!f.liveViews && f.viewsTotal ? ' <span class="badge b-other">canvas only</span>' : ""}</td>
+      <td>${date(f.createdAt)}</td>
+    </tr>`).join("")}</tbody></table>` : `<div class="empty">No feeds created yet.</div>`}</div>
+    <p class="note" style="margin-bottom:16px"><b>Views</b> counts every render the backend served, the Framer editor and canvas included &mdash;
+      that is real usage, not real audience. <b>On live sites</b> counts published pages only, on the same rule as the Live sites table below.
+      A feed marked <span class="badge b-other">canvas only</span> has been built but never published, which is the normal state for the first
+      few days after sign-up. A feed blocked by the custom-domain gate counts in neither column &mdash; those are in the table above.<br>
+      The figure after the slash is the owner&rsquo;s plan allowance (Free 10,000 / Pro 50,000 a month). <b>It is not enforced</b> &mdash; a feed
+      past it keeps rendering in full. The bar is here so the first account to reach one is visible before there is a rule about what happens
+      next. The cap is per plan and the counter is per feed, so the ratio is one feed&rsquo;s views against its owner&rsquo;s allowance; the
+      Users table above sums a person&rsquo;s feeds and so carries no ratio.</p>` : unavailable("Feeds", rs[3])}
 
     <div class="toolbar" style="margin-top:4px"><div class="sec-title" style="margin:0">Outreach · paywall drop-offs</div>
       <button id="reach-scan" style="width:auto;margin-left:auto">Scan now</button></div>
