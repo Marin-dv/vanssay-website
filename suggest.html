@@ -103,7 +103,7 @@
         <input id="email" type="email" maxlength="255" placeholder="you@company.com" />
 
         <button class="btn btn-accent" type="submit" id="send">Send suggestion &rarr;</button>
-        <div class="msg err" id="err"></div>
+        <div class="msg" id="err"></div>
         <p class="c-note">Or write to <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a></p>
       </form>
     </div>
@@ -144,7 +144,7 @@
     var detail = document.getElementById("detail").value.trim();
     if (!title || !detail) { fail("Tell us what it is and what it should do."); return; }
 
-    err.style.display = "none";
+    err.classList.remove("err");
     btn.disabled = true;
     btn.textContent = "Sending…";
 
@@ -170,7 +170,7 @@
 
   function fail(m) {
     err.textContent = m;
-    err.style.display = "block";
+    err.classList.add("err");
     btn.disabled = false;
     btn.textContent = SEND;
   }
