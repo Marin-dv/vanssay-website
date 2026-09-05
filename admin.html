@@ -225,7 +225,8 @@
     <div class="navsep">Plugins</div>
     <div id="prod-nav"></div>
     <div class="navsep">Components</div>
-    <button class="navlink" data-tab="components"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></span> Reviews for Creators</button>
+    <button class="navlink" data-tab="comp-live"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></span> Google Reviews Live</button>
+    <button class="navlink" data-tab="comp-creators"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></span> Reviews for Creators</button>
     <div class="aside-foot">
       <div id="admin-email" style="margin-bottom:8px;color:var(--text-2);font-weight:600"></div>
       <button class="btn btn-line btn-sm" id="signout">Sign out</button>
@@ -378,7 +379,7 @@ function switchTab(tab) {
   $("view").innerHTML = `<div class="empty">Loading…</div>`;
   if (tab.startsWith("prod:")) return renderProduct(tab.slice(5));
   ({ overview: renderOverview, users: renderUsers, subs: renderSubs, expenses: renderExpenses,
-     components: renderComponents, compliance: renderCompliance,
+     "comp-live": renderComponentLive, "comp-creators": renderComponents, compliance: renderCompliance,
      diag: renderDiagnostics, site: renderWebsite }[tab])();
 }
 
@@ -655,7 +656,12 @@ async function renderOverview() {
   const rs = await Promise.allSettled([
     ...PRODUCTS.map((p) => acct("/overview", null, p.key)),
     ...PRODUCTS.map((p) => p.base ? api(p.base + "/admin/overview") : Promise.resolve(null)),
+    // Components sell by Payment Link and leave no invoice, so their money is
+    // absent from every per-product billing figure above. Read separately and
+    // added to the one-time tile — never to MRR, since it does not recur.
+    api("/admin/components"),
   ]);
+  const cmp = val(rs[PRODUCTS.length * 2]);
   const bills = {}, doms = {};
   PRODUCTS.forEach((p, i) => { bills[p.key] = val(rs[i]); doms[p.key] = val(rs[PRODUCTS.length + i]); });
 
@@ -672,6 +678,12 @@ async function renderOverview() {
   // monthly figure would overstate every month after the one it landed in.
   const totLife = okBills.reduce((s, b) => s + (b.revenue.lifetimeRevenue || 0), 0);
   const totLifeN = okBills.reduce((s, b) => s + (b.revenue.lifetimeCount || 0), 0);
+  // Component sales are one-time money too, so they belong in the same tile —
+  // but they come from Stripe in cents and the plugin figures are whole dollars.
+  const cmpRevenue = cmp ? cmp.totals.revenueCents / 100 : 0;
+  const cmpSales = cmp ? cmp.totals.sales : 0;
+  const totOneTime = totLife + cmpRevenue;
+  const totOneTimeN = totLifeN + cmpSales;
   const igOpened = doms.instagram && doms.instagram.funnel30d ? doms.instagram.funnel30d.opened : null;
 
   // Per-product domain highlights.
@@ -704,10 +716,10 @@ async function renderOverview() {
   ov.innerHTML = `
     <div class="kpis">
       <div class="kpi hero"><div class="k-label">Monthly · recurring</div><div class="k-val">${money(totMRR)}</div><div class="k-sub">${money(totMRR*12)} / year · subscriptions only</div></div>
-      <div class="kpi"><div class="k-label">Lifetime · one-time</div><div class="k-val">${money(totLife)}</div><div class="k-sub">${fmt(totLifeN)} purchase${totLifeN === 1 ? "" : "s"} · not recurring</div></div>
+      <div class="kpi"><div class="k-label">One-time</div><div class="k-val">${moneyCents(Math.round(totOneTime * 100))}</div><div class="k-sub">${fmt(totOneTimeN)} purchase${totOneTimeN === 1 ? "" : "s"} · ${fmt(totLifeN)} lifetime${cmpSales ? ` + ${fmt(cmpSales)} component` : ""} · not recurring</div></div>
       <div class="kpi"><div class="k-label">Accounts</div><div class="k-val">${fmt(anyBill.users.total)}</div><div class="k-sub">+${fmt(anyBill.users.newThisMonth)} this month · shared across plugins</div></div>
       ${igOpened !== null ? `<div class="kpi"><div class="k-label">📸 Instagram opened</div><div class="k-val">${fmt(igOpened)}</div><div class="k-sub">distinct visitors · last 30 days</div></div>` : ""}
-      <div class="kpi"><div class="k-label">Paying subscriptions</div><div class="k-val">${fmt(totSubs)}</div><div class="k-sub">recurring · plus ${fmt(totLifeN)} lifetime, ${fmt(okBills.reduce((s, b) => s + (b.plans.gifted || 0), 0))} gifted</div></div>
+      <div class="kpi"><div class="k-label">Paying subscriptions</div><div class="k-val">${fmt(totSubs)}</div><div class="k-sub">recurring · plus ${fmt(totOneTimeN)} one-time, ${fmt(okBills.reduce((s, b) => s + (b.plans.gifted || 0), 0))} gifted</div></div>
       <div class="kpi"><div class="k-label">Conversion</div><div class="k-val">${anyBill.users.total ? ((totPaid/anyBill.users.total)*100).toFixed(1) : "0"}%</div><div class="k-sub">everyone who has paid / accounts</div></div>
       ${anyBill.sources ? `<div class="kpi"><div class="k-label">By platform</div>
         <div class="k-val" style="font-size:20px;display:flex;gap:14px;align-items:baseline">
@@ -1110,6 +1122,55 @@ async function renderExpenses() {
     </tr>`).join("")}</tbody></table>` : `<div class="empty">No scrapes recorded yet.</div>`}</div>
     <p class="note">* estimated from the per-item price. Only paid-plan review fetches hit Apify: free Trustpilot uses the self-hosted scraper and free Google uses the Places API (Google's $200/mo credit), both $0. Every Instagram scrape is paid.</p>
     ${!ig ? `<p class="note">Instagram spend unavailable: ${esc(why(rs[1]) || "no data")}</p>` : ""}`;
+}
+
+/* ── Component: sold by Payment Link ───────────────────────────────────────────
+   A component is a file, not a service: paid for once, downloaded, and never
+   seen by our backend again. There is no account, no webhook and no invoice row
+   behind a sale, so Stripe is the whole record and /admin/components reads it
+   live. That also means the only funnel a Payment Link leaves is how many
+   checkout pages were opened and abandoned. */
+async function renderComponentLive() {
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Google Reviews Live</h2><p>A Framer component sold once through a Stripe Payment Link — no account, no subscription.</p></div></div>
+    <div id="cl"><div class="empty">Loading…</div></div>`;
+  let d;
+  try { d = await api("/admin/components"); }
+  catch (e) { $("cl").innerHTML = `<div class="empty">Couldn't load: ${esc(e.message)}</div>`; return; }
+
+  const c = (d.components || []).find((x) => x.slug === "google-reviews-live");
+  if (!c) { $("cl").innerHTML = `<div class="empty">This component is not configured on the backend.</div>`; return; }
+  if (c.unavailable) { $("cl").innerHTML = `<div class="empty">${esc(c.unavailable)}</div>`; return; }
+
+  const opened = c.sales.length + c.abandoned;
+  const conv = opened ? ((c.sales.length / opened) * 100).toFixed(0) : "0";
+
+  $("cl").innerHTML = `
+    <div class="kpis">
+      <div class="kpi hero"><div class="k-label">Revenue</div><div class="k-val">${moneyCents(c.revenueCents)}</div>
+        <div class="k-sub">${fmt(c.sales.length)} sale${c.sales.length === 1 ? "" : "s"} · ${moneyCents(c.priceCents)} each</div></div>
+      <div class="kpi"><div class="k-label">Checkouts opened</div><div class="k-val">${fmt(opened)}</div>
+        <div class="k-sub">${fmt(c.abandoned)} left without paying</div></div>
+      <div class="kpi"><div class="k-label">Checkout conversion</div><div class="k-val">${conv}%</div>
+        <div class="k-sub">paid / opened · the only funnel a link leaves</div></div>
+    </div>
+
+    ${c.byMonth.length ? `<div class="panel" style="margin-bottom:16px"><h3>Sales per month</h3>
+      ${barChart(c.byMonth.map((m) => ({ v: m.sales, tip: `${bucketLabel(m.month, true)}: ${fmt(m.sales)} sale${m.sales === 1 ? "" : "s"} · ${moneyCents(m.cents)}`, label: bucketLabel(m.month) })))}</div>` : ""}
+
+    <div class="sec-title">Sales</div>
+    <div class="tablewrap" style="margin-bottom:6px">${c.sales.length ? `<table><thead><tr>
+      <th>Buyer</th><th>Country</th><th class="right">Paid</th><th>When</th>
+    </tr></thead><tbody>${c.sales.map((x) => `<tr>
+      <td>${x.email ? esc(x.email) : '<span class="muted">no email</span>'}</td>
+      <td>${x.country ? esc(x.country) : "-"}</td>
+      <td class="right">${moneyCents(x.cents)}</td>
+      <td>${dt(x.createdAt)}</td>
+    </tr>`).join("")}</tbody></table>` : `<div class="empty">No sales yet.</div>`}</div>
+    <p class="note">Read live from Stripe on every load &mdash; nothing about a component sale is stored here, so this cannot drift from the
+      dashboard. <b>Paid</b> is what the session actually charged, not the list price, so a discount or a currency conversion shows as itself.
+      A refund is not deducted: Stripe still reports the session as paid, and refunds are rare enough to be worth checking there rather than
+      guessing at here. Page: <a href="${esc(c.page)}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(c.page.replace(/^https?:\/\//, ""))}</a>.</p>`;
 }
 
 /* ── Components ────────────────────────────────────────────────────────────────
