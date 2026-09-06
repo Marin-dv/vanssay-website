@@ -226,7 +226,6 @@
     <div id="prod-nav"></div>
     <div class="navsep">Components</div>
     <button class="navlink" data-tab="comp-live"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></span> Google Reviews Live</button>
-    <button class="navlink" data-tab="comp-creators"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></span> Reviews for Creators</button>
     <div class="aside-foot">
       <div id="admin-email" style="margin-bottom:8px;color:var(--text-2);font-weight:600"></div>
       <button class="btn btn-line btn-sm" id="signout">Sign out</button>
@@ -379,7 +378,7 @@ function switchTab(tab) {
   $("view").innerHTML = `<div class="empty">Loading…</div>`;
   if (tab.startsWith("prod:")) return renderProduct(tab.slice(5));
   ({ overview: renderOverview, users: renderUsers, subs: renderSubs, expenses: renderExpenses,
-     "comp-live": renderComponentLive, "comp-creators": renderComponents, compliance: renderCompliance,
+     "comp-live": renderComponentLive, compliance: renderCompliance,
      diag: renderDiagnostics, site: renderWebsite }[tab])();
 }
 
