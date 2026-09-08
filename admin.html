@@ -1328,9 +1328,10 @@ async function renderCompliance() {
       <p>Every French filing the business owes. Dates are computed from the rules; turnover is read from the invoice table. Tick a row only once it is really filed.</p></div></div>
     <div id="cp"><div class="empty">Loading…</div></div>`;
 
-  let d;
+  let d, creds;
   try { d = await api("/admin/compliance"); }
   catch (e) { $("cp").innerHTML = `<div class="empty">Couldn't load: ${esc(e.message)}</div>`; return; }
+  try { creds = await api("/admin/credentials"); } catch { creds = []; }
 
   const today = d.today;
   const items = complianceItems(d).sort((a, b) => {
@@ -1430,6 +1431,23 @@ async function renderCompliance() {
         <div class="kv"><span>URSSAF periodicity</span><span>${esc(d.identity.periodicity)}</span></div>
         <p class="note">These come from the backend's INVOICE_SELLER_* env, which is the same snapshot frozen onto every issued invoice. Change them there, never here.</p>
       </div>
+    </div>
+
+    <div class="panel" style="margin-top:16px">
+      <h3>Gov &amp; platform accounts</h3>
+      <p class="note" style="margin-top:0">Logins for the portals these filings actually happen on. Passwords are encrypted at rest and only decrypt with the reveal code — nothing here shows in plain text without it.</p>
+      ${credentialsTable(creds)}
+      <div class="toolbar" style="margin-top:14px;flex-wrap:wrap">
+        <input id="cr-key" placeholder="key (e.g. douane)" style="max-width:140px">
+        <input id="cr-label" placeholder="Label (e.g. Douane — DES)" style="max-width:200px">
+        <input id="cr-identifiant" placeholder="Identifiant / username" style="max-width:160px">
+        <input id="cr-email" placeholder="Email" style="max-width:200px">
+        <input id="cr-password" type="password" placeholder="Password (blank = keep current)" style="max-width:220px">
+        <input id="cr-url" placeholder="URL" style="max-width:200px">
+        <button id="cr-save" style="width:auto">Save account</button>
+        <button id="cr-clear" class="btn-line" style="width:auto">Clear</button>
+      </div>
+      <div id="cr-err" class="note" style="margin-bottom:0"></div>
     </div>`;
 
   $("cp").querySelectorAll("[data-task]").forEach((box) => box.onchange = async () => {
@@ -1442,6 +1460,94 @@ async function renderCompliance() {
       box.checked = !wanted; box.disabled = false;
       showErr("cp-err", e.message);
     }
+  });
+
+  wireCredentialsPanel(creds);
+}
+
+/* ── Gov & platform account credentials ──────────────────────────────────────
+   Passwords never leave the server as plaintext except through /reveal, which
+   requires a fixed code on top of the admin session — a deliberate speed bump
+   before a secret prints to screen, not a real second factor. */
+function credentialsTable(creds) {
+  if (!creds.length) return `<div class="empty">No accounts saved yet.</div>`;
+  return `<div class="tablewrap"><table><thead><tr>
+    <th>Label</th><th>Identifiant</th><th>Email</th><th>Password</th><th>Link</th><th></th>
+  </tr></thead><tbody>${creds.map((c) => `<tr data-cred-row="${esc(c.key)}">
+    <td>${esc(c.label)}<div class="muted-sm">${esc(c.key)}</div></td>
+    <td>${c.identifiant ? `<span class="mono">${esc(c.identifiant)}</span>` : "-"}</td>
+    <td>${c.email ? esc(c.email) : "-"}</td>
+    <td><span class="mono cr-secret" data-cred-secret="${esc(c.key)}">${c.hasSecret ? "••••••••" : "-"}</span></td>
+    <td>${c.url ? `<a href="${esc(c.url)}" target="_blank" rel="noopener">open</a>` : "-"}</td>
+    <td class="right">
+      ${c.hasSecret ? `<button class="cr-view btn-line btn-sm" data-key="${esc(c.key)}" style="width:auto">View</button>` : ""}
+      <button class="cr-edit btn-line btn-sm" data-key="${esc(c.key)}" style="width:auto">Edit</button>
+      <button class="cr-del btn-danger btn-sm" data-key="${esc(c.key)}" style="width:auto">Delete</button>
+    </td>
+  </tr>`).join("")}</tbody></table></div>`;
+}
+
+function wireCredentialsPanel(creds) {
+  const byKey = (k) => creds.find((c) => c.key === k);
+  const clearForm = () => {
+    ["cr-key", "cr-label", "cr-identifiant", "cr-email", "cr-password", "cr-url"].forEach((id) => { if ($(id)) $(id).value = ""; });
+    if ($("cr-key")) $("cr-key").disabled = false;
+  };
+
+  if ($("cr-clear")) $("cr-clear").onclick = clearForm;
+
+  if ($("cr-save")) $("cr-save").onclick = async () => {
+    showErr("cr-err", "");
+    const key = $("cr-key").value.trim();
+    const label = $("cr-label").value.trim();
+    if (!key || !label) { showErr("cr-err", "Key and label are required."); return; }
+    $("cr-save").disabled = true;
+    try {
+      await api("/admin/credentials", { method: "POST", body: {
+        key, label,
+        identifiant: $("cr-identifiant").value.trim() || undefined,
+        email: $("cr-email").value.trim() || undefined,
+        password: $("cr-password").value || undefined,
+        url: $("cr-url").value.trim() || undefined,
+      } });
+      clearForm();
+      await renderCompliance();
+    } catch (e) { showErr("cr-err", e.message); }
+    finally { if ($("cr-save")) $("cr-save").disabled = false; }
+  };
+
+  $("cp").querySelectorAll(".cr-edit").forEach((btn) => btn.onclick = () => {
+    const c = byKey(btn.dataset.key);
+    if (!c) return;
+    $("cr-key").value = c.key; $("cr-key").disabled = true;
+    $("cr-label").value = c.label;
+    $("cr-identifiant").value = c.identifiant || "";
+    $("cr-email").value = c.email || "";
+    $("cr-password").value = "";
+    $("cr-url").value = c.url || "";
+    $("cr-key").scrollIntoView({ block: "center", behavior: "smooth" });
+  });
+
+  $("cp").querySelectorAll(".cr-del").forEach((btn) => btn.onclick = async () => {
+    const c = byKey(btn.dataset.key);
+    if (!c || !confirm(`Delete the saved account "${c.label}"? This can't be undone.`)) return;
+    try { await api("/admin/credentials/" + encodeURIComponent(c.key), { method: "DELETE" }); await renderCompliance(); }
+    catch (e) { showErr("cr-err", e.message); }
+  });
+
+  $("cp").querySelectorAll(".cr-view").forEach((btn) => btn.onclick = async () => {
+    const code = prompt("Reveal code:");
+    if (!code) return;
+    btn.disabled = true;
+    try {
+      const r = await api("/admin/credentials/" + encodeURIComponent(btn.dataset.key) + "/reveal", { method: "POST", body: { code } });
+      const cell = $("cp").querySelector(`[data-cred-secret="${CSS.escape(btn.dataset.key)}"]`);
+      if (cell && r.secret) {
+        cell.textContent = r.secret;
+        setTimeout(() => { if (cell.isConnected) cell.textContent = "••••••••"; }, 20000);
+      }
+    } catch (e) { showErr("cr-err", e.message); }
+    finally { btn.disabled = false; }
   });
 }
 

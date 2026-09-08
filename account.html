@@ -50,6 +50,11 @@
     .switch a { color:var(--accent); font-weight:600; cursor:pointer; }
     .badge { display:inline-flex; padding:3px 12px; border-radius:99px; font-size:12px; font-weight:800; }
     .b-free { background:var(--surface-2); color:var(--text-2); } .b-starter,.b-pro { background:#f1edff; color:var(--pro); } .b-ultra { background:linear-gradient(90deg,var(--accent),var(--pro)); color:#fff; }
+    /* Lifetime is a real plan the badge can be set to, and without its own rule
+       it rendered as bare text on the page someone lands on right after paying
+       for it. Warm gold rather than the blue/violet of the subscriptions —
+       it reads as owned, not as billed. */
+    .b-lifetime { background:linear-gradient(90deg,#b45309,#f59e0b); color:#fff; }
     .meter { height:8px; border-radius:99px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden; margin-top:8px; }
     .meter span { display:block; height:100%; background:var(--accent); border-radius:99px; }
     .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
@@ -152,12 +157,16 @@ const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net"
 // Checkout sends a plan CHOICE; the backend resolves the live Stripe price id
 // from its env (single source of truth). Yearly plans give 2 months free.
 const PLAN_COPY = {
-  starter:    { label: "Starter", price: "$2.99/mo" },
-  starterYearly:{ label: "Starter", price: "$29.90/yr" },
+  starter:    { label: "Starter", price: "$5.99/mo" },
+  starterYearly:{ label: "Starter", price: "$59.90/yr" },
   pro:        { label: "Pro",    price: "$9/mo"  },
   proYearly:  { label: "Pro",    price: "$90/yr" },
   ultra:      { label: "Agency", price: "$29/mo" },
   ultraYearly:{ label: "Agency", price: "$290/yr" },
+  // One payment, no interval. 100k views a month and a WEEKLY refresh rather
+  // than the continuous one the recurring plans get — that difference is what
+  // makes a single payment sustainable, so it is stated on the button.
+  lifetime:   { label: "Lifetime", price: "$129 once" },
 };
 const TKEY = "vanssay.token";
 let registerMode = false;
@@ -249,6 +258,12 @@ async function load() {
     const billedLabel = interval === "year" ? "Billed yearly" : interval === "month" ? "Billed monthly" : null;
     if (plan === "free") {
       $("d-renew").textContent = "Free forever. Upgrade anytime.";
+    } else if (plan === "lifetime") {
+      // Nothing renews, so the subscription copy below would have read
+      // "active subscription" to someone who deliberately bought the opposite.
+      // The weekly refresh is stated here too: it is the tradeoff that makes a
+      // single payment work, and this is where they check what they own.
+      $("d-renew").textContent = "One payment · yours forever. Reviews refresh weekly.";
     } else {
       const renews = me.subscription.currentPeriodEnd ? "renews " + new Date(me.subscription.currentPeriodEnd).toLocaleDateString() : "active subscription";
       $("d-renew").textContent = billedLabel ? `${billedLabel} · ${renews}` : renews[0].toUpperCase() + renews.slice(1);
@@ -276,9 +291,11 @@ async function load() {
       if (plan === "free") {
         mk(`Start Starter (${PLAN_COPY[starterChoice].price})`, "btn-line", checkout(starterChoice));
         mk(`Upgrade to Pro (${PLAN_COPY[proChoice].price})`, "btn-line", checkout(proChoice));
+        mk(`Lifetime (${PLAN_COPY.lifetime.price})`, "btn-line", checkout("lifetime"));
         mk(`Go Agency (${PLAN_COPY[agencyChoice].price})`, "btn-blue", checkout(agencyChoice));
       } else if (plan === "starter") {
         mk(`Upgrade to Pro (${PLAN_COPY[proChoice].price})`, "btn-line", checkout(proChoice));
+        mk(`Lifetime (${PLAN_COPY.lifetime.price})`, "btn-line", checkout("lifetime"));
         mk(`Go Agency (${PLAN_COPY[agencyChoice].price})`, "btn-blue", checkout(agencyChoice));
         if (interval === "month") mk("Switch to yearly · 2 months free", "btn-line", switchInterval("year"));
         else if (interval === "year") mk("Switch to monthly", "btn-line", switchInterval("month"));
@@ -288,6 +305,11 @@ async function load() {
         if (interval === "month") mk("Switch to yearly · 2 months free", "btn-line", switchInterval("year"));
         else if (interval === "year") mk("Switch to monthly", "btn-line", switchInterval("month"));
         mk("Manage / cancel billing", "btn-line", portal);
+      } else if (plan === "lifetime") {
+        // Deliberately no buttons. There is no interval to switch and no Stripe
+        // subscription for the portal to open — offering either would send a
+        // paid-up owner to an error. The receipt lives in the invoices card
+        // below, which every plan already gets.
       } else {
         if (interval === "month") mk("Switch to yearly · 2 months free", "btn-line", switchInterval("year"));
         else if (interval === "year") mk("Switch to monthly", "btn-line", switchInterval("month"));
@@ -310,7 +332,7 @@ async function load() {
       $("quota-banner").style.display = over ? "block" : "none";
       if (over) {
         $("qb-limit").textContent = u.limit.toLocaleString();
-        $("quota-up").textContent = plan === "free" ? "Upgrade to Starter ($2.99/mo)" : "Upgrade to Pro ($9/mo)";
+        $("quota-up").textContent = plan === "free" ? "Upgrade to Starter ($5.99/mo)" : "Upgrade to Pro ($9/mo)";
         $("quota-up").onclick = checkout(plan === "free" ? "starter" : "pro");
       }
     } catch (e) { $("d-limit").textContent = "Usage unavailable right now."; }
