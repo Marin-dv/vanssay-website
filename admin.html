@@ -1126,9 +1126,11 @@ async function renderExpenses() {
 /* ── Component: sold by Payment Link ───────────────────────────────────────────
    A component is a file, not a service: paid for once, downloaded, and never
    seen by our backend again. There is no account, no webhook and no invoice row
-   behind a sale, so Stripe is the whole record and /admin/components reads it
-   live. That also means the only funnel a Payment Link leaves is how many
-   checkout pages were opened and abandoned. */
+   behind a sale, so Stripe is the whole record for everything from "checkout
+   opened" onward. Everything upstream of that — did anyone even reach the
+   landing page, did they click Buy — Stripe cannot see at all, so those come
+   from the same page-view counters as the Website tab (routes/site.ts),
+   scoped here to just this component's three paths instead of read there. */
 async function renderComponentLive() {
   $("view").innerHTML = `
     <div class="page-head"><div><h2>Google Reviews Live</h2><p>A Framer component sold once through a Stripe Payment Link — no account, no subscription.</p></div></div>
@@ -1143,6 +1145,8 @@ async function renderComponentLive() {
 
   const opened = c.sales.length + c.abandoned;
   const conv = opened ? ((c.sales.length / opened) * 100).toFixed(0) : "0";
+  const f = c.funnel || { landingViews: 0, buyClicks: 0, thanksViews: 0 };
+  const clickRate = f.landingViews ? ((f.buyClicks / f.landingViews) * 100).toFixed(0) : "0";
 
   $("cl").innerHTML = `
     <div class="kpis">
@@ -1153,6 +1157,19 @@ async function renderComponentLive() {
       <div class="kpi"><div class="k-label">Checkout conversion</div><div class="k-val">${conv}%</div>
         <div class="k-sub">paid / opened · the only funnel a link leaves</div></div>
     </div>
+
+    <div class="sec-title">Full funnel</div>
+    <div class="kpis" style="margin-bottom:16px">
+      <div class="kpi"><div class="k-label">Landing page views</div><div class="k-val">${fmt(f.landingViews)}</div>
+        <div class="k-sub">${esc(c.landingPath || "")}</div></div>
+      <div class="kpi"><div class="k-label">Clicked Buy</div><div class="k-val">${fmt(f.buyClicks)}</div>
+        <div class="k-sub">${clickRate}% of landing views</div></div>
+      <div class="kpi"><div class="k-label">Checkout opened</div><div class="k-val">${fmt(opened)}</div>
+        <div class="k-sub">on Stripe, after the Buy click</div></div>
+      <div class="kpi"><div class="k-label">Paid</div><div class="k-val">${fmt(c.sales.length)}</div>
+        <div class="k-sub">${fmt(f.thanksViews)} reached the thanks page</div></div>
+    </div>
+    <p class="note">Views and clicks are lifetime counts from the same beacon as the Website tab (assets/track.js), scoped to this component's pages — not a rolling window like the KPIs above it.</p>
 
     ${c.byMonth.length ? `<div class="panel" style="margin-bottom:16px"><h3>Sales per month</h3>
       ${barChart(c.byMonth.map((m) => ({ v: m.sales, tip: `${bucketLabel(m.month, true)}: ${fmt(m.sales)} sale${m.sales === 1 ? "" : "s"} · ${moneyCents(m.cents)}`, label: bucketLabel(m.month) })))}</div>` : ""}

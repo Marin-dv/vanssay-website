@@ -419,8 +419,7 @@
   </div>
 
   <div class="callout">
-    <p><strong>Google returns five reviews per business.</strong> That is a hard limit of the Places API, not of this component. If a component asks you to paste your own Google API key, it reads reviews the same way and shows the same five, whichever one you buy. There is no setting, and no price, that raises it.</p>
-    <p><strong>If you want more than five, you need a plugin, not a component.</strong> A component runs in your visitor's browser, so it only ever sees what one live request to Google returns. Passing that means syncing reviews on a server instead. Ours is <a href="https://vanssay.net/reviews.html" target="_blank" rel="noopener">Vanssay Reviews</a>: it pulls well past five, adds Trustpilot next to Google with one combined rating, and needs no API key at all. It is a subscription rather than a one-time purchase, and the widget loads through our servers. That is the trade. If five is enough, stay here and pay once.</p>
+    <p><strong>Google returns five reviews per business.</strong> That is a hard limit of the Places API, not of this component — every component built on your own Google key shows the same five. They stay live and up to date; only the count is capped.</p>
     <p><strong>The API calls are billed to your Google account.</strong> Places API has a monthly free allowance that comfortably covers a typical small business site, and the built-in caching is there to keep you inside it. You control the key, so you control the spend.</p>
     <p><strong>Your API key is visible in the page source.</strong> That is true of every client-side integration. Restricting the key to your domain in Google Cloud Console makes it useless to anyone else, and the <a href="https://vanssay.net/guides/google-reviews-framer-setup.html" target="_blank" rel="noopener">setup guide</a> walks through it.</p>
   </div>
@@ -443,7 +442,7 @@
     <li><span>Updates included.</span></li>
   </ul>
 
-  <a class="btn btn-primary" href="https://buy.stripe.com/aFa4gy72D4ecbqg7oN1Fe00">Buy for $8</a>
+  <a class="btn btn-primary" id="buy-link" href="https://buy.stripe.com/aFa4gy72D4ecbqg7oN1Fe00">Buy for $8</a>
   <p style="margin-top:14px;font-size:0.875rem;color:var(--muted)">
     Secure checkout by Stripe. You get the component link straight after paying.
   </p>
@@ -761,6 +760,33 @@
   });
 
   render();
+</script>
+
+<script>
+  // ── buy-click tracking ─────────────────────────────────────────────────────
+  // assets/track.js (loaded in <head>) counts the page view; this counts buy
+  // intent specifically, so the two together show where visitors actually stop
+  // — never reaching this page, reaching it but not clicking Buy, or clicking
+  // Buy but not finishing checkout on Stripe. Reuses the existing /site/view
+  // beacon with a synthetic path instead of a new endpoint: it needs nothing
+  // server-side and shows up for free in the admin "top pages" table.
+  (function () {
+    var link = document.getElementById("buy-link");
+    if (!link) return;
+    link.addEventListener("click", function () {
+      var url =
+        "https://api.vanssay.net/site/view?p=" +
+        encodeURIComponent("/google-reviews-live/buy-click") +
+        "&r=" +
+        encodeURIComponent(location.href);
+      try {
+        if (navigator.sendBeacon) navigator.sendBeacon(url);
+        else fetch(url, { method: "POST", mode: "no-cors", keepalive: true });
+      } catch (e) {
+        /* a missed click-count is not worth blocking the purchase */
+      }
+    });
+  })();
 </script>
 </body>
 </html>
