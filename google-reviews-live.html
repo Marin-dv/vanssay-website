@@ -322,7 +322,7 @@
     <span class="brand-sep" aria-hidden="true">/</span>
     <span class="brand-product">Google Reviews Live</span>
   </span>
-  <a class="btn btn-primary" href="#pricing">Get the component</a>
+  <a class="btn btn-primary" href="#pricing">See pricing</a>
 </header>
 
 <section class="wrap hero">
@@ -343,7 +343,7 @@
   </p>
 
   <div class="demo-cta">
-    <a class="btn btn-primary" href="#pricing">Get the component, $8</a>
+    <a class="btn btn-primary" href="#pricing">See pricing, $8</a>
     <a class="btn btn-quiet" href="#setup">How it works</a>
     <span>No account, no subscription, no server between your site and Google.</span>
   </div>
@@ -408,7 +408,7 @@
   </div>
 
   <p class="more-detail">
-    <a href="https://vanssay.net/guides/google-reviews-framer-setup.html" target="_blank" rel="noopener">Read the full setup guide</a>
+    <a class="guide-link" href="https://vanssay.net/guides/google-reviews-framer-setup.html" target="_blank" rel="noopener">Read the full setup guide</a>
     for every step in detail, with the exact key restrictions to use and a fix for each error Google can return.
   </p>
 </section>
@@ -430,9 +430,8 @@
     <li><span>Updates included.</span></li>
   </ul>
 
-  <a class="btn btn-primary" id="buy-link" href="https://buy.stripe.com/aFa4gy72D4ecbqg7oN1Fe00">Buy for $8</a>
   <p style="margin-top:14px;font-size:0.875rem;color:var(--muted)">
-    Secure checkout by Stripe. You get the component link straight after paying, usually on your site within the hour.
+    You get the component link straight after paying, usually on your site within the hour.
   </p>
 </section>
 
@@ -444,7 +443,7 @@
   <div class="callout">
     <p><strong>Google shows five reviews per business.</strong> That's a Places API limit every Google-key component runs into, not something specific to this one, and the five you get stay genuinely live, pulled straight from Google, never stale.</p>
     <p><strong>API calls run through your own Google account.</strong> Places API's free monthly allowance easily covers a typical small-business site, and the built-in caching keeps you well inside it.</p>
-    <p><strong>Restrict your API key to your domain,</strong> one setting in Google Cloud Console, and it's useless to anyone who finds it in your page source. The <a href="https://vanssay.net/guides/google-reviews-framer-setup.html" target="_blank" rel="noopener">setup guide</a> shows exactly where to click.</p>
+    <p><strong>Restrict your API key to your domain,</strong> one setting in Google Cloud Console, and it's useless to anyone who finds it in your page source. The <a class="guide-link" href="https://vanssay.net/guides/google-reviews-framer-setup.html" target="_blank" rel="noopener">setup guide</a> shows exactly where to click.</p>
   </div>
 </section>
 
@@ -763,28 +762,27 @@
 </script>
 
 <script>
-  // ── buy-click tracking ─────────────────────────────────────────────────────
-  // assets/track.js (loaded in <head>) counts the page view; this counts buy
-  // intent specifically, so the two together show where visitors actually stop:
-  // never reaching this page, reaching it but not clicking Buy, or clicking
-  // Buy but not finishing checkout on Stripe. Reuses the existing /site/view
-  // beacon with a synthetic path instead of a new endpoint: it needs nothing
-  // server-side and shows up for free in the admin "top pages" table.
+  // ── setup-guide click tracking ───────────────────────────────────────────
+  // The buy button is Framer's own (this page is embedded in the Marketplace
+  // listing), so we cannot see a purchase at all. The setup guide link is
+  // still ours, and a click on it is a real intent signal: someone read this
+  // page and wanted more before buying. Reuses the existing /site/view beacon
+  // with a synthetic path, same as the page-view counter.
   (function () {
-    var link = document.getElementById("buy-link");
-    if (!link) return;
-    link.addEventListener("click", function () {
-      var url =
-        "https://api.vanssay.net/site/view?p=" +
-        encodeURIComponent("/google-reviews-live/buy-click") +
-        "&r=" +
-        encodeURIComponent(location.href);
-      try {
-        if (navigator.sendBeacon) navigator.sendBeacon(url);
-        else fetch(url, { method: "POST", mode: "no-cors", keepalive: true });
-      } catch (e) {
-        /* a missed click-count is not worth blocking the purchase */
-      }
+    document.querySelectorAll(".guide-link").forEach(function (link) {
+      link.addEventListener("click", function () {
+        var url =
+          "https://api.vanssay.net/site/view?p=" +
+          encodeURIComponent("/google-reviews-live/guide-click") +
+          "&r=" +
+          encodeURIComponent(location.href);
+        try {
+          if (navigator.sendBeacon) navigator.sendBeacon(url);
+          else fetch(url, { method: "POST", mode: "no-cors", keepalive: true });
+        } catch (e) {
+          /* a missed click-count is not worth blocking navigation */
+        }
+      });
     });
   })();
 </script>
