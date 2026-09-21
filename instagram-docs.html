@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Instagram Feed: Documentation | Vanssay</title>
+<meta name="description" content="How to install, set up and use the Instagram Feed app for Webflow and Framer: connect a handle, choose a layout, insert the feed and publish." />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+<link rel="apple-touch-icon" href="/favicon-180.png" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#fafafa;color:#18181b;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:#0e7afe;text-decoration:none}a:hover{text-decoration:underline}
+nav{position:sticky;top:0;background:rgba(250,250,250,.85);backdrop-filter:blur(14px);border-bottom:1px solid #e4e4e7;z-index:5}
+.nav-in{max-width:1140px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;color:#18181b}
+main{max-width:760px;margin:0 auto;padding:64px 28px 96px}
+h1{font-size:36px;font-weight:900;letter-spacing:-.02em}
+.date{color:#a1a1aa;font-size:14px;margin:8px 0 28px}
+h2{font-size:20px;font-weight:800;margin:36px 0 10px;scroll-margin-top:80px}
+h3{font-size:16px;font-weight:700;margin:22px 0 6px}
+p,li{color:#52525b;font-size:15px}
+ul,ol.body{padding-left:22px;margin:8px 0}
+li{margin:4px 0}
+b{color:#18181b}
+code{background:#f4f4f5;border:1px solid #e4e4e7;border-radius:5px;padding:1px 6px;font-size:13.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#18181b}
+.lede{background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:20px 22px;margin:0 0 32px}
+.lede p{font-size:15.5px}
+.lede p+p{margin-top:10px}
+.toc{background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:18px 22px;margin:0 0 40px}
+.toc b{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#a1a1aa}
+.toc ol{margin:10px 0 0;padding-left:20px;columns:2;font-size:14px}
+.toc a{color:#52525b}
+.key{background:#fff;border:1px solid #e4e4e7;border-left:3px solid #0e7afe;border-radius:10px;padding:14px 18px;margin:14px 0}
+.key p{font-size:14.5px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:14px 0}
+.steps li{counter-increment:s;position:relative;padding-left:40px;margin:14px 0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;
+  background:#18181b;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid #e4e4e7;color:#52525b}
+th{color:#18181b;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+footer{max-width:760px;margin:0 auto;padding:0 28px 60px;font-size:13.5px;color:#a1a1aa}
+footer a{color:#71717a}
+@media(max-width:640px){.toc ol{columns:1}h1{font-size:29px}}
+</style>
+<script defer src="assets/track.js"></script>
+</head>
+<body>
+<nav><div class="nav-in"><a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a><a href="instagram" style="font-size:14px;font-weight:600">Instagram Feed →</a></div></nav>
+<main>
+  <h1>Instagram Feed documentation</h1>
+  <p class="date">How to install, configure and use the app. Last updated: September 21, 2026</p>
+
+  <div class="lede">
+    <p><b>What it does.</b> Instagram Feed puts a live Instagram feed on your website. You connect a public Instagram handle, pick one of seven layouts, and place the feed on your page. New posts then appear on the published site on their own, with no re-publishing and no manual updates.</p>
+    <p>It runs as a <b>Webflow App</b> (Designer Extension) and as a <b>Framer plugin</b>. The setup is the same on both; only the insert step differs, and both are covered below.</p>
+  </div>
+
+  <div class="toc">
+    <b>Contents</b>
+    <ol>
+      <li><a href="#install">Installing</a></li>
+      <li><a href="#connect">Connecting a profile</a></li>
+      <li><a href="#layouts">Choosing a layout</a></li>
+      <li><a href="#settings">Configuring the feed</a></li>
+      <li><a href="#insert">Inserting and publishing</a></li>
+      <li><a href="#sync">How syncing works</a></li>
+      <li><a href="#plans">Plans and limits</a></li>
+      <li><a href="#account">Managing your account</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+      <li><a href="#support">Getting support</a></li>
+    </ol>
+  </div>
+
+  <h2 id="install">1. Installing</h2>
+
+  <h3>Webflow</h3>
+  <ol class="steps">
+    <li>Open your site in the <b>Webflow Designer</b>.</li>
+    <li>Open the <b>Apps</b> panel in the left toolbar.</li>
+    <li>Find <b>Instagram Feed</b> and click <b>Install</b>, then <b>Open</b>.</li>
+    <li>The app opens as a panel on the right side of the Designer.</li>
+  </ol>
+
+  <h3>Framer</h3>
+  <ol class="steps">
+    <li>Open your project in <b>Framer</b>.</li>
+    <li>Open the <b>Plugins</b> menu and search for <b>Instagram Feed</b>.</li>
+    <li>Click <b>Install</b>. The plugin opens in a panel.</li>
+  </ol>
+
+  <div class="key">
+    <p><b>No Instagram login is needed.</b> The app reads public profiles by handle. You never connect your Instagram account, and you never enter Instagram credentials anywhere.</p>
+  </div>
+
+  <h2 id="connect">2. Connecting a profile</h2>
+  <ol class="steps">
+    <li>Type or paste an Instagram handle into the field, with or without the <code>@</code>. For example <code>nasa</code>.</li>
+    <li>Press <b>Preview</b>.</li>
+    <li>The real profile and its recent posts load so you can see exactly what the feed will look like.</li>
+  </ol>
+  <p>The profile must be <b>public</b>. Private accounts cannot be read by anyone who does not follow them, so they cannot be displayed on a website.</p>
+  <p>You can preview any handle before creating an account. You only sign in when you are ready to place the feed on your page.</p>
+
+  <h2 id="layouts">3. Choosing a layout</h2>
+  <p>Seven layouts are available. Click any of them in the panel to see your own posts in that layout straight away.</p>
+  <table>
+    <tr><th>Layout</th><th>What it looks like</th></tr>
+    <tr><td><b>Grid</b></td><td>The classic square gallery, in the number of columns you choose.</td></tr>
+    <tr><td><b>Profile</b></td><td>A profile header with avatar, bio and stats, above the posts.</td></tr>
+    <tr><td><b>Slider</b></td><td>A horizontal row visitors can swipe or drag through.</td></tr>
+    <tr><td><b>Carousel</b></td><td>A coverflow where side posts scale back for depth.</td></tr>
+    <tr><td><b>Marquee</b></td><td>A strip that scrolls continuously on its own.</td></tr>
+    <tr><td><b>Rainbow</b></td><td>A staggered, editorial collage.</td></tr>
+    <tr><td><b>Aperture</b></td><td>Vertical slices that expand as the visitor moves across them.</td></tr>
+  </table>
+
+  <h2 id="settings">4. Configuring the feed</h2>
+  <p>All settings live in the app panel and apply immediately to the preview. Nothing here requires code.</p>
+  <table>
+    <tr><th>Setting</th><th>What it does</th></tr>
+    <tr><td><b>Columns</b></td><td>How many posts sit side by side.</td></tr>
+    <tr><td><b>Gap</b></td><td>Space between posts, in pixels.</td></tr>
+    <tr><td><b>Corner radius</b></td><td>How rounded each post is, in pixels.</td></tr>
+    <tr><td><b>Posts</b></td><td>How many posts the feed shows. The maximum depends on your plan.</td></tr>
+    <tr><td><b>Show header</b></td><td>Shows the profile avatar, name and stats above the feed.</td></tr>
+    <tr><td><b>Captions</b></td><td>Shows each post's caption under its image.</td></tr>
+    <tr><td><b>Lightbox</b></td><td>On, a click opens the post in a popup. Off, it opens Instagram in a new tab.</td></tr>
+  </table>
+
+  <h3>Choosing which posts appear</h3>
+  <p>By default the feed shows your most recent posts and updates itself as you post. On a paid plan you can instead use the <b>curated picker</b> to hand-pick exactly which posts appear, chosen from your latest 50.</p>
+
+  <h2 id="insert">5. Inserting and publishing</h2>
+
+  <h3>Webflow</h3>
+  <ol class="steps">
+    <li>On the canvas, click the Section or the Body where the feed should go.</li>
+    <li>In the app panel, press <b>Insert</b>.</li>
+    <li>A labelled placeholder appears on the canvas. This is normal: the Webflow Designer cannot run scripts or load external images, so no feed renders real posts on the canvas.</li>
+    <li>Press <b>Publish</b> in Webflow. The real feed appears on your published site.</li>
+  </ol>
+  <div class="key">
+    <p><b>To also see the feed in Webflow Preview</b>, turn on <b>Site Settings → Custom Code → "Run custom code in Preview"</b>. This is a one-time setting per site.</p>
+  </div>
+
+  <h3>Framer</h3>
+  <ol class="steps">
+    <li>Press <b>Insert</b> in the plugin panel.</li>
+    <li>The feed is added to your canvas as a code component and renders your posts directly.</li>
+    <li>Publish your site as usual.</li>
+  </ol>
+
+  <h2 id="sync">6. How syncing works</h2>
+  <p>Once the feed is on your published site, it keeps itself current. When you post to Instagram, the new post appears on your site automatically. You do not need to re-publish, re-insert or open the app again.</p>
+  <p>How often the feed checks for new posts depends on your plan. You can also trigger a manual refresh from the app panel, a limited number of times per day.</p>
+  <p>Posts are fetched and cached on our servers, not in your visitors' browsers, so the feed stays fast and does not slow your page down.</p>
+
+  <h2 id="plans">7. Plans and limits</h2>
+  <p>There is a free tier and several paid plans. Plans differ by how many Instagram profiles you can connect, how many posts each feed shows, how many feed views per month are included, how often the feed syncs, and whether the curated picker is available.</p>
+  <div class="key">
+    <p><b>The free tier runs on your platform's own address only</b>, meaning <code>*.webflow.io</code> or <code>*.framer.website</code>. To run a feed on a domain you own, you need a paid plan. This is so you can see the product working on a real, public site before paying anything.</p>
+  </div>
+  <p>Current prices and what each plan includes are on the <a href="instagram">Instagram Feed product page</a>. A one-time Lifetime option is also available; see the <a href="instagram-lifetime-terms">Lifetime conditions of purchase</a>.</p>
+
+  <h2 id="account">8. Managing your account</h2>
+  <p>You create a Vanssay account inside the app panel, using an email and password. The same account works across Vanssay products.</p>
+  <p>To change your plan, update payment details, download invoices or cancel, go to <a href="instagram-account">your account page</a>. Cancelling stops future charges; your feed keeps working until the end of the period you have already paid for.</p>
+
+  <h2 id="troubleshooting">9. Troubleshooting</h2>
+
+  <h3>The feed shows nothing on my published site</h3>
+  <ul>
+    <li>Check the profile is public. Private accounts cannot be displayed.</li>
+    <li>If you are on the free tier, check the site is on <code>*.webflow.io</code> or <code>*.framer.website</code>. On a custom domain a free feed does not render.</li>
+    <li>Check whether you have passed your plan's monthly view limit. The app panel shows your usage.</li>
+  </ul>
+
+  <h3>The feed shows a placeholder box in the Webflow Designer</h3>
+  <p>That is expected. The Designer canvas cannot execute JavaScript or load external images, so real posts only appear once you publish, or in Preview with "Run custom code in Preview" enabled.</p>
+
+  <h3>New Instagram posts are not showing up</h3>
+  <p>Feeds refresh on a schedule set by your plan rather than instantly. You can force an update with the manual refresh in the app panel. If the feed is set to curated rather than automatic, it shows only the posts you picked, and new posts will not be added on their own.</p>
+
+  <h3>My feed stopped working after I connected a custom domain</h3>
+  <p>The free tier only runs on your platform's own address. Moving to a domain you own requires a paid plan.</p>
+
+  <h2 id="support">10. Getting support</h2>
+  <p>Email <a href="mailto:support@vanssay.net">support@vanssay.net</a>, or use the <a href="contact">contact form</a>. Include your account email and, if you can, the URL of the page the feed is on. Paid plans get priority support.</p>
+
+  <div class="key">
+    <p><b>Not affiliated with Instagram.</b> Instagram Feed is an independent product built by Vanssay. It is not affiliated with, endorsed by, or sponsored by Instagram or Meta Platforms, Inc. Instagram is a trademark of Meta Platforms, Inc. The app displays publicly available content from Instagram profiles you choose to connect.</p>
+  </div>
+</main>
+<footer>
+  <a href="/">Vanssay</a> &middot; <a href="instagram">Instagram Feed</a> &middot; <a href="terms">Terms</a> &middot; <a href="privacy">Privacy</a> &middot; <a href="contact">Contact</a>
+</footer>
+</body>
+</html>
