@@ -1423,7 +1423,7 @@ async function renderCompliance() {
 
       <div class="panel"><h3>DES · EU B2B services</h3>
         ${d.des.months.length ? `<div class="tablewrap"><table><thead><tr>
-          <th>Month</th><th>Customers</th><th class="right">Amount</th><th>File by</th><th>Status</th>
+          <th>Quarter</th><th>Customers</th><th class="right">Amount</th><th>File by</th><th>Status</th>
         </tr></thead><tbody>${d.des.months.map((m) => `<tr>
           <td>${esc(m.label)}</td>
           <td><div class="badges">${m.partners.map((p) => `<span class="badge b-other" title="${esc((p.name || "") + " · " + eur(p.eurCents))}">${flag(p.country)} ${esc(p.vatId)}</span>`).join("")}</div></td>
@@ -1434,7 +1434,7 @@ async function renderCompliance() {
               : `<span class="badge b-free">Due</span>`}</td>
         </tr>`).join("")}</tbody></table></div>`
         : `<div class="empty">No EU B2B sale yet — nothing to file.</div>`}
-        <p class="note">One filing per month in which a reverse-charge service was supplied, within 10 working days of the month end. The dates shown skip weekends only, so a public holiday can push the real deadline later. Nothing is owed for months with no EU B2B sale. Monthly filing applies below €460,000/yr in EU B2B services (quarterly above that — not relevant here, but that's why the cadence is monthly).</p>
+        <p class="note">One filing per quarter in which a reverse-charge service was supplied, within 10 working days of the quarter's end. Quarterly applies below €460,000/yr in EU B2B services; above that it switches to monthly (not relevant here). The dates shown skip weekends only, so a public holiday can push the real deadline later. Nothing is owed for quarters with no EU B2B sale.</p>
         <p class="note">⚠ A missing or late DES costs ${esc(eur(d.des.penaltyEur * 100))} flat, plus ${esc(eur(d.des.penaltyMonthlyEur * 100))}/month of delay — even on a €0 declaration. No exemption for the franchise or for micro-entrepreneurs.</p></div>
     </div>
 
