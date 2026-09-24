@@ -219,6 +219,7 @@
     <button class="navlink" data-tab="users"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span> Users</button>
     <button class="navlink" data-tab="subs"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span> Subscriptions</button>
     <button class="navlink" data-tab="expenses"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span> Expenses</button>
+    <button class="navlink" data-tab="invoices"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg></span> Invoices</button>
     <button class="navlink" data-tab="compliance"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg></span> Compliance</button>
     <button class="navlink" data-tab="diag"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span> Diagnostics</button>
     <button class="navlink" data-tab="site"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span> Website</button>
@@ -379,7 +380,7 @@ function switchTab(tab) {
   $("view").innerHTML = `<div class="empty">Loading…</div>`;
   if (tab.startsWith("prod:")) return renderProduct(tab.slice(5));
   ({ overview: renderOverview, users: renderUsers, subs: renderSubs, expenses: renderExpenses,
-     "comp-live": renderComponentLive, compliance: renderCompliance,
+     "comp-live": renderComponentLive, invoices: renderInvoices, compliance: renderCompliance,
      diag: renderDiagnostics, site: renderWebsite, ranks: renderRanks }[tab])();
 }
 
@@ -1345,6 +1346,68 @@ function meterRow(label, cents, thresholdEur, note) {
       <strong>${eur(cents)} · ${pct}% of ${eur(thresholdEur * 100)}</strong></div>
     <div class="meter ${cls}"><span style="width:${pct}%"></span></div>
     <p class="note" style="padding:5px 0 0">${note}</p></div>`;
+}
+
+/* The issued invoice series: the legal record, newest first. Everything shown
+   here is frozen on the invoice itself, never joined back to the user, so a row
+   reads the same today as on the day it was issued. */
+async function renderInvoices() {
+  $("view").innerHTML = `
+    <div class="page-head"><div><h2>Invoices</h2>
+      <p>Every invoice issued, across all products. The series is continuous by law: numbers are allocated when a payment lands and are never reused, so a gap here would be a real problem.</p></div></div>
+    <div class="card" style="margin-bottom:14px;padding:12px 14px;">
+      <input id="inv-q" type="search" placeholder="Search number, email or name…"
+             style="width:100%;box-sizing:border-box;padding:9px 12px;border:1px solid var(--line,#e4e4e7);border-radius:10px;font:inherit;background:transparent;color:inherit;" />
+    </div>
+    <div id="inv-body"><div class="empty">Loading…</div></div>`;
+
+  let timer = null;
+  const load = async (q) => {
+    try {
+      const d = await api("/admin/invoices?limit=200" + (q ? "&q=" + encodeURIComponent(q) : ""));
+      paint(d, q);
+    } catch (e) {
+      $("inv-body").innerHTML = `<div class="empty">Couldn't load: ${esc(e.message)}</div>`;
+    }
+  };
+
+  const paint = (d, q) => {
+    if (!d.invoices.length) {
+      $("inv-body").innerHTML = `<div class="empty">${q ? "No invoice matches that." : "No invoices yet."}</div>`;
+      return;
+    }
+    // Only meaningful without a filter: a search shows a subset by design.
+    const shown = d.invoices.length;
+    const head = q
+      ? `${fmt(shown)} of ${fmt(d.total)} invoices`
+      : `${fmt(d.total)} invoice${d.total === 1 ? "" : "s"}${shown < d.total ? ` · showing the newest ${fmt(shown)}` : ""}`;
+
+    $("inv-body").innerHTML = `
+      <p style="color:var(--dim,#71717a);font-size:13px;margin:0 0 10px;">${head}</p>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="tablewrap"><table><thead><tr>
+          <th>Number</th><th>Buyer</th><th>Product</th>
+          <th>Issued</th><th>Paid</th><th class="right">Amount</th><th></th>
+        </tr></thead><tbody>
+        ${d.invoices.map((inv) => `<tr>
+          <td><strong>${esc(inv.number)}</strong>${inv.blocked ? ` <span title="Held until our intracom VAT number is attributed" style="color:#f59e0b;">held</span>` : ""}</td>
+          <td>${esc(inv.buyerName || "-")}<div style="color:var(--dim,#71717a);font-size:12px;">${esc(inv.buyerEmail)}${inv.buyerCountry ? " · " + esc(inv.buyerCountry) : ""}</div></td>
+          <td>${esc(inv.product)}${inv.accountLess ? `<div style="color:var(--dim,#71717a);font-size:12px;">no account</div>` : ""}</td>
+          <td>${date(inv.issuedAt)}</td>
+          <td>${date(inv.supplyDate)}</td>
+          <td class="right">${moneyCents(inv.amountCents)}${inv.currency && inv.currency !== "USD" ? " " + esc(inv.currency) : ""}</td>
+          <td class="right">${inv.url ? `<a href="${esc(inv.url)}" target="_blank" rel="noopener">open</a>` : ""}</td>
+        </tr>`).join("")}
+        </tbody></table></div>
+      </div>`;
+  };
+
+  $("inv-q").oninput = (e) => {
+    const q = e.target.value.trim();
+    clearTimeout(timer);
+    timer = setTimeout(() => load(q), 250);
+  };
+  load("");
 }
 
 async function renderCompliance() {

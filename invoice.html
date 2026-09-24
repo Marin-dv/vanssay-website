@@ -72,6 +72,10 @@ var $ = function (id) { return document.getElementById(id); };
 var params = new URLSearchParams(location.search);
 var number = (params.get("n") || "").trim();
 var preferred = params.get("k");
+// Component sales are account-less, so their invoice has no session to scope to.
+// Those buyers arrive with ?t=<token>, which is the only credential the document
+// has. Presence of `t` switches this page to the unauthenticated route.
+var accessToken = (params.get("t") || "").trim();
 
 // Arriving straight from a plugin, with the session in the link.
 if (location.hash.indexOf("#token=") === 0) {
@@ -164,7 +168,24 @@ $("dl").onclick = function () {
 };
 $("back").onclick = function () { location.href = accountHref(); };
 
-if (!number) {
+if (accessToken) {
+  // Token link: no session involved, and no invoice number in the URL either
+  // (the document carries its own number, which show() reads into the title).
+  $("num").textContent = "Invoice";
+  $("back").style.display = "none";
+  fetch(API + "/billing/invoices/by-token/" + encodeURIComponent(accessToken))
+    .then(function (res) {
+      if (res.ok) return res.text();
+      return res.json().catch(function () { return {}; }).then(function (d) {
+        throw new Error(d.error || "Could not open that invoice");
+      });
+    })
+    .then(show)
+    .catch(function (e) {
+      fail("Could not open that invoice",
+           e.message + ' Write to <a href="mailto:support@vanssay.net">support@vanssay.net</a> and we will send it to you.');
+    });
+} else if (!number) {
   fail("No invoice asked for", 'Open an invoice from <a href="accounts">your account</a>.');
 } else {
   $("num").textContent = "Invoice " + number;
