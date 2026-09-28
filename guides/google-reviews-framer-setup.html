@@ -195,7 +195,7 @@ details p{margin-top:8px;font-size:14.5px}
   <span class="av"><svg width="18" height="18" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#5f6368"/><path d="M34,4H25L13,36H22Z" fill="#1a73e8"/></svg></span>
   <div>By the <b>Vanssay team</b>. We build the component used in this guide. The Google Cloud steps below are the same whichever review widget you end up using, so they are worth following either way.</div>
 </div>
-<p class="meta">Updated August 2026 · 9 min read</p>
+<p class="meta">Updated September 2026 · 9 min read</p>
 <div class="compat">
   <span><svg class="i-framer" width="11" height="17" viewBox="0 0 24 36" aria-hidden="true"><path fill="#202124" d="M0 0h24v12H12zM0 12h12l12 12H12v12L0 24z"/></svg>Works on any Framer site</span>
   <span>No account · No subscription</span>
@@ -231,7 +231,7 @@ details p{margin-top:8px;font-size:14.5px}
 <p>Click <strong>Edit API key</strong> and set both restrictions:</p>
 
 <ol class="steps">
-<li><strong>Application restrictions → Websites.</strong> Add your live domain as <code>https://yoursite.com/*</code>. Add <code>https://*.framer.website/*</code> as well, so Framer previews and staging URLs keep working. If you use a www subdomain, add that too, Google treats it as a separate referrer.</li>
+<li><strong>Application restrictions → Websites.</strong> Add your live domain as <code>https://yoursite.com/*</code>. Add <code>https://*.framer.website/*</code> as well, so Framer previews and staging URLs keep working. If you use a www subdomain, add that too, Google treats it as a separate referrer. To see your reviews on the Framer canvas while you design, also add <code>https://framercanvas.com/*</code>, <code>https://*.framercanvas.com/*</code> and <code>https://framer.com/*</code>, because the editor loads the component from Framer's own domains, not yours.</li>
 <li><strong>API restrictions → Restrict key.</strong> Select <strong>Places API (New)</strong> and nothing else. Now the key can only be used for this one purpose.</li>
 <li><strong>Save.</strong> Google can take up to five minutes to apply restriction changes. If reviews do not appear straight away, wait a moment and reload.</li>
 </ol>
@@ -332,7 +332,7 @@ details p{margin-top:8px;font-size:14.5px}
 </tr>
 <tr>
   <td><code>Google blocked this domain</code></td>
-  <td>The site's address is not in the key's website restrictions. Add it exactly, including <code>https://</code> and the <code>/*</code> at the end, and add <code>https://*.framer.website/*</code> for previews. Changes take up to five minutes.</td>
+  <td>The address the component is running on is not in the key's website restrictions. On the canvas, that address is Framer's, not yours: add <code>https://framercanvas.com/*</code>, <code>https://*.framercanvas.com/*</code> and <code>https://framer.com/*</code>. On your live site, add your domain exactly, including <code>https://</code> and the <code>/*</code> at the end, plus <code>https://*.framer.website/*</code> for previews. Changes take up to five minutes.</td>
 </tr>
 <tr>
   <td><code>This key can't use Places API (New)</code></td>
@@ -360,7 +360,15 @@ details p{margin-top:8px;font-size:14.5px}
 </tr>
 <tr>
   <td>Empty on the live site, fine on the canvas</td>
-  <td>Almost always the referrer restriction. The canvas runs on framer.com, your published site does not, so a key restricted to only one of them works in only one place. Add your live domain.</td>
+  <td>Almost always the referrer restriction. The canvas runs on Framer's domains, your published site runs on yours, so a key restricted to only one of them works in only one place. Add your live domain.</td>
+</tr>
+<tr>
+  <td>Fine on the live site, <code>Google blocked this domain</code> on the canvas</td>
+  <td>The same restriction, the other way round. Add <code>https://framercanvas.com/*</code>, <code>https://*.framercanvas.com/*</code> and <code>https://framer.com/*</code> to the key's websites. Your live site is unaffected either way.</td>
+</tr>
+<tr>
+  <td>Rating and count show, but no review cards</td>
+  <td>Your key and Place ID work: Google is sending the rating but no reviews for this place. Check the Place ID belongs to the listing where you actually see your reviews on Google Maps, not a duplicate or older one. If it does, <a href="mailto:support@vanssay.net">email us</a> with your site's address and we'll look at what Google returns.</td>
 </tr>
 <tr>
   <td>Reviews are out of date</td>
