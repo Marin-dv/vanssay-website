@@ -146,7 +146,7 @@
     .b-free { background:var(--surface-2); color:var(--text-2); } .b-pro { background:var(--accent-soft); color:var(--pro); } .b-ultra { background:var(--ink); color:#fff; }
     .b-starter { background:#fdecf3; color:#e0457b; }
     .b-active { background:#e9f7ef; color:var(--green); } .b-canceled { background:#fdecec; color:var(--error); } .b-other { background:var(--surface-2); color:var(--text-2); }
-    .b-framer { background:#eef1f4; color:#111318; } .b-webflow { background:#e6f0ff; color:#155cc4; }
+    .b-framer { background:#eef1f4; color:#111318; } .b-webflow { background:#e6f0ff; color:#155cc4; } .b-web { background:#fdeef4; color:#c0266a; }
     .badges { display:flex; gap:5px; flex-wrap:wrap; }
     .pager { display:flex; align-items:center; gap:12px; justify-content:flex-end; margin-top:14px; font-size:13px; color:var(--text-2); }
     .meter { height:7px; border-radius:99px; background:var(--surface-2); overflow:hidden; }
@@ -303,8 +303,9 @@ const tpLink = (url) => url
   ? `<a href="${esc(url)}" target="_blank" rel="noopener" title="${esc(url)}">${esc(String(url).replace(/^https?:\/\/(www\.)?/, ""))}</a>`
   : "-";
 const planBadge = (p) => { p = p || "free"; return `<span class="badge b-${esc(p)}">${esc(p[0].toUpperCase()+p.slice(1))}</span>`; };
-// Signup platform (host): Framer or Webflow.
-const platformBadge = (p) => { const k = p === "webflow" ? "webflow" : "framer"; const lbl = k === "webflow" ? "Webflow" : "Framer"; return `<span class="badge b-${k}">${k==="webflow"?"◇":"◆"} ${lbl}</span>`; };
+// Signup platform (host): Framer, Webflow, or the Instagram web app (instagram.vanssay.net).
+const PLATFORMS = { framer: ["◆", "Framer"], webflow: ["◇", "Webflow"], web: ["○", "Web"] };
+const platformBadge = (p) => { const k = PLATFORMS[p] ? p : "framer"; const [icon, lbl] = PLATFORMS[k]; return `<span class="badge b-${k}">${icon} ${lbl}</span>`; };
 const statusBadge = (s) => { const k = s==="active"||s==="trialing"?"b-active":s==="canceled"?"b-canceled":"b-other"; return `<span class="badge ${k}">${esc(s||"-")}</span>`; };
 const flag = (cc) => (cc && cc.length === 2 ? cc.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0))) : "🏳️");
 const minStarsLabel = (n) => (Number(n) > 1 ? Number(n) + "★+" : '<span class="muted">All</span>');
@@ -734,6 +735,7 @@ async function renderOverview() {
         <div class="k-val" style="font-size:20px;display:flex;gap:14px;align-items:baseline">
           <span>${fmt(anyBill.sources.framer)} <small style="font-size:11px;color:var(--muted);font-weight:700">FRAMER</small></span>
           <span>${fmt(anyBill.sources.webflow)} <small style="font-size:11px;color:var(--muted);font-weight:700">WEBFLOW</small></span>
+          ${anyBill.sources.web !== undefined ? `<span>${fmt(anyBill.sources.web)} <small style="font-size:11px;color:var(--muted);font-weight:700">WEB</small></span>` : ""}
         </div><div class="k-sub">where accounts signed up</div></div>` : ""}
     </div>
 
@@ -784,6 +786,7 @@ async function renderUsers() {
         <option value="">All platforms</option>
         <option value="framer" ${usersState.source==="framer"?"selected":""}>Framer</option>
         <option value="webflow" ${usersState.source==="webflow"?"selected":""}>Webflow</option>
+        <option value="web" ${usersState.source==="web"?"selected":""}>Web</option>
       </select>
       <button class="btn btn-line btn-sm" id="u-refresh">Refresh</button>
     </div>
