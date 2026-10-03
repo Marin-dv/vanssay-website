@@ -1040,7 +1040,7 @@ async function renderSubs() {
     <div class="tablewrap">${d.subscriptions.length?`<table><thead><tr>
       <th>Email</th><th>Plan</th><th>Status</th><th>Live</th><th class="right">MRR</th><th>Period end</th><th>Created</th><th>Stripe sub</th>
     </tr></thead><tbody>${d.subscriptions.map((s)=>`<tr>
-      <td>${esc(s.email)}</td><td>${planBadge(s.plan)}</td><td>${statusBadge(s.status)}</td>
+      <td>${esc(s.email)}</td><td>${planBadge(s.plan)}${s.lifetime?" Lifetime · one-time":""}</td><td>${statusBadge(s.status)}</td>
       <td>${s.live?"✅":"-"}</td><td class="right">${s.monthlyValue?money(s.monthlyValue):"-"}</td>
       <td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td>
       <td class="mono truncate">${esc(s.stripeSubscriptionId||"manual")}</td>
