@@ -692,8 +692,11 @@ async function renderOverview() {
   // but they come from Stripe in cents and the plugin figures are whole dollars.
   const cmpRevenue = cmp ? cmp.totals.revenueCents / 100 : 0;
   const cmpSales = cmp ? cmp.totals.sales : 0;
-  const totOneTime = totLife + cmpRevenue;
-  const totOneTimeN = totLifeN + cmpSales;
+  // Extra feed slots: one-time and repeatable, neither a licence nor a plan.
+  const totAddOn = okBills.reduce((s, b) => s + (b.revenue.addOnRevenue || 0), 0);
+  const totAddOnN = okBills.reduce((s, b) => s + (b.revenue.addOnCount || 0), 0);
+  const totOneTime = totLife + totAddOn + cmpRevenue;
+  const totOneTimeN = totLifeN + totAddOnN + cmpSales;
   const igOpened = doms.instagram && doms.instagram.funnel30d ? doms.instagram.funnel30d.opened : null;
 
   // Per-product domain highlights.
@@ -726,7 +729,7 @@ async function renderOverview() {
   ov.innerHTML = `
     <div class="kpis">
       <div class="kpi hero"><div class="k-label">Monthly · recurring</div><div class="k-val">${money(totMRR)}</div><div class="k-sub">${money(totMRR*12)} / year · subscriptions only</div></div>
-      <div class="kpi"><div class="k-label">One-time</div><div class="k-val">${moneyCents(Math.round(totOneTime * 100))}</div><div class="k-sub">${fmt(totOneTimeN)} purchase${totOneTimeN === 1 ? "" : "s"} · ${fmt(totLifeN)} lifetime${cmpSales ? ` + ${fmt(cmpSales)} component` : ""} · not recurring</div></div>
+      <div class="kpi"><div class="k-label">One-time</div><div class="k-val">${moneyCents(Math.round(totOneTime * 100))}</div><div class="k-sub">${fmt(totOneTimeN)} purchase${totOneTimeN === 1 ? "" : "s"} · ${fmt(totLifeN)} lifetime${totAddOnN ? ` + ${fmt(totAddOnN)} extra feed` : ""}${cmpSales ? ` + ${fmt(cmpSales)} component` : ""} · not recurring</div></div>
       <div class="kpi"><div class="k-label">Accounts</div><div class="k-val">${fmt(anyBill.users.total)}</div><div class="k-sub">+${fmt(anyBill.users.newThisMonth)} this month · shared across plugins</div></div>
       ${igOpened !== null ? `<div class="kpi"><div class="k-label">📸 Instagram opened</div><div class="k-val">${fmt(igOpened)}</div><div class="k-sub">distinct visitors · last 30 days</div></div>` : ""}
       <div class="kpi"><div class="k-label">Paying subscriptions</div><div class="k-val">${fmt(totSubs)}</div><div class="k-sub">recurring · plus ${fmt(totOneTimeN)} one-time, ${fmt(okBills.reduce((s, b) => s + (b.plans.gifted || 0), 0))} gifted</div></div>
@@ -745,7 +748,8 @@ async function renderOverview() {
         return `<div class="panel"><h3>${p.icon} ${esc(p.label)} <a class="open" href="#" data-open="${p.key}">Open →</a></h3>
           ${b ? `<div class="mrr">${money(b.revenue.mrr)} <small>MRR</small></div>
           <div class="kv"><span>Paying</span><strong>${planBreakdown(b.plans)}</strong></div>
-          ${b.revenue.lifetimeRevenue ? `<div class="kv"><span>Lifetime (one-time)</span><strong>${money(b.revenue.lifetimeRevenue)}</strong></div>` : ""}`
+          ${b.revenue.lifetimeRevenue ? `<div class="kv"><span>Lifetime (one-time)</span><strong>${money(b.revenue.lifetimeRevenue)}</strong></div>` : ""}
+          ${b.revenue.addOnRevenue ? `<div class="kv"><span>Extra feeds (one-time)</span><strong>${money(b.revenue.addOnRevenue)}</strong></div>` : ""}`
           : `<div class="note">Billing unavailable.</div>`}
           ${domainKv(p).map(([k, x]) => `<div class="kv"><span>${k}</span><strong>${x}</strong></div>`).join("")}
         </div>`;
@@ -2475,7 +2479,8 @@ async function renderInstagram(head) {
     <div class="kpis">
       ${bill ? `<div class="kpi hero"><div class="k-label">MRR</div><div class="k-val">${money(bill.revenue.mrr)}</div><div class="k-sub">${money(bill.revenue.arr)} / year</div></div>
       <div class="kpi"><div class="k-label">Paying</div><div class="k-val">${fmt(bill.plans.paid)}</div><div class="k-sub">${planBreakdown(bill.plans).replace(/^\S+\s·\s/, "")}</div></div>
-      ${bill.revenue.lifetimeRevenue ? `<div class="kpi"><div class="k-label">Lifetime · one-time</div><div class="k-val">${money(bill.revenue.lifetimeRevenue)}</div><div class="k-sub">${fmt(bill.revenue.lifetimeCount)} sales · ${money(bill.revenue.lifetimeUnitPrice)} today${(bill.revenue.lifetimePricedActual ?? bill.revenue.lifetimeCount) < bill.revenue.lifetimeCount ? " · some estimated" : ""} · not in MRR</div></div>` : ""}` : ""}
+      ${bill.revenue.lifetimeRevenue ? `<div class="kpi"><div class="k-label">Lifetime · one-time</div><div class="k-val">${money(bill.revenue.lifetimeRevenue)}</div><div class="k-sub">${fmt(bill.revenue.lifetimeCount)} sales · ${money(bill.revenue.lifetimeUnitPrice)} today${(bill.revenue.lifetimePricedActual ?? bill.revenue.lifetimeCount) < bill.revenue.lifetimeCount ? " · some estimated" : ""} · not in MRR</div></div>` : ""}
+      ${bill.revenue.addOnRevenue ? `<div class="kpi"><div class="k-label">Extra feeds · one-time</div><div class="k-val">${money(bill.revenue.addOnRevenue)}</div><div class="k-sub">${fmt(bill.revenue.addOnCount)} slot${bill.revenue.addOnCount === 1 ? "" : "s"} sold · not in MRR</div></div>` : ""}` : ""}
       ${dom ? `<div class="kpi"><div class="k-label">Feeds</div><div class="k-val">${fmt(dom.feeds)}</div><div class="k-sub">${fmt(dom.cachedHandles)} handles cached</div></div>
       <div class="kpi"><div class="k-label">Views this month</div><div class="k-val">${fmt(dom.viewsThisMonth)}</div><div class="k-sub">every widget render · canvas included</div></div>` : ""}
       ${fn ? `<div class="kpi"><div class="k-label">Opened (30d)</div><div class="k-val">${fmt(fn.opened)}</div><div class="k-sub">${fmt(fn.previewed)} saw a feed</div></div>
