@@ -145,6 +145,7 @@
     .badge { display:inline-flex; padding:2px 10px; border-radius:99px; font-size:11.5px; font-weight:800; white-space:nowrap; }
     .b-free { background:var(--surface-2); color:var(--text-2); } .b-pro { background:var(--accent-soft); color:var(--pro); } .b-ultra { background:var(--ink); color:#fff; }
     .b-starter { background:#fdecf3; color:#e0457b; }
+    .b-lifetime { background:#fdf3d8; color:#9a6700; }
     .b-active { background:#e9f7ef; color:var(--green); } .b-canceled { background:#fdecec; color:var(--error); } .b-other { background:var(--surface-2); color:var(--text-2); }
     .b-framer { background:#eef1f4; color:#111318; } .b-webflow { background:#e6f0ff; color:#155cc4; } .b-web { background:#fdeef4; color:#c0266a; }
     .badges { display:flex; gap:5px; flex-wrap:wrap; }
@@ -302,7 +303,10 @@ const viewsOfCap = (views, limit, meter) => {
 const tpLink = (url) => url
   ? `<a href="${esc(url)}" target="_blank" rel="noopener" title="${esc(url)}">${esc(String(url).replace(/^https?:\/\/(www\.)?/, ""))}</a>`
   : "-";
-const planBadge = (p) => { p = p || "free"; return `<span class="badge b-${esc(p)}">${esc(p[0].toUpperCase()+p.slice(1))}</span>`; };
+// A Lifetime purchase is stored on the `pro` tier, so the tier alone would badge
+// it "Pro". `billing` ("lifetime", or a "lifetime_" subscription id) tells them apart.
+const isLifetime = (b) => b === "lifetime" || String(b || "").startsWith("lifetime_");
+const planBadge = (p, billing) => { p = p || "free"; if (isLifetime(billing)) return `<span class="badge b-lifetime">Lifetime</span>`; return `<span class="badge b-${esc(p)}">${esc(p[0].toUpperCase()+p.slice(1))}</span>`; };
 // Signup platform (host): Framer, Webflow, or the Instagram web app (instagram.vanssay.net).
 const PLATFORMS = { framer: ["◆", "Framer"], webflow: ["◇", "Webflow"], web: ["○", "Web"] };
 const platformBadge = (p) => { const k = PLATFORMS[p] ? p : "framer"; const [icon, lbl] = PLATFORMS[k]; return `<span class="badge b-${k}">${icon} ${lbl}</span>`; };
@@ -995,7 +999,7 @@ async function openUser(id, force) {
 
     <div class="sec-title">Subscriptions · all plugins (${allSubs.length})</div>
     <div class="card" style="padding:0;overflow:hidden">${allSubs.length ? `<table><thead><tr><th>Plugin</th><th>Plan</th><th>Status</th><th>Period end</th><th>Created</th></tr></thead><tbody>
-      ${allSubs.map((s)=>`<tr><td>${s.product.icon} ${esc(s.product.label)}</td><td>${planBadge(s.plan)}</td><td>${statusBadge(s.status)}</td><td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No subscriptions.</div>`}</div>
+      ${allSubs.map((s)=>`<tr><td>${s.product.icon} ${esc(s.product.label)}</td><td>${planBadge(s.plan, s.stripeSubscriptionId)}</td><td>${statusBadge(s.status)}</td><td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td></tr>`).join("")}</tbody></table>` : `<div class="empty">No subscriptions.</div>`}</div>
 
     ${showReviews ? reviewsSections : showInstagram ? igSections : `<p class="note">Not actively using Reviews or Instagram yet.</p>`}
   `;
@@ -1040,7 +1044,7 @@ async function renderSubs() {
     <div class="tablewrap">${d.subscriptions.length?`<table><thead><tr>
       <th>Email</th><th>Plan</th><th>Status</th><th>Live</th><th class="right">MRR</th><th>Period end</th><th>Created</th><th>Stripe sub</th>
     </tr></thead><tbody>${d.subscriptions.map((s)=>`<tr>
-      <td>${esc(s.email)}</td><td>${planBadge(s.plan)}${s.lifetime?" Lifetime · one-time":""}</td><td>${statusBadge(s.status)}</td>
+      <td>${esc(s.email)}</td><td>${planBadge(s.plan, s.lifetime ? "lifetime" : null)}${s.lifetime?" one-time":""}</td><td>${statusBadge(s.status)}</td>
       <td>${s.live?"✅":"-"}</td><td class="right">${s.monthlyValue?money(s.monthlyValue):"-"}</td>
       <td>${date(s.currentPeriodEnd)}</td><td>${date(s.createdAt)}</td>
       <td class="mono truncate">${esc(s.stripeSubscriptionId||"manual")}</td>
@@ -2165,7 +2169,7 @@ async function loadReviewsUsers() {
       <th>Email</th><th>Plan</th><th>Platform</th><th class="right">Views / quota</th><th class="right">Businesses</th><th>Joined</th>
     </tr></thead><tbody>${r.slice.map((u) => `<tr class="clickable" data-id="${u.id}">
       <td>${esc(u.email)}</td>
-      <td>${planBadge(u.plan)}</td>
+      <td>${planBadge(u.plan, u.billing)}</td>
       <td>${platformBadge(u.platform)}</td>
       <td class="right">${fmt(u.viewsThisMonth)}${u.quota>0?" / "+fmt(u.quota):" / ∞"}</td>
       <td class="right">${fmt(u.businesses)}</td>
@@ -2442,7 +2446,7 @@ async function loadInstagramUsers(feedRows) {
       <th>Email</th><th>Plan</th><th>Platform</th><th class="right">Feeds</th><th class="right">Views · this month</th><th>Joined</th>
     </tr></thead><tbody>${r.slice.map((u) => `<tr class="clickable" data-id="${u.id}">
       <td>${esc(u.email)}</td>
-      <td>${planBadge(u.plan)}</td>
+      <td>${planBadge(u.plan, u.billing)}</td>
       <td>${platformBadge(u.platform)}</td>
       <td class="right">${fmt(feedCount.get(u.id) || 0)}</td>
       <td class="right">${fmt(feedViews.get(u.id) || 0)}</td>
