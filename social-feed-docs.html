@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Social Feed Documentation | Vanssay</title>
+<meta name="description" content="How to install and use Social Feed - Vanssay in Webflow: connect an Instagram account, choose a layout, place the feed, publish, and remove it." />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+<link rel="apple-touch-icon" href="/favicon-180.png" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#fafafa;color:#18181b;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:#0e7afe;text-decoration:none}a:hover{text-decoration:underline}
+nav{position:sticky;top:0;background:rgba(250,250,250,.85);backdrop-filter:blur(14px);border-bottom:1px solid #e4e4e7;z-index:5}
+.nav-in{max-width:1140px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;color:#18181b}
+main{max-width:760px;margin:0 auto;padding:64px 28px 96px}
+h1{font-size:36px;font-weight:900;letter-spacing:-.02em}
+.date{color:#a1a1aa;font-size:14px;margin:8px 0 28px}
+h2{font-size:20px;font-weight:800;margin:36px 0 10px;scroll-margin-top:80px}
+h3{font-size:16px;font-weight:700;margin:22px 0 6px;scroll-margin-top:80px}
+p,li{color:#52525b;font-size:15px}
+p+p{margin-top:10px}
+ul{padding-left:22px;margin:8px 0}
+li{margin:4px 0}
+b{color:#18181b}
+code{background:#f4f4f5;border:1px solid #e4e4e7;border-radius:5px;padding:1px 6px;font-size:13.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#18181b}
+.lede{background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:20px 22px;margin:0 0 32px}
+.lede p{font-size:15.5px}
+.toc{background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:18px 22px;margin:0 0 40px}
+.toc b{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#a1a1aa}
+.toc ol{margin:10px 0 0;padding-left:20px;columns:2;font-size:14px}
+.toc a{color:#52525b}
+.key{background:#fff;border:1px solid #e4e4e7;border-left:3px solid #0e7afe;border-radius:10px;padding:14px 18px;margin:14px 0}
+.key p{font-size:14.5px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:14px 0}
+.steps li{counter-increment:s;position:relative;padding-left:40px;margin:14px 0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;background:#18181b;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.scroll{overflow-x:auto;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:520px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid #e4e4e7;color:#52525b;vertical-align:top}
+th{color:#18181b;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+footer{max-width:760px;margin:0 auto;padding:0 28px 60px;font-size:13.5px;color:#a1a1aa}
+footer a{color:#71717a}
+@media(max-width:640px){.toc ol{columns:1}h1{font-size:29px}main{padding:44px 16px 72px}.nav-in{padding:0 16px}footer{padding:0 16px 48px}}
+</style>
+<script defer src="assets/track.js"></script>
+</head>
+<body>
+<nav><div class="nav-in"><a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a><a href="social-feed" style="font-size:14px;font-weight:600">Social Feed for Webflow →</a></div></nav>
+<main>
+  <h1>Social Feed documentation</h1>
+  <p class="date">How to install, use and remove the Webflow App "Social Feed - Vanssay". Last updated: October 17, 2026</p>
+
+  <div class="lede">
+    <p><b>What it does.</b> Social Feed shows the posts of an Instagram account you own or manage on your Webflow site. You connect the account, pick one of seven layouts, and place the feed on your page from the Designer. On your published site, one script added to your site's footer shows the feed in that spot. A free Vanssay account is required to place a feed.</p>
+  </div>
+
+  <div class="toc">
+    <b>Contents</b>
+    <ol>
+      <li><a href="#install">Installing the App</a></li>
+      <li><a href="#connect">Connecting an Instagram account</a></li>
+      <li><a href="#layouts">Layouts</a></li>
+      <li><a href="#settings">Settings</a></li>
+      <li><a href="#insert">Placing the feed and publishing</a></li>
+      <li><a href="#code">What the App adds to your site</a></li>
+      <li><a href="#sync">How and when the feed refreshes</a></li>
+      <li><a href="#plans">Plans</a></li>
+      <li><a href="#account">Your account and billing</a></li>
+      <li><a href="#remove">Removing the feed and the App</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+      <li><a href="#support">Support</a></li>
+    </ol>
+  </div>
+
+  <h2 id="install">1. Installing the App</h2>
+  <ol class="steps">
+    <li>Install <b>Social Feed - Vanssay</b> from the Webflow App Marketplace and choose the site to use it on.</li>
+    <li>Open that site in the <b>Webflow Designer</b>.</li>
+    <li>Open the <b>Apps</b> panel in the left toolbar and launch <b>Social Feed - Vanssay</b>. It opens as a panel.</li>
+  </ol>
+  <div class="key">
+    <p><b>No Instagram login.</b> The App reads a public Instagram profile by its handle. You never connect your Instagram login and never enter an Instagram password.</p>
+  </div>
+
+  <h2 id="connect">2. Connecting an Instagram account</h2>
+  <ol class="steps">
+    <li>Type the handle of an Instagram account <b>you own or are authorized to represent</b>, with or without the <code>@</code>, or paste its instagram.com link.</li>
+    <li>Press <b>Preview Feed</b>. The profile and its recent posts load so you can see the feed before placing it. You do not need an account to preview.</li>
+  </ol>
+  <p>The account must be <b>public</b>. You must also have the rights for its posts to be shown on your site. A profile being public does not give you those rights: see the <a href="social-feed-terms#s5">Terms, §5</a>.</p>
+
+  <h2 id="layouts">3. Layouts</h2>
+  <p>There are seven layouts. Click any of them in the panel to see your posts in it.</p>
+  <div class="scroll"><table>
+    <tr><th>Layout</th><th>What it looks like</th></tr>
+    <tr><td><b>Profile</b></td><td>A profile header (picture, name, counts) above a grid of posts.</td></tr>
+    <tr><td><b>Grid</b></td><td>A square gallery in the number of columns you choose.</td></tr>
+    <tr><td><b>Slider</b></td><td>A row of posts visitors swipe or drag through.</td></tr>
+    <tr><td><b>Aperture</b></td><td>Vertical slices that open up as the visitor moves across them.</td></tr>
+    <tr><td><b>Carousel</b></td><td>A coverflow where the side posts step back for depth.</td></tr>
+    <tr><td><b>Marquee</b></td><td>A strip that scrolls on its own.</td></tr>
+    <tr><td><b>Rainbow</b></td><td>A fanned deck of tilted cards.</td></tr>
+  </table></div>
+  <p>Clicking a post on your site opens it in a popup with its caption, date and, for videos, playback.</p>
+
+  <h2 id="settings">4. Settings</h2>
+  <p>You choose the layout in the App. The App places the feed with sensible defaults (3 columns, 4px gap, 8px corners, header on, captions off). To change them, select the feed's placeholder on the canvas, open the <b>Settings</b> panel (gear icon) and edit its <b>custom attributes</b>, then publish:</p>
+  <div class="scroll"><table>
+    <tr><th>Attribute</th><th>What it does</th></tr>
+    <tr><td><code>data-columns</code></td><td>How many posts sit side by side (1 to 6).</td></tr>
+    <tr><td><code>data-gap</code></td><td>Space between posts, in pixels.</td></tr>
+    <tr><td><code>data-radius</code></td><td>How rounded each post is, in pixels.</td></tr>
+    <tr><td><code>data-limit</code></td><td>How many posts the feed shows, up to your plan's limit.</td></tr>
+    <tr><td><code>data-header</code></td><td><code>1</code> shows the profile picture, name and counts above the feed, <code>0</code> hides them.</td></tr>
+    <tr><td><code>data-captions</code></td><td><code>1</code> shows each post's caption, <code>0</code> hides it.</td></tr>
+    <tr><td><code>data-aperture</code></td><td>Aperture only: the shape of the opened slice (<code>1</code> square, <code>0.8</code> portrait, <code>1.25</code> landscape).</td></tr>
+  </table></div>
+  <p>Leave <code>data-vanssay-instagram</code> and <code>data-token</code> as they are: they tell the script which feed to show.</p>
+  <p>By default a feed shows the account's latest posts. On a paid plan you can switch to <b>Curated</b> and hand-pick which posts appear, from the latest 50.</p>
+
+  <h2 id="insert">5. Placing the feed and publishing</h2>
+  <ol class="steps">
+    <li>Sign in, or create a free Vanssay account (email and password), when the App asks. This is needed to save a feed.</li>
+    <li>On the canvas, select the section or element where the feed should go.</li>
+    <li>In the App, press <b>Insert to Canvas</b>.</li>
+    <li>The first time on a site, Webflow asks you to <b>authorize</b> the App for that site. This lets the App add its script to your site's footer (see <a href="#code">§6</a>). If you decline, nothing is placed and nothing is changed.</li>
+    <li>A <b>labelled placeholder</b> appears on the canvas, showing the feed's layout and handle. This is expected: the Designer canvas does not run scripts, so the posts do not show there.</li>
+    <li><b>Publish</b> your site. The feed appears on the published site in place of the placeholder.</li>
+  </ol>
+  <div class="key">
+    <p><b>To see the feed in Webflow's Preview,</b> turn on <b>Site settings → Custom code → Run custom code in Preview</b>. This is a one-time setting per site.</p>
+  </div>
+  <p>You can move, resize or style the placeholder's container like any element. To change the display settings later, edit the placeholder's attributes (see <a href="#settings">§4</a>), then publish your site.</p>
+
+  <h2 id="code">6. What the App adds to your site</h2>
+  <ul>
+    <li><b>What:</b> one script, shown in Webflow as <code>VanssayInstagram</code>. It is loaded from <code>api.vanssay.net</code> as a fixed version with an integrity hash, so its content cannot change once registered.</li>
+    <li><b>Where:</b> your site's <b>footer custom code</b>, site-wide, so a feed works on any page you place it on. It is added through Webflow's Custom Code API. Your other custom code is not changed.</li>
+    <li><b>What it does:</b> it finds the feed placeholders on the page and shows the feed in their place. On pages without a feed, it does nothing.</li>
+    <li><b>External resources:</b> the script, the feed's posts and its images and videos all come from <code>api.vanssay.net</code>. Nothing is loaded from Instagram or any other server.</li>
+    <li><b>Data:</b> each page load with a feed adds one to that feed's monthly view count and records the site address. No cookies, no browser storage, nothing stored about the visitor. Details are in the <a href="social-feed-privacy#s4">Privacy Policy, §4</a>.</li>
+  </ul>
+  <p>Webflow runs site custom code only on plans that include it. If the feed does not appear after publishing, check that your Webflow site or Workspace plan includes custom code.</p>
+
+  <h2 id="sync">7. How and when the feed refreshes</h2>
+  <p>A feed is <b>not real-time</b>. It shows the posts we last retrieved from Instagram, and how often that happens depends on your plan:</p>
+  <ul>
+    <li><b>Free:</b> never on its own. The feed shows the posts from your last refresh until you press <b>Sync now</b> in the App (once a day).</li>
+    <li><b>Starter and Pro:</b> automatically about once a day, plus manual refreshes from the App (3 or 10 a day).</li>
+    <li><b>Lifetime:</b> automatically about once a week, plus 1 manual refresh a day.</li>
+  </ul>
+  <p>A new Instagram post can therefore take up to a day (Starter, Pro) or a week (Lifetime) to appear, or until you refresh by hand. A <b>Curated</b> feed shows only the posts you picked and does not add new ones. You do not need to republish your site for a refresh to show.</p>
+
+  <h2 id="plans">8. Plans</h2>
+  <div class="scroll"><table>
+    <tr><th></th><th>Free</th><th>Starter</th><th>Pro</th><th>Lifetime</th></tr>
+    <tr><td><b>Price</b></td><td>$0</td><td>$7.99/mo</td><td>$17.99/mo</td><td>$149 once</td></tr>
+    <tr><td><b>Where it shows</b></td><td><code>*.webflow.io</code> only</td><td>Any domain</td><td>Any domain</td><td>Any domain</td></tr>
+    <tr><td><b>Feeds</b></td><td>1</td><td>1</td><td>10</td><td>2 (+$29 each)</td></tr>
+    <tr><td><b>Posts per feed</b></td><td>6</td><td>18</td><td>18</td><td>12</td></tr>
+    <tr><td><b>Refresh</b></td><td>By hand, 1/day</td><td>Daily + 3/day</td><td>Daily + 10/day</td><td>Weekly + 1/day</td></tr>
+    <tr><td><b>Views / month</b></td><td>10,000</td><td>10,000</td><td>50,000</td><td>50,000</td></tr>
+    <tr><td><b>Curated picker</b></td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+  </table></div>
+  <div class="key">
+    <p><b>The Free plan works on your <code>*.webflow.io</code> address only.</b> On a custom domain, a Free feed shows nothing until you choose a paid plan. Starter and Pro start with a 7-day free trial that needs a card. Lifetime is a one-time payment with its own <a href="social-feed-terms#lifetime">conditions</a>.</p>
+  </div>
+
+  <h2 id="account">9. Your account and billing</h2>
+  <p>You create your Vanssay account inside the App. The same account works across Vanssay products. To change plan, update your card, get invoices or cancel, open your <a href="accounts">account page</a> (also reachable from the App's Account tab). Cancelling stops future charges, and your plan stays active until the end of the period already paid.</p>
+
+  <h2 id="remove">10. Removing the feed and the App</h2>
+  <h3>Remove one feed from a page</h3>
+  <ol class="steps">
+    <li>On the canvas, select the feed's placeholder element and delete it.</li>
+    <li>Publish your site.</li>
+  </ol>
+  <h3>Remove the App's script from a site</h3>
+  <ol class="steps">
+    <li>Open the App in the Designer and go to the <b>Account</b> tab, section <b>Installed code</b>.</li>
+    <li>Press <b>Remove from this site</b> and confirm. Every version of the App's script is removed from your site's custom code. Your other custom code stays as it is.</li>
+    <li>Delete the feed placeholders still on your pages. In the Style panel, delete the styles named <b>Vanssay Social Feed (placeholder…)</b>. The App cannot delete canvas elements or styles for you.</li>
+    <li>Publish your site.</li>
+  </ol>
+  <h3>Uninstall the App</h3>
+  <ol class="steps">
+    <li>Remove the script first, as above. Uninstalling withdraws the App's access to your site, after which it can no longer remove its script for you.</li>
+    <li>In Webflow, open your Workspace or site settings, go to <b>Apps &amp; Integrations</b>, find Social Feed - Vanssay and uninstall it.</li>
+    <li>If you uninstalled before removing the script, open <b>Site settings → Custom code</b> and delete the <code>VanssayInstagram</code> script there, then publish.</li>
+  </ol>
+  <p>Your Vanssay account and saved feeds are kept after uninstalling, so you can come back. To delete them, delete the feeds in the App, or email <a href="mailto:support@vanssay.net">support@vanssay.net</a> to delete your account.</p>
+
+  <h2 id="troubleshooting">11. Troubleshooting</h2>
+  <h3>The canvas shows a placeholder, not my posts</h3>
+  <p>That is expected. The Designer canvas does not run scripts. Publish the site, or turn on "Run custom code in Preview" to see it in Preview.</p>
+  <h3>The feed shows nothing on my published site</h3>
+  <ul>
+    <li>Check that you published after inserting the feed.</li>
+    <li>On the Free plan, check that you are looking at your <code>*.webflow.io</code> address. On a custom domain, a Free feed shows nothing.</li>
+    <li>Check that your Webflow plan runs custom code (see <a href="#code">§6</a>).</li>
+    <li>Check that the Instagram account is still public.</li>
+  </ul>
+  <h3>A new post is not showing</h3>
+  <p>Feeds refresh on your plan's schedule, not instantly (see <a href="#sync">§7</a>). Press <b>Sync now</b> in the App to update it now. A Curated feed only shows the posts you picked.</p>
+
+  <h2 id="support">12. Support</h2>
+  <p>Email <a href="mailto:support@vanssay.net">support@vanssay.net</a> or use the <a href="contact">contact form</a>. Include your account email and the URL of the page with the feed. Pro and Lifetime get priority support.</p>
+
+  <div class="key">
+    <p><b>Not affiliated with Instagram or Webflow.</b> Social Feed is an independent product by Vanssay. It is not affiliated with, endorsed by, or sponsored by Instagram, Meta Platforms, Inc., or Webflow, Inc. Instagram is a trademark of Meta Platforms, Inc.</p>
+  </div>
+</main>
+<footer><a href="/">Vanssay</a> · <a href="social-feed">Social Feed for Webflow</a> · <a href="social-feed-terms">Terms</a> · <a href="social-feed-privacy">Privacy</a> · <a href="contact">Contact</a></footer>
+</body>
+</html>

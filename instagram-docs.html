@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Instagram Feed: Documentation | Vanssay</title>
-<meta name="description" content="How to install, set up and use the Instagram Feed app for Webflow and Framer: connect a handle, choose a layout, insert the feed and publish." />
+<meta name="description" content="How to install, set up and use the Instagram Feed plugin for Framer: connect a handle, choose a layout, insert the feed and publish." />
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
 <link rel="apple-touch-icon" href="/favicon-180.png" />
@@ -56,7 +56,7 @@ footer a{color:#71717a}
 
   <div class="lede">
     <p><b>What it does.</b> Instagram Feed puts a live Instagram feed on your website. You connect a public Instagram handle, pick one of seven layouts, and place the feed on your page. New posts then appear on the published site on their own, with no re-publishing and no manual updates.</p>
-    <p>It runs as a <b>Webflow App</b> (Designer Extension) and as a <b>Framer plugin</b>. The setup is the same on both; only the insert step differs, and both are covered below.</p>
+    <p>This page covers the <b>Framer plugin</b>. Using Webflow? The Webflow App is called <b>Social Feed - Vanssay</b> and has its own <a href="social-feed-docs">documentation</a>.</p>
   </div>
 
   <div class="toc">
@@ -77,15 +77,6 @@ footer a{color:#71717a}
 
   <h2 id="install">1. Installing</h2>
 
-  <h3>Webflow</h3>
-  <ol class="steps">
-    <li>Open your site in the <b>Webflow Designer</b>.</li>
-    <li>Open the <b>Apps</b> panel in the left toolbar.</li>
-    <li>Find <b>Instagram Feed</b> and click <b>Install</b>, then <b>Open</b>.</li>
-    <li>The app opens as a panel on the right side of the Designer.</li>
-  </ol>
-
-  <h3>Framer</h3>
   <ol class="steps">
     <li>Open your project in <b>Framer</b>.</li>
     <li>Open the <b>Plugins</b> menu and search for <b>Instagram Feed</b>.</li>
@@ -136,18 +127,6 @@ footer a{color:#71717a}
 
   <h2 id="insert">5. Inserting and publishing</h2>
 
-  <h3>Webflow</h3>
-  <ol class="steps">
-    <li>On the canvas, click the Section or the Body where the feed should go.</li>
-    <li>In the app panel, press <b>Insert</b>.</li>
-    <li>A labelled placeholder appears on the canvas. This is normal: the Webflow Designer cannot run scripts or load external images, so no feed renders real posts on the canvas.</li>
-    <li>Press <b>Publish</b> in Webflow. The real feed appears on your published site.</li>
-  </ol>
-  <div class="key">
-    <p><b>To also see the feed in Webflow Preview</b>, turn on <b>Site Settings → Custom Code → "Run custom code in Preview"</b>. This is a one-time setting per site.</p>
-  </div>
-
-  <h3>Framer</h3>
   <ol class="steps">
     <li>Press <b>Insert</b> in the plugin panel.</li>
     <li>The feed is added to your canvas as a code component and renders your posts directly.</li>
@@ -178,9 +157,6 @@ footer a{color:#71717a}
     <li>If you are on the free tier, check the site is on <code>*.webflow.io</code> or <code>*.framer.website</code>. On a custom domain a free feed does not render.</li>
     <li>Check whether you have passed your plan's monthly view limit. The app panel shows your usage.</li>
   </ul>
-
-  <h3>The feed shows a placeholder box in the Webflow Designer</h3>
-  <p>That is expected. The Designer canvas cannot execute JavaScript or load external images, so real posts only appear once you publish, or in Preview with "Run custom code in Preview" enabled.</p>
 
   <h3>New Instagram posts are not showing up</h3>
   <p>Feeds refresh on a schedule set by your plan rather than instantly. You can force an update with the manual refresh in the app panel. If the feed is set to curated rather than automatic, it shows only the posts you picked, and new posts will not be added on their own.</p>

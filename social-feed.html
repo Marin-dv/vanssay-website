@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Social Feed for Webflow | Vanssay</title>
+<meta name="description" content="Social Feed - Vanssay is a Webflow App that shows the Instagram posts of an account you own or manage on your Webflow site, in seven layouts." />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+<link rel="apple-touch-icon" href="/favicon-180.png" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#fafafa;color:#18181b;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:#0e7afe;text-decoration:none}a:hover{text-decoration:underline}
+nav{position:sticky;top:0;background:rgba(250,250,250,.85);backdrop-filter:blur(14px);border-bottom:1px solid #e4e4e7;z-index:5}
+.nav-in{max-width:1040px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;color:#18181b}
+.nav-links{display:flex;gap:18px;font-size:14px;font-weight:600}
+.nav-links a{color:#52525b}
+.wrap{max-width:1040px;margin:0 auto;padding:0 28px}
+.hero{padding:72px 0 56px;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.mark{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#f6913d,#e0457b 55%,#7452e0);display:grid;place-items:center;margin-bottom:22px}
+h1{font-size:46px;line-height:1.05;font-weight:900;letter-spacing:-.035em}
+.sub{font-size:18px;color:#52525b;margin:16px 0 26px;max-width:34em}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;height:44px;padding:0 20px;border-radius:10px;font-weight:700;font-size:15px}
+.btn.primary{background:#18181b;color:#fff}
+.btn.ghost{border:1px solid #d4d4d8;color:#18181b;background:#fff}
+.btn:hover{text-decoration:none;opacity:.9}
+.fine{font-size:13px;color:#a1a1aa;margin-top:14px}
+.canvas{background:#fff;border:1px solid #e4e4e7;border-radius:16px;padding:18px;box-shadow:0 20px 50px rgba(15,15,20,.08)}
+.canvas .bar{display:flex;gap:6px;margin-bottom:14px}.canvas .bar i{width:9px;height:9px;border-radius:50%;background:#e4e4e7}
+.ph{border:1px dashed #d4d4d8;background:#fafafa;border-radius:10px;padding:16px}
+.ph b{font-size:13.5px}.ph span{display:block;font-size:12.5px;color:#71717a;margin-top:4px}
+.arrow{text-align:center;color:#a1a1aa;font-size:12.5px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.grid div{aspect-ratio:1;border-radius:8px;background:linear-gradient(135deg,#dbe8ff,#e9e3ff)}
+.grid div:nth-child(2n){background:linear-gradient(135deg,#e9e3ff,#f3f4f6)}
+.grid div:nth-child(3n){background:linear-gradient(135deg,#f3f4f6,#dbe8ff)}
+section{padding:56px 0;border-top:1px solid #e4e4e7}
+h2{font-size:28px;font-weight:900;letter-spacing:-.02em;margin-bottom:8px}
+.lead{color:#52525b;margin-bottom:26px;max-width:42em}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:#fff;border:1px solid #e4e4e7;border-radius:14px;padding:20px}
+.card b{display:block;font-size:15.5px;margin-bottom:4px}
+.card p{font-size:14.5px;color:#52525b}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:s}
+.steps .card{counter-increment:s}
+.steps .card::before{content:counter(s);display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#18181b;color:#fff;font-size:13px;font-weight:700;margin-bottom:10px}
+.layouts{display:flex;flex-wrap:wrap;gap:8px}
+.layouts span{background:#fff;border:1px solid #e4e4e7;border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
+.plans{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.plan{background:#fff;border:1px solid #e4e4e7;border-radius:14px;padding:20px}
+.plan .n{font-weight:800}
+.plan .p{font-size:26px;font-weight:900;letter-spacing:-.02em;margin:4px 0 12px}
+.plan .p small{font-size:14px;font-weight:600;color:#71717a}
+.plan ul{list-style:none;font-size:14px;color:#52525b}
+.plan li{padding:5px 0;border-top:1px solid #f4f4f5}
+.note{background:#fff;border:1px solid #e4e4e7;border-left:3px solid #0e7afe;border-radius:10px;padding:14px 18px;margin-top:16px;font-size:14.5px;color:#52525b}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:4px;padding:1px 5px;color:#3f3f46}
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+footer{max-width:1040px;margin:0 auto;padding:36px 28px 60px;font-size:13.5px;color:#a1a1aa;border-top:1px solid #e4e4e7}
+footer a{color:#71717a}
+footer p+p{margin-top:8px}
+@media(max-width:860px){.hero{grid-template-columns:1fr;padding:48px 0 40px}.cards,.steps,.plans,.facts{grid-template-columns:1fr 1fr}h1{font-size:36px}}
+@media(max-width:560px){.wrap,.nav-in,footer{padding-left:16px;padding-right:16px}.cards,.steps,.plans,.facts{grid-template-columns:1fr}.nav-links a:not(:last-child){display:none}h1{font-size:31px}}
+</style>
+<script defer src="assets/track.js"></script>
+</head>
+<body>
+<nav><div class="nav-in"><a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a><div class="nav-links"><a href="#plans">Plans</a><a href="social-feed-docs">Documentation</a></div></div></nav>
+
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <div class="mark"><svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><g fill="#fff"><rect x="1.5" y="1.5" width="6" height="6" rx="1.5"/><rect x="9" y="1.5" width="6" height="6" rx="1.5" opacity=".82"/><rect x="16.5" y="1.5" width="6" height="6" rx="1.5" opacity=".64"/><rect x="1.5" y="9" width="6" height="6" rx="1.5" opacity=".82"/><rect x="9" y="9" width="6" height="6" rx="1.5" opacity=".64"/><rect x="16.5" y="9" width="6" height="6" rx="1.5" opacity=".82"/><rect x="1.5" y="16.5" width="6" height="6" rx="1.5" opacity=".64"/><rect x="9" y="16.5" width="6" height="6" rx="1.5" opacity=".82"/><rect x="16.5" y="16.5" width="6" height="6" rx="1.5"/></g></svg></div>
+      <h1>Social Feed - Vanssay, for Webflow</h1>
+      <p class="sub">Show the Instagram posts of an account you own or manage on your Webflow site. Pick one of seven layouts, place it from the Designer, publish. No Instagram login and no code to paste.</p>
+      <div class="cta">
+        <a class="btn primary" href="social-feed-docs#install">How to install</a>
+        <a class="btn ghost" href="#plans">See plans</a>
+      </div>
+      <p class="fine">Free on your <code>*.webflow.io</code> address. A free Vanssay account is needed to place a feed.</p>
+    </div>
+    <div class="canvas" aria-hidden="true">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <div class="ph"><b>Social Feed: Grid · @yourbrand</b><span>In the Designer: a labelled placeholder. The canvas does not run scripts.</span></div>
+      <div class="arrow">↓ after you publish</div>
+      <div class="grid"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    </div>
+  </div>
+</div>
+
+<section><div class="wrap">
+  <h2>How it works</h2>
+  <p class="lead">The posts are retrieved and stored on our servers, so your page only talks to one place and Instagram's expiring image links never break it.</p>
+  <div class="steps">
+    <div class="card"><b>Connect</b><p>Type the handle of an account you own or are authorized to represent, and preview it.</p></div>
+    <div class="card"><b>Choose a layout</b><p>Flip through all seven on your own posts before placing anything.</p></div>
+    <div class="card"><b>Insert</b><p>Authorize the App once per site. A labelled placeholder goes on your canvas.</p></div>
+    <div class="card"><b>Publish</b><p>The feed shows on your published site, in place of the placeholder.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Seven layouts</h2>
+  <p class="lead">Each one is built for posts, with a popup that shows the caption, date and video playback.</p>
+  <div class="layouts"><span>Profile</span><span>Grid</span><span>Slider</span><span>Aperture</span><span>Carousel</span><span>Marquee</span><span>Rainbow</span></div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>What it adds to your site</h2>
+  <p class="lead">One script, through Webflow's own Custom Code API. Nothing else.</p>
+  <div class="facts">
+    <div class="card"><b>Where</b><p>Your site's footer custom code, added only after you authorize the App and insert a feed. Your other custom code is left as it is.</p></div>
+    <div class="card"><b>What it loads</b><p>A fixed version of our script, with an integrity hash, plus the feed's posts and media. All from <code>api.vanssay.net</code>.</p></div>
+    <div class="card"><b>What it records</b><p>One view per page load for the feed's monthly count, and the site address. No cookies, no browser storage, nothing about the visitor.</p></div>
+    <div class="card"><b>How to remove it</b><p><b>Remove from this site</b> in the App takes the script out. Then delete the placeholders and publish. <a href="social-feed-docs#remove">Step by step</a>.</p></div>
+  </div>
+</div></section>
+
+<section id="plans"><div class="wrap">
+  <h2>Plans</h2>
+  <p class="lead">Feeds are not real-time: they show the posts from the last refresh, and how often that happens depends on the plan.</p>
+  <div class="plans">
+    <div class="plan"><div class="n">Free</div><div class="p">$0</div><ul><li><code>*.webflow.io</code> only</li><li>1 feed, 6 posts</li><li>Refresh by hand, once a day</li><li>No automatic refresh</li><li>10,000 views / month</li></ul></div>
+    <div class="plan"><div class="n">Starter</div><div class="p">$7.99<small> / month</small></div><ul><li>Any domain</li><li>1 feed, 18 posts</li><li>Daily automatic refresh</li><li>Curated picker</li><li>10,000 views / month</li></ul></div>
+    <div class="plan"><div class="n">Pro</div><div class="p">$17.99<small> / month</small></div><ul><li>Any domain</li><li>10 feeds, 18 posts each</li><li>Daily automatic refresh</li><li>Curated picker, priority support</li><li>50,000 views / month</li></ul></div>
+    <div class="plan"><div class="n">Lifetime</div><div class="p">$149<small> once</small></div><ul><li>Any domain</li><li>2 feeds, 12 posts each</li><li>Weekly automatic refresh</li><li>Curated picker, priority support</li><li>50,000 views / month</li></ul></div>
+  </div>
+  <div class="note">Starter and Pro start with a 7-day free trial that needs a card. Extra feeds are $29 one-time on Pro and Lifetime. Lifetime has its own <a href="social-feed-terms#lifetime">conditions</a>. On a custom domain, a Free feed shows nothing until you choose a paid plan.</div>
+</div></section>
+
+<footer>
+  <p><a href="social-feed-docs">Documentation</a> · <a href="social-feed-terms">Terms</a> · <a href="social-feed-privacy">Privacy</a> · <a href="contact">Contact</a> · <a href="mailto:support@vanssay.net">support@vanssay.net</a></p>
+  <p>Social Feed is an independent product by Vanssay. It is not affiliated with, endorsed by, or sponsored by Instagram, Meta Platforms, Inc., or Webflow, Inc. Instagram is a trademark of Meta Platforms, Inc.</p>
+</footer>
+</body>
+</html>

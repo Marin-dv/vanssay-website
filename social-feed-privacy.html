@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Social Feed Privacy | Vanssay</title>
+<meta name="description" content="Privacy policy for Social Feed - Vanssay, the Webflow App: what data it collects, where it goes, why, and how to remove it." />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+<link rel="apple-touch-icon" href="/favicon-180.png" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#fafafa;color:#18181b;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:#0e7afe;text-decoration:none}a:hover{text-decoration:underline}
+nav{position:sticky;top:0;background:rgba(250,250,250,.85);backdrop-filter:blur(14px);border-bottom:1px solid #e4e4e7;z-index:5}
+.nav-in{max-width:1140px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;color:#18181b}
+main{max-width:760px;margin:0 auto;padding:64px 28px 96px}
+h1{font-size:36px;font-weight:900;letter-spacing:-.02em}
+.date{color:#a1a1aa;font-size:14px;margin:8px 0 32px}
+h2{font-size:20px;font-weight:800;margin:36px 0 10px;scroll-margin-top:80px}
+p,li{color:#52525b;font-size:15px}
+p+p{margin-top:10px}
+ul{padding-left:22px;margin:8px 0}
+li{margin:4px 0}
+b{color:#18181b}
+.toc{background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:18px 22px;margin:0 0 40px}
+.toc b{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#a1a1aa}
+.toc ol{margin:10px 0 0;padding-left:20px;columns:2;font-size:14px}
+.toc a{color:#52525b}
+.scroll{overflow-x:auto;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
+th,td{border:1px solid #e4e4e7;padding:9px 11px;text-align:left;vertical-align:top}
+th{background:#f4f4f5;font-weight:700;color:#3f3f46}
+td{color:#52525b}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em;background:#f4f4f5;border:1px solid #e4e4e7;border-radius:4px;padding:1px 5px;color:#3f3f46}
+.callout{background:#fff;border:1px solid #e4e4e7;border-left:3px solid #0e7afe;border-radius:8px;padding:14px 18px;margin:14px 0}
+footer{max-width:760px;margin:0 auto;padding:0 28px 60px;font-size:13.5px;color:#a1a1aa}
+footer a{color:#71717a}
+@media(max-width:640px){.toc ol{columns:1}h1{font-size:29px}main{padding:44px 16px 72px}.nav-in{padding:0 16px}footer{padding:0 16px 48px}}
+</style>
+<script defer src="assets/track.js"></script>
+</head>
+<body>
+<nav><div class="nav-in"><a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a><a href="social-feed" style="font-size:14px;font-weight:600">Social Feed for Webflow →</a></div></nav>
+<main>
+  <h1>Social Feed: Privacy Policy</h1>
+  <p class="date">For the Webflow App "Social Feed - Vanssay". Last updated: October 17, 2026</p>
+
+  <div class="callout">
+    <p><b>The short version.</b> The App talks to one server, <code>api.vanssay.net</code>. We keep your account email, your feed settings, the Instagram content of the feeds you save, and an encrypted Webflow access token used only to add or remove our script. On your published site, each page load with a feed adds one to that feed's monthly view count and records which site it came from. We store nothing about your visitors: no cookies, no IP addresses, no identifiers.</p>
+  </div>
+
+  <div class="toc">
+    <b>Contents</b>
+    <ol>
+      <li><a href="#s1">Who we are and scope</a></li>
+      <li><a href="#s2">Data we collect from you</a></li>
+      <li><a href="#s3">Instagram content</a></li>
+      <li><a href="#s4">Your published site and its visitors</a></li>
+      <li><a href="#s5">Webflow authorization</a></li>
+      <li><a href="#s6">Why we use data, and legal bases</a></li>
+      <li><a href="#s7">Processors and transfers</a></li>
+      <li><a href="#s8">Retention and deletion</a></li>
+      <li><a href="#s9">Your rights</a></li>
+      <li><a href="#s10">Cookies and security</a></li>
+      <li><a href="#s11">Changes and contact</a></li>
+    </ol>
+  </div>
+
+  <h2 id="s1">1. Who we are and scope</h2>
+  <p>This policy covers <b>Social Feed - Vanssay</b> (the "App"): the Webflow Designer Extension, the script it adds to your published Webflow site, and the Vanssay servers behind them. The controller for your account data is <b>Marin de Vanssay</b>, sole trader (micro-entreprise), SIREN 107304735, France. Contact for any privacy request: <a href="mailto:support@vanssay.net">support@vanssay.net</a>.</p>
+  <p><b>Two roles.</b> For your account, billing and use of the App, we are the controller. For the requests your published site makes when a visitor views a page with your feed (§4), you are the controller of your site and we act as your processor.</p>
+
+  <h2 id="s2">2. Data we collect from you</h2>
+  <ul>
+    <li><b>Account data.</b> Your email address and a securely hashed password. We never store your password in plain text. The same Vanssay account works across Vanssay products.</li>
+    <li><b>Feed configuration.</b> For each feed you save: the Instagram handle, the layout and display settings you picked, and, in Curated mode, which posts you selected. Each feed also gets a random token, which your published site uses to load it.</li>
+    <li><b>Webflow authorization.</b> The IDs of the Webflow sites you authorize and an access token issued by Webflow. See §5.</li>
+    <li><b>Billing data.</b> Payments are processed by Stripe. We receive your plan, its status, and your country and tax details. We never see or store your card details.</li>
+    <li><b>App usage.</b> In the App we record which step you reached (opened, previewed, reached the plan screen, subscribed) against a random identifier generated in your browser, so we can see where people get stuck. It contains no IP address and no device fingerprint, is not shared with any advertising network, and clearing the App's site data removes it.</li>
+    <li><b>Support.</b> Emails you send us and their content.</li>
+  </ul>
+  <p>The App never reads your Webflow pages, your CMS or your site's content. The only part of your site it touches is its custom code, as described in §5.</p>
+
+  <h2 id="s3">3. Instagram content</h2>
+  <ul>
+    <li><b>What we retrieve.</b> The public profile of the Instagram account you connect (profile picture, name, biography, follower and post counts) and its posts (images, videos, captions, like and comment counts, dates). We retrieve it through <b>Apify</b>, a third-party data provider. We never ask for an Instagram password and never log in to Instagram as you.</li>
+    <li><b>Whose account.</b> You may connect only an account you own or are authorized to represent, and you must have the rights for its content to be retrieved, stored and displayed through the App (see the <a href="social-feed-terms#s5">Terms, §5</a>).</li>
+    <li><b>Previewing</b> a profile sends only the handle you typed. The result is kept in a short-lived cache and no media is stored.</li>
+    <li><b>Saved feeds.</b> For each feed you save, we cache its posts on our servers and download and store copies of its images and videos, because Instagram's own links expire after a few days. Your visitors' browsers load the media from our server and never contact Instagram to display your feed.</li>
+  </ul>
+
+  <h2 id="s4">4. Your published site and its visitors</h2>
+  <p>When a page with your feed is viewed, the visitor's browser makes these requests to <code>api.vanssay.net</code>, and only these:</p>
+  <div class="scroll"><table>
+    <tr><th>Request</th><th>Why</th><th>What is sent or recorded</th></tr>
+    <tr><td>Our script, <code>/instagram/embed/v/instagram-….js</code></td><td>The code that shows the feed. A fixed version, checked by an integrity hash</td><td>A standard file request. Nothing is recorded</td></tr>
+    <tr><td><code>/instagram/feed</code></td><td>Load the posts to display</td><td>The feed's random token. We add one to the feed's <b>monthly view count</b> (for your plan's limit) and record the <b>address of the site</b> it was viewed on (its origin, and the page path when the browser sends it), so we can apply the Free plan's <code>*.webflow.io</code> rule and show you where your feeds are live</td></tr>
+    <tr><td><code>/instagram/media/…</code></td><td>Load the images and videos</td><td>The media file requested. Nothing is recorded</td></tr>
+  </table></div>
+  <p>The token identifies <b>your feed</b>, not the visitor. No account ID or email is placed on your page. The script sets <b>no cookie</b> and writes nothing to <code>localStorage</code> or any other browser storage. It does not fingerprint the device and does not track the visitor across pages or sites. Counts are aggregate totals per feed: we cannot tell from them who visited or how many distinct people did.</p>
+  <p>Like any web server, ours sees the IP address of a browser that calls it in order to send the response. We use it only to answer and to apply anti-abuse rate limits. We do not store visitors' IP addresses against your feed and do not use them for analytics.</p>
+  <p>A data-processing addendum is available on request at <a href="mailto:support@vanssay.net">support@vanssay.net</a>.</p>
+
+  <h2 id="s5">5. Webflow authorization</h2>
+  <p>To add its script to your site, the App asks Webflow for access through Webflow's standard authorization screen. It requests three permissions, and uses each only as described:</p>
+  <ul>
+    <li><b>Sites (read):</b> to list the sites you authorized, so the App acts only on sites you control.</li>
+    <li><b>Custom code (read and write):</b> to register our one script, apply it to your site's footer, and remove it again, while leaving your other custom code as it is.</li>
+  </ul>
+  <p>We store the access token <b>encrypted</b> on our servers. It never reaches your browser or your published site, and it is never used for anything else. It ends when you uninstall the App in Webflow, which withdraws our access at once. Using <b>Remove from this site</b> in the App removes our script and deletes our record of that site, including the token.</p>
+
+  <h2 id="s6">6. Why we use data, and legal bases (GDPR Art. 6)</h2>
+  <div class="scroll"><table>
+    <tr><th>Purpose</th><th>Legal basis</th></tr>
+    <tr><td>Running your account, retrieving and showing your feeds, adding and removing the script</td><td>Performance of a contract</td></tr>
+    <tr><td>Payments, fraud prevention, tax and accounting</td><td>Contract and legal obligation</td></tr>
+    <tr><td>View counts for plan limits, the Free plan domain rule, App usage steps, security</td><td>Legitimate interest</td></tr>
+    <tr><td>Transactional emails (password reset, account and plan notices)</td><td>Contract and legitimate interest</td></tr>
+    <tr><td>Answering support requests</td><td>Legitimate interest</td></tr>
+  </table></div>
+  <p>We never sell or rent personal data and never use it for advertising.</p>
+
+  <h2 id="s7">7. Processors and transfers</h2>
+  <div class="scroll"><table>
+    <tr><th>Processor</th><th>Purpose</th><th>Location</th></tr>
+    <tr><td>Apify</td><td>Retrieving public Instagram profiles and posts</td><td>EU / USA</td></tr>
+    <tr><td>Stripe</td><td>Payments and billing</td><td>EU / USA</td></tr>
+    <tr><td>Brevo</td><td>Transactional email</td><td>EU</td></tr>
+    <tr><td>Hosting provider (VPS)</td><td>Our servers, database and stored media</td><td>EU</td></tr>
+  </table></div>
+  <p>Webflow, Inc. runs the platform the App works on. Your use of Webflow is governed by Webflow's own privacy policy. Where a processor is outside the EU/EEA, transfers rely on Standard Contractual Clauses or an adequacy decision.</p>
+
+  <h2 id="s8">8. Retention and deletion</h2>
+  <ul>
+    <li><b>Previews:</b> short-lived cache, typically up to 24 hours. No media stored.</li>
+    <li><b>Saved feeds:</b> posts and media are kept while the feed exists. Deleting a feed deletes its stored media, unless another account still has a feed for the same Instagram profile.</li>
+    <li><b>Webflow site ID and token:</b> deleted when you use Remove from this site, or when we detect that you uninstalled the App.</li>
+    <li><b>View counts and site addresses:</b> kept as running totals per feed while the feed exists.</li>
+    <li><b>Account and configuration:</b> kept while your account is active. Billing records are kept as long as the law requires (up to 10 years for accounting).</li>
+  </ul>
+  <p>To delete your account and its data, email <a href="mailto:support@vanssay.net">support@vanssay.net</a>. We do it within 30 days, except records we must keep by law.</p>
+
+  <h2 id="s9">9. Your rights</h2>
+  <p>Under the GDPR and similar laws you can ask to access, correct, erase, restrict or port your data, and object to processing. Email <a href="mailto:support@vanssay.net">support@vanssay.net</a>. You can also complain to a supervisory authority; in France, the <a href="https://www.cnil.fr" target="_blank" rel="noopener">CNIL</a>. If you visited a site that uses the App, the site's owner is the controller: contact them first, and they can instruct us.</p>
+
+  <h2 id="s10">10. Cookies and security</h2>
+  <p>The App and our account pages use only strictly necessary storage, such as your login session. The script on your published site sets no cookies and uses no browser storage on your visitors. Data travels over HTTPS, passwords are hashed, Webflow tokens are encrypted at rest, and access to our servers is restricted. If a breach affects you, we will tell you and the relevant authority as the law requires.</p>
+
+  <h2 id="s11">11. Changes and contact</h2>
+  <p>We may update this policy as the App changes. Material changes are announced on this page with a new date and, where significant, by email. Questions: <a href="mailto:support@vanssay.net">support@vanssay.net</a>.</p>
+  <p>The App is not affiliated with, endorsed by, or sponsored by Instagram, Meta Platforms, Inc., or Webflow, Inc.</p>
+</main>
+<footer><a href="/">Vanssay</a> · <a href="social-feed">Social Feed for Webflow</a> · <a href="social-feed-docs">Documentation</a> · <a href="social-feed-terms">Terms</a> · <a href="contact">Contact</a></footer>
+</body>
+</html>
