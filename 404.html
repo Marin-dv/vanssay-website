@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Page not found | Vanssay</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+<link rel="apple-touch-icon" href="/favicon-180.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<!-- Absolute paths everywhere: GitHub Pages serves this file at any missing URL, nested ones included. -->
+<link rel="stylesheet" href="/assets/home.css" />
+<style>
+  .nf{padding:170px 0 80px;min-height:calc(100vh - 140px)}
+  .nf-inner{position:relative;z-index:1;max-width:720px}
+  .nf-code{font-family:var(--disp);font-weight:800;font-size:clamp(88px,16vw,168px);line-height:.9;letter-spacing:-.04em;color:var(--ink)}
+  .nf-code span{color:var(--accent)}
+  .nf h1{margin-top:22px;font-size:clamp(30px,4.4vw,48px);line-height:1.05}
+  .nf .lede{margin-top:16px;font-size:16px;color:var(--ink-soft);max-width:520px}
+  .nf-path{font-family:var(--mono);font-size:13px;background:var(--surface-2);border-radius:6px;padding:2px 7px;word-break:break-all}
+  .nf .ctas{margin-top:30px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .nf-guess{margin-top:26px;font-size:15px;color:var(--ink-soft)}
+  .nf-guess a{color:var(--accent);font-weight:700}
+  .nf-list{margin-top:54px}
+  .nf-grid{margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:720px){.nf-grid{grid-template-columns:1fr 1fr}.nf{padding-top:140px}}
+  @media(max-width:420px){.nf-grid{grid-template-columns:1fr}}
+  .nf-link{display:flex;align-items:center;gap:10px;padding:13px 15px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);font-weight:600;font-size:14.5px;color:var(--ink);transition:border-color .18s ease,box-shadow .18s ease}
+  .nf-link:hover{border-color:var(--ink);box-shadow:var(--shadow-sm)}
+  .nf-link i{width:9px;height:9px;border-radius:50%;flex:none}
+</style>
+</head>
+<body>
+
+<div class="nav-shell">
+  <div class="nav" id="nav">
+    <a class="brand" href="/">
+      <svg width="24" height="24" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>
+      Vanssay
+    </a>
+    <div class="navlinks">
+      <div class="has-menu">
+        <span class="navlink" style="cursor:default">Plugins</span>
+        <div class="megamenu">
+          <div class="mm-group">
+            <span>Reviews &amp; social proof</span>
+            <a class="mm-item" href="/reviews">Reviews</a>
+            <a class="mm-item" href="/instagram">Instagram Feed</a>
+          </div>
+          <div class="mm-group">
+            <span>Access &amp; traffic control</span>
+            <a class="mm-item" href="/geoblock">Bouncer</a>
+            <a class="mm-item" href="/router">Router</a>
+          </div>
+          <div class="mm-group">
+            <span>Site status</span>
+            <a class="mm-item" href="/maintenance">Maintenance Mode</a>
+          </div>
+          <div class="mm-group" style="grid-column:1/-1;border-top:1px solid rgba(128,128,140,.22);padding-top:13px">
+            <span>Missing one?</span>
+            <a class="mm-item" href="/suggest">Suggest a plugin &rarr;</a>
+          </div>
+        </div>
+      </div>
+      <a class="navlink" href="/contact">Contact</a>
+    </div>
+    <div class="navcta">
+      <a href="/accounts" class="btn btn-primary btn-sm">Your account →</a>
+    </div>
+  </div>
+</div>
+
+<section class="hero nf">
+  <div class="hero-bg"><div class="glow"></div><div class="dotgrid"></div></div>
+  <div class="wrap nf-inner">
+    <p class="eyebrow">Error 404</p>
+    <div class="nf-code" aria-hidden="true">4<span>0</span>4</div>
+    <h1>This page took a <span class="acc">wrong turn.</span></h1>
+    <p class="lede">There is nothing at <span class="nf-path" id="nf-path">this address</span>. It may have moved, or the link has a typo.</p>
+    <p class="nf-guess" id="nf-guess" hidden></p>
+    <div class="ctas">
+      <a href="/" class="btn btn-primary">Back to home →</a>
+      <a href="/contact" class="btn btn-ghost">Report a broken link</a>
+    </div>
+
+    <div class="nf-list">
+      <p class="eyebrow">Or jump to</p>
+      <div class="nf-grid">
+        <a class="nf-link" href="/reviews"><i style="background:#2b50ff"></i>Reviews</a>
+        <a class="nf-link" href="/instagram"><i style="background:#e0457b"></i>Instagram Feed</a>
+        <a class="nf-link" href="/geoblock"><i style="background:#22c55e"></i>Bouncer</a>
+        <a class="nf-link" href="/router"><i style="background:#7c3aed"></i>Router</a>
+        <a class="nf-link" href="/maintenance"><i style="background:#0891b2"></i>Maintenance</a>
+        <a class="nf-link" href="/guides/"><i style="background:var(--ink)"></i>Guides</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <a class="brand" href="/" style="font-size:14.5px">
+      <svg width="19" height="19" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>
+      Vanssay
+    </a>
+    <div class="foot-links"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/guides/">Guides</a><a href="/suggest">Suggest a plugin</a><a href="mailto:support@vanssay.net">support@vanssay.net</a></div>
+    <span class="foot-copy">© 2026 Vanssay</span>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var path = decodeURIComponent(location.pathname);
+    document.getElementById('nf-path').textContent = path;
+
+    // Point at the page they most likely meant, from the words in the missing URL.
+    var pages = [
+      { href: '/reviews', name: 'Reviews', words: ['review', 'trustpilot', 'google', 'avis'] },
+      { href: '/instagram', name: 'Instagram Feed', words: ['instagram', 'insta', 'feed', 'social'] },
+      { href: '/geoblock', name: 'Bouncer', words: ['geoblock', 'bouncer', 'block', 'vpn', 'country'] },
+      { href: '/router', name: 'Router', words: ['router', 'redirect', 'route'] },
+      { href: '/maintenance', name: 'Maintenance Mode', words: ['maintenance', 'coming-soon'] },
+      { href: '/accounts', name: 'your account', words: ['account', 'login', 'billing', 'invoice', 'subscription'] },
+      { href: '/contact', name: 'Contact', words: ['contact', 'support', 'help'] },
+      { href: '/guides/', name: 'the guides', words: ['guide', 'docs', 'doc'] },
+      { href: '/privacy', name: 'Privacy', words: ['privacy', 'gdpr'] },
+      { href: '/terms', name: 'Terms', words: ['terms', 'legal'] }
+    ];
+    var p = path.toLowerCase();
+    for (var i = 0; i < pages.length; i++) {
+      for (var j = 0; j < pages[i].words.length; j++) {
+        if (p.indexOf(pages[i].words[j]) !== -1) {
+          var g = document.getElementById('nf-guess');
+          g.innerHTML = 'Looking for <a href="' + pages[i].href + '">' + pages[i].name + ' &rarr;</a>';
+          g.hidden = false;
+          return;
+        }
+      }
+    }
+  })();
+  (function(){
+    var nav = document.getElementById('nav');
+    var setNavState = function(){ nav.classList.toggle('scrolled', window.scrollY > 40); };
+    setNavState();
+    window.addEventListener('scroll', setNavState, { passive: true });
+  })();
+</script>
+</body>
+</html>

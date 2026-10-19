@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Marin de Vanssay</title>
+<meta name="description" content="Marin de Vanssay, solo developer in France. Framer and Webflow plugins (Vanssay) and Framefly, an AI agent that films demo videos of web apps." />
+<link rel="canonical" href="https://vanssay.net/marin" />
+<meta property="og:title" content="Marin de Vanssay" />
+<meta property="og:description" content="Solo dev. Framer & Webflow plugins, and Framefly." />
+<meta property="og:image" content="https://vanssay.net/assets/marin/reviews.webp" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+<script defer src="assets/track.js"></script>
+<style>
+  :root {
+    --bg: #fdfdfb;
+    --fg: #161616;
+    --dim: #6b6b6b;
+    --rule: #d8d8d4;
+    --link: #1d3fd8;
+    --mark: #fff3a8;
+    --live: #157f3b;
+    --soon: #9a6400;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111111;
+      --fg: #e6e6e3;
+      --dim: #8f8f8a;
+      --rule: #2f2f2c;
+      --link: #8aa4ff;
+      --mark: #3d3610;
+      --live: #4cc775;
+      --soon: #e0a640;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #111111; --fg: #e6e6e3; --dim: #8f8f8a; --rule: #2f2f2c;
+    --link: #8aa4ff; --mark: #3d3610; --live: #4cc775; --soon: #e0a640;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 15px/1.6 ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+  a { color: var(--link); text-underline-offset: 2px; }
+  a:hover { background: var(--mark); }
+  h1, h2, h3 { font-size: 15px; margin: 0; }
+  h1 { font-size: 20px; }
+  h2 { margin: 44px 0 12px; }
+  h2::before { content: "## "; color: var(--dim); }
+  h3::before { content: "### "; color: var(--dim); font-weight: normal; }
+  p { margin: 0 0 12px; }
+  hr { border: 0; border-top: 1px dashed var(--rule); margin: 32px 0; }
+  .dim { color: var(--dim); }
+  .links { margin-top: 12px; }
+  .links a { margin-right: 14px; white-space: nowrap; }
+  .links a::before { content: "["; color: var(--dim); }
+  .links a::after { content: "]"; color: var(--dim); }
+  pre {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--rule);
+    overflow-x: auto;
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .project { margin: 0 0 40px; }
+  .project h3 { display: inline; }
+  .tag { font-size: 12px; margin-left: 6px; }
+  .tag.live { color: var(--live); }
+  .tag.soon { color: var(--soon); }
+  .meta { font-size: 13px; color: var(--dim); margin: 2px 0 10px; }
+  .meta b { color: var(--fg); font-weight: normal; }
+  figure { margin: 12px 0 0; }
+  figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
+  figcaption { font-size: 12px; color: var(--dim); margin-top: 4px; }
+  ul { margin: 0 0 12px; padding-left: 22px; }
+  li { margin: 2px 0; }
+  footer { font-size: 12px; color: var(--dim); }
+  .cv-actions { font-size: 13px; }
+  .cv-actions a, .cv-actions button { margin-right: 14px; }
+  .cv-actions a::before, .cv-actions button::before { content: "["; color: var(--dim); }
+  .cv-actions a::after, .cv-actions button::after { content: "]"; color: var(--dim); }
+  button {
+    font: inherit; color: var(--link); background: none; border: 0; padding: 0;
+    cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+  }
+  button:hover { background: var(--mark); }
+  .cv a { display: block; }
+  .cv a:hover { background: none; }
+  .cv img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); background: #fff; cursor: zoom-in; }
+  .cv-exit { display: none; }
+  .cv:fullscreen { overflow-y: auto; background: #3a3a3a; padding: 24px 16px; }
+  .cv:fullscreen img { max-width: 1000px; margin: 0 auto; cursor: default; border: 0; }
+  .cv:fullscreen .cv-exit {
+    display: block; position: fixed; top: 12px; right: 16px;
+    color: #fff; background: #000; padding: 4px 10px; text-decoration: none;
+  }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <h1>Marin de Vanssay</h1>
+  <p class="dim" style="margin:2px 0 0">solo developer · nantes, france · engineering student at IMT Atlantique</p>
+  <nav class="links" aria-label="Links">
+    <a href="https://x.com/MarindeVanssay">x / twitter</a>
+    <a href="https://www.linkedin.com/in/marin-de-vanssay/">linkedin</a>
+    <a href="https://github.com/Marin-dv">github</a>
+    <a href="mailto:devanssay.marin@gmail.com">email</a>
+    <a href="/">vanssay.net</a>
+    <a href="https://framefly.app">framefly.app</a>
+  </nav>
+</header>
+
+<h2>cv</h2>
+<p class="cv-actions">
+  <button type="button" id="cv-full">view full screen</button>
+  <a href="assets/marin/marin-de-vanssay-cv.pdf" target="_blank" rel="noopener">pdf</a>
+  <a href="assets/marin/marin-de-vanssay-cv.pdf" download>download</a>
+</p>
+<div id="cv" class="cv">
+  <a href="assets/marin/marin-de-vanssay-cv.pdf" target="_blank" rel="noopener" id="cv-link">
+    <img src="assets/marin/cv.webp" alt="CV of Marin de Vanssay, one page" width="1656" height="2339" />
+  </a>
+  <button type="button" id="cv-exit" class="cv-exit">close [esc]</button>
+</div>
+
+<h2>about</h2>
+<p>I build and sell small web products on my own: plugins for Framer and Webflow sites under the name <a href="/">Vanssay</a>, and now <a href="https://framefly.app">Framefly</a>. I write the backend, the frontend, the billing and the marketing site, and I answer the support mail.</p>
+
+<h2>now</h2>
+<p>Getting <a href="https://framefly.app">Framefly</a> in front of beta testers. Posting what I build, and what it earns, on <a href="https://x.com/MarindeVanssay">X</a>.</p>
+
+<h2>projects</h2>
+
+<div class="project">
+  <h3>Framefly</h3><span class="tag soon">[private beta]</span>
+  <p class="meta">AI agent that films demo videos · <a href="https://framefly.app">framefly.app</a></p>
+  <p>You connect your web app and it gets explored once by an AI agent driving a real browser. From a short brief it then writes a script, films real actions in your app (no mockups), adds captions and music, and renders a demo or launch video. I built the agent, the render pipeline and the editor.</p>
+  <p class="meta"><b>stack:</b> react, zustand, motion, node/express render server, a browser agent on top of Claude</p>
+  <figure>
+    <img src="assets/marin/framefly.webp" alt="Framefly home screen with video templates" width="1200" height="675" loading="lazy" />
+    <figcaption>fig. 1: the app's home screen</figcaption>
+  </figure>
+</div>
+
+<div class="project">
+  <h3>Reviews</h3><span class="tag live">[live]</span>
+  <p class="meta">Framer plugin · <a href="https://www.framer.com/community/marketplace/plugins/vanssay-google-trustpilot-reviews/">marketplace</a> · <a href="reviews">site</a></p>
+  <p>Pulls a business's Google and Trustpilot reviews and drops them on a Framer site as a native component, with one rating averaged across both platforms. The widget matches the site's fonts and colors, and the reviews keep syncing server-side, so the site owner never handles an API key. The first Vanssay product, and the one that made the first sale (July 2026).</p>
+  <p class="meta"><b>stack:</b> typescript, express, prisma + postgres, react + vite (plugin), stripe, docker on a VPS</p>
+  <figure>
+    <img src="assets/marin/reviews.webp" alt="Reviews plugin inserting a carousel of Google reviews in the Framer editor" width="1200" height="639" loading="lazy" />
+    <figcaption>fig. 2: inserting a review carousel in the Framer editor</figcaption>
+  </figure>
+</div>
+
+<div class="project">
+  <h3>Instagram Feed</h3><span class="tag live">[live]</span>
+  <p class="meta">Framer plugin + Webflow app + web app · <a href="https://www.framer.com/community/marketplace/plugins/instagram-feed-vanssay/">marketplace</a> · <a href="https://instagram.vanssay.net">instagram.vanssay.net</a></p>
+  <p>Paste a public Instagram handle, pick one of seven layouts, and the feed lands on your site and keeps itself up to date. No Instagram login. Same backend behind three front ends: the Framer plugin, a Webflow app ("Social Feed"), and a web version that gives you one snippet for any site builder.</p>
+  <p class="meta"><b>stack:</b> typescript, express, prisma, zod, webflow-api, a scraping provider for the posts, preact embed script</p>
+  <figure>
+    <img src="assets/marin/instagram.webp" alt="Instagram Feed plugin start screen" width="1170" height="816" loading="lazy" />
+    <figcaption>fig. 3: the plugin's start screen</figcaption>
+  </figure>
+</div>
+
+<div class="project">
+  <h3>Bouncer</h3><span class="tag live">[live]</span>
+  <p class="meta">Framer plugin · <a href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">marketplace</a> · <a href="geoblock">site</a></p>
+  <p>Blocks visitors by country, or lets only some countries in, and spots VPN and proxy traffic. Blocked visitors get a block screen styled like the site. Countries are resolved from a local GeoIP database, so most checks never leave the server.</p>
+  <p class="meta"><b>stack:</b> typescript, express, prisma, maxmind db, a custom-code script injected into the published site</p>
+  <figure>
+    <img src="assets/marin/bouncer.webp" alt="Bouncer plugin country picker" width="1200" height="760" loading="lazy" />
+    <figcaption>fig. 4: picking countries to block</figcaption>
+  </figure>
+</div>
+
+<div class="project">
+  <h3>Router</h3><span class="tag live">[live]</span>
+  <p class="meta">Framer plugin · <a href="https://www.framer.com/community/marketplace/plugins/router-vanssay/">marketplace</a> · <a href="router">site</a></p>
+  <p>Sends each visitor to the right page by country, region, language, device or VPN, or just suggests it with a banner they can dismiss. Rules run top to bottom and are decided server-side, so they change without republishing the site.</p>
+  <p class="meta"><b>stack:</b> same engine as Bouncer, own service and database</p>
+  <figure>
+    <img src="assets/marin/router.webp" alt="Router plugin redirect rules list" width="1000" height="650" loading="lazy" />
+    <figcaption>fig. 5: redirect rules</figcaption>
+  </figure>
+</div>
+
+<div class="project">
+  <h3>Maintenance Mode</h3><span class="tag soon">[coming soon]</span>
+  <p class="meta">Framer plugin · <a href="maintenance">site</a></p>
+  <p>Puts a Framer site behind a maintenance page while you still see the real site from your own IP. On and off is a server-side switch, so it takes effect instantly, without a republish.</p>
+</div>
+
+<h3>smaller things</h3>
+<ul>
+  <li><a href="google-reviews-live">Google Reviews Live</a>: a single Framer code component, sold as a one-off download.</li>
+  <li>An admin dashboard for all products: signups, sales, usage, invoices.</li>
+</ul>
+
+<h2>how it's put together</h2>
+<p>Every product sits on one shared accounts service: one login across all of them, one Stripe setup, one invoice series. Each product is a small service of its own next to it.</p>
+<pre>
+framer / webflow editor ──► plugin ──┐
+published sites ─────► embed script ─┼──► nginx ─► product APIs (reviews, bouncer, router, ...)
+vanssay.net (static) ────────────────┘                 │
+                                                       └─► accounts: login + stripe billing
+                       one VPS · docker compose · postgres per service
+</pre>
+
+<hr />
+<footer>
+  <p>hand-written html, no framework · last updated 2026-10-19 · <a href="/">vanssay.net</a></p>
+</footer>
+
+</main>
+<script>
+  // Full screen where the browser allows it on an element; elsewhere (iPhone) the PDF opens in a new tab.
+  (function () {
+    var cv = document.getElementById("cv");
+    var pdf = document.getElementById("cv-link").href;
+    function open(e) {
+      if (!cv.requestFullscreen) return; // let the link open the PDF
+      if (e) e.preventDefault();
+      if (document.fullscreenElement) return;
+      cv.requestFullscreen().catch(function () { location.href = pdf; });
+    }
+    document.getElementById("cv-full").addEventListener("click", function () {
+      if (cv.requestFullscreen) open(); else window.open(pdf, "_blank", "noopener");
+    });
+    document.getElementById("cv-link").addEventListener("click", open);
+    document.getElementById("cv-exit").addEventListener("click", function () {
+      if (document.fullscreenElement) document.exitFullscreen();
+    });
+  })();
+</script>
+</body>
+</html>
