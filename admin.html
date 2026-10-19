@@ -1074,6 +1074,10 @@ async function renderExpenses() {
   const revMonth = rev ? rev.month.total : 0;
   const igMonth = ig ? ig.month.total : 0;
   const monthTotal = revMonth + igMonth;
+  // Apify's billing cycle runs 16th → 15th, so "this month" is that window.
+  const cm = (rev && rev.month.from ? rev.month : null) || (ig && ig.month.from ? ig.month : null);
+  const cycleDay = (s) => new Date(s + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+  const cycle = cm ? `${cycleDay(cm.from)} – ${cycleDay(cm.to)}` : "";
   const monthReq = tp.requests + gg.requests + igProf.requests + igPost.requests;
   const allTime = (rev ? rev.allTime.cost : 0) + (ig ? ig.allTime.cost : 0);
   const allReq = (rev ? rev.allTime.requests : 0) + (ig ? ig.allTime.requests : 0);
@@ -1109,7 +1113,7 @@ async function renderExpenses() {
 
   $("ex").innerHTML = `
     <div class="kpis">
-      <div class="kpi hero"><div class="k-label">Spend · this month</div><div class="k-val">${usd(monthTotal)}</div><div class="k-sub">${fmt(monthReq)} paid scrape(s) · ${esc((rev && rev.month.key) || (ig && ig.month.key) || "")}</div></div>
+      <div class="kpi hero"><div class="k-label">Spend · this month</div><div class="k-val">${usd(monthTotal)}</div><div class="k-sub">${fmt(monthReq)} paid scrape(s) · ${esc(cycle)}</div></div>
       <div class="kpi"><div class="k-label">⭐🔵 Reviews (month)</div><div class="k-val">${usd(revMonth)}</div><div class="k-sub">${fmt(tp.requests + gg.requests)} scrapes · ${fmt(tp.items + gg.items)} reviews</div></div>
       <div class="kpi"><div class="k-label">📸 Instagram (month)</div><div class="k-val">${usd(igMonth)}</div><div class="k-sub">${ig ? `${fmt(igProf.requests + igPost.requests)} scrapes · ${fmt(igProf.items + igPost.items)} items` : "unavailable"}</div></div>
       <div class="kpi"><div class="k-label">All-time spend</div><div class="k-val">${usd(allTime)}</div><div class="k-sub">${fmt(allReq)} scrapes total</div></div>
@@ -1117,14 +1121,14 @@ async function renderExpenses() {
     </div>
 
     <div class="grid-2" style="margin-bottom:16px">
-      <div class="panel"><h3>Monthly spend · last 12 months</h3>
+      <div class="panel"><h3>Spend per Apify cycle (16th → 15th) · last 12</h3>
         ${barChart(months.map((m) => ({ v: m.reviews + m.instagram, tip: `${m.month}: ${usd(m.reviews + m.instagram)} (Reviews ${usd(m.reviews)} · IG ${usd(m.instagram)})`, label: m.month.slice(5) })))}</div>
       <div class="panel"><h3>This month by source</h3>
         ${planRow("⭐ Trustpilot", tp.cost, monthTotal)}
         ${planRow("🔵 Google", gg.cost, monthTotal)}
         ${planRow("📸 IG profile", igProf.cost, monthTotal)}
         ${planRow("📸 IG post", igPost.cost, monthTotal)}
-        <div class="kv" style="margin-top:10px"><span>Total this month</span><strong>${usd(monthTotal)}</strong></div>
+        <div class="kv" style="margin-top:10px"><span>Total this cycle (${esc(cycle)})</span><strong>${usd(monthTotal)}</strong></div>
         <p class="note">Reviews cost is Apify's exact <span class="mono">usageTotalUsd</span> per run. Instagram is items × unit price${ig ? ` (${usd(ig.unitPrice.profile)}/profile item, ${usd(ig.unitPrice.post)}/post item)` : ""} — both actors bill per dataset item.</p></div>
     </div>
 
