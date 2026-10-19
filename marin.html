@@ -151,7 +151,6 @@
   <h3>Framefly</h3><span class="tag soon">[private beta]</span>
   <p class="meta">AI agent that films demo videos · <a href="https://framefly.app">framefly.app</a></p>
   <p>You connect your web app and it gets explored once by an AI agent driving a real browser. From a short brief it then writes a script, films real actions in your app (no mockups), adds captions and music, and renders a demo or launch video. I built the agent, the render pipeline and the editor.</p>
-  <p class="meta"><b>stack:</b> react, zustand, motion, node/express render server, a browser agent on top of Claude</p>
   <figure>
     <img src="assets/marin/framefly.webp" alt="Framefly home screen with video templates" width="1200" height="675" loading="lazy" />
     <figcaption>fig. 1: the app's home screen</figcaption>
@@ -162,7 +161,6 @@
   <h3>Reviews</h3><span class="tag live">[live]</span>
   <p class="meta">Framer plugin · <a href="https://www.framer.com/community/marketplace/plugins/vanssay-google-trustpilot-reviews/">marketplace</a> · <a href="reviews">site</a></p>
   <p>Pulls a business's Google and Trustpilot reviews and drops them on a Framer site as a native component, with one rating averaged across both platforms. The widget matches the site's fonts and colors, and the reviews keep syncing server-side, so the site owner never handles an API key. The first Vanssay product, and the one that made the first sale (July 2026).</p>
-  <p class="meta"><b>stack:</b> typescript, express, prisma + postgres, react + vite (plugin), stripe, docker on a VPS</p>
   <figure>
     <img src="assets/marin/reviews.webp" alt="Reviews plugin inserting a carousel of Google reviews in the Framer editor" width="1200" height="639" loading="lazy" />
     <figcaption>fig. 2: inserting a review carousel in the Framer editor</figcaption>
@@ -173,7 +171,6 @@
   <h3>Instagram Feed</h3><span class="tag live">[live]</span>
   <p class="meta">Framer plugin + Webflow app + web app · <a href="https://www.framer.com/community/marketplace/plugins/instagram-feed-vanssay/">marketplace</a> · <a href="https://instagram.vanssay.net">instagram.vanssay.net</a></p>
   <p>Paste a public Instagram handle, pick one of seven layouts, and the feed lands on your site and keeps itself up to date. No Instagram login. Same backend behind three front ends: the Framer plugin, a Webflow app ("Social Feed"), and a web version that gives you one snippet for any site builder.</p>
-  <p class="meta"><b>stack:</b> typescript, express, prisma, zod, webflow-api, a scraping provider for the posts, preact embed script</p>
   <figure>
     <img src="assets/marin/instagram.webp" alt="Instagram Feed plugin start screen" width="1170" height="816" loading="lazy" />
     <figcaption>fig. 3: the plugin's start screen</figcaption>
@@ -184,7 +181,6 @@
   <h3>Bouncer</h3><span class="tag live">[live]</span>
   <p class="meta">Framer plugin · <a href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">marketplace</a> · <a href="geoblock">site</a></p>
   <p>Blocks visitors by country, or lets only some countries in, and spots VPN and proxy traffic. Blocked visitors get a block screen styled like the site. Countries are resolved from a local GeoIP database, so most checks never leave the server.</p>
-  <p class="meta"><b>stack:</b> typescript, express, prisma, maxmind db, a custom-code script injected into the published site</p>
   <figure>
     <img src="assets/marin/bouncer.webp" alt="Bouncer plugin country picker" width="1200" height="760" loading="lazy" />
     <figcaption>fig. 4: picking countries to block</figcaption>
@@ -195,7 +191,6 @@
   <h3>Router</h3><span class="tag live">[live]</span>
   <p class="meta">Framer plugin · <a href="https://www.framer.com/community/marketplace/plugins/router-vanssay/">marketplace</a> · <a href="router">site</a></p>
   <p>Sends each visitor to the right page by country, region, language, device or VPN, or just suggests it with a banner they can dismiss. Rules run top to bottom and are decided server-side, so they change without republishing the site.</p>
-  <p class="meta"><b>stack:</b> same engine as Bouncer, own service and database</p>
   <figure>
     <img src="assets/marin/router.webp" alt="Router plugin redirect rules list" width="1000" height="650" loading="lazy" />
     <figcaption>fig. 5: redirect rules</figcaption>
@@ -226,7 +221,7 @@ vanssay.net (static) ────────────────┘        
 
 <hr />
 <footer>
-  <p>hand-written html, no framework · last updated 2026-10-19 · <a href="/">vanssay.net</a></p>
+  <p>plain html, no framework · last updated 2026-10-19 · <a href="/">vanssay.net</a></p>
 </footer>
 
 </main>
