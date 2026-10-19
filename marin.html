@@ -60,6 +60,10 @@
   hr { border: 0; border-top: 1px dashed var(--rule); margin: 32px 0; }
   .dim { color: var(--dim); }
   .links { margin-top: 12px; }
+  .email { margin: 6px 0 0; font-size: 14px; overflow-wrap: anywhere; }
+  .email span { user-select: all; }
+  .email button::before { content: "["; color: var(--dim); }
+  .email button::after { content: "]"; color: var(--dim); }
   .links a { margin-right: 14px; white-space: nowrap; }
   .links a::before { content: "["; color: var(--dim); }
   .links a::after { content: "]"; color: var(--dim); }
@@ -116,10 +120,10 @@
     <a href="https://x.com/MarindeVanssay">x / twitter</a>
     <a href="https://www.linkedin.com/in/marin-de-vanssay/">linkedin</a>
     <a href="https://github.com/Marin-dv">github</a>
-    <a href="mailto:marin-de-vanssay-de-blavous@imt-atlantique.net">email</a>
     <a href="/">vanssay.net</a>
     <a href="https://framefly.app">framefly.app</a>
   </nav>
+  <p class="email">email: <span id="email">marin-de-vanssay-de-blavous@imt-atlantique.net</span> <button type="button" id="email-copy">copy</button></p>
 </header>
 
 <h2>cv</h2>
@@ -243,6 +247,34 @@ vanssay.net (static) ────────────────┘        
     document.getElementById("cv-link").addEventListener("click", open);
     document.getElementById("cv-exit").addEventListener("click", function () {
       if (document.fullscreenElement) document.exitFullscreen();
+    });
+  })();
+
+  // Copy the address; when the clipboard is unavailable, select it so it can be copied by hand.
+  (function () {
+    var btn = document.getElementById("email-copy");
+    var addr = document.getElementById("email");
+    function done(label) {
+      btn.textContent = label;
+      setTimeout(function () { btn.textContent = "copy"; }, 1600);
+    }
+    function select() {
+      var r = document.createRange();
+      r.selectNodeContents(addr);
+      var s = window.getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
+    }
+    btn.addEventListener("click", function () {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(addr.textContent).then(
+          function () { done("copied"); },
+          function () { select(); done("selected"); }
+        );
+      } else {
+        select();
+        done("selected");
+      }
     });
   })();
 </script>
