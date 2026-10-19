@@ -213,9 +213,9 @@
 <p>Every product sits on one shared accounts service: one login across all of them, one Stripe setup, one invoice series. Each product is a small service of its own next to it.</p>
 <pre>
 framer / webflow editor ──► plugin ──┐
-published sites ─────► embed script ─┼──► nginx ─► product APIs (reviews, bouncer, router, ...)
-vanssay.net (static) ────────────────┘                 │
-                                                       └─► accounts: login + stripe billing
+published sites ─────► embed script ─┼──► product APIs (reviews, bouncer, router, ...)
+vanssay.net (static) ────────────────┘       │
+                                             └─► accounts: login + stripe billing
                        one VPS · docker compose · postgres per service
 </pre>
 
