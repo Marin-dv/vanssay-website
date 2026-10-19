@@ -226,7 +226,7 @@ vanssay.net (static) ────────────────┘       �
 
 <div class="project">
   <h3>Contact-based 3D scanner</h3><span class="tag">[2024–2025]</span>
-  <p class="meta">TIPE at Fénelon Sainte-Marie (CPGE, Paris) · team of 3 · <a href="assets/marin/tipe-3d-scanner.pdf" target="_blank" rel="noopener">slides</a> (in French)</p>
+  <p class="meta">TIPE at Fénelon Sainte-Marie (CPGE, Paris) · team of 3 · <a href="assets/marin/tipe-3d-scanner.pdf" target="_blank" rel="noopener">slides</a> (in French) · <a href="https://github.com/Marin-dv/tipe-3d-scanner">code</a></p>
   <p>A home-made 3D scanner modelled on an atomic force microscope. A tip rides over the object and tilts a mirror; a laser bounces off the mirror onto a row of six photodiodes, and which one lights up gives the height at that point. Stepper motors move the object under the tip point by point, on a wooden frame driven by two Arduinos that signal each other.</p>
   <p>Heights are calibrated against a reference ramp with k-nearest neighbours, then drawn as a triangle mesh in OpenGL. A scan takes 4 to 5 hours for about 15,000 points, with a measured uncertainty of 180 µm. I wrote most of the code, in C.</p>
   <figure class="pair">
