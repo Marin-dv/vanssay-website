@@ -154,22 +154,15 @@
 </header>
 
 <nav class="toc" id="toc" aria-label="Sections">
-  <a href="#about"><span class="n">01</span>about</a>
-  <a href="#cv-section"><span class="n">02</span>cv</a>
-  <a href="#code"><span class="n">03</span>code I wrote</a>
-  <a href="#vanssay"><span class="n">04</span>vanssay</a>
+  <a href="#cv-section"><span class="n">01</span>cv</a>
+  <a href="#about"><span class="n">02</span>about</a>
+  <a href="#vanssay"><span class="n">03</span>vanssay</a>
+  <a href="#code"><span class="n">04</span>code I wrote</a>
   <a href="#in-progress"><span class="n">05</span>in progress</a>
 </nav>
 
-<section id="about">
-<h2><span class="n">01</span>about</h2>
-<p class="lede">Who I am and what I'm on right now.</p>
-<p>Engineering student at IMT Atlantique. I like building things that work end to end: a line-following robot, a home-made 3D scanner, a COVID risk calculator, and a set of web products I run on my own under the name <a href="/">Vanssay</a>, from the backend and billing to the support mail.</p>
-<p><b>Right now:</b> getting <a href="https://framefly.app">Framefly</a> in front of beta testers. Posting what I build, and what it earns, on <a href="https://x.com/MarindeVanssay">X</a>.</p>
-</section>
-
 <section id="cv-section">
-<h2><span class="n">02</span>cv</h2>
+<h2><span class="n">01</span>cv</h2>
 <p class="lede">One page. Click it to read it full screen.</p>
 <p class="cv-actions">
   <button type="button" id="cv-full">view full screen</button>
@@ -184,48 +177,15 @@
 </div>
 </section>
 
-<section id="code">
-<h2><span class="n">03</span>code I wrote</h2>
-<p class="lede">School and personal projects where the code is mine, newest first.</p>
-
-<div class="project">
-  <h3>LethalBOT</h3><span class="tag">[2025–2026]</span>
-  <p class="meta">PRONTO project, IMT Atlantique · team of 5 · <a href="https://lethalbot.pages.dev/">project site</a> · <a href="https://github.com/Marin-dv/lethalbot">code</a></p>
-  <p>A transport robot that carries a 2 kg load along a black line, guided only by a 40 × 30 pixel camera, on a Raspberry Pi Pico W. I wrote all of its code. Each row of the image gets its own black/white threshold, a linear regression through the black pixels gives the line's offset and angle, and both steer the two wheels.</p>
-  <p>The gear motors stall below about 20% power, so the final version drives them in 150 ms pulses (macro-PWM) and measures that dead zone itself at start-up with the wheel encoders. CircuitPython, with an OLED status screen and a PC tool to watch the camera feed over USB.</p>
-  <figure class="pair">
-    <img src="assets/marin/lethalbot-robot.webp" alt="The finished LethalBOT on a scale reading 1.778 kg" width="562" height="1000" loading="lazy" />
-    <img src="assets/marin/lethalbot-wiring.webp" alt="Raspberry Pi Pico W wired to the camera on a breadboard" width="700" height="933" loading="lazy" />
-    <figcaption>fig. 1: the finished robot, 1.78 kg &nbsp;·&nbsp; fig. 2: the Pico W wired to the camera</figcaption>
-  </figure>
-</div>
-
-<div class="project">
-  <h3>Contact-based 3D scanner</h3><span class="tag">[2024–2025]</span>
-  <p class="meta">TIPE at Fénelon Sainte-Marie (CPGE, Paris) · team of 3 · <a href="assets/marin/tipe-3d-scanner.pdf" target="_blank" rel="noopener">slides</a> (in French) · <a href="https://github.com/Marin-dv/tipe-3d-scanner">code</a></p>
-  <p>A home-made 3D scanner modelled on an atomic force microscope. A tip rides over the object and tilts a mirror; a laser bounces off the mirror onto a row of six photodiodes, and which one lights up gives the height at that point. Stepper motors move the object under the tip point by point, on a wooden frame driven by two Arduinos that signal each other.</p>
-  <p>Heights are calibrated against a reference ramp with k-nearest neighbours, then drawn as a triangle mesh in OpenGL. A scan takes 4 to 5 hours for about 15,000 points, with a measured uncertainty of 180 µm. I wrote most of the code, in C.</p>
-  <figure class="pair">
-    <img src="assets/marin/tipe-build.webp" alt="3D sketch and photo of the wooden scanner frame with motors, tip, photodiodes and laser" width="848" height="1035" loading="lazy" />
-    <img src="assets/marin/tipe-scan.webp" alt="Scanned mesh of LEGO bricks above a 3D model of the same bricks" width="780" height="945" loading="lazy" />
-    <figcaption>fig. 3: the scanner, sketch and real build &nbsp;·&nbsp; fig. 4: a scan of LEGO bricks (top) against a model of the real bricks (bottom)</figcaption>
-  </figure>
-</div>
-
-<div class="project">
-  <h3>RoomSafe</h3><span class="tag">[2021–2022]</span>
-  <p class="meta">European School of Brussels I · team of 2 · 3rd place, International Science Festival of European Schools · <a href="https://github.com/Marin-dv/roomsafe">code</a></p>
-  <p>A web app that estimates the risk of COVID-19 airborne transmission at an indoor event before it happens. The host enters the room size, ventilation, filtration, humidity, guest count, duration and mask use, and gets a score out of 10 plus a graph of how many guests, for how long, stay in the safe zone. Guests can then join the event with their own details and the score updates.</p>
-  <p>The risk model treats the room air as well mixed: virus-carrying droplets build up from an infectious guest and are removed by ventilation, filtration, settling to the floor and the virus decaying over time. Built with Python, Flask and SQLite.</p>
-  <figure>
-    <img src="assets/marin/roomsafe-score.webp" alt="RoomSafe event page with a score of 8 out of 10 and a graph of safe guest counts against duration" width="1000" height="587" loading="lazy" />
-    <figcaption>fig. 5: an event's RoomSafe Score, with the safe zone in green</figcaption>
-  </figure>
-</div>
+<section id="about">
+<h2><span class="n">02</span>about</h2>
+<p class="lede">Who I am and what I'm on right now.</p>
+<p>Engineering student at IMT Atlantique. I like building things that work end to end: a line-following robot, a home-made 3D scanner, a COVID risk calculator, and a set of web products I run on my own under the name <a href="/">Vanssay</a>, from the backend and billing to the support mail.</p>
+<p><b>Right now:</b> getting <a href="https://framefly.app">Framefly</a> in front of beta testers. Posting what I build, and what it earns, on <a href="https://x.com/MarindeVanssay">X</a>.</p>
 </section>
 
 <section id="vanssay">
-<h2><span class="n">04</span>vanssay</h2>
+<h2><span class="n">03</span>vanssay</h2>
 <p class="lede">Framer and Webflow plugins I build and run on my own. I chose how they are structured and built them with AI coding assistants. Production is mine (the VPS, Docker containers, deploys, databases, backups), and so is the customer side: billing, invoices, support mail, marketplace submissions.</p>
 
 <div class="project">
@@ -234,7 +194,7 @@
   <p>Pulls a business's Google and Trustpilot reviews and drops them on a Framer site as a native component, with one rating averaged across both platforms. The widget matches the site's fonts and colors, and the reviews keep syncing server-side, so the site owner never handles an API key. The first Vanssay product, and the one that made the first sale (July 2026).</p>
   <figure>
     <img src="assets/marin/reviews.webp" alt="Reviews plugin layout step, previewing a shop's Google reviews in a Feature layout, reviewer names blurred" width="1200" height="826" loading="lazy" />
-    <figcaption>fig. 6: picking a layout for a shop's real Google reviews (names blurred)</figcaption>
+    <figcaption>fig. 1: picking a layout for a shop's real Google reviews (names blurred)</figcaption>
   </figure>
 </div>
 
@@ -244,7 +204,7 @@
   <p>Paste a public Instagram handle, pick one of seven layouts, and the feed lands on your site and keeps itself up to date. No Instagram login. Same backend behind three front ends: the Framer plugin, a Webflow app ("Social Feed"), and a web version that gives you one snippet for any site builder.</p>
   <figure>
     <img src="assets/marin/instagram.webp" alt="Instagram Feed plugin start screen" width="1170" height="816" loading="lazy" />
-    <figcaption>fig. 7: the plugin's start screen</figcaption>
+    <figcaption>fig. 2: the plugin's start screen</figcaption>
   </figure>
 </div>
 
@@ -254,7 +214,7 @@
   <p>Blocks visitors by country, or lets only some countries in, and spots VPN and proxy traffic. Blocked visitors get a block screen styled like the site. Countries are resolved from a local GeoIP database, so most checks never leave the server.</p>
   <figure>
     <img src="assets/marin/bouncer.webp" alt="Bouncer plugin country picker" width="1200" height="760" loading="lazy" />
-    <figcaption>fig. 8: picking countries to block</figcaption>
+    <figcaption>fig. 3: picking countries to block</figcaption>
   </figure>
 </div>
 
@@ -264,7 +224,7 @@
   <p>Sends each visitor to the right page by country, region, language, device or VPN, or just suggests it with a banner they can dismiss. Rules run top to bottom and are decided server-side, so they change without republishing the site.</p>
   <figure>
     <img src="assets/marin/router.webp" alt="Router plugin redirect rules list" width="1000" height="650" loading="lazy" />
-    <figcaption>fig. 9: redirect rules</figcaption>
+    <figcaption>fig. 4: redirect rules</figcaption>
   </figure>
 </div>
 
@@ -283,6 +243,46 @@ vanssay.net (static) ────────────────┘       �
                                              └─► accounts: login + stripe billing
                        one VPS · docker compose · postgres per service
 </pre>
+</section>
+
+<section id="code">
+<h2><span class="n">04</span>code I wrote</h2>
+<p class="lede">School and personal projects where the code is mine, newest first.</p>
+
+<div class="project">
+  <h3>LethalBOT</h3><span class="tag">[2025–2026]</span>
+  <p class="meta">PRONTO project, IMT Atlantique · team of 5 · <a href="https://lethalbot.pages.dev/">project site</a> · <a href="https://github.com/Marin-dv/lethalbot">code</a></p>
+  <p>A transport robot that carries a 2 kg load along a black line, guided only by a 40 × 30 pixel camera, on a Raspberry Pi Pico W. I wrote all of its code. Each row of the image gets its own black/white threshold, a linear regression through the black pixels gives the line's offset and angle, and both steer the two wheels.</p>
+  <p>The gear motors stall below about 20% power, so the final version drives them in 150 ms pulses (macro-PWM) and measures that dead zone itself at start-up with the wheel encoders. CircuitPython, with an OLED status screen and a PC tool to watch the camera feed over USB.</p>
+  <figure class="pair">
+    <img src="assets/marin/lethalbot-robot.webp" alt="The finished LethalBOT on a scale reading 1.778 kg" width="562" height="1000" loading="lazy" />
+    <img src="assets/marin/lethalbot-wiring.webp" alt="Raspberry Pi Pico W wired to the camera on a breadboard" width="700" height="933" loading="lazy" />
+    <figcaption>fig. 5: the finished robot, 1.78 kg &nbsp;·&nbsp; fig. 6: the Pico W wired to the camera</figcaption>
+  </figure>
+</div>
+
+<div class="project">
+  <h3>Contact-based 3D scanner</h3><span class="tag">[2024–2025]</span>
+  <p class="meta">TIPE at Fénelon Sainte-Marie (CPGE, Paris) · team of 3 · <a href="assets/marin/tipe-3d-scanner.pdf" target="_blank" rel="noopener">slides</a> (in French) · <a href="https://github.com/Marin-dv/tipe-3d-scanner">code</a></p>
+  <p>A home-made 3D scanner modelled on an atomic force microscope. A tip rides over the object and tilts a mirror; a laser bounces off the mirror onto a row of six photodiodes, and which one lights up gives the height at that point. Stepper motors move the object under the tip point by point, on a wooden frame driven by two Arduinos that signal each other.</p>
+  <p>Heights are calibrated against a reference ramp with k-nearest neighbours, then drawn as a triangle mesh in OpenGL. A scan takes 4 to 5 hours for about 15,000 points, with a measured uncertainty of 180 µm. I wrote most of the code, in C.</p>
+  <figure class="pair">
+    <img src="assets/marin/tipe-build.webp" alt="3D sketch and photo of the wooden scanner frame with motors, tip, photodiodes and laser" width="848" height="1035" loading="lazy" />
+    <img src="assets/marin/tipe-scan.webp" alt="Scanned mesh of LEGO bricks above a 3D model of the same bricks" width="780" height="945" loading="lazy" />
+    <figcaption>fig. 7: the scanner, sketch and real build &nbsp;·&nbsp; fig. 8: a scan of LEGO bricks (top) against a model of the real bricks (bottom)</figcaption>
+  </figure>
+</div>
+
+<div class="project">
+  <h3>RoomSafe</h3><span class="tag">[2021–2022]</span>
+  <p class="meta">European School of Brussels I · team of 2 · 3rd place, International Science Festival of European Schools · <a href="https://github.com/Marin-dv/roomsafe">code</a></p>
+  <p>A web app that estimates the risk of COVID-19 airborne transmission at an indoor event before it happens. The host enters the room size, ventilation, filtration, humidity, guest count, duration and mask use, and gets a score out of 10 plus a graph of how many guests, for how long, stay in the safe zone. Guests can then join the event with their own details and the score updates.</p>
+  <p>The risk model treats the room air as well mixed: virus-carrying droplets build up from an infectious guest and are removed by ventilation, filtration, settling to the floor and the virus decaying over time. Built with Python, Flask and SQLite.</p>
+  <figure>
+    <img src="assets/marin/roomsafe-score.webp" alt="RoomSafe event page with a score of 8 out of 10 and a graph of safe guest counts against duration" width="1000" height="587" loading="lazy" />
+    <figcaption>fig. 9: an event's RoomSafe Score, with the safe zone in green</figcaption>
+  </figure>
+</div>
 </section>
 
 <section id="in-progress">
