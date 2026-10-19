@@ -110,6 +110,16 @@
   figure { margin: 12px 0 0; }
   figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
   figcaption { font-size: 12px; color: var(--dim); margin-top: 4px; }
+  figure img { cursor: zoom-in; }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 20;
+    display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    padding: 48px 16px 16px; background: rgba(0, 0, 0, .92); cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { display: block; max-width: 100%; max-height: calc(100vh - 110px); width: auto; height: auto; }
+  .lightbox p { margin: 0; max-width: 760px; font-size: 13px; color: #c8c8c4; text-align: center; }
+  .lightbox button { position: fixed; top: 12px; right: 16px; color: #fff; background: #000; padding: 4px 10px; text-decoration: none; }
   /* Each figure grows by its image's width/height ratio, so both photos come out the same height. */
   .pair { display: flex; gap: 8px; align-items: flex-start; margin: 12px 0 0; }
   .pair figure { margin: 0; min-width: 0; flex: var(--r) 1 0; }
@@ -323,7 +333,38 @@ vanssay.net (static) ────────────────┘       �
 </footer>
 
 </main>
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image, full screen">
+  <button type="button">close [esc]</button>
+  <img alt="" />
+  <p></p>
+</div>
 <script>
+  // Open any project image full screen with its caption; a click anywhere or Esc closes it.
+  (function () {
+    var box = document.getElementById("lightbox");
+    var big = box.querySelector("img");
+    var cap = box.querySelector("p");
+    function close() {
+      box.classList.remove("open");
+      document.documentElement.style.overflow = "";
+      big.removeAttribute("src");
+    }
+    document.querySelectorAll("figure img").forEach(function (img) {
+      img.addEventListener("click", function () {
+        var fc = img.closest("figure").querySelector("figcaption");
+        big.src = img.currentSrc || img.src;
+        big.alt = img.alt;
+        cap.textContent = fc ? fc.textContent : "";
+        box.classList.add("open");
+        document.documentElement.style.overflow = "hidden";
+      });
+    });
+    box.addEventListener("click", close);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && box.classList.contains("open")) close();
+    });
+  })();
+
   // Full screen where the browser allows it on an element; elsewhere (iPhone) the PDF opens in a new tab.
   (function () {
     var cv = document.getElementById("cv");
