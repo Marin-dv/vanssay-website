@@ -206,8 +206,26 @@
   <p>Puts a Framer site behind a maintenance page while you still see the real site from your own IP. On and off is a server-side switch, so it takes effect instantly, without a republish.</p>
 </div>
 
+<h3>smaller things</h3>
+<ul>
+  <li><a href="google-reviews-live">Google Reviews Live</a>: a single Framer code component, sold as a one-off download.</li>
+  <li>An admin dashboard for all products: signups, sales, usage, invoices.</li>
+</ul>
+
+<h3>how the vanssay products are put together</h3>
+<p>Every product sits on one shared accounts service: one login across all of them, one Stripe setup, one invoice series. Each product is a small service of its own next to it.</p>
+<pre>
+framer / webflow editor ──► plugin ──┐
+published sites ─────► embed script ─┼──► product APIs (reviews, bouncer, router, ...)
+vanssay.net (static) ────────────────┘       │
+                                             └─► accounts: login + stripe billing
+                       one VPS · docker compose · postgres per service
+</pre>
+
+<h2>school projects</h2>
+
 <div class="project">
-  <h3>Contact-based 3D scanner</h3><span class="tag">[school project, 2024–2025]</span>
+  <h3>Contact-based 3D scanner</h3><span class="tag">[2024–2025]</span>
   <p class="meta">TIPE at Fénelon Sainte-Marie (CPGE, Paris) · team of 3 · <a href="assets/marin/tipe-3d-scanner.pdf" target="_blank" rel="noopener">slides</a> (in French)</p>
   <p>A home-made 3D scanner modelled on an atomic force microscope. A tip rides over the object and tilts a mirror; a laser bounces off the mirror onto a row of six photodiodes, and which one lights up gives the height at that point. Stepper motors move the object under the tip point by point, on a wooden frame driven by two Arduinos that signal each other.</p>
   <p>Heights are calibrated against a reference ramp with k-nearest neighbours, then drawn as a triangle mesh in OpenGL. A scan takes 4 to 5 hours for about 15,000 points, with a measured uncertainty of 180 µm. I wrote most of the code, in C.</p>
@@ -217,22 +235,6 @@
     <figcaption>fig. 6: the scanner, sketch and real build &nbsp;·&nbsp; fig. 7: a scan of LEGO bricks (top) against a model of the real bricks (bottom)</figcaption>
   </figure>
 </div>
-
-<h3>smaller things</h3>
-<ul>
-  <li><a href="google-reviews-live">Google Reviews Live</a>: a single Framer code component, sold as a one-off download.</li>
-  <li>An admin dashboard for all products: signups, sales, usage, invoices.</li>
-</ul>
-
-<h2>how it's put together</h2>
-<p>Every product sits on one shared accounts service: one login across all of them, one Stripe setup, one invoice series. Each product is a small service of its own next to it.</p>
-<pre>
-framer / webflow editor ──► plugin ──┐
-published sites ─────► embed script ─┼──► product APIs (reviews, bouncer, router, ...)
-vanssay.net (static) ────────────────┘       │
-                                             └─► accounts: login + stripe billing
-                       one VPS · docker compose · postgres per service
-</pre>
 
 <hr />
 <footer>
