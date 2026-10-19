@@ -143,86 +143,24 @@
 </div>
 
 <h2>about</h2>
-<p>I build and sell small web products on my own: plugins for Framer and Webflow sites under the name <a href="/">Vanssay</a>, and now <a href="https://framefly.app">Framefly</a>. I write the backend, the frontend, the billing and the marketing site, and I answer the support mail.</p>
+<p>Engineering student at IMT Atlantique. I like building things that work end to end: a line-following robot, a home-made 3D scanner, a COVID risk calculator, and a set of web products I run on my own under the name <a href="/">Vanssay</a>, from the backend and billing to the support mail.</p>
 
 <h2>now</h2>
 <p>Getting <a href="https://framefly.app">Framefly</a> in front of beta testers. Posting what I build, and what it earns, on <a href="https://x.com/MarindeVanssay">X</a>.</p>
 
-<h2>projects</h2>
+<h2>code I wrote</h2>
 
 <div class="project">
-  <h3>Framefly</h3><span class="tag soon">[private beta]</span>
-  <p class="meta">AI agent that films demo videos · <a href="https://framefly.app">framefly.app</a></p>
-  <p>You connect your web app and it gets explored once by an AI agent driving a real browser. From a short brief it then writes a script, films real actions in your app (no mockups), adds captions and music, and renders a demo or launch video. I built the agent, the render pipeline and the editor.</p>
-  <figure>
-    <img src="assets/marin/framefly.webp" alt="Framefly home screen with video templates" width="1200" height="675" loading="lazy" />
-    <figcaption>fig. 1: the app's home screen</figcaption>
+  <h3>LethalBOT</h3><span class="tag">[2025–2026]</span>
+  <p class="meta">PRONTO project, IMT Atlantique · team of 5 · <a href="https://lethalbot.pages.dev/">project site</a> · <a href="https://github.com/Marin-dv/lethalbot">code</a></p>
+  <p>A transport robot that carries a 2 kg load along a black line, guided only by a 40 × 30 pixel camera, on a Raspberry Pi Pico W. I wrote all of its code. Each row of the image gets its own black/white threshold, a linear regression through the black pixels gives the line's offset and angle, and both steer the two wheels.</p>
+  <p>The gear motors stall below about 20% power, so the final version drives them in 150 ms pulses (macro-PWM) and measures that dead zone itself at start-up with the wheel encoders. CircuitPython, with an OLED status screen and a PC tool to watch the camera feed over USB.</p>
+  <figure class="pair">
+    <img src="assets/marin/lethalbot-robot.webp" alt="The finished LethalBOT on a scale reading 1.778 kg" width="562" height="1000" loading="lazy" />
+    <img src="assets/marin/lethalbot-wiring.webp" alt="Raspberry Pi Pico W wired to the camera on a breadboard" width="700" height="933" loading="lazy" />
+    <figcaption>fig. 1: the finished robot, 1.78 kg &nbsp;·&nbsp; fig. 2: the Pico W wired to the camera</figcaption>
   </figure>
 </div>
-
-<div class="project">
-  <h3>Reviews</h3><span class="tag live">[live]</span>
-  <p class="meta">Framer plugin · <a href="https://www.framer.com/community/marketplace/plugins/vanssay-google-trustpilot-reviews/">marketplace</a> · <a href="reviews">site</a></p>
-  <p>Pulls a business's Google and Trustpilot reviews and drops them on a Framer site as a native component, with one rating averaged across both platforms. The widget matches the site's fonts and colors, and the reviews keep syncing server-side, so the site owner never handles an API key. The first Vanssay product, and the one that made the first sale (July 2026).</p>
-  <figure>
-    <img src="assets/marin/reviews.webp" alt="Reviews plugin inserting a carousel of Google reviews in the Framer editor" width="1200" height="639" loading="lazy" />
-    <figcaption>fig. 2: inserting a review carousel in the Framer editor</figcaption>
-  </figure>
-</div>
-
-<div class="project">
-  <h3>Instagram Feed</h3><span class="tag live">[live]</span>
-  <p class="meta">Framer plugin + Webflow app + web app · <a href="https://www.framer.com/community/marketplace/plugins/instagram-feed-vanssay/">marketplace</a> · <a href="https://instagram.vanssay.net">instagram.vanssay.net</a></p>
-  <p>Paste a public Instagram handle, pick one of seven layouts, and the feed lands on your site and keeps itself up to date. No Instagram login. Same backend behind three front ends: the Framer plugin, a Webflow app ("Social Feed"), and a web version that gives you one snippet for any site builder.</p>
-  <figure>
-    <img src="assets/marin/instagram.webp" alt="Instagram Feed plugin start screen" width="1170" height="816" loading="lazy" />
-    <figcaption>fig. 3: the plugin's start screen</figcaption>
-  </figure>
-</div>
-
-<div class="project">
-  <h3>Bouncer</h3><span class="tag live">[live]</span>
-  <p class="meta">Framer plugin · <a href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">marketplace</a> · <a href="geoblock">site</a></p>
-  <p>Blocks visitors by country, or lets only some countries in, and spots VPN and proxy traffic. Blocked visitors get a block screen styled like the site. Countries are resolved from a local GeoIP database, so most checks never leave the server.</p>
-  <figure>
-    <img src="assets/marin/bouncer.webp" alt="Bouncer plugin country picker" width="1200" height="760" loading="lazy" />
-    <figcaption>fig. 4: picking countries to block</figcaption>
-  </figure>
-</div>
-
-<div class="project">
-  <h3>Router</h3><span class="tag live">[live]</span>
-  <p class="meta">Framer plugin · <a href="https://www.framer.com/community/marketplace/plugins/router-vanssay/">marketplace</a> · <a href="router">site</a></p>
-  <p>Sends each visitor to the right page by country, region, language, device or VPN, or just suggests it with a banner they can dismiss. Rules run top to bottom and are decided server-side, so they change without republishing the site.</p>
-  <figure>
-    <img src="assets/marin/router.webp" alt="Router plugin redirect rules list" width="1000" height="650" loading="lazy" />
-    <figcaption>fig. 5: redirect rules</figcaption>
-  </figure>
-</div>
-
-<div class="project">
-  <h3>Maintenance Mode</h3><span class="tag soon">[coming soon]</span>
-  <p class="meta">Framer plugin · <a href="maintenance">site</a></p>
-  <p>Puts a Framer site behind a maintenance page while you still see the real site from your own IP. On and off is a server-side switch, so it takes effect instantly, without a republish.</p>
-</div>
-
-<h3>smaller things</h3>
-<ul>
-  <li><a href="google-reviews-live">Google Reviews Live</a>: a single Framer code component, sold as a one-off download.</li>
-  <li>An admin dashboard for all products: signups, sales, usage, invoices.</li>
-</ul>
-
-<h3>how the vanssay products are put together</h3>
-<p>Every product sits on one shared accounts service: one login across all of them, one Stripe setup, one invoice series. Each product is a small service of its own next to it.</p>
-<pre>
-framer / webflow editor ──► plugin ──┐
-published sites ─────► embed script ─┼──► product APIs (reviews, bouncer, router, ...)
-vanssay.net (static) ────────────────┘       │
-                                             └─► accounts: login + stripe billing
-                       one VPS · docker compose · postgres per service
-</pre>
-
-<h2>school projects</h2>
 
 <div class="project">
   <h3>Contact-based 3D scanner</h3><span class="tag">[2024–2025]</span>
@@ -232,7 +170,7 @@ vanssay.net (static) ────────────────┘       �
   <figure class="pair">
     <img src="assets/marin/tipe-build.webp" alt="3D sketch and photo of the wooden scanner frame with motors, tip, photodiodes and laser" width="848" height="1035" loading="lazy" />
     <img src="assets/marin/tipe-scan.webp" alt="Scanned mesh of LEGO bricks above a 3D model of the same bricks" width="780" height="945" loading="lazy" />
-    <figcaption>fig. 6: the scanner, sketch and real build &nbsp;·&nbsp; fig. 7: a scan of LEGO bricks (top) against a model of the real bricks (bottom)</figcaption>
+    <figcaption>fig. 3: the scanner, sketch and real build &nbsp;·&nbsp; fig. 4: a scan of LEGO bricks (top) against a model of the real bricks (bottom)</figcaption>
   </figure>
 </div>
 
@@ -243,8 +181,85 @@ vanssay.net (static) ────────────────┘       �
   <p>The risk model treats the room air as well mixed: virus-carrying droplets build up from an infectious guest and are removed by ventilation, filtration, settling to the floor and the virus decaying over time. Built with Python, Flask and SQLite.</p>
   <figure>
     <img src="assets/marin/roomsafe-score.webp" alt="RoomSafe event page with a score of 8 out of 10 and a graph of safe guest counts against duration" width="1000" height="587" loading="lazy" />
-    <figcaption>fig. 8: an event's RoomSafe Score, with the safe zone in green</figcaption>
+    <figcaption>fig. 5: an event's RoomSafe Score, with the safe zone in green</figcaption>
   </figure>
+</div>
+
+<h2>vanssay</h2>
+<p class="dim">Framer and Webflow plugins I build and run on my own: product, backend, billing, support. Built with AI coding assistants.</p>
+
+<div class="project">
+  <h3>Reviews</h3><span class="tag live">[live]</span>
+  <p class="meta">Framer plugin · <a href="https://www.framer.com/community/marketplace/plugins/vanssay-google-trustpilot-reviews/">marketplace</a> · <a href="reviews">site</a></p>
+  <p>Pulls a business's Google and Trustpilot reviews and drops them on a Framer site as a native component, with one rating averaged across both platforms. The widget matches the site's fonts and colors, and the reviews keep syncing server-side, so the site owner never handles an API key. The first Vanssay product, and the one that made the first sale (July 2026).</p>
+  <figure>
+    <img src="assets/marin/reviews.webp" alt="Reviews plugin inserting a carousel of Google reviews in the Framer editor" width="1200" height="639" loading="lazy" />
+    <figcaption>fig. 6: inserting a review carousel in the Framer editor</figcaption>
+  </figure>
+</div>
+
+<div class="project">
+  <h3>Instagram Feed</h3><span class="tag live">[live]</span>
+  <p class="meta">Framer plugin + Webflow app + web app · <a href="https://www.framer.com/community/marketplace/plugins/instagram-feed-vanssay/">marketplace</a> · <a href="https://instagram.vanssay.net">instagram.vanssay.net</a></p>
+  <p>Paste a public Instagram handle, pick one of seven layouts, and the feed lands on your site and keeps itself up to date. No Instagram login. Same backend behind three front ends: the Framer plugin, a Webflow app ("Social Feed"), and a web version that gives you one snippet for any site builder.</p>
+  <figure>
+    <img src="assets/marin/instagram.webp" alt="Instagram Feed plugin start screen" width="1170" height="816" loading="lazy" />
+    <figcaption>fig. 7: the plugin's start screen</figcaption>
+  </figure>
+</div>
+
+<div class="project">
+  <h3>Bouncer</h3><span class="tag live">[live]</span>
+  <p class="meta">Framer plugin · <a href="https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/">marketplace</a> · <a href="geoblock">site</a></p>
+  <p>Blocks visitors by country, or lets only some countries in, and spots VPN and proxy traffic. Blocked visitors get a block screen styled like the site. Countries are resolved from a local GeoIP database, so most checks never leave the server.</p>
+  <figure>
+    <img src="assets/marin/bouncer.webp" alt="Bouncer plugin country picker" width="1200" height="760" loading="lazy" />
+    <figcaption>fig. 8: picking countries to block</figcaption>
+  </figure>
+</div>
+
+<div class="project">
+  <h3>Router</h3><span class="tag live">[live]</span>
+  <p class="meta">Framer plugin · <a href="https://www.framer.com/community/marketplace/plugins/router-vanssay/">marketplace</a> · <a href="router">site</a></p>
+  <p>Sends each visitor to the right page by country, region, language, device or VPN, or just suggests it with a banner they can dismiss. Rules run top to bottom and are decided server-side, so they change without republishing the site.</p>
+  <figure>
+    <img src="assets/marin/router.webp" alt="Router plugin redirect rules list" width="1000" height="650" loading="lazy" />
+    <figcaption>fig. 9: redirect rules</figcaption>
+  </figure>
+</div>
+
+<h3>smaller things</h3>
+<ul>
+  <li><a href="google-reviews-live">Google Reviews Live</a>: a single Framer code component, sold as a one-off download.</li>
+  <li>An admin dashboard for all products: signups, sales, usage, invoices.</li>
+</ul>
+
+<h3>how they are put together</h3>
+<p>Every product sits on one shared accounts service: one login across all of them, one Stripe setup, one invoice series. Each product is a small service of its own next to it.</p>
+<pre>
+framer / webflow editor ──► plugin ──┐
+published sites ─────► embed script ─┼──► product APIs (reviews, bouncer, router, ...)
+vanssay.net (static) ────────────────┘       │
+                                             └─► accounts: login + stripe billing
+                       one VPS · docker compose · postgres per service
+</pre>
+
+<h2>in progress</h2>
+
+<div class="project">
+  <h3>Framefly</h3><span class="tag soon">[private beta]</span>
+  <p class="meta">AI agent that films demo videos · <a href="https://framefly.app">framefly.app</a></p>
+  <p>You connect your web app and it gets explored once by an AI agent driving a real browser. From a short brief it then writes a script, films real actions in your app (no mockups), adds captions and music, and renders a demo or launch video. I built the agent, the render pipeline and the editor.</p>
+  <figure>
+    <img src="assets/marin/framefly.webp" alt="Framefly home screen with video templates" width="1200" height="675" loading="lazy" />
+    <figcaption>fig. 10: the app's home screen</figcaption>
+  </figure>
+</div>
+
+<div class="project">
+  <h3>Maintenance Mode</h3><span class="tag soon">[coming soon]</span>
+  <p class="meta">Framer plugin · <a href="maintenance">site</a></p>
+  <p>Puts a Framer site behind a maintenance page while you still see the real site from your own IP. On and off is a server-side switch, so it takes effect instantly, without a republish.</p>
 </div>
 
 <hr />
