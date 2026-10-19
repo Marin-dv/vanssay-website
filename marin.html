@@ -110,8 +110,9 @@
   figure { margin: 12px 0 0; }
   figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
   figcaption { font-size: 12px; color: var(--dim); margin-top: 4px; }
-  figure.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
-  figure.pair figcaption { grid-column: 1 / -1; }
+  /* Each figure grows by its image's width/height ratio, so both photos come out the same height. */
+  .pair { display: flex; gap: 8px; align-items: flex-start; margin: 12px 0 0; }
+  .pair figure { margin: 0; min-width: 0; flex: var(--r) 1 0; }
   .tag:not(.live):not(.soon) { color: var(--dim); }
   ul { margin: 0 0 12px; padding-left: 22px; }
   li { margin: 2px 0; }
@@ -254,11 +255,16 @@ vanssay.net (static) ────────────────┘       �
   <p class="meta">PRONTO project, IMT Atlantique · team of 5 · <a href="https://lethalbot.pages.dev/">project site</a> · <a href="https://github.com/Marin-dv/lethalbot">code</a></p>
   <p>A transport robot that carries a 2 kg load along a black line, guided only by a 40 × 30 pixel camera, on a Raspberry Pi Pico W. I wrote all of its code. Each row of the image gets its own black/white threshold, a linear regression through the black pixels gives the line's offset and angle, and both steer the two wheels.</p>
   <p>The gear motors stall below about 20% power, so the final version drives them in 150 ms pulses (macro-PWM) and measures that dead zone itself at start-up with the wheel encoders. CircuitPython, with an OLED status screen and a PC tool to watch the camera feed over USB.</p>
-  <figure class="pair">
-    <img src="assets/marin/lethalbot-robot.webp" alt="The finished LethalBOT on a scale reading 1.778 kg" width="562" height="1000" loading="lazy" />
-    <img src="assets/marin/lethalbot-wiring.webp" alt="Raspberry Pi Pico W wired to the camera on a breadboard" width="700" height="933" loading="lazy" />
-    <figcaption>fig. 5: the finished robot, 1.78 kg &nbsp;·&nbsp; fig. 6: the Pico W wired to the camera</figcaption>
-  </figure>
+  <div class="pair">
+    <figure style="--r: 0.562">
+      <img src="assets/marin/lethalbot-robot.webp" alt="The finished LethalBOT on a scale reading 1.778 kg" width="562" height="1000" loading="lazy" />
+      <figcaption>fig. 5: the finished robot, 1.78 kg</figcaption>
+    </figure>
+    <figure style="--r: 0.750">
+      <img src="assets/marin/lethalbot-wiring.webp" alt="Raspberry Pi Pico W wired to the camera on a breadboard" width="700" height="933" loading="lazy" />
+      <figcaption>fig. 6: the Pico W wired to the camera</figcaption>
+    </figure>
+  </div>
 </div>
 
 <div class="project">
@@ -266,11 +272,16 @@ vanssay.net (static) ────────────────┘       �
   <p class="meta">TIPE at Fénelon Sainte-Marie (CPGE, Paris) · team of 3 · <a href="assets/marin/tipe-3d-scanner.pdf" target="_blank" rel="noopener">slides</a> (in French) · <a href="https://github.com/Marin-dv/tipe-3d-scanner">code</a></p>
   <p>A home-made 3D scanner modelled on an atomic force microscope. A tip rides over the object and tilts a mirror; a laser bounces off the mirror onto a row of six photodiodes, and which one lights up gives the height at that point. Stepper motors move the object under the tip point by point, on a wooden frame driven by two Arduinos that signal each other.</p>
   <p>Heights are calibrated against a reference ramp with k-nearest neighbours, then drawn as a triangle mesh in OpenGL. A scan takes 4 to 5 hours for about 15,000 points, with a measured uncertainty of 180 µm. I wrote most of the code, in C.</p>
-  <figure class="pair">
-    <img src="assets/marin/tipe-build.webp" alt="3D sketch and photo of the wooden scanner frame with motors, tip, photodiodes and laser" width="848" height="1035" loading="lazy" />
-    <img src="assets/marin/tipe-scan.webp" alt="Scanned mesh of LEGO bricks above a 3D model of the same bricks" width="780" height="945" loading="lazy" />
-    <figcaption>fig. 7: the scanner, sketch and real build &nbsp;·&nbsp; fig. 8: a scan of LEGO bricks (top) against a model of the real bricks (bottom)</figcaption>
-  </figure>
+  <div class="pair">
+    <figure style="--r: 0.819">
+      <img src="assets/marin/tipe-build.webp" alt="3D sketch and photo of the wooden scanner frame with motors, tip, photodiodes and laser" width="848" height="1035" loading="lazy" />
+      <figcaption>fig. 7: the scanner, sketch and real build</figcaption>
+    </figure>
+    <figure style="--r: 0.825">
+      <img src="assets/marin/tipe-scan.webp" alt="Scanned mesh of LEGO bricks above a 3D model of the same bricks" width="780" height="945" loading="lazy" />
+      <figcaption>fig. 8: a scan of LEGO bricks (top) against a model of the real bricks (bottom)</figcaption>
+    </figure>
+  </div>
 </div>
 
 <div class="project">
