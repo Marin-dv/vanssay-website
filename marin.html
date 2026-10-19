@@ -86,6 +86,9 @@
   figure { margin: 12px 0 0; }
   figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
   figcaption { font-size: 12px; color: var(--dim); margin-top: 4px; }
+  figure.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
+  figure.pair figcaption { grid-column: 1 / -1; }
+  .tag:not(.live):not(.soon) { color: var(--dim); }
   ul { margin: 0 0 12px; padding-left: 22px; }
   li { margin: 2px 0; }
   footer { font-size: 12px; color: var(--dim); }
@@ -201,6 +204,18 @@
   <h3>Maintenance Mode</h3><span class="tag soon">[coming soon]</span>
   <p class="meta">Framer plugin · <a href="maintenance">site</a></p>
   <p>Puts a Framer site behind a maintenance page while you still see the real site from your own IP. On and off is a server-side switch, so it takes effect instantly, without a republish.</p>
+</div>
+
+<div class="project">
+  <h3>Contact-based 3D scanner</h3><span class="tag">[school project, 2024–2025]</span>
+  <p class="meta">TIPE at Fénelon Sainte-Marie (CPGE, Paris) · team of 3 · <a href="assets/marin/tipe-3d-scanner.pdf" target="_blank" rel="noopener">slides</a> (in French)</p>
+  <p>A home-made 3D scanner modelled on an atomic force microscope. A tip rides over the object and tilts a mirror; a laser bounces off the mirror onto a row of six photodiodes, and which one lights up gives the height at that point. Stepper motors move the object under the tip point by point, on a wooden frame driven by two Arduinos that signal each other.</p>
+  <p>Heights are calibrated against a reference ramp with k-nearest neighbours, then drawn as a triangle mesh in OpenGL. A scan takes 4 to 5 hours for about 15,000 points, with a measured uncertainty of 180 µm. I wrote most of the code, in C.</p>
+  <figure class="pair">
+    <img src="assets/marin/tipe-build.webp" alt="3D sketch and photo of the wooden scanner frame with motors, tip, photodiodes and laser" width="848" height="1035" loading="lazy" />
+    <img src="assets/marin/tipe-scan.webp" alt="Scanned mesh of LEGO bricks above a 3D model of the same bricks" width="780" height="945" loading="lazy" />
+    <figcaption>fig. 6: the scanner, sketch and real build &nbsp;·&nbsp; fig. 7: a scan of LEGO bricks (top) against a model of the real bricks (bottom)</figcaption>
+  </figure>
 </div>
 
 <h3>smaller things</h3>
