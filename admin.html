@@ -2600,7 +2600,7 @@ async function pageUsers(ctx) {
 /* ── Revenue ───────────────────────────────────────────────────────────────── */
 async function pageRevenue(ctx) {
   const range = ["30", "90", "12m", "all"].includes(ctx.r.q.get("range")) ? ctx.r.q.get("range") : "all";
-  const [d, s62, rs, cmp] = await Promise.all([get(salesPath(range)), get("/admin/sales?days=62").then((x) => x, () => null), overviews(), componentsData()]);
+  const [d, s62, rs, cmp, sAll] = await Promise.all([get(salesPath(range)), get("/admin/sales?days=62").then((x) => x, () => null), overviews(), componentsData(), get(salesPath("all")).then((x) => x, () => null)]);
   if (!ctx.live()) return;
   const bills = {}; PRODUCTS.forEach((p, i) => { bills[p.key] = val(rs[i]); });
   const ok = PRODUCTS.filter((p) => bills[p.key]);
@@ -2622,6 +2622,8 @@ async function pageRevenue(ctx) {
       { label: `Collected · ${win}`, value: moneyCents(d.totals.cents), sub: `${plural(d.totals.count, "payment")} · ${plural(d.totals.buyers, "buyer")}`, info: MONEY_INFO, hero: true },
       s62 ? { label: "This month so far", value: moneyCents(pace.now), delta: delta(pace.now, pace.then), sub: `${moneyCents(s62.lastMonth.cents)} all of last month` } : null,
       { label: "Monthly recurring", value: money(mrr), sub: `${money(mrr * 12)} a year`, info: MRR_INFO },
+      sAll ? { label: "Subscriptions, all time", value: money(Math.max(0, Math.round(sAll.totals.cents - oneTime * 100)) / 100), sub: `of ${moneyCents(sAll.totals.cents)} collected in total`,
+        info: "<p>Everything collected since the first sale, minus the one-time money (Lifetime licences, extra feeds, components). What is left is every subscription payment: first months and renewals.</p>" } : null,
       { label: "One-time, all time", value: money(Math.round(oneTime * 100) / 100), sub: "Lifetime, extra feeds, components" },
       { label: "Average payment", value: d.totals.count ? moneyCents(d.totals.cents / d.totals.count) : "–", sub: win },
     ])}
@@ -2762,6 +2764,19 @@ async function pageCosts(ctx) {
   if (!ctx.live()) return;
   const [rev, ig] = rs.map(val);
   if (!rev && !ig) throw new Error(why(rs[0]) || "Expenses unavailable");
+  // Apify bills 16th → 15th. Until the Reviews backend reports that window
+  // itself, rebuild its cycle from the scrape ledger (the newest 200 runs,
+  // far more than one cycle holds) so "this cycle" resets on the 16th.
+  const now = new Date();
+  const cycleStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (now.getUTCDate() < 16 ? 1 : 0), 16));
+  const cycleEnd = new Date(Date.UTC(cycleStart.getUTCFullYear(), cycleStart.getUTCMonth() + 1, 15));
+  if (rev && !rev.month.from) {
+    const rows = (rev.recent || []).filter((r) => new Date(r.createdAt) >= cycleStart);
+    const by = {};
+    rows.forEach((r) => { const x = by[r.platform] || (by[r.platform] = { platform: r.platform, cost: 0, items: 0, requests: 0 }); x.cost += Number(r.cost) || 0; x.items += r.items || 0; x.requests++; });
+    rev.month = { ...rev.month, from: cycleStart.toISOString().slice(0, 10), to: cycleEnd.toISOString().slice(0, 10), byPlatform: Object.values(by), total: sum(rows, (r) => Number(r.cost) || 0),
+      partial: (rev.recent || []).length >= 200 && rows.length === rev.recent.length };
+  }
   const bp = Object.fromEntries(((rev && rev.month.byPlatform) || []).map((x) => [x.platform, x]));
   const z = { cost: 0, items: 0, requests: 0 };
   const tp = bp.trustpilot || z, gg = bp.google || z;
