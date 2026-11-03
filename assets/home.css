@@ -103,6 +103,8 @@ p{margin:0;line-height:1.65}
 @keyframes pulse{50%{opacity:.35}}
 @media (prefers-reduced-motion:reduce){ .hv-live i{animation:none} }
 #hero-widget .vr-root{padding:14px 6px 10px}
+/* the page-wide svg{max-width:100%} squeezes the clipped star fill out of line */
+.vr-root svg{max-width:none}
 .hv-cap{padding:10px 18px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.02em;color:var(--ink-faint);border-top:1px solid var(--line-soft)}
 
 /* ---------- live proof ---------- */
