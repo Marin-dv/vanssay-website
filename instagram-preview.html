@@ -8,6 +8,7 @@
 <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
 <link rel="apple-touch-icon" href="/favicon-180.png" />
 <meta name="description" content="The Instagram Feed plugin's own live demo, running in your browser: a real @letypographe_be feed in all seven layouts — Profile, Grid, Slider, Aperture, Carousel, Marquee and Rainbow." />
+<script>if (/[?&]embed\b/.test(location.search)) document.documentElement.classList.add("embed");</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -429,6 +430,18 @@ img { display: block; max-width: 100%; }
   font-size: 12px; font-weight: 500; text-align: center;
 }
 .demo-strip b { color: #fff; font-weight: 700; }
+
+/* ?embed: framed inside /instagram, which sizes the iframe to the content */
+html.embed, html.embed body { height: auto; background: transparent; overflow: hidden; }
+html.embed .demo-tag { display: none; }
+html.embed .demo-head { justify-content: center; }
+html.embed .grid-layout { grid-template-columns: repeat(4, 1fr); }
+html.embed .grid-layout .post-tile:nth-child(n+9) { display: none; }
+@media (max-width: 600px) { html.embed .grid-layout { grid-template-columns: repeat(3, 1fr); } }
+html.embed #root, html.embed .app { min-height: 0; height: auto; background: transparent; }
+html.embed .demo-strip { display: none; }
+html.embed .connect-center { padding: 0; overflow: visible; }
+html.embed .demo-explorer { margin: 0; max-width: none; padding: 2px; animation: none; }
 .demo-strip a { color: #fff; text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
 </style>
 </head>
