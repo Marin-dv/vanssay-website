@@ -4,13 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Vanssay: Framer plugins that just work</title>
-<meta name="description" content="Vanssay builds focused, no-code Framer plugins. Reviews aggregation and country/VPN blocking, install in one click." />
+<meta name="description" content="Vanssay makes focused Framer plugins: Google + Trustpilot reviews, Instagram feeds, country and VPN blocking, and geo-redirects. Free plan on every plugin, no API keys." />
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
 <link rel="apple-touch-icon" href="/favicon-180.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/reviews-widget.css" />
 <link rel="stylesheet" href="assets/home.css" />
 <script defer src="assets/track.js"></script>
 </head>
@@ -24,7 +25,7 @@
     </a>
     <div class="navlinks">
       <div class="has-menu">
-        <span class="navlink" style="cursor:default">Plugins</span>
+        <a class="navlink" href="#plugins">Plugins</a>
         <div class="megamenu">
           <div class="mm-group">
             <span>Reviews &amp; social proof</span>
@@ -38,7 +39,7 @@
           </div>
           <div class="mm-group">
             <span>Site status</span>
-            <a class="mm-item" href="maintenance">Maintenance Mode</a>
+            <a class="mm-item" href="maintenance">Maintenance Mode <em class="mm-soon">soon</em></a>
           </div>
           <div class="mm-group" style="grid-column:1/-1;border-top:1px solid rgba(128,128,140,.22);padding-top:13px">
             <span>Missing one?</span>
@@ -46,6 +47,7 @@
           </div>
         </div>
       </div>
+      <a class="navlink" href="guides/">Guides</a>
       <a class="navlink" href="contact">Contact</a>
     </div>
     <div class="navcta">
@@ -58,128 +60,157 @@
   <div class="hero-bg"><div class="glow"></div><div class="dotgrid"></div></div>
   <div class="wrap hero-inner">
     <div class="hero-copy">
-      <p class="eyebrow reveal">Robust Framer plugins · 4 live</p>
-      <h1 class="reveal" style="transition-delay:.05s">Small plugins.<br>Big <span class="acc">leverage.</span></h1>
-      <p class="lede reveal" style="transition-delay:.16s">Focused, no-code Framer plugins. Each one does a single job exceptionally well. Install in a click, no API keys, nothing to maintain.</p>
+      <p class="eyebrow reveal">Framer plugins · by Marin de Vanssay</p>
+      <h1 class="reveal" style="transition-delay:.05s">Framer plugins that <span class="acc">keep working</span> after you publish.</h1>
+      <p class="lede reveal" style="transition-delay:.16s">Reviews, Instagram feeds, country blocking and geo-redirects for your Framer site. New reviews and posts sync on their own, and rule changes go live without a republish.</p>
       <div class="ctas reveal" style="transition-delay:.22s">
-        <a href="#plugins" class="btn btn-primary">Explore plugins →</a>
+        <a href="#plugins" class="btn btn-primary">Browse plugins →</a>
         <a href="guides/" class="btn btn-ghost">Read the guides</a>
       </div>
-      <div class="proofbar reveal" style="transition-delay:.3s">
-        <span class="pf"><b>4</b>&nbsp;plugins live</span>
-        <span class="div"></span>
-        <span class="pf"><b>0</b>&nbsp;API keys to manage</span>
-        <span class="div"></span>
-        <span class="pf"><b>1-click</b>&nbsp;install</span>
-      </div>
+      <ul class="checks reveal" style="transition-delay:.3s">
+        <li>Free plan on every plugin</li>
+        <li>No API keys</li>
+        <li>Support from the person who built it</li>
+      </ul>
     </div>
+
+    <!-- The real Reviews widget, rendered by the same code as /reviews. -->
     <div class="hero-visual reveal" style="transition-delay:.2s">
-      <div class="hv-bar"><span></span><span></span><span></span><span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--ink-faint)">System status</span></div>
-      <div class="hv-body" style="padding-top:6px">
-        <div class="hv-row"><span class="hv-icn" style="background:#2b50ff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77 5.82 21l1.18-6.88-5-4.87 7.1-1.01z"/></svg></span><span class="hv-name">Reviews</span><span class="hv-status">Live</span></div>
-        <div class="hv-row"><span class="hv-icn" style="background:#e0457b"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.2"/></svg></span><span class="hv-name">Instagram Feed</span><span class="hv-status">Live</span></div>
-        <div class="hv-row"><span class="hv-icn" style="background:#22c55e"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span class="hv-name">Bouncer</span><span class="hv-status">Live</span></div>
-        <div class="hv-row"><span class="hv-icn" style="background:#7c3aed"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M2 12h20"/></svg></span><span class="hv-name">Router</span><span class="hv-status">Live</span></div>
-        <div class="hv-row"><span class="hv-icn" style="background:#0891b2"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><span class="hv-name">Maintenance Mode</span><span class="hv-status hv-status-soon">Soon</span></div>
+      <div class="hv-bar"><span></span><span></span><span></span><span class="hv-url">maison-cafe.framer.website</span></div>
+      <div class="hv-site">
+        <div class="hv-sitehead"><b>Loved by locals</b><span class="hv-live"><i></i>Live widget</span></div>
+        <div class="vrhost" id="hero-widget"></div>
       </div>
+      <p class="hv-cap">Reviews plugin · Google + Trustpilot in one rating</p>
     </div>
   </div>
 </section>
 
-<div class="trust">
-  <div class="wrap">
-    <div class="trust-head reveal">
-      <p class="eyebrow">The promise</p>
-      <h2 style="font-size:clamp(24px,3vw,32px);margin-top:12px">Every Vanssay plugin is built to be installed in one click and forgotten.</h2>
-      <p>No servers to run, no API keys to paste, no code to maintain. They just work on your published Framer site.</p>
+<!-- Filled from production on load; stays hidden if the API is unreachable. -->
+<section class="proof" id="proof" hidden>
+  <div class="wrap proof-inner">
+    <div class="proof-head">
+      <p class="eyebrow">Live right now</p>
+      <h2>Counted, not <span class="acc">claimed.</span></h2>
+      <p>Read from the Reviews plugin's production database when this page loaded.</p>
     </div>
-    <div class="trust-grid reveal-stagger">
-      <div class="trust-item"><span class="icn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><h3>Keys stay server-side</h3><p>Every credential lives on our backend, never in your published site.</p></div>
-      <div class="trust-item"><span class="icn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></span><h3>One-click install</h3><p>Add it from the Framer marketplace and it just works.</p></div>
-      <div class="trust-item"><span class="icn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><path d="M8 21l4.5-11L21 6"/><path d="M8 21l-5-9 9.5-4.5"/></svg></span><h3>Matches your brand</h3><p>Fonts, colors and radius are detected from your project automatically.</p></div>
-      <div class="trust-item"><span class="icn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41L11 3.83A2 2 0 0 0 9.59 3.24L4 3v5.59a2 2 0 0 0 .59 1.41l9.58 9.59a2 2 0 0 0 2.82 0l3.6-3.6a2 2 0 0 0 0-2.58z"/><circle cx="8.5" cy="8.5" r="1"/></svg></span><h3>Free tier on everything</h3><p>Every plugin has a real free plan — not a 7-day trial.</p></div>
-    </div>
+    <div class="proof-grid" id="proof-grid"></div>
   </div>
-</div>
+</section>
 
 <div class="wrap">
   <section class="section" id="plugins">
-    <div class="cat-block">
-      <div class="cat-head reveal">
-        <div class="cat-title"><span class="icn" style="background:#2b50ff"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77 5.82 21l1.18-6.88-5-4.87 7.1-1.01z"/></svg></span><h2>Reviews &amp; social proof</h2></div>
-        <span class="cat-count">2 live</span>
+    <div class="sec-head reveal">
+      <div>
+        <p class="eyebrow">Plugins</p>
+        <h2>On the Framer Marketplace</h2>
+        <p>Each one has a free plan you can keep, not a trial.</p>
       </div>
-      <div class="card-grid reveal-stagger">
-        <a class="plugin-card" href="reviews" style="color:inherit">
-          <div class="pc-top"><h3>Reviews</h3><span class="price-tag" style="color:#2b50ff;background:#eef1ff">From Free</span></div>
-          <p class="pc-desc">Turn your Google &amp; Trustpilot reviews into stunning, theme-matched widgets: one aggregated rating, 10 layouts, zero tweaking.</p>
-          <div class="pc-features"><span class="chip">Google + Trustpilot</span><span class="chip">Aggregate badge</span><span class="chip">Auto theme-match</span><span class="chip">SEO stars</span></div>
-        </a>
-        <a class="plugin-card" href="instagram" style="color:inherit">
-          <div class="pc-top"><h3>Instagram Feed</h3><span class="price-tag" style="color:#e0457b;background:#fdeef6">From Free</span></div>
-          <p class="pc-desc">Put your live Instagram feed on your site: paste a handle, pick one of seven layouts, then insert it in Framer or paste one snippet into any other site. It keeps syncing on its own, with no Instagram login and no API keys.</p>
-          <div class="pc-features"><span class="chip">Any website</span><span class="chip">Auto-sync</span><span class="chip">Curated picker</span><span class="chip">Lightbox</span></div>
-        </a>
-      </div>
+      <a href="suggest" class="btn btn-ghost btn-sm">Suggest a plugin →</a>
     </div>
 
-    <div class="cat-block">
-      <div class="cat-head reveal">
-        <div class="cat-title"><span class="icn" style="background:#22c55e"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><h2>Access &amp; traffic control</h2></div>
-        <span class="cat-count">2 live</span>
-      </div>
-      <div class="card-grid reveal-stagger">
-        <a class="plugin-card" href="geoblock" style="color:inherit">
-          <div class="pc-top"><h3>Bouncer</h3><span class="price-tag" style="color:#16a34a;background:#e9f7ef">From Free</span></div>
-          <p class="pc-desc">Block visitors by country and detect VPN/proxy traffic, with a styled "access denied" screen that matches your site. Reliable, never breaks.</p>
-          <div class="pc-features"><span class="chip">Country allow / block</span><span class="chip">VPN &amp; proxy detection</span><span class="chip">Custom block screen</span><span class="chip">Per-page or element</span></div>
-        </a>
-        <a class="plugin-card" href="router" style="color:inherit">
-          <div class="pc-top"><h3>Router</h3><span class="price-tag" style="color:#7c3aed;background:#f3ecfe">From Free</span></div>
-          <p class="pc-desc">Send visitors to the right place automatically: redirect by country, region, language or device, or suggest it with a non-forced banner. No-code, UTM-safe and VPN-aware.</p>
-          <div class="pc-features"><span class="chip">Geo redirect</span><span class="chip">Suggestion banner</span><span class="chip">UTM preserved</span><span class="chip">VPN-aware</span></div>
-        </a>
-      </div>
+    <div class="mk-grid reveal-stagger">
+      <a class="mk-card" href="reviews">
+        <div class="mk-cover"><img src="assets/covers/reviews.webp" alt="Reviews plugin cover: Google and Trustpilot reviews in Framer" width="960" height="720" loading="lazy" /></div>
+        <div class="mk-meta">
+          <span class="mk-icn" style="background:#2b50ff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77 5.82 21l1.18-6.88-5-4.87 7.1-1.01z"/></svg></span>
+          <span class="mk-name">Reviews</span>
+          <span class="mk-price">Free</span>
+        </div>
+        <p class="mk-desc">Google and Trustpilot in one combined rating. 25 layouts, 57 card styles.</p>
+      </a>
+      <a class="mk-card" href="instagram">
+        <div class="mk-cover"><img src="assets/covers/instagram.webp" alt="Instagram Feed plugin cover" width="960" height="720" loading="lazy" /></div>
+        <div class="mk-meta">
+          <span class="mk-icn" style="background:#e0457b"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.2"/></svg></span>
+          <span class="mk-name">Instagram Feed</span>
+          <span class="mk-price">Free</span>
+        </div>
+        <p class="mk-desc">Paste a handle, pick a layout. New posts sync on their own, on Framer or any site.</p>
+      </a>
+      <a class="mk-card" href="geoblock">
+        <div class="mk-cover"><img src="assets/covers/bouncer.webp" alt="Bouncer plugin cover: block countries and VPNs" width="960" height="720" loading="lazy" /></div>
+        <div class="mk-meta">
+          <span class="mk-icn" style="background:#22c55e"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+          <span class="mk-name">Bouncer</span>
+          <span class="mk-price">Free</span>
+        </div>
+        <p class="mk-desc">Block countries, VPNs and proxies, with an access screen that matches your site.</p>
+      </a>
+      <a class="mk-card" href="router">
+        <div class="mk-cover"><img src="assets/covers/router.webp" alt="Router plugin cover: redirect by country, region, language and device" width="960" height="720" loading="lazy" /></div>
+        <div class="mk-meta">
+          <span class="mk-icn" style="background:#7c3aed"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M2 12h20"/></svg></span>
+          <span class="mk-name">Router</span>
+          <span class="mk-price">Free</span>
+        </div>
+        <p class="mk-desc">Redirect by country, region, language or device, or suggest it with a banner.</p>
+      </a>
     </div>
 
-    <div class="cat-block">
-      <div class="cat-head reveal">
-        <div class="cat-title"><span class="icn" style="background:#0891b2"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span><h2>Site status</h2></div>
-        <span class="cat-count">Coming soon</span>
-      </div>
-      <div class="card-grid reveal-stagger" style="grid-template-columns:1fr 1fr">
-        <a class="plugin-card" href="maintenance" style="color:inherit">
-          <div class="pc-top"><h3>Maintenance Mode</h3><span class="price-tag" style="color:var(--ink-faint);background:var(--surface-2)">Coming soon</span></div>
-          <p class="pc-desc">Put your site behind a clean maintenance page with an IP whitelist so you still see it: countdown, redirect and a custom page. Toggles on/off live, no republish.</p>
-          <div class="pc-features"><span class="chip">IP whitelist</span><span class="chip">Countdown timer</span><span class="chip">Custom page</span><span class="chip">Instant on/off</span></div>
-        </a>
-      </div>
-      <div style="margin-top:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <p style="font-size:12.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint)">More coming soon</p>
-        <a href="suggest" class="btn btn-ghost btn-sm">Suggest a plugin →</a>
+    <a class="next-up reveal" href="maintenance">
+      <span class="next-tag">Coming next</span>
+      <span><b>Maintenance Mode</b> · a live on/off maintenance page with an IP whitelist, no republish.</span>
+      <span class="next-arrow">→</span>
+    </a>
+  </section>
+
+  <section class="maker reveal">
+    <img class="maker-pic" src="assets/marin/portrait.webp" alt="Marin de Vanssay" width="160" height="160" loading="lazy" />
+    <div class="maker-copy">
+      <p class="eyebrow">Who's behind this</p>
+      <h2>One person, every plugin.</h2>
+      <p>I'm Marin, an engineering student in Nantes. I make these plugins, run the servers they live on and answer every support email myself. When something breaks, you're writing to the person who can fix it.</p>
+      <div class="maker-links">
+        <a href="https://x.com/MarindeVanssay" target="_blank" rel="noopener">X</a>
+        <a href="https://www.linkedin.com/in/marin-de-vanssay/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="mailto:support@vanssay.net">support@vanssay.net</a>
       </div>
     </div>
   </section>
 
   <div class="cta-band reveal">
     <h2>Add a plugin, not a maintenance job.</h2>
-    <p>Every Vanssay plugin has a real free tier. Install one in the time it takes to read this.</p>
-    <div class="ctas"><a href="#plugins" class="btn btn-primary">Browse all plugins →</a><a href="contact" class="btn btn-ghost">Contact support</a></div>
-    <p style="margin-top:18px;font-size:13.5px;opacity:.7">Need one that doesn't exist yet? <a href="suggest" style="color:inherit;text-decoration:underline;font-weight:700">Suggest a plugin &rarr;</a></p>
+    <p>Start on the free plan. Upgrade only when your site needs more.</p>
+    <div class="ctas"><a href="#plugins" class="btn btn-primary">Browse plugins →</a><a href="contact" class="btn btn-ghost">Contact support</a></div>
   </div>
 </div>
 
 <footer>
-  <div class="wrap foot-row">
-    <a class="brand" href="/" style="font-size:14.5px">
-      <svg width="19" height="19" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>
-      Vanssay
-    </a>
-    <div class="foot-links"><a href="privacy">Privacy</a><a href="terms">Terms</a><a href="guides/">Guides</a><a href="suggest">Suggest a plugin</a><a href="mailto:support@vanssay.net">support@vanssay.net</a></div>
-    <span class="foot-copy">© 2026 Vanssay</span>
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <a class="brand" href="/">
+        <svg width="20" height="20" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>
+        Vanssay
+      </a>
+      <p>Focused plugins for Framer sites. Made in Nantes, France.</p>
+    </div>
+    <div class="foot-col">
+      <span>Plugins</span>
+      <a href="reviews">Reviews</a>
+      <a href="instagram">Instagram Feed</a>
+      <a href="geoblock">Bouncer</a>
+      <a href="router">Router</a>
+    </div>
+    <div class="foot-col">
+      <span>Resources</span>
+      <a href="guides/">Guides</a>
+      <a href="suggest">Suggest a plugin</a>
+      <a href="accounts">Your account</a>
+      <a href="contact">Contact</a>
+    </div>
+    <div class="foot-col">
+      <span>Company</span>
+      <a href="privacy">Privacy</a>
+      <a href="terms">Terms</a>
+      <a href="mailto:support@vanssay.net">support@vanssay.net</a>
+    </div>
   </div>
+  <div class="wrap foot-bottom"><span>© 2026 Vanssay</span></div>
 </footer>
 
+<script src="assets/reviews-data.js"></script>
+<script src="assets/reviews-demo.js"></script>
 <script>
   (function(){
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -189,13 +220,66 @@
     } else {
       var io = new IntersectionObserver(function(entries){
         entries.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
       targets.forEach(function(t){ io.observe(t); });
     }
     var nav = document.getElementById('nav');
     var setNavState = function(){ nav.classList.toggle('scrolled', window.scrollY > 40); };
     setNavState();
     window.addEventListener('scroll', setNavState, { passive: true });
+
+    var V = window.VR, D = window.VR_DATA;
+    if (!V || !D) return;
+
+    // Same sample café and totals as /reviews, so the two pages tell one story.
+    V.render(document.getElementById('hero-widget'), {
+      layout: 'carousel', preset: 'elevated', accent: '#2b50ff',
+      text: '#16151b', cardBg: '#ffffff', radius: 12,
+      tpStars: true, watermark: false, sourceDisplay: 'icon', stamp: false,
+      cardMin: 250, cardPad: 16, showHeader: true,
+      reviews: D.reviews.slice(0, 6),
+      aggregate: { rating: 4.77, count: 1626, platforms: ['google', 'trustpilot'] }
+    });
+
+    var COUNTERS = [
+      { k: 'liveSites', l: 'Live sites', d: 'showing the widget to real visitors' },
+      { k: 'widgets', l: 'Widgets', d: 'running on published pages' },
+      { k: 'businesses', l: 'Businesses', d: 'connected across Google and Trustpilot' },
+      { k: 'views', l: 'Widget views', d: 'served to visitors so far' }
+    ];
+    function countUp(el, to) {
+      if (reduced) { el.textContent = V.fmtCount(to); return; }
+      var start = performance.now(), dur = 1100;
+      (function step(now) {
+        var t = Math.min(1, (now - start) / dur);
+        var e = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+        el.textContent = V.fmtCount(Math.round(to * e));
+        if (t < 1) requestAnimationFrame(step);
+      })(start);
+    }
+    fetch(V.API + '/stats/social-proof')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (p) {
+        if (!p) return;
+        var tiles = COUNTERS.filter(function (c) { return typeof p[c.k] === 'number' && p[c.k] > 0; });
+        if (tiles.length < 2) return;
+        var grid = document.getElementById('proof-grid');
+        grid.innerHTML = tiles.map(function (c) {
+          return '<div class="ctr"><div class="ctr-n" data-to="' + p[c.k] + '">0</div>' +
+            '<div class="ctr-l">' + c.l + '</div><div class="ctr-d">' + c.d + '</div></div>';
+        }).join('');
+        var sec = document.getElementById('proof');
+        sec.hidden = false;
+        var run = function () {
+          grid.querySelectorAll('.ctr-n').forEach(function (n) { countUp(n, Number(n.getAttribute('data-to'))); });
+        };
+        if (!('IntersectionObserver' in window)) { run(); return; }
+        var cio = new IntersectionObserver(function (es) {
+          es.forEach(function (e) { if (e.isIntersecting) { run(); cio.disconnect(); } });
+        }, { threshold: 0.35 });
+        cio.observe(sec);
+      })
+      .catch(function () { /* no numbers is better than made-up numbers */ });
   })();
 </script>
 </body>
