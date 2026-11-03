@@ -32,46 +32,32 @@
   .nf-link:hover{border-color:var(--ink);box-shadow:var(--shadow-sm)}
   .nf-link i{width:9px;height:9px;border-radius:50%;flex:none}
 </style>
+<link rel="stylesheet" href="/assets/chrome.css?v=1" />
+<script defer src="/assets/chrome.js?v=1"></script>
 </head>
 <body>
 
-<div class="nav-shell">
-  <div class="nav" id="nav">
-    <a class="brand" href="/">
-      <svg width="24" height="24" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>
-      Vanssay
-    </a>
-    <div class="navlinks">
-      <div class="has-menu">
-        <span class="navlink" style="cursor:default">Plugins</span>
-        <div class="megamenu">
-          <div class="mm-group">
-            <span>Reviews &amp; social proof</span>
-            <a class="mm-item" href="/reviews">Reviews</a>
-            <a class="mm-item" href="/instagram">Instagram Feed</a>
-          </div>
-          <div class="mm-group">
-            <span>Access &amp; traffic control</span>
-            <a class="mm-item" href="/geoblock">Bouncer</a>
-            <a class="mm-item" href="/router">Router</a>
-          </div>
-          <div class="mm-group">
-            <span>Site status</span>
-            <a class="mm-item" href="/maintenance">Maintenance Mode</a>
-          </div>
-          <div class="mm-group" style="grid-column:1/-1;border-top:1px solid rgba(128,128,140,.22);padding-top:13px">
-            <span>Missing one?</span>
-            <a class="mm-item" href="/suggest">Suggest a plugin &rarr;</a>
-          </div>
+<!-- vn:nav nospacer -->
+<div class="vn-shell" role="banner">
+  <div class="vn-nav" id="vn-nav">
+    <a class="vn-brand" href="/"><svg width="24" height="24" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+    <div class="vn-links" role="navigation" aria-label="Main">
+      <div class="vn-has-menu">
+        <a class="vn-link" href="/#plugins">Plugins</a>
+        <div class="vn-menu">
+          <div class="vn-mm-group"><span>Reviews &amp; social proof</span><a class="vn-mm-item" href="/reviews">Reviews</a><a class="vn-mm-item" href="/instagram">Instagram Feed</a></div>
+          <div class="vn-mm-group"><span>Access &amp; traffic control</span><a class="vn-mm-item" href="/geoblock">Bouncer</a><a class="vn-mm-item" href="/router">Router</a></div>
+          <div class="vn-mm-group"><span>Site status</span><a class="vn-mm-item" href="/maintenance">Maintenance Mode <em class="vn-soon">soon</em></a></div>
+          <div class="vn-mm-group vn-mm-wide"><span>Missing one?</span><a class="vn-mm-item" href="/suggest">Suggest a plugin &rarr;</a></div>
         </div>
       </div>
-      <a class="navlink" href="/contact">Contact</a>
+      <a class="vn-link" href="/guides/">Guides</a>
+      <a class="vn-link" href="/contact">Contact</a>
     </div>
-    <div class="navcta">
-      <a href="/accounts" class="btn btn-primary btn-sm">Your account →</a>
-    </div>
+    <div class="vn-cta"><a href="/accounts" class="vn-btn">Your account →</a></div>
   </div>
 </div>
+<!-- /vn:nav -->
 
 <section class="hero nf">
   <div class="hero-bg"><div class="glow"></div><div class="dotgrid"></div></div>
@@ -100,16 +86,20 @@
   </div>
 </section>
 
-<footer>
-  <div class="wrap foot-row">
-    <a class="brand" href="/" style="font-size:14.5px">
-      <svg width="19" height="19" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>
-      Vanssay
-    </a>
-    <div class="foot-links"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/guides/">Guides</a><a href="/suggest">Suggest a plugin</a><a href="mailto:support@vanssay.net">support@vanssay.net</a></div>
-    <span class="foot-copy">© 2026 Vanssay</span>
+<!-- vn:foot -->
+<div class="vn-foot" role="contentinfo">
+  <div class="vn-wrap vn-foot-grid">
+    <div class="vn-foot-brand">
+      <a class="vn-brand" href="/"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+      <p>Focused plugins for Framer sites. Made in Nantes, France.</p>
+    </div>
+    <div class="vn-foot-col"><span>Plugins</span><a href="/reviews">Reviews</a><a href="/instagram">Instagram Feed</a><a href="/geoblock">Bouncer</a><a href="/router">Router</a></div>
+    <div class="vn-foot-col"><span>Resources</span><a href="/guides/">Guides</a><a href="/suggest">Suggest a plugin</a><a href="/accounts">Your account</a><a href="/contact">Contact</a></div>
+    <div class="vn-foot-col"><span>Company</span><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:support@vanssay.net">support@vanssay.net</a></div>
   </div>
-</footer>
+  <div class="vn-wrap vn-foot-bottom"><span>© 2026 Vanssay</span></div>
+</div>
+<!-- /vn:foot -->
 
 <script>
   (function(){
@@ -140,12 +130,6 @@
         }
       }
     }
-  })();
-  (function(){
-    var nav = document.getElementById('nav');
-    var setNavState = function(){ nav.classList.toggle('scrolled', window.scrollY > 40); };
-    setNavState();
-    window.addEventListener('scroll', setNavState, { passive: true });
   })();
 </script>
 </body>

@@ -1,365 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Account | Vanssay</title>
-  <link rel="icon" href="/favicon.ico" sizes="any" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>Account | Reviews by Vanssay</title>
+<link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
 <link rel="apple-touch-icon" href="/favicon-180.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    :root {
-      --bg:#fafafa; --surface:#fff; --surface-2:#f4f4f5; --border:#e4e4e7; --text:#18181b;
-      --text-2:#52525b; --muted:#a1a1aa; --accent:#0e7afe; --pro:#7c5cff; --error:#dc2626;
-      --shadow:0 1px 2px rgba(0,0,0,.05); --shadow-md:0 8px 30px rgba(0,0,0,.08);
-    }
-    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; min-height:100vh; -webkit-font-smoothing:antialiased; }
-    a { color:inherit; text-decoration:none; }
-    nav { position:sticky; top:0; background:rgba(250,250,250,.85); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
-    .nav-in { max-width:1140px; margin:0 auto; padding:0 28px; display:flex; align-items:center; justify-content:space-between; height:64px; }
-    .logo { display:flex; align-items:center; gap:9px; font-weight:800; font-size:17px; }
-    .logo-dot { width:22px; height:22px; border-radius:7px; background:linear-gradient(135deg,var(--accent),var(--pro)); }
-    .nav-links { display:flex; gap:28px; font-size:14px; font-weight:500; color:var(--text-2); }
-    main { max-width:920px; margin:0 auto; padding:44px 28px 80px; }
-    #auth, #loading { max-width:460px; margin-inline:auto; }
-    .dash-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start; }
-    .dash-grid .col { display:flex; flex-direction:column; gap:18px; }
-    .dash-grid .card { margin-bottom:0; }
-    @media (max-width:760px) { main { max-width:520px; } .dash-grid { grid-template-columns:1fr; } }
-    h1 { font-size:30px; font-weight:900; letter-spacing:-.02em; margin-bottom:6px; }
-    .sub { color:var(--text-2); margin-bottom:28px; }
-    .card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:28px; box-shadow:var(--shadow-md); margin-bottom:18px; }
-    label { display:block; font-size:13px; font-weight:600; margin:14px 0 5px; }
-    input { width:100%; padding:11px 14px; border:1px solid var(--border); border-radius:10px; font:inherit; font-size:14px; outline:none; }
-    input:focus { border-color:var(--accent); box-shadow:0 0 0 3px #eaf3ff; }
-    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:12px 20px; margin-top:18px;
-      border-radius:11px; font:inherit; font-size:14.5px; font-weight:700; border:1px solid transparent; cursor:pointer; }
-    .btn-blue { background:linear-gradient(120deg,var(--accent),var(--pro)); color:#fff; }
-    .btn-line { background:var(--surface); border-color:var(--border); color:var(--text); }
-    .btn-sm { width:auto; padding:8px 16px; font-size:13px; margin-top:0; }
-    .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .muted { color:var(--muted); font-size:13px; }
-    .err { background:#fdecec; color:var(--error); border-radius:10px; padding:10px 14px; font-size:13px; margin-top:14px; display:none; }
-    .quota-alert { display:none; background:#fdecec; border:1px solid #f5b5b5; color:#b91c1c; border-radius:14px; padding:18px 20px; margin-bottom:18px; }
-    .quota-alert strong { font-size:15px; display:block; margin-bottom:4px; }
-    .quota-alert p { font-size:13.5px; color:#7f1d1d; margin-bottom:12px; }
-    .quota-alert .btn { width:auto; margin-top:0; }
-    .switch { text-align:center; font-size:13.5px; color:var(--text-2); margin-top:18px; }
-    .switch a { color:var(--accent); font-weight:600; cursor:pointer; }
-    .badge { display:inline-flex; padding:3px 12px; border-radius:99px; font-size:12px; font-weight:800; }
-    .b-free { background:var(--surface-2); color:var(--text-2); } .b-starter,.b-pro { background:#f1edff; color:var(--pro); } .b-ultra { background:linear-gradient(90deg,var(--accent),var(--pro)); color:#fff; }
-    /* Lifetime is a real plan the badge can be set to, and without its own rule
-       it rendered as bare text on the page someone lands on right after paying
-       for it. Warm gold rather than the blue/violet of the subscriptions —
-       it reads as owned, not as billed. */
-    .b-lifetime { background:linear-gradient(90deg,#b45309,#f59e0b); color:#fff; }
-    .meter { height:8px; border-radius:99px; background:var(--surface-2); border:1px solid var(--border); overflow:hidden; margin-top:8px; }
-    .meter span { display:block; height:100%; background:var(--accent); border-radius:99px; }
-    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
-    .actions .btn { width:auto; flex:1; margin-top:0; }
-    .cycle { display:flex; width:100%; gap:4px; padding:4px; background:var(--surface-2); border:1px solid var(--border); border-radius:99px; margin-bottom:2px; }
-    .cycle-opt { flex:1; border:0; background:transparent; color:var(--text-2); font:inherit; font-size:12.5px; font-weight:700; padding:8px 10px; border-radius:99px; cursor:pointer; }
-    .cycle-opt.on { background:var(--surface-1,#fff); color:var(--accent); box-shadow:0 1px 2px rgba(0,0,0,.08); }
-    #dash { display:none; }
-    h3 { font-size:15px; font-weight:800; margin-bottom:4px; }
-    /* Loading state while the session is verified (e.g. arriving from the plugin) */
-    #loading { display:none; text-align:center; padding:80px 0; }
-    .spinner { width:34px; height:34px; margin:0 auto 16px; border-radius:50%;
-      border:3px solid var(--surface-2); border-top-color:var(--accent); animation:spin .8s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-  </style>
+<link rel="stylesheet" href="assets/site.css" />
+<link rel="stylesheet" href="assets/account.css?v=3" />
+<link rel="stylesheet" href="/assets/chrome.css?v=1" />
+<script defer src="/assets/chrome.js?v=1"></script>
 </head>
-<body>
-<nav><div class="nav-in">
-  <a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a>
-  <div class="nav-links"><a href="/#widgets">Widgets</a><a href="demo">Live demo</a><a href="/#pricing">Pricing</a></div>
-</div></nav>
-
-<main>
-  <!-- Loading (session check) -->
-  <div id="loading"><div class="spinner"></div><p class="sub">Signing you in…</p></div>
-
-  <!-- Auth -->
-  <div id="auth">
-    <h1 id="auth-title">Welcome back</h1>
-    <p class="sub">Same account as the Framer plugin.</p>
-    <div class="card">
-      <div id="f-email"><label>Email</label><input id="email" type="email" placeholder="you@company.com" autocomplete="email" /></div>
-      <div id="f-pass">
-        <label style="display:flex;justify-content:space-between">Password <a id="toggle-pass" style="color:var(--accent);cursor:pointer;font-weight:600">Show</a></label>
-        <input id="password" type="password" placeholder="Your password" autocomplete="current-password" />
-        <div style="text-align:right;margin-top:6px"><a id="forgot-link" style="font-size:12.5px;color:var(--accent);cursor:pointer">Forgot password?</a></div>
+<body data-product="reviews">
+<!-- Rendered by assets/account.js (shared by every account page). -->
+<!-- vn:nav -->
+<div class="vn-shell" role="banner">
+  <div class="vn-nav" id="vn-nav">
+    <a class="vn-brand" href="/"><svg width="24" height="24" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+    <div class="vn-links" role="navigation" aria-label="Main">
+      <div class="vn-has-menu">
+        <a class="vn-link" href="/#plugins">Plugins</a>
+        <div class="vn-menu">
+          <div class="vn-mm-group"><span>Reviews &amp; social proof</span><a class="vn-mm-item" href="/reviews">Reviews</a><a class="vn-mm-item" href="/instagram">Instagram Feed</a></div>
+          <div class="vn-mm-group"><span>Access &amp; traffic control</span><a class="vn-mm-item" href="/geoblock">Bouncer</a><a class="vn-mm-item" href="/router">Router</a></div>
+          <div class="vn-mm-group"><span>Site status</span><a class="vn-mm-item" href="/maintenance">Maintenance Mode <em class="vn-soon">soon</em></a></div>
+          <div class="vn-mm-group vn-mm-wide"><span>Missing one?</span><a class="vn-mm-item" href="/suggest">Suggest a plugin &rarr;</a></div>
+        </div>
       </div>
-      <div class="err" id="auth-err"></div>
-      <div class="err" id="auth-ok" style="background:#e9f7ef;color:#16a34a"></div>
-      <button class="btn btn-blue" id="auth-btn">Sign in</button>
-      <div class="switch" id="auth-switch">New to Vanssay? <a>Create an account</a></div>
+      <a class="vn-link" href="/guides/">Guides</a>
+      <a class="vn-link" href="/contact">Contact</a>
     </div>
+    <div class="vn-cta"><a href="/accounts" class="vn-btn">Your account →</a></div>
   </div>
-
-  <!-- Dashboard -->
-  <div id="dash">
-    <h1>Your account</h1>
-    <p class="sub" id="d-email"></p>
-    <p style="margin:-22px 0 26px"><a href="accounts" style="color:var(--accent);font-weight:600;font-size:13.5px">← Your Vanssay account &amp; all plugins</a></p>
-
-    <div id="quota-banner" class="quota-alert">
-      <strong>Your widget is showing fewer reviews</strong>
-      <p>You've used all <span id="qb-limit">300</span> widget views included in your plan this month, so your widget now shows <b>3 reviews</b> instead of your full set. It stays live on your site. Upgrade to show them all.</p>
-      <button class="btn btn-blue" id="quota-up">Upgrade to Pro ($9/mo)</button>
+</div>
+<div class="vn-spacer" aria-hidden="true"></div>
+<!-- /vn:nav -->
+<div id="app"></div>
+<noscript><p style="padding:48px 24px;text-align:center">Your Vanssay account needs JavaScript. Turn it on and reload, or email support@vanssay.net.</p></noscript>
+<!-- vn:foot -->
+<div class="vn-foot" role="contentinfo">
+  <div class="vn-wrap vn-foot-grid">
+    <div class="vn-foot-brand">
+      <a class="vn-brand" href="/"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+      <p>Focused plugins for Framer sites. Made in Nantes, France.</p>
     </div>
-
-    <div class="dash-grid">
-      <div class="col">
-        <div class="card">
-          <div class="row"><h3>Plan</h3><span class="badge b-free" id="d-plan">Free</span></div>
-          <p class="muted" id="d-renew"></p>
-          <div class="actions" id="d-billing"></div>
-        </div>
-
-        <div class="card">
-          <div class="row"><h3>Widget views this month</h3><strong id="d-views">-</strong></div>
-          <div class="meter"><span id="d-meter" style="width:0%"></span></div>
-          <p class="muted" id="d-limit"></p>
-        </div>
-
-        <div id="d-invoices" style="display:none"></div>
-      </div>
-
-      <div class="col">
-        <div class="card">
-          <div class="row"><h3>Reviews live on your site</h3></div>
-          <p class="muted">See the exact reviews your widget is showing right now, and when they last synced.</p>
-          <div class="actions"><a class="btn btn-line" href="reviews-live">View live reviews →</a></div>
-        </div>
-
-        <div class="card">
-          <h3>Profile</h3>
-          <p class="muted">Signed-in email: <strong id="d-email2"></strong></p>
-          <p class="muted">To change your email, contact <a href="mailto:support@vanssay.net" style="color:var(--accent)">support@vanssay.net</a>.</p>
-          <div class="err" id="dash-err"></div>
-          <div class="err" id="dash-ok" style="background:#e9f7ef;color:#16a34a"></div>
-          <div class="actions">
-            <button class="btn btn-line" id="d-changepass">Change password</button>
-            <button class="btn btn-line" id="d-signout">Sign out</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="vn-foot-col"><span>Plugins</span><a href="/reviews">Reviews</a><a href="/instagram">Instagram Feed</a><a href="/geoblock">Bouncer</a><a href="/router">Router</a></div>
+    <div class="vn-foot-col"><span>Resources</span><a href="/guides/">Guides</a><a href="/suggest">Suggest a plugin</a><a href="/accounts">Your account</a><a href="/contact">Contact</a></div>
+    <div class="vn-foot-col"><span>Company</span><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:support@vanssay.net">support@vanssay.net</a></div>
   </div>
-</main>
-
-<script src="assets/invoices.js"></script>
-<script>
-const API = localStorage.getItem("vanssay.apiBase") || "https://api.vanssay.net";
-// Checkout sends a plan CHOICE; the backend resolves the live Stripe price id
-// from its env (single source of truth). Yearly plans give 2 months free.
-const PLAN_COPY = {
-  starter:    { label: "Starter", price: "$5.99/mo" },
-  starterYearly:{ label: "Starter", price: "$59.90/yr" },
-  pro:        { label: "Pro",    price: "$9/mo"  },
-  proYearly:  { label: "Pro",    price: "$90/yr" },
-  ultra:      { label: "Agency", price: "$29/mo" },
-  ultraYearly:{ label: "Agency", price: "$290/yr" },
-  // One payment, no interval. 100k views a month and a WEEKLY refresh rather
-  // than the continuous one the recurring plans get — that difference is what
-  // makes a single payment sustainable, so it is stated on the button.
-  lifetime:   { label: "Lifetime", price: "$129 once" },
-};
-const TKEY = "vanssay.token";
-let registerMode = false;
-
-const $ = (id) => document.getElementById(id);
-const api = async (path, opts = {}) => {
-  const headers = { ...(opts.body ? { "Content-Type": "application/json" } : {}) };
-  const t = localStorage.getItem(TKEY);
-  if (t) headers.Authorization = "Bearer " + t;
-  const res = await fetch(API + path, { method: opts.method || "GET", headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || "Something went wrong");
-  return data;
-};
-const showErr = (id, msg) => { const el = $(id); el.textContent = msg; el.style.display = msg ? "block" : "none"; };
-
-// Auto sign-in when arriving from the plugin (#token=<jwt>)
-if (location.hash.startsWith("#token=")) {
-  localStorage.setItem(TKEY, decodeURIComponent(location.hash.slice(7)));
-  history.replaceState(null, "", location.pathname);
-}
-
-// Modes: login | register | forgot | reset (arriving from the email link)
-let mode = location.hash.startsWith("#reset=") ? "reset" : "login";
-const resetToken = mode === "reset" ? location.hash.slice(7) : "";
-const COPY = {
-  login: ["Welcome back", "Sign in", 'New to Vanssay? <a>Create an account</a>'],
-  register: ["Create your account", "Create account", 'Already have an account? <a>Sign in</a>'],
-  forgot: ["Reset your password", "Send reset link", '<a>Back to sign in</a>'],
-  reset: ["Choose a new password", "Set new password", '<a>Back to sign in</a>'],
-};
-function render() {
-  $("auth-title").textContent = COPY[mode][0];
-  $("auth-btn").textContent = COPY[mode][1];
-  $("auth-switch").innerHTML = COPY[mode][2];
-  $("f-email").style.display = mode === "reset" ? "none" : "block";
-  $("f-pass").style.display = mode === "forgot" ? "none" : "block";
-  $("forgot-link").style.display = mode === "login" ? "inline" : "none";
-  $("password").placeholder = mode === "reset" || mode === "register" ? "At least 8 characters" : "Your password";
-  showErr("auth-err", ""); showErr("auth-ok", "");
-}
-$("auth-switch").onclick = () => { mode = mode === "login" ? "register" : "login"; render(); };
-$("forgot-link").onclick = () => { mode = "forgot"; render(); };
-$("toggle-pass").onclick = () => {
-  const p = $("password");
-  p.type = p.type === "password" ? "text" : "password";
-  $("toggle-pass").textContent = p.type === "password" ? "Show" : "Hide";
-};
-
-$("auth-btn").onclick = async () => {
-  showErr("auth-err", ""); showErr("auth-ok", "");
-  try {
-    if (mode === "forgot") {
-      await api("/auth/forgot-password", { method: "POST", body: { email: $("email").value.trim() } });
-      showErr("auth-ok", "If an account exists for that email, a reset link from no-reply@vanssay.net is on its way. Check your inbox (and spam).");
-      return;
-    }
-    if (mode === "reset") {
-      await api("/auth/reset-password", { method: "POST", body: { token: resetToken, password: $("password").value } });
-      history.replaceState(null, "", location.pathname);
-      mode = "login"; render();
-      showErr("auth-ok", "Password updated. Sign in with your new password.");
-      return;
-    }
-    const r = await api(mode === "register" ? "/auth/register" : "/auth/login", { method: "POST", body: { email: $("email").value.trim(), password: $("password").value } });
-    localStorage.setItem(TKEY, r.token);
-    load();
-  } catch (e) { showErr("auth-err", e.message); }
-};
-render();
-$("password").addEventListener("keydown", (e) => e.key === "Enter" && $("auth-btn").click());
-
-async function load() {
-  // Arriving from a reset-password email: always show the reset form, even
-  // when a session already exists in this browser.
-  if (mode === "reset") { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
-  if (!localStorage.getItem(TKEY)) { $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none"; return; }
-  // Token present (e.g. arriving from the plugin), spinner instead of the login form.
-  $("auth").style.display = "none"; $("dash").style.display = "none"; $("loading").style.display = "block";
-  try {
-    const me = await api("/auth/me");
-    $("loading").style.display = "none"; $("dash").style.display = "block";
-    $("d-email").textContent = me.user.email; $("d-email2").textContent = me.user.email;
-    const plan = me.subscription.plan;
-    const badge = $("d-plan");
-    badge.textContent = plan === "ultra" ? "Agency" : plan[0].toUpperCase() + plan.slice(1);
-    badge.className = "badge b-" + plan;
-    const interval = me.subscription.interval; // 'month' | 'year' | null
-    const billedLabel = interval === "year" ? "Billed yearly" : interval === "month" ? "Billed monthly" : null;
-    if (plan === "free") {
-      $("d-renew").textContent = "Free forever. Upgrade anytime.";
-    } else if (plan === "lifetime") {
-      // Nothing renews, so the subscription copy below would have read
-      // "active subscription" to someone who deliberately bought the opposite.
-      // The weekly refresh is stated here too: it is the tradeoff that makes a
-      // single payment work, and this is where they check what they own.
-      $("d-renew").textContent = "One payment · yours forever. Reviews refresh weekly.";
-    } else {
-      const renews = me.subscription.currentPeriodEnd ? "renews " + new Date(me.subscription.currentPeriodEnd).toLocaleDateString() : "active subscription";
-      $("d-renew").textContent = billedLabel ? `${billedLabel} · ${renews}` : renews[0].toUpperCase() + renews.slice(1);
-    }
-
-    const actions = $("d-billing");
-    const checkout = (choice) => async () => { try { const r = await api("/billing/create-checkout", { method: "POST", body: { plan: choice } }); location.href = r.checkoutUrl; } catch (e) { showErr("dash-err", e.message); } };
-    const portal = async () => { try { const r = await api("/billing/portal", { method: "POST" }); location.href = r.portalUrl; } catch (e) { showErr("dash-err", e.message); } };
-    const switchInterval = (to) => async () => { showErr("dash-err", ""); try { await api("/billing/change-interval", { method: "POST", body: { interval: to } }); location.reload(); } catch (e) { showErr("dash-err", e.message); } };
-
-    let cycle = "monthly"; // billing-cycle toggle driving the upgrade buttons
-    function renderBilling() {
-      actions.innerHTML = "";
-      const mk = (label, cls, fn) => { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.onclick = fn; actions.appendChild(b); };
-      // Monthly / yearly toggle — yearly gives 2 months free. Only where upgrading is possible.
-      if (plan === "free" || plan === "starter" || plan === "pro") {
-        const t = document.createElement("div"); t.className = "cycle";
-        const seg = (val, txt) => { const s = document.createElement("button"); s.type = "button"; s.className = "cycle-opt" + (cycle === val ? " on" : ""); s.textContent = txt; s.onclick = () => { cycle = val; renderBilling(); }; t.appendChild(s); };
-        seg("monthly", "Monthly"); seg("yearly", "Yearly · 2 months free");
-        actions.appendChild(t);
-      }
-      const starterChoice = cycle === "yearly" ? "starterYearly" : "starter";
-      const proChoice = cycle === "yearly" ? "proYearly" : "pro";
-      const agencyChoice = cycle === "yearly" ? "ultraYearly" : "ultra";
-      if (plan === "free") {
-        mk(`Start Starter (${PLAN_COPY[starterChoice].price})`, "btn-line", checkout(starterChoice));
-        mk(`Upgrade to Pro (${PLAN_COPY[proChoice].price})`, "btn-line", checkout(proChoice));
-        mk(`Lifetime (${PLAN_COPY.lifetime.price})`, "btn-line", checkout("lifetime"));
-        mk(`Go Agency (${PLAN_COPY[agencyChoice].price})`, "btn-blue", checkout(agencyChoice));
-      } else if (plan === "starter") {
-        mk(`Upgrade to Pro (${PLAN_COPY[proChoice].price})`, "btn-line", checkout(proChoice));
-        mk(`Lifetime (${PLAN_COPY.lifetime.price})`, "btn-line", checkout("lifetime"));
-        mk(`Go Agency (${PLAN_COPY[agencyChoice].price})`, "btn-blue", checkout(agencyChoice));
-        if (interval === "month") mk("Switch to yearly · 2 months free", "btn-line", switchInterval("year"));
-        else if (interval === "year") mk("Switch to monthly", "btn-line", switchInterval("month"));
-        mk("Manage / cancel billing", "btn-line", portal);
-      } else if (plan === "pro") {
-        mk(`Upgrade to Agency (${PLAN_COPY[agencyChoice].price})`, "btn-blue", checkout(agencyChoice));
-        if (interval === "month") mk("Switch to yearly · 2 months free", "btn-line", switchInterval("year"));
-        else if (interval === "year") mk("Switch to monthly", "btn-line", switchInterval("month"));
-        mk("Manage / cancel billing", "btn-line", portal);
-      } else if (plan === "lifetime") {
-        // Deliberately no buttons. There is no interval to switch and no Stripe
-        // subscription for the portal to open — offering either would send a
-        // paid-up owner to an error. The receipt lives in the invoices card
-        // below, which every plan already gets.
-      } else {
-        if (interval === "month") mk("Switch to yearly · 2 months free", "btn-line", switchInterval("year"));
-        else if (interval === "year") mk("Switch to monthly", "btn-line", switchInterval("month"));
-        mk("Manage / cancel billing", "btn-line", portal);
-      }
-    }
-    renderBilling();
-    VanssayInvoices.mount({ apiBase: API, tokenKey: TKEY, product: "reviews", mountId: "d-invoices" });
-
-    try {
-      const u = await api("/track/usage");
-      $("d-views").textContent = u.views.toLocaleString();
-      $("d-limit").textContent = "Included in your plan: " + (u.limit > 0 ? u.limit.toLocaleString() + " views / month" : "Unlimited views");
-      const pct = u.limit > 0 ? Math.min(100, (u.views / u.limit) * 100) : 0;
-      const m = $("d-meter"); m.style.width = pct + "%";
-      m.style.background = pct > 90 ? "var(--error)" : pct > 70 ? "#d97706" : "var(--accent)";
-      // Over the cap → the widget degrades to 3 reviews (it is never hidden).
-      // Only Free/Starter degrade, so only nudge those; Pro/Agency keep their full set.
-      const over = (plan === "free" || plan === "starter") && u.limit > 0 && u.views > u.limit;
-      $("quota-banner").style.display = over ? "block" : "none";
-      if (over) {
-        $("qb-limit").textContent = u.limit.toLocaleString();
-        $("quota-up").textContent = plan === "free" ? "Upgrade to Starter ($5.99/mo)" : "Upgrade to Pro ($9/mo)";
-        $("quota-up").onclick = checkout(plan === "free" ? "starter" : "pro");
-      }
-    } catch (e) { $("d-limit").textContent = "Usage unavailable right now."; }
-  } catch (e) {
-    localStorage.removeItem(TKEY); $("loading").style.display = "none"; $("auth").style.display = "block"; $("dash").style.display = "none";
-  }
-}
-$("d-signout").onclick = () => { localStorage.removeItem(TKEY); load(); };
-$("d-changepass").onclick = async () => {
-  const btn = $("d-changepass");
-  if (btn.disabled) return;
-  showErr("dash-err", ""); showErr("dash-ok", "");
-  try {
-    await api("/auth/forgot-password", { method: "POST", body: { email: $("d-email2").textContent.trim() } });
-    showErr("dash-ok", "Check your inbox: a reset link from no-reply@vanssay.net is on its way (valid 1 hour).");
-    // 60s cooldown so the button can't be spammed.
-    btn.disabled = true; btn.style.opacity = ".55";
-    let left = 60;
-    btn.textContent = "Email sent (" + left + "s)";
-    const t = setInterval(() => {
-      left--;
-      if (left <= 0) { clearInterval(t); btn.disabled = false; btn.style.opacity = ""; btn.textContent = "Change password"; }
-      else btn.textContent = "Email sent (" + left + "s)";
-    }, 1000);
-  } catch (e) { showErr("dash-err", e.message); }
-};
-load();
-</script>
+  <div class="vn-wrap vn-foot-bottom"><span>© 2026 Vanssay</span></div>
+</div>
+<!-- /vn:foot -->
+<script src="assets/invoices.js?v=2"></script>
+<script src="assets/account.js?v=3"></script>
 </body>
 </html>

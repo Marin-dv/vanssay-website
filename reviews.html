@@ -35,20 +35,9 @@ h1,h2,h3{font-family:'Bricolage Grotesque',-apple-system,sans-serif;font-weight:
 .serif{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.03em;color:var(--accent);
   text-decoration:underline;text-decoration-thickness:5px;text-underline-offset:7px}
 .mono{font-family:'Space Mono',monospace}
-
-/* ── nav ────────────────────────────────────────────────────────────── */
-.nav-shell{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;justify-content:center;padding:16px 20px 0;pointer-events:none}
 nav{pointer-events:auto;width:min(1180px,100%);border-radius:999px;background:transparent;border:1px solid transparent;padding:7px 7px 7px 22px;transition:background .35s ease,border-color .35s ease,box-shadow .35s ease}
 nav.scrolled{background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(16px) saturate(1.4);border-color:var(--border);box-shadow:0 1px 2px rgba(22,21,27,.04),0 6px 18px rgba(22,21,27,.05)}
-.nav-in{display:flex;align-items:center;justify-content:space-between;height:50px;gap:20px}
-.logo{display:flex;align-items:center;gap:9px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.03em}
-.nav-links{display:flex;align-items:center;gap:22px;font-family:'Space Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2)}
-.nav-links a:hover{color:var(--accent)}
-@media(max-width:940px){.nav-links{display:none}}
-.nav-in .btn{border-radius:999px}
 .has-menu{position:relative;display:flex;align-items:center;cursor:default}
-.megamenu{position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%) translateY(8px);width:520px;background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow-lg);padding:22px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;opacity:0;visibility:hidden;transition:opacity .22s ease,transform .22s cubic-bezier(.16,1,.3,1),visibility .22s;text-transform:none;letter-spacing:normal;font-family:'Inter',sans-serif}
-.has-menu:hover .megamenu{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
 .mm-group span{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;font-family:'Space Mono',monospace}
 .mm-item{display:block;padding:7px 0;font-size:13.5px;font-weight:600;color:var(--text);border-radius:8px;transition:color .15s ease,transform .15s ease}
 .mm-item:hover{color:var(--accent);transform:translateX(2px)}
@@ -391,53 +380,34 @@ summary::-webkit-details-marker{display:none}
 summary::after{content:"+";font-size:22px;font-weight:300;color:var(--accent);transition:transform .25s;flex-shrink:0}
 details[open] summary::after{transform:rotate(45deg)}
 details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
-
-/* ── footer ─────────────────────────────────────────────────────────── */
-.site-foot{background:#16151b;color:#fff;padding:84px 0 40px;position:relative;overflow:hidden}
-.site-foot .wrap{position:relative;z-index:2}
-.site-foot .foot-logo{display:flex;align-items:center;gap:9px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.03em;margin-bottom:30px}
-.site-foot h2{color:#fff;max-width:780px}
-.site-foot h2 .serif{color:#8ab0ff;text-decoration-color:#8ab0ff}
-.site-foot p{color:rgba(255,255,255,.6);max-width:480px;margin:18px 0 30px;font-size:16px}
-.site-foot .foot-links{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:54px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14);font-family:'Space Mono',monospace;font-size:12px;color:rgba(255,255,255,.5)}
-.site-foot .foot-links a{color:rgba(255,255,255,.7)}.site-foot .foot-links a:hover{color:#fff}
 </style>
 <script defer src="assets/track.js"></script>
+<link rel="stylesheet" href="/assets/chrome.css?v=1" />
+<script defer src="/assets/chrome.js?v=1"></script>
 </head>
 <body>
 
-<div class="nav-shell">
-<nav id="nav"><div class="nav-in">
-  <a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
-  <div class="nav-links">
-    <div class="has-menu">
-      <span>Plugins</span>
-      <div class="megamenu">
-        <div class="mm-group">
-          <span>Reviews &amp; social proof</span>
-          <a class="mm-item" href="reviews">Reviews</a>
-          <a class="mm-item" href="instagram">Instagram Feed</a>
-        </div>
-        <div class="mm-group">
-          <span>Access &amp; traffic control</span>
-          <a class="mm-item" href="geoblock">Bouncer</a>
-          <a class="mm-item" href="router">Router</a>
-        </div>
-        <div class="mm-group">
-          <span>Site status</span>
-          <a class="mm-item" href="maintenance">Maintenance Mode</a>
-        </div>
-        <div class="mm-group" style="grid-column:1/-1;border-top:1px solid rgba(128,128,140,.22);padding-top:13px">
-          <span>Missing one?</span>
-          <a class="mm-item" href="suggest">Suggest a plugin &rarr;</a>
+<!-- vn:nav nospacer -->
+<div class="vn-shell" role="banner">
+  <div class="vn-nav" id="vn-nav">
+    <a class="vn-brand" href="/"><svg width="24" height="24" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+    <div class="vn-links" role="navigation" aria-label="Main">
+      <div class="vn-has-menu">
+        <a class="vn-link" href="/#plugins">Plugins</a>
+        <div class="vn-menu">
+          <div class="vn-mm-group"><span>Reviews &amp; social proof</span><a class="vn-mm-item" href="/reviews">Reviews</a><a class="vn-mm-item" href="/instagram">Instagram Feed</a></div>
+          <div class="vn-mm-group"><span>Access &amp; traffic control</span><a class="vn-mm-item" href="/geoblock">Bouncer</a><a class="vn-mm-item" href="/router">Router</a></div>
+          <div class="vn-mm-group"><span>Site status</span><a class="vn-mm-item" href="/maintenance">Maintenance Mode <em class="vn-soon">soon</em></a></div>
+          <div class="vn-mm-group vn-mm-wide"><span>Missing one?</span><a class="vn-mm-item" href="/suggest">Suggest a plugin &rarr;</a></div>
         </div>
       </div>
+      <a class="vn-link" href="/guides/">Guides</a>
+      <a class="vn-link" href="/contact">Contact</a>
     </div>
-    <a href="#studio">Layouts</a><a href="#cards">Card styles</a><a href="#pricing">Pricing</a>
+    <div class="vn-cta"><a href="/accounts" class="vn-btn">Your account →</a></div>
   </div>
-  <a class="btn btn-dark btn-sm" href="account">Your account →</a>
-</div></nav>
 </div>
+<!-- /vn:nav -->
 
 <!-- ══ hero ══════════════════════════════════════════════════════════ -->
 <header class="hero">
@@ -772,18 +742,20 @@ details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
   </div>
 </section>
 
-<footer class="site-foot">
-  <div class="wrap">
-    <div class="foot-logo"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#fff"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</div>
-    <h2>Stop telling visitors you're good.<br/>Let your <span class="serif">customers</span> do it.</h2>
-    <p>Add Vanssay to your Framer project and turn five-star reviews into revenue, in the next two minutes.</p>
-    <a class="btn btn-blue" href="https://www.framer.com/community/marketplace/plugins/vanssay-google-trustpilot-reviews/">Add to Framer (free)</a>
-    <div class="foot-links">
-      <span>© 2026 Vanssay · <a href="privacy">Privacy</a> · <a href="terms">Terms</a> · <a href="suggest">Suggest a plugin</a></span>
-      <span>Google &amp; Trustpilot reviews for <a href="https://www.framer.com" target="_blank" rel="noopener noreferrer">Framer</a> · <a href="mailto:support@vanssay.net">support@vanssay.net</a></span>
+<!-- vn:foot -->
+<div class="vn-foot" role="contentinfo">
+  <div class="vn-wrap vn-foot-grid">
+    <div class="vn-foot-brand">
+      <a class="vn-brand" href="/"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+      <p>Focused plugins for Framer sites. Made in Nantes, France.</p>
     </div>
+    <div class="vn-foot-col"><span>Plugins</span><a href="/reviews">Reviews</a><a href="/instagram">Instagram Feed</a><a href="/geoblock">Bouncer</a><a href="/router">Router</a></div>
+    <div class="vn-foot-col"><span>Resources</span><a href="/guides/">Guides</a><a href="/suggest">Suggest a plugin</a><a href="/accounts">Your account</a><a href="/contact">Contact</a></div>
+    <div class="vn-foot-col"><span>Company</span><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:support@vanssay.net">support@vanssay.net</a></div>
   </div>
-</footer>
+  <div class="vn-wrap vn-foot-bottom"><span>© 2026 Vanssay</span></div>
+</div>
+<!-- /vn:foot -->
 
 <script src="assets/reviews-data.js"></script>
 <script src="assets/reviews-demo.js"></script>
@@ -1166,12 +1138,6 @@ if (location.hash.startsWith("#token=")) {
 
 
   /* ── ambient page behaviour ───────────────────────────────────────── */
-  function wireNav() {
-    var nav = $("nav");
-    var set = function () { nav.classList.toggle("scrolled", scrollY > 40); };
-    set();
-    addEventListener("scroll", set, { passive: true });
-  }
   function wireReveal() {
     var els = document.querySelectorAll("[data-rv]");
     if (typeof IntersectionObserver === "undefined") {
@@ -1296,7 +1262,6 @@ if (location.hash.startsWith("#token=")) {
   paint(cmpD);
   wireCompare();
   wireRows();
-  wireNav();
   wireReveal();
   wireSteps();
   wirePricing();

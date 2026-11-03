@@ -18,12 +18,7 @@
     body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; -webkit-font-smoothing:antialiased; }
     a { color:inherit; text-decoration:none; }
     .wrap { max-width:1140px; margin:0 auto; padding:0 28px; }
-    nav { position:sticky; top:0; z-index:100; background:rgba(250,250,250,.85); backdrop-filter:blur(14px); border-bottom:1px solid var(--border); }
-    .nav-in { display:flex; align-items:center; justify-content:space-between; height:64px; }
-    .logo { display:flex; align-items:center; gap:9px; font-weight:800; font-size:17px; }
     .logo-dot { width:22px; height:22px; border-radius:7px; background:linear-gradient(135deg,var(--accent),var(--pro)); }
-    .nav-links { display:flex; gap:28px; font-size:14px; font-weight:500; color:var(--text-2); }
-    .nav-links a:hover { color:var(--text); }
     .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:11px; font-weight:700; font-size:14px; border:1px solid transparent; cursor:pointer; }
     .btn-blue { background:linear-gradient(120deg,var(--accent),var(--pro)); color:#fff; box-shadow:0 8px 24px rgba(14,122,254,.3); }
     header { text-align:center; padding:72px 0 36px; }
@@ -74,16 +69,35 @@
     .cta { text-align:center; padding-bottom:90px; }
     .cta p { color:var(--text-2); margin-bottom:18px; }
     @media (prefers-reduced-motion:reduce){ .lay-ticker .row,.lay-wall .col{animation:none;} }
-    @media (max-width:760px){ .nav-links{display:none;} .stage{padding:22px;} }
+    @media (max-width:760px){ .stage{padding:22px;} }
   </style>
 <script defer src="assets/track.js"></script>
+<link rel="stylesheet" href="/assets/chrome.css?v=1" />
+<script defer src="/assets/chrome.js?v=1"></script>
 </head>
 <body>
-<nav><div class="wrap nav-in">
-  <a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a>
-  <div class="nav-links"><a href="/#widgets">Widgets</a><a href="/#pricing">Pricing</a><a href="account">Account</a></div>
-  <a class="btn btn-blue" href="/#pricing">Add to Framer</a>
-</div></nav>
+<!-- vn:nav -->
+<div class="vn-shell" role="banner">
+  <div class="vn-nav" id="vn-nav">
+    <a class="vn-brand" href="/"><svg width="24" height="24" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+    <div class="vn-links" role="navigation" aria-label="Main">
+      <div class="vn-has-menu">
+        <a class="vn-link" href="/#plugins">Plugins</a>
+        <div class="vn-menu">
+          <div class="vn-mm-group"><span>Reviews &amp; social proof</span><a class="vn-mm-item" href="/reviews">Reviews</a><a class="vn-mm-item" href="/instagram">Instagram Feed</a></div>
+          <div class="vn-mm-group"><span>Access &amp; traffic control</span><a class="vn-mm-item" href="/geoblock">Bouncer</a><a class="vn-mm-item" href="/router">Router</a></div>
+          <div class="vn-mm-group"><span>Site status</span><a class="vn-mm-item" href="/maintenance">Maintenance Mode <em class="vn-soon">soon</em></a></div>
+          <div class="vn-mm-group vn-mm-wide"><span>Missing one?</span><a class="vn-mm-item" href="/suggest">Suggest a plugin &rarr;</a></div>
+        </div>
+      </div>
+      <a class="vn-link" href="/guides/">Guides</a>
+      <a class="vn-link" href="/contact">Contact</a>
+    </div>
+    <div class="vn-cta"><a href="/accounts" class="vn-btn">Your account →</a></div>
+  </div>
+</div>
+<div class="vn-spacer" aria-hidden="true"></div>
+<!-- /vn:nav -->
 
 <header class="wrap">
   <h1>Play with the widgets</h1>
@@ -137,5 +151,19 @@ document.getElementById("tabs").addEventListener("click", (e) => {
   body.innerHTML = layouts[b.dataset.l];
 });
 </script>
+<!-- vn:foot -->
+<div class="vn-foot" role="contentinfo">
+  <div class="vn-wrap vn-foot-grid">
+    <div class="vn-foot-brand">
+      <a class="vn-brand" href="/"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+      <p>Focused plugins for Framer sites. Made in Nantes, France.</p>
+    </div>
+    <div class="vn-foot-col"><span>Plugins</span><a href="/reviews">Reviews</a><a href="/instagram">Instagram Feed</a><a href="/geoblock">Bouncer</a><a href="/router">Router</a></div>
+    <div class="vn-foot-col"><span>Resources</span><a href="/guides/">Guides</a><a href="/suggest">Suggest a plugin</a><a href="/accounts">Your account</a><a href="/contact">Contact</a></div>
+    <div class="vn-foot-col"><span>Company</span><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:support@vanssay.net">support@vanssay.net</a></div>
+  </div>
+  <div class="vn-wrap vn-foot-bottom"><span>© 2026 Vanssay</span></div>
+</div>
+<!-- /vn:foot -->
 </body>
 </html>

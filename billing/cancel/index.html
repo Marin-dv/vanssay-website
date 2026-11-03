@@ -8,20 +8,58 @@
 <style>
   :root { --text:#18181b; --muted:#71717a; --accent:#2563eb; --border:#e4e4e7; }
   * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:'Inter',sans-serif; background:#fafafa; color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  body { font-family:'Inter',sans-serif; background:#fafafa; color:var(--text); min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; }
   .card { background:#fff; border:1px solid var(--border); border-radius:18px; padding:48px 44px; max-width:460px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,.06); }
   .emoji { font-size:44px; }
   h1 { font-size:24px; margin:18px 0 10px; letter-spacing:-.02em; }
   p { color:var(--muted); font-size:14.5px; line-height:1.65; }
   .btn { display:inline-block; margin-top:26px; padding:12px 22px; border-radius:12px; background:var(--accent); color:#fff; font-weight:600; font-size:14px; text-decoration:none; }
 </style>
+<link rel="stylesheet" href="/assets/chrome.css?v=1" />
+<script defer src="/assets/chrome.js?v=1"></script>
 </head>
 <body>
+<!-- vn:nav -->
+<div class="vn-shell" role="banner">
+  <div class="vn-nav" id="vn-nav">
+    <a class="vn-brand" href="/"><svg width="24" height="24" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+    <div class="vn-links" role="navigation" aria-label="Main">
+      <div class="vn-has-menu">
+        <a class="vn-link" href="/#plugins">Plugins</a>
+        <div class="vn-menu">
+          <div class="vn-mm-group"><span>Reviews &amp; social proof</span><a class="vn-mm-item" href="/reviews">Reviews</a><a class="vn-mm-item" href="/instagram">Instagram Feed</a></div>
+          <div class="vn-mm-group"><span>Access &amp; traffic control</span><a class="vn-mm-item" href="/geoblock">Bouncer</a><a class="vn-mm-item" href="/router">Router</a></div>
+          <div class="vn-mm-group"><span>Site status</span><a class="vn-mm-item" href="/maintenance">Maintenance Mode <em class="vn-soon">soon</em></a></div>
+          <div class="vn-mm-group vn-mm-wide"><span>Missing one?</span><a class="vn-mm-item" href="/suggest">Suggest a plugin &rarr;</a></div>
+        </div>
+      </div>
+      <a class="vn-link" href="/guides/">Guides</a>
+      <a class="vn-link" href="/contact">Contact</a>
+    </div>
+    <div class="vn-cta"><a href="/accounts" class="vn-btn">Your account →</a></div>
+  </div>
+</div>
+<div class="vn-spacer" aria-hidden="true"></div>
+<!-- /vn:nav -->
   <div class="card">
     <div class="emoji">🙅</div>
     <h1>Payment canceled</h1>
     <p>No charge was made. You can keep using Vanssay on the free plan, and upgrade anytime from the plugin or your account page.</p>
     <a class="btn" href="/#pricing">Back to pricing</a>
   </div>
+<!-- vn:foot -->
+<div class="vn-foot" role="contentinfo">
+  <div class="vn-wrap vn-foot-grid">
+    <div class="vn-foot-brand">
+      <a class="vn-brand" href="/"><svg width="20" height="20" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#16151b"/><path d="M34,4H25L13,36H22Z" fill="#2b50ff"/></svg>Vanssay</a>
+      <p>Focused plugins for Framer sites. Made in Nantes, France.</p>
+    </div>
+    <div class="vn-foot-col"><span>Plugins</span><a href="/reviews">Reviews</a><a href="/instagram">Instagram Feed</a><a href="/geoblock">Bouncer</a><a href="/router">Router</a></div>
+    <div class="vn-foot-col"><span>Resources</span><a href="/guides/">Guides</a><a href="/suggest">Suggest a plugin</a><a href="/accounts">Your account</a><a href="/contact">Contact</a></div>
+    <div class="vn-foot-col"><span>Company</span><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:support@vanssay.net">support@vanssay.net</a></div>
+  </div>
+  <div class="vn-wrap vn-foot-bottom"><span>© 2026 Vanssay</span></div>
+</div>
+<!-- /vn:foot -->
 </body>
 </html>

@@ -1,0 +1,77 @@
+/* ============================================================
+   Vanssay site chrome: the floating nav and the footer, shared by
+   every page. The look is the home page's.
+
+   The markup lives in each page between <!-- vn:nav --> / <!-- vn:foot -->
+   markers and is written by tools/chrome.mjs. Edit it there, then run
+   `node tools/chrome.mjs`.
+
+   Every class is prefixed vn- and every property the chrome depends on is
+   set here, so a page's own styles (bare `nav{}`, `footer{}`, `.btn`,
+   `a{}`…) can't leak in. Loaded last in <head> for the same reason.
+   ============================================================ */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@700&display=swap");
+
+.vn-shell,.vn-foot{
+  --vn-ink:#16151b; --vn-ink-soft:rgba(22,21,27,.6); --vn-ink-faint:rgba(22,21,27,.4);
+  --vn-paper:#f6f6f4; --vn-surface:#fffefb; --vn-line:rgba(22,21,27,.09); --vn-accent:#2b50ff;
+  --vn-disp:"Bricolage Grotesque",Inter,sans-serif; --vn-body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --vn-mono:"Space Mono",ui-monospace,monospace;
+  font-family:var(--vn-body);color:var(--vn-ink);line-height:1.5;-webkit-font-smoothing:antialiased;text-align:left;
+}
+.vn-shell *,.vn-foot *{box-sizing:border-box;margin:0}
+.vn-shell a,.vn-foot a{color:inherit;text-decoration:none}
+
+/* ---- nav ---- */
+.vn-shell{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;justify-content:center;padding:18px 20px 0;pointer-events:none}
+.vn-nav{pointer-events:auto;width:min(1180px,100%);display:flex;align-items:center;justify-content:space-between;gap:24px;
+  padding:14px 14px 14px 22px;border-radius:999px;background:transparent;border:1px solid transparent;
+  transition:background .35s ease,border-color .35s ease,box-shadow .35s ease,padding .35s ease}
+.vn-nav.scrolled{background:color-mix(in srgb,var(--vn-paper) 85%,transparent);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);
+  border-color:var(--vn-line);box-shadow:0 1px 2px rgba(22,21,27,.04),0 6px 18px rgba(22,21,27,.05);padding:9px 9px 9px 22px}
+.vn-brand{display:flex;align-items:center;gap:9px;font-family:var(--vn-disp);font-weight:700;font-size:16.5px;letter-spacing:-.01em;color:var(--vn-ink)}
+.vn-brand svg{display:block;flex:none}
+.vn-links{display:flex;align-items:center;gap:6px;font-size:14.5px;font-weight:500;color:var(--vn-ink-soft)}
+.vn-link{position:relative;display:inline-block;padding:9px 14px;border-radius:999px;transition:color .2s ease}
+.vn-link:hover{color:var(--vn-ink)}
+.vn-link::after{content:"";position:absolute;left:14px;right:14px;bottom:5px;height:1px;background:var(--vn-ink);transform:scaleX(0);transform-origin:left;transition:transform .25s cubic-bezier(.16,1,.3,1)}
+.vn-link:hover::after{transform:scaleX(1)}
+@media (max-width:900px){.vn-links{display:none}}
+.vn-has-menu{position:relative}
+.vn-menu{position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%) translateY(8px);width:560px;background:var(--vn-surface);
+  border:1px solid var(--vn-line);border-radius:18px;box-shadow:0 20px 50px -18px rgba(22,21,27,.28);padding:22px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;opacity:0;visibility:hidden;
+  transition:opacity .22s ease,transform .22s cubic-bezier(.16,1,.3,1),visibility .22s}
+.vn-has-menu:hover .vn-menu,.vn-has-menu:focus-within .vn-menu{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.vn-mm-group>span{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--vn-ink-faint);margin-bottom:10px}
+.vn-mm-group.vn-mm-wide{grid-column:1/-1;border-top:1px solid rgba(128,128,140,.22);padding-top:13px}
+.vn-mm-item{display:block;padding:7px 0;font-size:13.5px;font-weight:600;color:var(--vn-ink);border-radius:8px;transition:color .15s ease,transform .15s ease}
+.vn-mm-item:hover{color:var(--vn-accent);transform:translateX(2px)}
+.vn-soon{font-style:normal;font-size:10.5px;font-weight:700;color:var(--vn-ink-faint);margin-left:4px}
+.vn-cta{display:flex;align-items:center;gap:10px}
+.vn-ghost{font-family:var(--vn-body);font-size:14px;font-weight:600;color:var(--vn-ink-soft);padding:9px 12px;border:0;background:none;cursor:pointer;white-space:nowrap}
+.vn-ghost:hover{color:var(--vn-ink)}
+@media (max-width:560px){.vn-ghost{display:none}}
+.vn-btn{display:inline-flex;align-items:center;gap:9px;padding:9px 16px;border-radius:999px;border:1px solid transparent;
+  font-family:var(--vn-body);font-size:13.5px;font-weight:700;line-height:1.4;white-space:nowrap;background:var(--vn-ink);color:var(--vn-paper);
+  transition:box-shadow .2s ease}
+.vn-shell a.vn-btn{color:var(--vn-paper)}
+.vn-btn:hover{box-shadow:0 16px 32px -12px rgba(0,0,0,.5)}
+.vn-shell :focus-visible,.vn-foot :focus-visible{outline:2px solid var(--vn-accent);outline-offset:3px}
+/* Keeps a page's content clear of the fixed nav. The home page has no spacer:
+   its hero already pads for it. */
+.vn-spacer{height:84px}
+/* Full width even on pages whose <body> is a centring flex column. */
+.vn-spacer,.vn-foot{align-self:stretch;width:100%}
+
+/* ---- footer ---- */
+.vn-foot{display:block;padding:56px 0 66px;background:transparent;border:0;font-size:13.5px}
+.vn-wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+@media (max-width:720px){.vn-wrap{padding:0 20px}}
+.vn-foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:32px;padding-bottom:40px;border-bottom:1px solid var(--vn-line)}
+@media (max-width:760px){.vn-foot-grid{grid-template-columns:1fr 1fr}.vn-foot-brand{grid-column:1/-1}}
+.vn-foot-brand p{margin-top:12px;font-size:13.5px;line-height:1.6;color:var(--vn-ink-soft);max-width:260px}
+.vn-foot-col{display:flex;flex-direction:column;gap:10px;font-size:13.5px;color:var(--vn-ink-soft)}
+.vn-foot-col>span{font-family:var(--vn-mono);font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--vn-ink-faint);margin-bottom:4px}
+.vn-foot-col a:hover{color:var(--vn-ink)}
+.vn-foot-bottom{padding-top:22px;font-size:13px;color:var(--vn-ink-faint)}
