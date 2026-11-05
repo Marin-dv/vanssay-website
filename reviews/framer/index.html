@@ -427,7 +427,7 @@ details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
 .wk-c > p{font-size:14.5px;color:var(--text-2);max-width:520px}
 .wk-vis{margin-top:auto;padding:16px;border-radius:var(--r-md);background:var(--bg);border:1px solid var(--border);display:grid;gap:10px}
 .wk-c > p{margin-bottom:14px}
-.wk-vis{align-content:center}
+.wk-c > .wk-vis{margin-top:0;flex:1;align-content:center}
 .wk-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--surface);border:1px solid var(--border);font-size:13.5px;min-width:0}
 .wk-row .av{width:32px;height:32px;flex:0 0 32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-2);background:var(--surface-2)}
 .wk-row .nm{font-weight:700;display:block}
@@ -1211,7 +1211,7 @@ if (location.hash.startsWith("#token=")) {
   function buildBadgeRow() {
     var box = $("bx-badges");
     box.innerHTML = "";
-    ["badge", "avatars", "gbadge"].forEach(function (k) {
+    ["badge", "gbadge"].forEach(function (k) {
       var host = document.createElement("div");
       host.className = "vrhost";
       box.appendChild(host);
