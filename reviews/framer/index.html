@@ -31,7 +31,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 a{color:inherit;text-decoration:none}
 img{max-width:100%}
 .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
-.wide{max-width:1440px;margin:0 auto;padding:0 28px}
+.wide{max-width:1180px;margin:0 auto;padding:0 28px}
 h1,h2,h3{font-family:'Bricolage Grotesque',-apple-system,sans-serif;font-weight:700;letter-spacing:-.025em;text-wrap:balance}
 .serif{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.03em;color:var(--accent);
   text-decoration:underline;text-decoration-thickness:5px;text-underline-offset:7px}
@@ -66,12 +66,12 @@ h3{font-size:20px;letter-spacing:-.02em}
 @media(prefers-reduced-motion:reduce){[data-rv]{opacity:1;transform:none;transition:none}}
 
 /* ── hero ───────────────────────────────────────────────────────────── */
-.hero{padding:148px 0 0;position:relative;overflow:hidden}
+.hero{padding:140px 0 88px;position:relative;overflow:hidden}
 .hero-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
 .dotgrid{position:absolute;inset:0;background-image:radial-gradient(rgba(128,128,140,.26) 1px,transparent 1px);background-size:26px 26px;-webkit-mask-image:radial-gradient(ellipse 80% 60% at 30% 0%,#000 35%,transparent 82%);mask-image:radial-gradient(ellipse 80% 60% at 30% 0%,#000 35%,transparent 82%)}
 .glow{position:absolute;top:-300px;left:20%;width:940px;height:660px;background:radial-gradient(ellipse at center,var(--accent-soft),transparent 68%);filter:blur(10px)}
 .hero .wide{position:relative;z-index:1}
-.hero-grid{display:grid;grid-template-columns:.94fr 1.06fr;gap:64px;align-items:center}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
 @media(max-width:1000px){.hero-grid{grid-template-columns:1fr;gap:44px}}
 h1{font-size:clamp(38px,5.2vw,64px);font-weight:700;letter-spacing:-.035em;line-height:1.02;margin:10px 0 22px}
 .hero .sub{font-size:clamp(16px,1.5vw,19px);color:var(--text-2);max-width:520px;margin-bottom:30px}
@@ -381,6 +381,35 @@ summary::after{content:"+";font-size:22px;font-weight:300;color:var(--accent);tr
 details[open] summary::after{transform:rotate(45deg)}
 details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
 
+/* ── hero frame: same browser-window look as the home page hero ─────── */
+.hf{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);overflow:hidden;min-width:0}
+.hf-bar{display:flex;align-items:center;gap:6px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg)}
+.hf-bar span:nth-child(-n+3){width:9px;height:9px;border-radius:50%;background:rgba(22,21,27,.12);flex:0 0 auto}
+.hf-url{margin:0 auto;padding:4px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--border);font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hf-site{padding:22px 18px 8px}
+.hf-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 6px}
+.hf-head b{font-family:'Bricolage Grotesque',sans-serif;font-size:19px;letter-spacing:-.02em}
+.hf-live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#16a34a;background:#e9f7ef;padding:4px 10px;border-radius:999px}
+.hf-live i{width:6px;height:6px;border-radius:50%;background:#16a34a;animation:blink 1.8s ease-in-out infinite}
+.hf .vrhost{min-height:300px;display:flex;align-items:center}
+.hf .vrhost .vr-root{animation:heroswap .45s ease}
+.hf-foot{display:flex;justify-content:space-between;gap:12px;padding:12px 18px 14px;border-top:1px solid var(--border);font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)}
+.hf-foot b{color:var(--text)}
+.checks{list-style:none;margin:28px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px 22px;font-size:13.5px;font-weight:600;color:var(--ink-soft)}
+.checks li{display:flex;align-items:center;gap:8px}
+.checks li::before{content:'';width:16px;height:16px;border-radius:50%;flex:0 0 16px;background:var(--accent-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232b50ff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center/10px no-repeat}
+.f4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:44px}
+@media(max-width:1000px){.f4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.f4{grid-template-columns:1fr}}
+.f4 > div{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:26px;display:grid;gap:10px;align-content:start}
+.f4 h3{font-size:18px}
+.f4 p{font-size:14px;color:var(--text-2)}
+.fw-soon{position:relative;margin-top:34px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;font-size:13.5px;color:rgba(255,255,255,.55)}
+.fw-soon .lgs{display:flex;gap:8px}
+.fw-soon .lgs span{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);color:#fff}
+.fw-soon .lgs svg{width:13px;height:13px;fill:currentColor}
+.fw-soon a{color:#fff;font-weight:700}
+
 /* ── platform-page furniture, shared look with /reviews/ ────────────── */
 .pill{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px;white-space:nowrap}
 .pill i{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 2s ease-in-out infinite}
@@ -394,7 +423,7 @@ details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
 .fw-tile svg{width:13px;height:13px;fill:currentColor}
 .fw-lock b{color:var(--text);font-family:'Bricolage Grotesque',sans-serif;font-size:15px}
 .sources{border-block:1px solid var(--border);background:var(--surface)}
-.sources-in{display:flex;align-items:center;justify-content:space-between;gap:24px 40px;flex-wrap:wrap;padding:26px 28px;max-width:1440px;margin:0 auto}
+.sources-in{display:flex;align-items:center;justify-content:space-between;gap:24px 40px;flex-wrap:wrap;padding:26px 28px;max-width:1180px;margin:0 auto}
 .sources-in p{font-size:14.5px;color:var(--text-2);max-width:460px}
 .sources-in p b{color:var(--text)}
 .src-list{display:flex;align-items:center;gap:30px;flex-wrap:wrap}
@@ -457,38 +486,26 @@ details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
   <div class="wide">
     <div class="hero-grid">
       <div>
-        <div class="fw-lock"><a href="/reviews/">Vanssay Reviews</a><span>/</span><span class="fw-tile"><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 0h16v8h-8zM4 8h8l8 8H4zM4 16h8v8z"/></svg></span><b>Framer</b><span class="pill p-live"><i></i>Live on the Marketplace</span></div>
-        <span class="eyebrow">Framer plugin · Google + Trustpilot</span>
+        <div class="fw-lock"><span class="fw-tile"><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 0h16v8h-8zM4 8h8l8 8H4zM4 16h8v8z"/></svg></span><b>Reviews for Framer</b><span class="pill p-live"><i></i>Live on the Marketplace</span></div>
         <h1>Your reviews,<br/>in <span class="serif">25 layouts.</span></h1>
-        <p class="sub">One plugin pulls Google and Trustpilot into a single combined rating, then hands you 25 layouts and 57 card designs to say it with. Everything below this line is the real widget — not a screenshot.</p>
+        <p class="sub">Google and Trustpilot in one combined rating, with 25 layouts and 57 card designs to show it. Everything on this page is the real widget.</p>
         <div class="cta-row">
-          <a class="btn btn-blue" href="https://www.framer.com/community/marketplace/plugins/vanssay-google-trustpilot-reviews/">Add to Framer — free</a>
-          <a class="btn btn-line" href="#studio">Open the studio</a>
+          <a class="btn btn-blue" href="https://www.framer.com/community/marketplace/plugins/vanssay-google-trustpilot-reviews/">Add to Framer, free →</a>
+          <a class="btn btn-line" href="#studio">Try it live</a>
         </div>
-        <p class="hero-proof"><span id="proof">No code · No API keys · One plan covers every Framer project you own</span></p>
+        <ul class="checks"><li>No code</li><li>No API keys</li><li>Free plan you can keep</li></ul>
       </div>
-      <div class="hero-stage">
-        <div class="float float-badge" data-rv>
-          <div class="vrhost" id="hero-badge"></div>
-        </div>
-        <div class="float float-card" data-rv style="--d:.12s">
-          <span class="float-tag">Live card</span>
+      <div class="hf" data-rv>
+        <div class="hf-bar"><span></span><span></span><span></span><span class="hf-url">maison-cafe.framer.website</span></div>
+        <div class="hf-site">
+          <div class="hf-head"><b>Loved by locals</b><span class="hf-live"><i></i>Live widget</span></div>
           <div class="vrhost" id="hero-card"></div>
-          <div class="float-meter">
-            <span>Card style <b id="hero-preset-name">Elevated</b></span>
-            <span id="hero-preset-i">1 / 57</span>
-          </div>
         </div>
+        <div class="hf-foot"><span>Card style <b id="hero-preset-name">Elevated</b></span><span id="hero-preset-i">1 / 57</span></div>
       </div>
     </div>
   </div>
 </header>
-
-<!-- ══ full-bleed ticker ═════════════════════════════════════════════ -->
-<div class="strip">
-  <div class="vrhost" id="strip-ticker"></div>
-  <p class="strip-note">Ticker layout · Elevated cards · running live in your browser right now</p>
-</div>
 
 <!-- ══ sources ════════════════════════════════════════════════════════ -->
 <div class="sources">
@@ -565,27 +582,6 @@ details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
   </div>
 </section>
 
-<!-- ══ card styles — the whole catalogue, family by family ═══════════ -->
-<section class="cardsec" id="cards">
-  <div class="wide">
-    <div class="cs-head">
-      <div data-rv>
-        <span class="eyebrow">Step two</span>
-        <h2>You pick a card.<br/>You don't <span class="serif">build one.</span></h2>
-      </div>
-      <div data-rv style="--d:.1s">
-        <p class="lead">No border/shadow/hover switches to assemble — that flow made ugly cards and quietly asked you to do the design work. Fifty-seven finished looks instead, sorted into seven families. Every accent in every one of them follows the colour you set in Framer.</p>
-        <p class="cs-stats"><b>57</b> designs · <b>7</b> families · <b>20</b> free on every plan</p>
-      </div>
-    </div>
-  </div>
-  <!-- A div, not a <nav>: the page's site-header rule styles every bare `nav`
-       into a 1180px rounded pill, which this bar is not. -->
-  <div class="famnav" id="famnav" role="navigation" aria-label="Card families"></div>
-  <div id="famblocks"></div>
-  <div class="wide"><p class="cs-foot">Every card above is live — hover one to see its motion, click it to load it into the studio.</p></div>
-</section>
-
 <!-- ══ brand match ═══════════════════════════════════════════════════ -->
 <section class="matchsec">
   <div class="wide">
@@ -608,78 +604,18 @@ details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
   </div>
 </section>
 
-<!-- ══ bento features ════════════════════════════════════════════════ -->
+<!-- ══ why it lasts ═════════════════════════════════════════════════ -->
 <section style="padding-top:30px">
   <div class="wide">
-    <div class="center">
-      <span class="eyebrow" data-rv>Why this one</span>
-      <h2 data-rv style="--d:.05s">Six reasons it's the one<br/>people <span class="serif">keep.</span></h2>
+    <div class="center" data-rv>
+      <span class="eyebrow">Why people keep it</span>
+      <h2>Set it up once. It <span class="serif">stays right.</span></h2>
     </div>
-    <div class="bento">
-      <div class="bx w4" data-rv>
-        <span class="bx-kicker">The hero feature</span>
-        <h3>One rating, both platforms</h3>
-        <p>Every competitor makes you show a Google block and a Trustpilot block. Vanssay weights them by review count into a single score — 4.8 from 1,626 reviews reads stronger than 4.9 from 12. Five badge shapes carry it, all free.</p>
-        <div class="bx-vis"><div class="badgegrid" id="bx-badges"></div></div>
-      </div>
-      <div class="bx" data-rv style="--d:.08s">
-        <span class="bx-kicker">Never stale</span>
-        <h3>Live, not baked</h3>
-        <p>On paid plans the widget re-fetches on every page load. A five-star review left this morning is on your site this morning — you don't reopen the plugin, and you don't republish.</p>
-        <div class="bx-vis sync">
-          <span class="node">Google</span><span class="wire"></span><span class="node">Vanssay</span><span class="wire"></span><span class="node">Your page</span>
-        </div>
-      </div>
-      <div class="bx" data-rv>
-        <span class="bx-kicker">Search results</span>
-        <h3>SEO star markup</h3>
-        <p>The widget emits schema.org rating markup so Google <em>can</em> show stars under your listing. Pick the type that truthfully describes you — local business, product, or software.</p>
-        <div class="bx-vis serp">
-          <div class="u">yoursite.com</div>
-          <div class="t">Café Lumière — Speciality coffee</div>
-          <div class="s"><span style="color:#e7711b;letter-spacing:1px">★★★★★</span><span class="n">Rating: 4.8 · 1,626 reviews</span></div>
-          <div class="d">Neighbourhood roastery and café. Subscriptions shipped weekly…</div>
-        </div>
-      </div>
-      <div class="bx" data-rv style="--d:.08s">
-        <span class="bx-kicker">Pro &amp; up</span>
-        <h3>Curate what shows</h3>
-        <p>Pin the reviews that sell, hide the one about the parking. Filter by minimum stars. Your widget stops being a firehose and starts being an argument.</p>
-        <div class="bx-vis curate">
-          <div class="crow"><span class="st">★★★★★</span><span class="who">Sofia M.</span><span class="act pin">Pinned</span></div>
-          <div class="crow"><span class="st">★★★★★</span><span class="who">James O.</span><span class="act pin">Pinned</span></div>
-          <div class="crow off"><span class="st">★★☆☆☆</span><span class="who">Marc D.</span><span class="act hide">Hidden</span></div>
-        </div>
-      </div>
-      <div class="bx w3" data-rv>
-        <span class="bx-kicker">Safety</span>
-        <h3>No API keys leave the server</h3>
-        <p>Your visitors' browsers never see a Google or Trustpilot credential. The widget asks our API, the API asks the platforms, and the answer is cached and rate-limited centrally. Nothing to rotate, nothing to leak.</p>
-      </div>
-      <div class="bx w3" data-rv style="--d:.08s">
-        <span class="bx-kicker">Multi-project</span>
-        <h3>One subscription, every site</h3>
-        <p>The plan sits on your account, not on a project. Pro connects five businesses, Agency thirty — so a studio can run every client site off one login, each with its own reviews and its own layout.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ how it works ══════════════════════════════════════════════════ -->
-<section style="padding-top:40px">
-  <div class="wrap">
-    <div class="steps-grid">
-      <div data-rv>
-        <span class="eyebrow">How it works</span>
-        <h2>Three steps,<br/><span class="serif">once.</span></h2>
-        <p class="lead" style="font-size:15px">After that the widget maintains itself.</p>
-      </div>
-      <div class="steps" id="steps">
-        <div class="steps-fill" id="steps-fill"></div>
-        <div class="step" data-rv><span class="n">Step 01</span><h3>Connect your business</h3><p>Search your business by name — the plugin resolves it to your Google profile. Paste a Trustpilot URL too, if you have one. That's the whole setup; no API keys, no verification files, no DNS.</p></div>
-        <div class="step" data-rv style="--d:.06s"><span class="n">Step 02</span><h3>Choose the reviews, the layout, the card</h3><p>Pin your best ones, hide the noise, set a minimum star rating. Then pick one of 25 layouts and one of 57 card designs — previewed with your actual reviews, before anything touches your canvas.</p></div>
-        <div class="step" data-rv style="--d:.12s"><span class="n">Step 03</span><h3>Insert, and forget it</h3><p>One click drops a real Framer code component onto the canvas, already wearing your fonts, colours and corner radii. Every knob stays editable in Framer's own right-hand panel afterwards.</p></div>
-      </div>
+    <div class="f4" data-rv style="--d:.06s">
+      <div><span class="bx-kicker">Every plan</span><h3>One rating, both platforms</h3><p>Google and Trustpilot weighted by review count into a single score, with five badge shapes to show it.</p></div>
+      <div><span class="bx-kicker">Paid plans</span><h3>Live, not baked</h3><p>The published widget fetches fresh reviews from our servers. A review left this morning is on your site this morning, no republish.</p></div>
+      <div><span class="bx-kicker">Pro &amp; up</span><h3>Curate what shows</h3><p>Pin the reviews that sell, hide the rest, and set a minimum star rating.</p></div>
+      <div><span class="bx-kicker">Account-wide</span><h3>One plan, every project</h3><p>The plan sits on your account. Pro connects five businesses, Agency thirty, each with its own layout.</p></div>
     </div>
   </div>
 </section>
@@ -786,8 +722,6 @@ details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
         <p class="lead" style="font-size:15px">Anything else? <a href="/contact" style="color:var(--accent);font-weight:600">Write to us</a>. The people who build the plugin answer every email.</p>
       </div>
       <div class="faq">
-        <details data-rv><summary>Is the demo on this page the real widget?</summary><p>Yes, literally. The stylesheet this page loads is the plugin's own widget CSS, copied out of the source with no edits, and the markup is the same DOM the published component renders. If a card looks like that here, it looks like that on your site.</p></details>
-        <details data-rv><summary>Whose reviews are in the demo?</summary><p>A sample café — a fictional business with a realistic spread of five-, four- and two-star reviews, so the layouts are shown handling the awkward ones too. Inside the plugin you search your own business and every preview switches to your real reviews before anything is inserted.</p></details>
         <details data-rv><summary>Do I need to write any code?</summary><p>No. It's a Framer plugin: connect your business, pick a layout, click insert. What lands on the canvas is a real Framer code component — you can move it, resize it and restyle it from Framer's right-hand panel like any other layer.</p></details>
         <details data-rv><summary>How does the theme matching work?</summary><p>Before inserting, the plugin reads your project's text styles, colour styles, corner radii and the background colour where the widget will land, then bakes those tokens into the component. It looks native from the first second, and every token stays editable afterwards.</p></details>
         <details data-rv><summary>How fresh are the reviews?</summary><p>They come straight from your Google Business Profile and your Trustpilot page. On Starter, Pro and Agency the widget re-fetches on every page load. On Free you refresh from the plugin; on Lifetime it re-syncs weekly.</p></details>
@@ -799,28 +733,11 @@ details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
   </div>
 </section>
 
-<!-- ══ other platforms ════════════════════════════════════════════════ -->
-<section style="padding-top:30px">
-  <div class="wrap">
-    <div class="elsewhere">
-      <div data-rv>
-        <span class="eyebrow">Other platforms</span>
-        <h2>Not on Framer? <span class="serif">Soon.</span></h2>
-        <p class="lead" style="font-size:15px">The same engine is coming to more builders. <a href="/reviews/" style="color:var(--accent);font-weight:600">See every platform</a>.</p>
-      </div>
-      <div class="op-list" data-rv style="--d:.08s">
-        <a class="op-row" href="/reviews/webflow"><span class="op-tile" style="background:#146ef5"><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m24 4.515-7.658 14.97H9.149l3.205-6.204h-.144C9.566 16.713 5.621 18.973 0 19.485v-6.118s3.596-.213 5.71-2.435H0V4.515h6.417v5.278l.144-.001 2.622-5.277h4.854v5.244h.144l2.72-5.244H24Z"/></svg></span><div><h3>Webflow</h3><p>A Designer app, using the same reviews engine.</p></div><span class="pill p-wip">In construction</span></a>
-        <a class="op-row" href="/reviews/wix"><span class="op-tile" style="background:#16151b"><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m0 7.354 2.113 9.292h.801a1.54 1.54 0 0 0 1.506-1.218l1.351-6.34a.171.171 0 0 1 .167-.137c.08 0 .15.058.167.137l1.352 6.34a1.54 1.54 0 0 0 1.506 1.218h.805l2.113-9.292h-.565c-.62 0-1.159.43-1.296 1.035l-1.26 5.545-1.106-5.176a1.76 1.76 0 0 0-2.19-1.324c-.639.176-1.113.716-1.251 1.365l-1.094 5.127-1.26-5.537A1.33 1.33 0 0 0 .563 7.354H0zm13.992 0a.951.951 0 0 0-.951.95v8.342h.635a.952.952 0 0 0 .951-.95V7.353h-.635zm1.778 0 3.158 4.66-3.14 4.632h1.325c.368 0 .712-.181.918-.486l1.756-2.59a.12.12 0 0 1 .197 0l1.754 2.59c.206.305.55.486.918.486h1.326l-3.14-4.632L24 7.354h-1.326c-.368 0-.712.181-.918.486l-1.772 2.617a.12.12 0 0 1-.197 0L18.014 7.84a1.108 1.108 0 0 0-.918-.486H15.77z"/></svg></span><div><h3>Wix</h3><p>A native Wix app, billed through Wix.</p></div><span class="pill p-wip">In construction</span></a>
-        <a class="op-row" href="/reviews/shopify"><span class="op-tile" style="background:#5e8e3e"><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15.337 23.979l7.216-1.561s-2.604-17.613-2.625-17.73c-.018-.116-.114-.192-.211-.192s-1.929-.136-1.929-.136-1.275-1.274-1.439-1.411c-.045-.037-.075-.057-.121-.074l-.914 21.104h.023zM11.71 11.305s-.81-.424-1.774-.424c-1.447 0-1.504.906-1.504 1.141 0 1.232 3.24 1.715 3.24 4.629 0 2.295-1.44 3.76-3.406 3.76-2.354 0-3.54-1.465-3.54-1.465l.646-2.086s1.245 1.066 2.28 1.066c.675 0 .975-.545.975-.932 0-1.619-2.654-1.694-2.654-4.359-.034-2.237 1.571-4.416 4.827-4.416 1.257 0 1.875.361 1.875.361l-.945 2.715-.02.01zM11.17.83c.136 0 .271.038.405.135-.984.465-2.064 1.639-2.508 3.992-.656.213-1.293.405-1.889.578C7.697 3.75 8.951.84 11.17.84V.83zm1.235 2.949v.135c-.754.232-1.583.484-2.394.736.466-1.777 1.333-2.645 2.085-2.971.193.501.309 1.176.309 2.1zm.539-2.234c.694.074 1.141.867 1.429 1.755-.349.114-.735.231-1.158.366v-.252c0-.752-.096-1.371-.271-1.871v.002zm2.992 1.289c-.02 0-.06.021-.078.021s-.289.075-.714.21c-.423-1.233-1.176-2.37-2.508-2.37h-.115C12.135.209 11.669 0 11.265 0 8.159 0 6.675 3.877 6.21 5.846c-1.194.365-2.063.636-2.16.674-.675.213-.694.232-.772.87-.075.462-1.83 14.063-1.83 14.063L15.009 24l.927-21.166z"/></svg></span><div><h3>Shopify</h3><p>A theme app block for your store.</p></div><span class="pill p-wip">In construction</span></a>
-      </div>
-    </div>
-  </div>
-</section>
-
 <div class="fw-cta" data-rv>
   <h2>Put your best reviews to work.</h2>
   <p>Free plan, no card. Live on your Framer site in under two minutes.</p>
   <div class="cta-row"><a class="btn btn-dark" href="https://www.framer.com/community/marketplace/plugins/vanssay-google-trustpilot-reviews/">Add to Framer, free →</a><a class="btn btn-line" href="#pricing">See pricing</a></div>
+  <p class="fw-soon"><span class="lgs"><span><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m24 4.515-7.658 14.97H9.149l3.205-6.204h-.144C9.566 16.713 5.621 18.973 0 19.485v-6.118s3.596-.213 5.71-2.435H0V4.515h6.417v5.278l.144-.001 2.622-5.277h4.854v5.244h.144l2.72-5.244H24Z"/></svg></span><span><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m0 7.354 2.113 9.292h.801a1.54 1.54 0 0 0 1.506-1.218l1.351-6.34a.171.171 0 0 1 .167-.137c.08 0 .15.058.167.137l1.352 6.34a1.54 1.54 0 0 0 1.506 1.218h.805l2.113-9.292h-.565c-.62 0-1.159.43-1.296 1.035l-1.26 5.545-1.106-5.176a1.76 1.76 0 0 0-2.19-1.324c-.639.176-1.113.716-1.251 1.365l-1.094 5.127-1.26-5.537A1.33 1.33 0 0 0 .563 7.354H0zm13.992 0a.951.951 0 0 0-.951.95v8.342h.635a.952.952 0 0 0 .951-.95V7.353h-.635zm1.778 0 3.158 4.66-3.14 4.632h1.325c.368 0 .712-.181.918-.486l1.756-2.59a.12.12 0 0 1 .197 0l1.754 2.59c.206.305.55.486.918.486h1.326l-3.14-4.632L24 7.354h-1.326c-.368 0-.712.181-.918.486l-1.772 2.617a.12.12 0 0 1-.197 0L18.014 7.84a1.108 1.108 0 0 0-.918-.486H15.77z"/></svg></span><span><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15.337 23.979l7.216-1.561s-2.604-17.613-2.625-17.73c-.018-.116-.114-.192-.211-.192s-1.929-.136-1.929-.136-1.275-1.274-1.439-1.411c-.045-.037-.075-.057-.121-.074l-.914 21.104h.023zM11.71 11.305s-.81-.424-1.774-.424c-1.447 0-1.504.906-1.504 1.141 0 1.232 3.24 1.715 3.24 4.629 0 2.295-1.44 3.76-3.406 3.76-2.354 0-3.54-1.465-3.54-1.465l.646-2.086s1.245 1.066 2.28 1.066c.675 0 .975-.545.975-.932 0-1.619-2.654-1.694-2.654-4.359-.034-2.237 1.571-4.416 4.827-4.416 1.257 0 1.875.361 1.875.361l-.945 2.715-.02.01zM11.17.83c.136 0 .271.038.405.135-.984.465-2.064 1.639-2.508 3.992-.656.213-1.293.405-1.889.578C7.697 3.75 8.951.84 11.17.84V.83zm1.235 2.949v.135c-.754.232-1.583.484-2.394.736.466-1.777 1.333-2.645 2.085-2.971.193.501.309 1.176.309 2.1zm.539-2.234c.694.074 1.141.867 1.429 1.755-.349.114-.735.231-1.158.366v-.252c0-.752-.096-1.371-.271-1.871v.002zm2.992 1.289c-.02 0-.06.021-.078.021s-.289.075-.714.21c-.423-1.233-1.176-2.37-2.508-2.37h-.115C12.135.209 11.669 0 11.265 0 8.159 0 6.675 3.877 6.21 5.846c-1.194.365-2.063.636-2.16.674-.675.213-.694.232-.772.87-.075.462-1.83 14.063-1.83 14.063L15.009 24l.927-21.166z"/></svg></span></span>Webflow, Wix and Shopify are on the way. <a href="/reviews/">All platforms →</a></p>
 </div>
 
 <!-- vn:foot -->
@@ -900,21 +817,15 @@ if (location.hash.startsWith("#token=")) {
   var $ = function (id) { return document.getElementById(id); };
 
   /* ── hero ─────────────────────────────────────────────────────────── */
-  var heroBadge = mount($("hero-badge"), function () {
-    return cfg({ layout: "avatars", reviews: S.reviews.slice(0, 5) });
-  });
   var heroPreset = 0;
   var heroCard = mount($("hero-card"), function () {
     var p = D.presets[heroPreset % D.presets.length];
     $("hero-preset-name").textContent = p.n;
     $("hero-preset-i").textContent = (heroPreset % D.presets.length) + 1 + " / " + D.presets.length;
-    return cfg({ layout: "grid", preset: p.id, reviews: [S.reviews[0]], showHeader: false });
+    return cfg({ layout: "grid", preset: p.id, reviews: S.reviews.slice(0, 2), showHeader: false });
   });
 
   /* ── the strip ────────────────────────────────────────────────────── */
-  var strip = mount($("strip-ticker"), function () {
-    return cfg({ layout: "ticker", preset: "elevated", showHeader: false, theme: "soft" });
-  });
 
   /* ── studio ───────────────────────────────────────────────────────── */
   function tierChip(t) {
@@ -1334,17 +1245,11 @@ if (location.hash.startsWith("#token=")) {
   buildPresetSelect();
   buildSwatches();
   paintStudio();
-  paint(heroBadge);
   paint(heroCard);
-  paint(strip);
-  buildFamilies();
-  buildBadgeRow();
   paint(cmpL);
   paint(cmpD);
   wireCompare();
-  wireRows();
   wireReveal();
-  wireSteps();
   wirePricing();
   wireProof();
   wireHeroCycle();
