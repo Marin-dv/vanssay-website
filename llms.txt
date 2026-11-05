@@ -8,7 +8,7 @@ Framer has no built-in geoblocking or geo-redirect features. These plugins add t
 
 - [Bouncer](https://vanssay.net/geoblock.html): Block visitors by country, restrict a site to chosen countries (allowlist), and detect VPN/proxy/datacenter traffic. Blocked visitors see a block screen styled to match the site. Free plan; Pro from $6/mo. Framer marketplace: https://www.framer.com/community/marketplace/plugins/control-visitor-access-vanssay/
 - [Router](https://vanssay.net/router.html): Redirect or suggest pages by country, region, browser language, device, or VPN status. Includes an SEO-safe, auto-translated suggestion banner instead of forced redirects, and UTM preservation. Free plan; Pro from $9/mo. Framer marketplace: https://www.framer.com/community/marketplace/plugins/router-vanssay/
-- [Reviews](https://vanssay.net/reviews.html): Aggregate Trustpilot and Google reviews natively on a Framer site, with a cross-platform aggregate rating badge.
+- [Reviews](https://vanssay.net/reviews/framer): Aggregate Trustpilot and Google reviews natively on a Framer site, with a cross-platform aggregate rating badge.
 - [Maintenance Mode](https://vanssay.net/maintenance.html): Put a Framer site into a maintenance state with a server-side toggle and IP whitelist.
 
 ## Guides (how to geoblock and geo-redirect on Framer)
