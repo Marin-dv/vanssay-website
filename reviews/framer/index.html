@@ -381,20 +381,32 @@ summary::after{content:"+";font-size:22px;font-weight:300;color:var(--accent);tr
 details[open] summary::after{transform:rotate(45deg)}
 details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
 
-/* ── hero frame: same browser-window look as the home page hero ─────── */
-.hf{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);overflow:hidden;min-width:0}
-.hf-bar{display:flex;align-items:center;gap:6px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg)}
-.hf-bar span:nth-child(-n+3){width:9px;height:9px;border-radius:50%;background:rgba(22,21,27,.12);flex:0 0 auto}
-.hf-url{margin:0 auto;padding:4px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--border);font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hf-site{padding:22px 18px 8px}
-.hf-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 6px}
-.hf-head b{font-family:'Bricolage Grotesque',sans-serif;font-size:19px;letter-spacing:-.02em}
-.hf-live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#16a34a;background:#e9f7ef;padding:4px 10px;border-radius:999px}
-.hf-live i{width:6px;height:6px;border-radius:50%;background:#16a34a;animation:blink 1.8s ease-in-out infinite}
-.hf .vrhost{min-height:300px;display:flex;align-items:center}
-.hf .vrhost .vr-root{animation:heroswap .45s ease}
-.hf-foot{display:flex;justify-content:space-between;gap:12px;padding:12px 18px 14px;border-top:1px solid var(--border);font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)}
-.hf-foot b{color:var(--text)}
+/* ── hero: the widget on a Framer-style canvas, next to the real
+   property panel it gets in Framer (screenshot from the plugin) ───── */
+.hero-grid{grid-template-columns:.8fr 1.2fr;gap:48px}
+.hero h1{font-size:clamp(34px,4vw,52px);line-height:1.04}
+.ed{background:#111113;border-radius:var(--r-lg);box-shadow:var(--shadow-lg);overflow:hidden;min-width:0;border:1px solid #000}
+.ed-bar{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid #222226;color:#fff;font-size:12px;font-weight:600}
+.ed-bar svg{width:12px;height:12px;fill:#fff}
+.ed-bar .ed-name{color:rgba(255,255,255,.55);font-weight:500}
+.ed-bar .ed-pub{margin-left:auto;background:#0099ff;color:#fff;font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:7px}
+.ed-body{display:grid;grid-template-columns:minmax(0,1fr) 290px}
+.ed-canvas{position:relative;padding:34px 22px 26px;background:#1a1a1d;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);background-size:18px 18px;display:flex;flex-direction:column;justify-content:center;min-height:430px}
+.ed-flabel{font-size:11px;font-weight:600;color:rgba(255,255,255,.5);margin:0 0 7px 2px}
+.ed-frame{background:#fff;border-radius:3px;padding:22px 18px}
+.ed-sel{position:relative;outline:1.5px solid #0099ff;outline-offset:6px}
+.ed-sel::before,.ed-sel::after{content:"";position:absolute;width:7px;height:7px;background:#fff;border:1.5px solid #0099ff;border-radius:2px;z-index:5}
+.ed-sel::before{top:-10px;left:-10px}.ed-sel::after{bottom:-10px;right:-10px}
+.ed-tag{position:absolute;top:-32px;left:-7px;background:#0099ff;color:#fff;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:5px;z-index:5;white-space:nowrap}
+.ed .vrhost{min-height:250px;display:flex;align-items:center;--vr-card-min:240px}
+.ed .vrhost .vr-root{animation:heroswap .45s ease}
+.ed-meter{margin-top:20px;display:flex;justify-content:space-between;gap:12px;font-family:'Space Mono',monospace;font-size:10.5px;color:rgba(255,255,255,.45)}
+.ed-meter b{color:#fff}
+.ed-panel{border-left:1px solid #222226;background:#111113;padding:12px 10px;align-self:stretch}
+.ed-panel img{width:100%;height:auto;display:block;border-radius:6px}
+.ed-panel figcaption{margin:10px 6px 0;font-size:11px;line-height:1.45;color:rgba(255,255,255,.45)}
+@media(max-width:1000px){.hero-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.ed-body{grid-template-columns:1fr}.ed-panel{border-left:0;border-top:1px solid #222226}.ed-panel img{max-width:320px;margin:0 auto}.ed-bar .ed-name{display:none}}
 .checks{list-style:none;margin:28px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px 22px;font-size:13.5px;font-weight:600;color:var(--ink-soft)}
 .checks li{display:flex;align-items:center;gap:8px}
 .checks li::before{content:'';width:16px;height:16px;border-radius:50%;flex:0 0 16px;background:var(--accent-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232b50ff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center/10px no-repeat}
@@ -487,21 +499,29 @@ details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
     <div class="hero-grid">
       <div>
         <div class="fw-lock"><span class="fw-tile"><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 0h16v8h-8zM4 8h8l8 8H4zM4 16h8v8z"/></svg></span><b>Reviews for Framer</b><span class="pill p-live"><i></i>Live on the Marketplace</span></div>
-        <h1>Your reviews,<br/>in <span class="serif">25 layouts.</span></h1>
-        <p class="sub">Google and Trustpilot in one combined rating, with 25 layouts and 57 card designs to show it. Everything on this page is the real widget.</p>
+        <h1>Google &amp; Trustpilot reviews, as a <span class="serif">native Framer component.</span></h1>
+        <p class="sub">Pick a layout, drop it on the canvas, and it arrives already styled to match your site. Then restyle it from Framer's right-hand panel, like any other layer.</p>
         <div class="cta-row">
           <a class="btn btn-blue" href="https://www.framer.com/community/marketplace/plugins/vanssay-google-trustpilot-reviews/">Add to Framer, free →</a>
           <a class="btn btn-line" href="#studio">Try it live</a>
         </div>
-        <ul class="checks"><li>No code</li><li>No API keys</li><li>Free plan you can keep</li></ul>
+        <ul class="checks"><li>No code</li><li>No API keys</li><li>25 layouts · 57 card designs</li></ul>
       </div>
-      <div class="hf" data-rv>
-        <div class="hf-bar"><span></span><span></span><span></span><span class="hf-url">maison-cafe.framer.website</span></div>
-        <div class="hf-site">
-          <div class="hf-head"><b>Loved by locals</b><span class="hf-live"><i></i>Live widget</span></div>
-          <div class="vrhost" id="hero-card"></div>
+      <div class="ed" data-rv>
+        <div class="ed-bar"><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 0h16v8h-8zM4 8h8l8 8H4zM4 16h8v8z"/></svg><span>Canvas</span><span class="ed-name">· Home</span><span class="ed-pub">Publish</span></div>
+        <div class="ed-body">
+          <div class="ed-canvas">
+            <p class="ed-flabel">Desktop</p>
+            <div class="ed-frame">
+              <div class="ed-sel"><span class="ed-tag">VanssayReviews</span><div class="vrhost" id="hero-card"></div></div>
+            </div>
+            <div class="ed-meter"><span>Card style <b id="hero-preset-name">Elevated</b></span><span id="hero-preset-i">1 / 57</span></div>
+          </div>
+          <figure class="ed-panel">
+            <img src="/assets/reviews/framer-panel.webp" alt="The VanssayReviews component's controls in Framer's right-hand panel: layout, header, card size, font, text, accent, card background and radius" width="1184" height="955" />
+            <figcaption>The component's own controls, in Framer's right-hand panel.</figcaption>
+          </figure>
         </div>
-        <div class="hf-foot"><span>Card style <b id="hero-preset-name">Elevated</b></span><span id="hero-preset-i">1 / 57</span></div>
       </div>
     </div>
   </div>
@@ -722,6 +742,7 @@ details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
         <p class="lead" style="font-size:15px">Anything else? <a href="/contact" style="color:var(--accent);font-weight:600">Write to us</a>. The people who build the plugin answer every email.</p>
       </div>
       <div class="faq">
+        <details data-rv><summary>Whose reviews are in the demo?</summary><p>A sample café — a fictional business with a realistic spread of five-, four- and two-star reviews, so the layouts are shown handling the awkward ones too. Inside the plugin you search your own business and every preview switches to your real reviews before anything is inserted.</p></details>
         <details data-rv><summary>Do I need to write any code?</summary><p>No. It's a Framer plugin: connect your business, pick a layout, click insert. What lands on the canvas is a real Framer code component — you can move it, resize it and restyle it from Framer's right-hand panel like any other layer.</p></details>
         <details data-rv><summary>How does the theme matching work?</summary><p>Before inserting, the plugin reads your project's text styles, colour styles, corner radii and the background colour where the widget will land, then bakes those tokens into the component. It looks native from the first second, and every token stays editable afterwards.</p></details>
         <details data-rv><summary>How fresh are the reviews?</summary><p>They come straight from your Google Business Profile and your Trustpilot page. On Starter, Pro and Agency the widget re-fetches on every page load. On Free you refresh from the plugin; on Lifetime it re-syncs weekly.</p></details>
@@ -735,7 +756,7 @@ details p{margin-top:11px;font-size:14.5px;color:var(--text-2)}
 
 <div class="fw-cta" data-rv>
   <h2>Put your best reviews to work.</h2>
-  <p>Free plan, no card. Live on your Framer site in under two minutes.</p>
+  <p>Start on the free plan. Live on your Framer site in under two minutes.</p>
   <div class="cta-row"><a class="btn btn-dark" href="https://www.framer.com/community/marketplace/plugins/vanssay-google-trustpilot-reviews/">Add to Framer, free →</a><a class="btn btn-line" href="#pricing">See pricing</a></div>
   <p class="fw-soon"><span class="lgs"><span><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m24 4.515-7.658 14.97H9.149l3.205-6.204h-.144C9.566 16.713 5.621 18.973 0 19.485v-6.118s3.596-.213 5.71-2.435H0V4.515h6.417v5.278l.144-.001 2.622-5.277h4.854v5.244h.144l2.72-5.244H24Z"/></svg></span><span><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m0 7.354 2.113 9.292h.801a1.54 1.54 0 0 0 1.506-1.218l1.351-6.34a.171.171 0 0 1 .167-.137c.08 0 .15.058.167.137l1.352 6.34a1.54 1.54 0 0 0 1.506 1.218h.805l2.113-9.292h-.565c-.62 0-1.159.43-1.296 1.035l-1.26 5.545-1.106-5.176a1.76 1.76 0 0 0-2.19-1.324c-.639.176-1.113.716-1.251 1.365l-1.094 5.127-1.26-5.537A1.33 1.33 0 0 0 .563 7.354H0zm13.992 0a.951.951 0 0 0-.951.95v8.342h.635a.952.952 0 0 0 .951-.95V7.353h-.635zm1.778 0 3.158 4.66-3.14 4.632h1.325c.368 0 .712-.181.918-.486l1.756-2.59a.12.12 0 0 1 .197 0l1.754 2.59c.206.305.55.486.918.486h1.326l-3.14-4.632L24 7.354h-1.326c-.368 0-.712.181-.918.486l-1.772 2.617a.12.12 0 0 1-.197 0L18.014 7.84a1.108 1.108 0 0 0-.918-.486H15.77z"/></svg></span><span><svg aria-hidden="true" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15.337 23.979l7.216-1.561s-2.604-17.613-2.625-17.73c-.018-.116-.114-.192-.211-.192s-1.929-.136-1.929-.136-1.275-1.274-1.439-1.411c-.045-.037-.075-.057-.121-.074l-.914 21.104h.023zM11.71 11.305s-.81-.424-1.774-.424c-1.447 0-1.504.906-1.504 1.141 0 1.232 3.24 1.715 3.24 4.629 0 2.295-1.44 3.76-3.406 3.76-2.354 0-3.54-1.465-3.54-1.465l.646-2.086s1.245 1.066 2.28 1.066c.675 0 .975-.545.975-.932 0-1.619-2.654-1.694-2.654-4.359-.034-2.237 1.571-4.416 4.827-4.416 1.257 0 1.875.361 1.875.361l-.945 2.715-.02.01zM11.17.83c.136 0 .271.038.405.135-.984.465-2.064 1.639-2.508 3.992-.656.213-1.293.405-1.889.578C7.697 3.75 8.951.84 11.17.84V.83zm1.235 2.949v.135c-.754.232-1.583.484-2.394.736.466-1.777 1.333-2.645 2.085-2.971.193.501.309 1.176.309 2.1zm.539-2.234c.694.074 1.141.867 1.429 1.755-.349.114-.735.231-1.158.366v-.252c0-.752-.096-1.371-.271-1.871v.002zm2.992 1.289c-.02 0-.06.021-.078.021s-.289.075-.714.21c-.423-1.233-1.176-2.37-2.508-2.37h-.115C12.135.209 11.669 0 11.265 0 8.159 0 6.675 3.877 6.21 5.846c-1.194.365-2.063.636-2.16.674-.675.213-.694.232-.772.87-.075.462-1.83 14.063-1.83 14.063L15.009 24l.927-21.166z"/></svg></span></span>Webflow, Wix and Shopify are on the way. <a href="/reviews/">All platforms →</a></p>
 </div>
@@ -822,7 +843,7 @@ if (location.hash.startsWith("#token=")) {
     var p = D.presets[heroPreset % D.presets.length];
     $("hero-preset-name").textContent = p.n;
     $("hero-preset-i").textContent = (heroPreset % D.presets.length) + 1 + " / " + D.presets.length;
-    return cfg({ layout: "grid", preset: p.id, reviews: S.reviews.slice(0, 2), showHeader: false });
+    return cfg({ layout: "grid", preset: p.id, reviews: [S.reviews[0]], showHeader: false });
   });
 
   /* ── the strip ────────────────────────────────────────────────────── */
