@@ -137,7 +137,9 @@ p{margin:0;line-height:1.65}
 @media (max-width:700px){ .maker-pic{width:96px;height:96px} }
 .maker-copy h2{margin-top:10px;font-size:clamp(24px,2.8vw,30px)}
 .maker-copy > p:not(.eyebrow){margin-top:12px;font-size:15.5px;color:var(--ink-soft);max-width:620px}
-.maker-links{margin-top:20px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;font-size:13.5px;font-weight:600;color:var(--ink-soft)}
+.maker-copy > p.maker-name{margin-top:16px;font-size:14px;color:var(--ink-soft)}
+.maker-copy > p.maker-name b{color:var(--ink)}
+.maker-links{margin-top:12px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;font-size:13.5px;font-weight:600;color:var(--ink-soft)}
 .maker-links a:hover{color:var(--ink)}
 
 /* ---------- cta band ---------- */
