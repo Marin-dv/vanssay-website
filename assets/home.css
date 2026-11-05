@@ -107,6 +107,20 @@ p{margin:0;line-height:1.65}
 .ctr-d{margin-top:6px;font-size:12.5px;line-height:1.5;color:var(--ink-soft)}
 
 /* ---------- plugins: marketplace-style grid ---------- */
+/* ---------- logo marquee ---------- */
+.logos{padding:8px 0 40px;text-align:center}
+.logos .eyebrow{margin-bottom:22px}
+.marquee{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.marquee-track{display:flex;width:max-content;animation:marquee 46s linear infinite}
+.marquee:hover .marquee-track{animation-play-state:paused}
+.marquee-half{display:flex;align-items:center}
+.lg-item{display:inline-flex;align-items:center;gap:11px;margin-right:64px;font-family:var(--disp);font-weight:700;font-size:21px;letter-spacing:-.01em;color:var(--ink-faint);white-space:nowrap;transition:color .2s ease}
+.lg-item svg{width:24px;height:24px;fill:currentColor;flex:0 0 24px}
+.lg-item:hover{color:var(--ink)}
+.lg-item em{font-style:normal;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:999px;background:var(--surface-2);color:var(--ink-faint)}
+@keyframes marquee{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){ .marquee-track{animation:none} }
+
 .section{padding:96px 0 80px}
 .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .sec-head h2{margin-top:12px;font-size:clamp(28px,3.4vw,38px)}
