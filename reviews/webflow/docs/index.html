@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reviews - Vanssay Documentation | Vanssay</title>
+<meta name="description" content="How to install and use Reviews - Vanssay in Webflow: connect your Google Business Profile, design a widget, place it from the Designer, publish, and remove it." />
+<link rel="canonical" href="https://vanssay.net/reviews/webflow/docs/" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+<link rel="apple-touch-icon" href="/favicon-180.png" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#fafafa;color:#18181b;line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:#0e7afe;text-decoration:none}a:hover{text-decoration:underline}
+nav{position:sticky;top:0;background:rgba(250,250,250,.85);backdrop-filter:blur(14px);border-bottom:1px solid #e4e4e7;z-index:5}
+.nav-in{max-width:1140px;margin:0 auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;color:#18181b}
+main{max-width:760px;margin:0 auto;padding:64px 28px 96px}
+h1{font-size:36px;font-weight:900;letter-spacing:-.02em}
+.date{color:#a1a1aa;font-size:14px;margin:8px 0 28px}
+h2{font-size:20px;font-weight:800;margin:36px 0 10px;scroll-margin-top:80px}
+h3{font-size:16px;font-weight:700;margin:22px 0 6px;scroll-margin-top:80px}
+p,li{color:#52525b;font-size:15px}
+p+p{margin-top:10px}
+ul{padding-left:22px;margin:8px 0}
+li{margin:4px 0}
+b{color:#18181b}
+code{background:#f4f4f5;border:1px solid #e4e4e7;border-radius:5px;padding:1px 6px;font-size:13.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#18181b;word-break:break-word}
+.lede{background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:20px 22px;margin:0 0 32px}
+.lede p{font-size:15.5px}
+.toc{background:#fff;border:1px solid #e4e4e7;border-radius:12px;padding:18px 22px;margin:0 0 40px}
+.toc b{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#a1a1aa}
+.toc ol{margin:10px 0 0;padding-left:20px;columns:2;font-size:14px}
+.toc a{color:#52525b}
+.key{background:#fff;border:1px solid #e4e4e7;border-left:3px solid #0e7afe;border-radius:10px;padding:14px 18px;margin:14px 0}
+.key p{font-size:14.5px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:14px 0}
+.steps li{counter-increment:s;position:relative;padding-left:40px;margin:14px 0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;background:#18181b;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.scroll{overflow-x:auto;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:520px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid #e4e4e7;color:#52525b;vertical-align:top}
+th{color:#18181b;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
+footer{max-width:760px;margin:0 auto;padding:0 28px 60px;font-size:13.5px;color:#a1a1aa}
+footer a{color:#71717a}
+@media(max-width:640px){.toc ol{columns:1}h1{font-size:29px}main{padding:44px 16px 72px}.nav-in{padding:0 16px}footer{padding:0 16px 48px}}
+</style>
+<script defer src="/assets/track.js"></script>
+</head>
+<body>
+<nav><div class="nav-in"><a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a><a href="/reviews/webflow/" style="font-size:14px;font-weight:600">Reviews for Webflow →</a></div></nav>
+<main>
+  <h1>Reviews - Vanssay documentation</h1>
+  <p class="date">How to install, use and remove the Webflow App "Reviews - Vanssay". Last updated: November 7, 2026</p>
+
+  <div class="lede">
+    <p><b>What it does.</b> Reviews - Vanssay shows the Google reviews of a business you own or manage on your Webflow site. You set it up in the Reviews web app at <code>reviews.vanssay.net</code>: connect Google, pick the reviews, design a widget. Then you place the widget on a page with the Reviews - Vanssay app in the Webflow Designer. On your published site, one script in your site's footer shows the widget in that spot. A free Vanssay account is required. It is created from your Webflow sign-in when you install the App.</p>
+  </div>
+
+  <div class="toc">
+    <b>Contents</b>
+    <ol>
+      <li><a href="#install">Installing the App</a></li>
+      <li><a href="#google">Connecting your Google reviews</a></li>
+      <li><a href="#choose">Choosing which reviews show</a></li>
+      <li><a href="#layouts">Layouts and design</a></li>
+      <li><a href="#place">Placing a widget and publishing</a></li>
+      <li><a href="#code">What the App adds to your site</a></li>
+      <li><a href="#sync">How and when reviews refresh</a></li>
+      <li><a href="#plans">Plans</a></li>
+      <li><a href="#account">Your account and billing</a></li>
+      <li><a href="#remove">Removing a widget, the script or the App</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+      <li><a href="#support">Support</a></li>
+    </ol>
+  </div>
+
+  <h2 id="install">1. Installing the App</h2>
+  <ol class="steps">
+    <li>Install <b>Reviews - Vanssay</b> from the Webflow App Marketplace.</li>
+    <li>Webflow shows its authorization screen. Choose the site or sites to use the App on and press <b>Authorize App</b>.</li>
+    <li>You land in the Reviews web app at <code>reviews.vanssay.net</code>, already signed in. The App has added its script to the sites you authorized (see <a href="#code">§6</a>). It goes live the next time you publish.</li>
+  </ol>
+  <p>If you press <b>Cancel</b> on Webflow's screen instead, nothing is installed, nothing is changed on your sites, and no account is created.</p>
+  <p>The App asks Webflow for these permissions, and uses each only as described:</p>
+  <div class="scroll"><table>
+    <tr><th>Permission</th><th>What we use it for</th></tr>
+    <tr><td><b>Authorized user (read)</b></td><td>Your Webflow email address, to create or find your Vanssay account. You never set a password.</td></tr>
+    <tr><td><b>Sites (read and write)</b></td><td>Read: list the sites you authorized and their domains, so the App only acts on sites you control. Write: Webflow asks Apps that remove their script while installed to keep it (see "Remove from this site" in <a href="#remove">§10</a>). The App never publishes your site and never changes your pages or content.</td></tr>
+    <tr><td><b>Custom code (read and write)</b></td><td>Register our one script, apply it to your site's footer, and remove it again, leaving your other custom code as it is.</td></tr>
+  </table></div>
+
+  <h2 id="google">2. Connecting your Google reviews</h2>
+  <p>In the web app, choose how to bring in your reviews:</p>
+  <ul>
+    <li><b>Sign in with Google (recommended).</b> For owners and managers of a Google Business Profile. You sign in with the Google account that manages the profile and pick the business. The App reads <b>all</b> its reviews, with the photos customers attached and your replies. Google shows a permission called "manage your Business Profile", because it offers no read-only version. The App only reads: it never replies to reviews, edits your listing or changes anything on your profile. Details in the <a href="/reviews/webflow/privacy/#google">Privacy Policy, §3</a>.</li>
+    <li><b>Search a business.</b> No sign-in. You search the business by name and the App shows the up to 5 reviews Google shows publicly, without photos or replies. You can connect the profile later.</li>
+  </ul>
+  <p>The Free and Starter plans include 1 Google business. Pro includes up to 10. To disconnect Google, open <b>Google reviews</b> in the web app and press <b>Disconnect Google</b>: we revoke our access at Google and delete the reviews we stored.</p>
+
+  <h2 id="choose">3. Choosing which reviews show</h2>
+  <p>After the import, the web app lists every review. <b>Pin</b> a review to show it first, or <b>hide</b> it so it never shows. In a widget's settings you can also filter by minimum star rating, show only reviews with text, exclude reviews containing chosen words or names, sort them, and set how many show.</p>
+
+  <h2 id="layouts">4. Layouts and design</h2>
+  <p>Each widget uses one of eight layouts. The web app previews your real reviews in each, on desktop and mobile widths.</p>
+  <div class="scroll"><table>
+    <tr><th>Layout</th><th>What it looks like</th></tr>
+    <tr><td><b>Grid</b></td><td>Even columns of review cards.</td></tr>
+    <tr><td><b>Slider</b></td><td>A row of cards visitors swipe or click through.</td></tr>
+    <tr><td><b>Masonry</b></td><td>Columns of cards of different heights.</td></tr>
+    <tr><td><b>Marquee</b></td><td>One or two rows that scroll on their own, at the speed you choose.</td></tr>
+    <tr><td><b>List</b></td><td>Reviews stacked one under the other.</td></tr>
+    <tr><td><b>Rating card</b></td><td>Your average rating with the breakdown by stars.</td></tr>
+    <tr><td><b>Badge</b></td><td>A compact rating badge.</td></tr>
+    <tr><td><b>Floating</b></td><td>A small card fixed in a corner of the page.</td></tr>
+  </table></div>
+  <p>The <b>Customize</b> panel sets the theme and colors, corner radius, font (your site's font by default), text size, which parts show (summary, photos, your replies, dates), the wording and the date language. Clicking a review on your site opens it in full, with its photos and your reply. Design changes reach your published site on the next page load, without republishing.</p>
+
+  <h2 id="place">5. Placing a widget and publishing</h2>
+  <ol class="steps">
+    <li>Open your site in the <b>Webflow Designer</b> and select the element the widget should go after.</li>
+    <li>Open the <b>Apps</b> panel in the left toolbar and launch <b>Reviews - Vanssay</b>. It signs you in with your Webflow identity and lists your widgets, with their views this month and the pages they are on.</li>
+    <li>Press <b>Add to page</b> on the widget you want. The App adds a block after the selected element (or at the end of the page if nothing is selected).</li>
+    <li>The block shows a <b>placeholder</b> on the canvas ("Your Google reviews show here on the published site"). This is expected: the Designer canvas does not run custom code.</li>
+    <li><b>Publish</b> your site. The widget appears on the published site in place of the placeholder.</li>
+  </ol>
+  <p>You can move the block like any element. The block is a <code>div</code> with the attribute <code>data-vanssay-reviews</code>, whose value is the widget's ID. Leave that attribute as it is: it tells the script which widget to show. The App never asks you to paste code.</p>
+
+  <h2 id="code">6. What the App adds to your site</h2>
+  <ul>
+    <li><b>What:</b> one script, shown in Webflow as <code>VanssayReviews</code>. It is loaded from <code>api.vanssay.net</code> as a fixed version with an integrity hash, so its content cannot change once registered. A new version is registered as a new version, never changed in place.</li>
+    <li><b>Where:</b> your site's <b>footer custom code</b>, site-wide, so a widget works on any page you place it on. It is added through Webflow's Custom Code API. Your other custom code is not changed.</li>
+    <li><b>What it does:</b> it finds the widget blocks on the page and shows each widget inside an isolated container, so your site's styles and the widget's styles cannot affect each other. On pages without a widget, it does nothing.</li>
+    <li><b>What it loads:</b> the widget's settings and reviews from <code>api.vanssay.net</code>. Reviewer profile pictures and review photos load from Google's image servers (<code>googleusercontent.com</code>), with no referrer sent. Nothing else is loaded.</li>
+    <li><b>Data:</b> each page load with a widget adds one to that widget's daily view count. No cookies, no browser storage, nothing stored about the visitor. Details in the <a href="/reviews/webflow/privacy/#site">Privacy Policy, §5</a>.</li>
+  </ul>
+  <p>Webflow runs site custom code only on plans that include it. If the widget does not appear after publishing, check that your Webflow site or Workspace plan includes custom code.</p>
+
+  <h2 id="sync">7. How and when reviews refresh</h2>
+  <p>Widgets are <b>not real-time</b>. They show the reviews we last retrieved from Google. We refresh every connected business automatically, about once every 24 hours, on every plan. A new Google review can therefore take up to a day to appear on your site. You do not need to republish for a refresh to show. A review you hid stays hidden, and a review deleted on Google disappears at the next refresh.</p>
+
+  <h2 id="plans">8. Plans</h2>
+  <div class="scroll"><table>
+    <tr><th></th><th>Free</th><th>Starter</th><th>Pro</th></tr>
+    <tr><td><b>Price</b></td><td>$0</td><td>$7.99/month or $79.90/year</td><td>$17.99/month or $179.90/year</td></tr>
+    <tr><td><b>Where widgets show</b></td><td>Your <code>*.webflow.io</code> address only</td><td>Your <code>*.webflow.io</code> address and custom domains</td><td>Your <code>*.webflow.io</code> address and custom domains</td></tr>
+    <tr><td><b>Google businesses</b></td><td>1</td><td>1</td><td>Up to 10</td></tr>
+    <tr><td><b>Widgets, layouts, views</b></td><td>Unlimited, all 8 layouts</td><td>Unlimited, all 8 layouts</td><td>Unlimited, all 8 layouts</td></tr>
+    <tr><td><b>Automatic refresh</b></td><td>About every 24 hours</td><td>About every 24 hours</td><td>About every 24 hours</td></tr>
+    <tr><td><b>"Google reviews by Vanssay" link</b></td><td>Shown</td><td>Not shown</td><td>Not shown</td></tr>
+    <tr><td><b>Support</b></td><td>Email</td><td>Email</td><td>Priority email</td></tr>
+  </table></div>
+  <div class="key">
+    <p><b>The Free plan works on your <code>*.webflow.io</code> address only.</b> On a custom domain, a Free widget shows nothing until you choose a paid plan. Starter and Pro start with a <b>7-day free trial</b> that needs a card, then renew monthly or yearly until you cancel. Prices are in US dollars, VAT may apply.</p>
+  </div>
+
+  <h2 id="account">9. Your account and billing</h2>
+  <p>Your Vanssay account is created from your Webflow email when you install the App. There is no password. To come back to the web app, open the Reviews - Vanssay app in the Designer and press <b>Dashboard</b>, or go to <code>reviews.vanssay.net</code> and ask for a sign-in link by email. If you already use another Vanssay product with the same email, it is the same account.</p>
+  <p>To start a plan, change it, update your card, get invoices or cancel, open <b>Plan &amp; billing</b> in the web app (payments are handled by Stripe). Cancelling stops future charges, and your plan stays active until the end of the period already paid.</p>
+
+  <h2 id="remove">10. Removing a widget, the script or the App</h2>
+  <h3>Remove one widget from a page</h3>
+  <ol class="steps">
+    <li>On the canvas, select the widget's block and delete it.</li>
+    <li>Publish your site.</li>
+  </ol>
+  <h3>Turn the App off on a site, and keep it installed</h3>
+  <ol class="steps">
+    <li>In the web app, open <b>Webflow sites</b> and press <b>Remove from this site</b> (the Designer app has the same button). Every version of our script is removed from that site's custom code. Your other custom code stays as it is.</li>
+    <li>Publish your site. Until then, your live site keeps the script.</li>
+  </ol>
+  <p>Press <b>Turn back on</b> at any time to add the script again, without reinstalling or authorizing again.</p>
+  <h3>Uninstall the App</h3>
+  <ol class="steps">
+    <li>In Webflow, open your Workspace or site settings, go to <b>Apps &amp; Integrations</b>, find Reviews - Vanssay and uninstall it. Webflow ends the App's access and removes the script the App added. The removal reaches your live site the next time you publish.</li>
+    <li>Delete the widget blocks still on your pages, then, in the Style panel, the style named <b>Vanssay Reviews placeholder</b>. Webflow does not remove canvas elements, and without the script those blocks would show their placeholder text on your live site.</li>
+    <li>Publish your site.</li>
+  </ol>
+  <p>After an uninstall we delete the access Webflow gave us and our record of your sites (we check daily). Your Vanssay account, widgets and imported reviews are kept, so you can reinstall and pick up where you left off. To delete them, open <b>Account</b> in the web app before you uninstall and press <b>Delete my data</b>: we take the script off your linked sites, revoke our Google access and delete your widgets, imported reviews and view counts. After uninstalling, email <a href="mailto:support@vanssay.net">support@vanssay.net</a> and we delete them within 30 days.</p>
+
+  <h2 id="troubleshooting">11. Troubleshooting</h2>
+  <h3>The canvas shows a placeholder, not my reviews</h3>
+  <p>That is expected. The Designer canvas does not run custom code. Publish the site to see the widget.</p>
+  <h3>The widget shows nothing on my published site</h3>
+  <ul>
+    <li>Check that you published after adding the widget.</li>
+    <li>On the Free plan, check that you are looking at your <code>*.webflow.io</code> address. On a custom domain, a Free widget shows nothing.</li>
+    <li>In the web app, check under <b>Webflow sites</b> that the script is on for that site, and that the widget is not paused.</li>
+    <li>Check that your Webflow plan runs custom code (see <a href="#code">§6</a>).</li>
+    <li>If Google shows "reconnect" for your business in the web app, sign in with Google again: the access was removed from your Google account.</li>
+  </ul>
+  <h3>A new review is not showing</h3>
+  <p>Reviews refresh about once every 24 hours, not instantly (see <a href="#sync">§7</a>). Also check the widget's filters (minimum stars, text only, excluded words) and that the review is not hidden.</p>
+
+  <h2 id="support">12. Support</h2>
+  <p>Email <a href="mailto:support@vanssay.net">support@vanssay.net</a> or use the <a href="/contact">contact form</a>. Include your account email and the URL of the page with the widget. Pro gets priority support.</p>
+
+  <div class="key">
+    <p><b>Not affiliated with Google or Webflow.</b> Reviews - Vanssay is an independent product by Vanssay. It is not affiliated with, endorsed by, or sponsored by Google LLC or Webflow, Inc. Google and Google Business Profile are trademarks of Google LLC.</p>
+  </div>
+</main>
+<footer><a href="/">Vanssay</a> · <a href="/reviews/webflow/">Reviews for Webflow</a> · <a href="/reviews/webflow/terms/">Terms</a> · <a href="/reviews/webflow/privacy/">Privacy</a> · <a href="/contact">Contact</a></footer>
+</body>
+</html>
