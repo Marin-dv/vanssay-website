@@ -7,7 +7,12 @@
   <title>Admin | Vanssay</title>
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
-  <link rel="apple-touch-icon" href="/favicon-180.png" />
+  <link rel="apple-touch-icon" href="/assets/admin/apple-touch-icon.png" />
+  <link rel="manifest" href="/admin.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Vanssay" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
@@ -798,6 +803,8 @@ function planBadge(plan, billing, product) {
 const PLATFORMS = { framer: ["F", "Framer"], webflow: ["W", "Webflow"], web: ["W", "Web app"] };
 const platformLabel = (p) => (PLATFORMS[p] || PLATFORMS.framer)[1];
 const platformBadge = (p) => { const k = PLATFORMS[p] ? p : "framer"; return `<span class="plat"><i>${k === "web" ? "◦" : PLATFORMS[k][0]}</i>${PLATFORMS[k][1]}</span>`; };
+// Short codes the backends store for a failed Apify scrape.
+const ERR_LABEL = { apify_bad_token: "token rejected", apify_task_not_found: "task not found", apify_run_failed: "run failed", apify_timeout: "timed out", apify_unreachable: "Apify unreachable", apify_error: "Apify error" };
 const statusBadge = (s) => `<span class="bdg ${s === "active" || s === "trialing" ? "good" : s === "canceled" ? "crit" : ""}">${esc(s || "–")}</span>`;
 // Flag emoji do not render on Windows, so a country is its code plus its name.
 const regionName = (() => {
@@ -1937,6 +1944,12 @@ async function loadAttention(fresh) {
         detail: `${usd(spent)} of $${APIFY_CYCLE_CAP} since ${dueDate(rexp.month.from)}. Resets on ${APIFY_CYCLE_RESET}.`, href: "#/costs", k: "Costs" });
       meta.costs = p >= 1 ? ["crit", "!"] : p >= 0.8 ? ["warn", Math.round(p * 100) + "%"] : null;
     }
+    const scrapeFails = ((rexp && rexp.failures && rexp.failures.last24h) || 0) + ((iexp && iexp.failures && iexp.failures.last24h) || 0);
+    if (scrapeFails) {
+      const last = [rexp, iexp].map((x) => x && x.failures && x.failures.last).filter(Boolean).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+      items.push({ level: "critical", title: `${plural(scrapeFails, "scrape")} failed in the last 24h`, detail: `Latest: ${last ? ERR_LABEL[last.error] || last.error || "unknown error" : "unknown error"}. Widgets keep serving cached reviews, but nothing refreshes until this is fixed.`, href: "#/costs", k: "Costs" });
+      meta.costs = ["crit", "!"];
+    }
     const rank = { critical: 0, warning: 1, info: 2 };
     items.sort((x, y) => rank[x.level] - rank[y.level]);
     ATTN.items = items; ATTN.meta = meta; ATTN.loaded = true;
@@ -2803,12 +2816,18 @@ async function pageCosts(ctx) {
   const months = [...series.values()].sort((a, b) => a.month.localeCompare(b.month));
   const capPct = (total / APIFY_CYCLE_CAP) * 100;
   const recent = [
-    ...((rev && rev.recent) || []).map((r) => ({ when: r.createdAt, plugin: "Reviews", kind: r.platform, source: r.sourceId, items: r.items, cost: r.cost, status: r.status, exact: true })),
-    ...((ig && ig.recent) || []).map((r) => ({ when: r.createdAt, plugin: "Instagram", kind: r.actor, source: "@" + r.handle, items: r.items, cost: r.cost, status: "SUCCEEDED", exact: false })),
+    ...((rev && rev.recent) || []).map((r) => ({ when: r.createdAt, plugin: "Reviews", kind: r.platform, source: r.sourceId, items: r.items, cost: r.cost, status: r.status, error: r.error, exact: true })),
+    ...((ig && ig.recent) || []).map((r) => ({ when: r.createdAt, plugin: "Instagram", kind: r.actor, source: "@" + r.handle, items: r.items, cost: r.cost, status: r.status || "SUCCEEDED", error: r.error, exact: false })),
   ].sort((a, b) => new Date(b.when) - new Date(a.when)).slice(0, 300);
+  const failedDay = ((rev && rev.failures && rev.failures.last24h) || 0) + ((ig && ig.failures && ig.failures.last24h) || 0);
+  const lastFail = recent.find((r) => r.status === "FAILED");
+  const failBanner = failedDay
+    ? alertBox("critical", `${plural(failedDay, "scrape")} failed in the last 24 hours`, `Latest: ${lastFail ? `${dt(lastFail.when)} · ${ERR_LABEL[lastFail.error] || lastFail.error || "unknown error"}` : "see the table below"}. Failed scrapes cost nothing, so they are not in the spend figures.`)
+    : "";
   const SRC = { trustpilot: "Trustpilot", google: "Google", profile: "IG profile", post: "IG posts" };
   const periodWord = cycleAligned ? "this cycle" : "this month";
   paint(ctx, `${pageHead({ title: "Costs", sub: "Everything paid to Apify for scraping, across every plugin. Cache misses only: a cached widget load is free." })}
+    ${failBanner}
     ${kpis([
       { label: `Spend · ${periodWord}`, value: usd(total), hero: true, sub: cycle ? `${esc(cycle)} · ${plural(tp.requests + gg.requests + igProf.requests + igPost.requests, "paid scrape")}` : plural(tp.requests + gg.requests + igProf.requests + igPost.requests, "paid scrape") },
       { label: `Reviews · ${periodWord}`, value: usd(revMonth), c: "--c-reviews", sub: `${plural(tp.requests + gg.requests, "scrape")} · ${plural(tp.items + gg.items, "review")}` },
@@ -2842,7 +2861,7 @@ async function pageCosts(ctx) {
           { key: "source", label: "Target", v: (r) => (/^https?:\/\//.test(r.source) ? `<a class="wrapurl" href="${esc(r.source)}" target="_blank" rel="noopener">${esc(r.source.replace(/^https?:\/\/(www\.)?/, ""))}</a>` : esc(r.source || "–")) },
           { key: "items", label: "Items", r: true, v: (r) => fmt(r.items) },
           { key: "cost", label: "Cost", r: true, v: (r) => usd(r.cost) + (r.exact ? "" : "*") },
-          { key: "status", label: "Status", v: (r) => (r.status === "SUCCEEDED" ? `<span class="bdg good">${icon("check")}ok</span>` : statusBadge(r.status)) },
+          { key: "status", label: "Status", v: (r) => (r.status === "FAILED" ? `<span class="bdg crit" title="${esc(r.error || "")}">${icon("alertc")}failed · ${esc(ERR_LABEL[r.error] || r.error || "error")}</span>` : r.status === "SUCCEEDED" ? `<span class="bdg good">${icon("check")}ok</span>` : statusBadge(r.status)) },
         ] }) })}
     ${!ig ? `<p class="note" style="margin-top:10px">Instagram spend unavailable: ${esc(why(rs[1]) || "no data")}</p>` : ""}`);
 }
@@ -3879,6 +3898,9 @@ async function pageSystem(ctx) {
   paint(ctx, `${pageHead({ title: "System", sub: "Live backend health, on-demand checks against the real services, and onboarding failures that used to leave no trace." })}
     ${sec("Router · live load", { sub: `<span id="live-at">${rd ? "updated " + clock() : ""}</span>`, act: `<span class="sdot ${level === "ok" ? "" : level}" id="live-dot"></span><button class="btn xs ghost" id="live-toggle">${icon(LIVE.paused ? "play" : "pause")}${LIVE.paused ? "Resume" : "Pause"}</button>` })}
     <div id="live">${rd ? routerLive(rd) : card({ body: unavailable("Router health", rs[0]) })}</div>
+    ${sec("Outage alerts", { sub: "a notification on this device when scraping breaks" })}
+    ${card({ title: "Push notifications", sub: "this device", id: "push-card", body: `<div id="push-out" class="note">Checking…</div>`,
+      info: "<p>You get a notification when Apify rejects our token, or when 3 scrapes fail within 30 minutes, for Reviews and Instagram. The server also checks the token every 10 minutes, so an outage is caught even with no customer traffic. At most one notification per hour for the same problem.</p><p>On an iPhone this only works from the app added to the Home Screen (iOS 16.4 or later).</p>" })}
     ${sec("On-demand checks", { sub: "real calls: press them, don't poll them" })}
     <div class="grid g2">
       ${card({ title: "Prod health", sub: "a Places search and a Stripe read", act: `<button class="btn sm primary" id="h-prod">${icon("zap")}Run</button>`, body: `<div id="h-prod-out" class="note">Not run yet.</div>` })}
@@ -3916,6 +3938,7 @@ async function pageSystem(ctx) {
      ${d.ok ? kv("Business", esc(d.businessName || "–")) + kv("Rating", `${d.averageRating} ★ of ${fmt(d.totalCount)}`) + (d.sample ? kv("Newest review", `${esc(d.sample.authorName)} · ${d.sample.rating}★`) : "") : ""}
      <p class="note wrapurl" style="margin-top:8px">Target: ${esc(d.url || "")}</p>`);
   runPendingSystemCheck();
+  pushPanel();
 
   const tick = async () => {
     if (LIVE.paused || !ctx.live()) return;
@@ -3936,6 +3959,51 @@ async function pageSystem(ctx) {
     $("live-toggle").innerHTML = icon(LIVE.paused ? "play" : "pause") + (LIVE.paused ? "Resume" : "Pause");
     if (!LIVE.paused) tick();
   };
+}
+
+/* ── Outage alerts: Web Push to this device ───────────────────────────────────
+   The service worker lives at /admin-sw.js. iOS only exposes PushManager inside
+   the app added to the Home Screen, so a plain Safari tab explains that instead. */
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/admin-sw.js").catch(() => {});
+const b64ToU8 = (s) => { const p = "=".repeat((4 - (s.length % 4)) % 4); const raw = atob((s + p).replace(/-/g, "+").replace(/_/g, "/")); return Uint8Array.from(raw, (c) => c.charCodeAt(0)); };
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const isStandalone = () => window.navigator.standalone === true || (window.matchMedia && matchMedia("(display-mode: standalone)").matches);
+async function pushPanel() {
+  const out = $("push-out"); if (!out) return;
+  const say = (html) => { const el = $("push-out"); if (el) el.innerHTML = html; };
+  if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+    say(isIOS && !isStandalone()
+      ? `<div class="alert warning">${icon("alertt")}<div><b>Open the Home Screen app</b><span>On iPhone, notifications only work from the app added to the Home Screen. In Safari: Share, Add to Home Screen, then open Vanssay from there and come back to this page.</span></div></div>`
+      : `<div class="alert warning">${icon("alertt")}<div><b>Not supported here</b><span>This browser can't receive push notifications.</span></div></div>`);
+    return;
+  }
+  let sub = null, key = null;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    sub = await reg.pushManager.getSubscription();
+    key = await request("/admin/push/key");
+  } catch (e) { say(`<div class="err-box">Couldn't check alerts: ${esc(e.message)}</div>`); return; }
+  if (!key.enabled) { say(`<div class="alert warning">${icon("alertt")}<div><b>Server not ready</b><span>Push keys (VAPID) are not set on the server yet.</span></div></div>`); return; }
+  if (Notification.permission === "denied") { say(`<div class="alert warning">${icon("alertt")}<div><b>Notifications are blocked</b><span>Allow them for Vanssay in this device's Settings, then reload.</span></div></div>`); return; }
+  say(sub
+    ? `${alertBox("ok", "Alerts are on for this device", "You will be notified if scraping breaks.")}<div style="display:flex;gap:8px;margin-top:10px"><button class="btn sm primary" id="push-test">Send a test</button><button class="btn sm ghost" id="push-off">Turn off</button></div>`
+    : `<p class="note" style="margin-bottom:10px">Not enabled on this device yet.</p><button class="btn sm primary" id="push-on">Enable alerts</button>`);
+  const busy = async (id, fn) => { const b = $(id); if (!b) return; b.disabled = true; try { await fn(); } catch (e) { toast(e.message || "Failed", "err"); } finally { if (b.isConnected) b.disabled = false; } };
+  if ($("push-on")) $("push-on").onclick = () => busy("push-on", async () => {
+    const perm = await Notification.requestPermission(); // must run straight from the tap
+    if (perm !== "granted") throw new Error("Permission was not granted");
+    const reg = await navigator.serviceWorker.ready;
+    const s = (await reg.pushManager.getSubscription()) || (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(key.publicKey) }));
+    await request("/admin/push/subscribe", { method: "POST", body: s.toJSON() });
+    await request("/admin/push/test", { method: "POST", body: {} }).catch(() => {});
+    pushPanel();
+  });
+  if ($("push-test")) $("push-test").onclick = () => busy("push-test", async () => { const r = await request("/admin/push/test", { method: "POST", body: {} }); toast(r.sent ? "Test sent" : "No device received it", r.sent ? "ok" : "err"); });
+  if ($("push-off")) $("push-off").onclick = () => busy("push-off", async () => {
+    await request("/admin/push/unsubscribe", { method: "POST", body: { endpoint: sub.endpoint } });
+    await sub.unsubscribe();
+    pushPanel();
+  });
 }
 
 /* ── Page registry, then go ── */
