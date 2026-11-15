@@ -2546,7 +2546,8 @@ function wixBill(o) {
   return {
     wix: true, estimated: true, raw: o,
     revenue: { mrr: o.revenue.mrr, arr: o.revenue.arr, lifetimeRevenue: 0, addOnRevenue: 0, lifetimeCount: 0, addOnCount: 0 },
-    plans: { free: o.plans.free || 0, starter: o.plans.starter || 0, pro: o.plans.pro || 0, ultra: o.plans.business || 0, lifetime: 0, gifted: 0, paid: o.plans.paid || 0 },
+    // Own or comped sites are "gifted": they have the plan, pay nothing (the backend leaves them out of paid).
+    plans: { free: o.plans.free || 0, starter: o.plans.starter || 0, pro: o.plans.pro || 0, ultra: o.plans.business || 0, lifetime: 0, gifted: o.plans.comped || 0, paid: o.plans.paid || 0 },
     users: { total: o.installs.live, newThisMonth: o.installs.newThisMonth },
     signups: [], sources: {},
   };
@@ -2575,7 +2576,7 @@ function planBreakdown(pl, product) {
   if (pl.pro) parts.push(fmt(pl.pro) + " Pro");
   if (pl.ultra) parts.push(fmt(pl.ultra) + " " + tierLabel("ultra", product));
   if (pl.lifetime) parts.push(fmt(pl.lifetime) + " Lifetime");
-  if (pl.gifted) parts.push(fmt(pl.gifted) + " gifted");
+  if (pl.gifted) parts.push(fmt(pl.gifted) + (product === "reviews-wix" ? " not paying" : " gifted"));
   return parts.length ? parts.join(" · ") : "none yet";
 }
 const MONEY_INFO = `<p>Cash actually invoiced, by the date it was paid: new subscriptions, renewals and one-time Lifetime sales alike, plus component sales from their Payment Link.</p>
@@ -3088,8 +3089,9 @@ async function pageSubscriptions(ctx) {
   // Wix Billing has no subscription record of ours: each paying site is one, live or (removed) canceled.
   if (wixR && wixR.sites) wixR.sites.filter((s) => ["starter", "pro", "business"].includes(s.plan)).forEach((s) => all.push({
     wix: true, instanceId: s.instanceId, email: s.ownerEmail || s.siteName || s.instanceId, siteName: s.siteName, product: WX,
-    plan: s.plan === "business" ? "ultra" : s.plan, cycle: s.billingCycle,
-    status: s.status === "removed" ? "canceled" : s.autoRenewing === false ? "canceling" : "active", live: s.status === "live",
+    plan: s.plan === "business" ? "ultra" : s.plan, cycle: s.billingCycle, gift: s.revenueExcluded,
+    // Own or comped sites stay listed (All records) but are never live revenue, like Accounts' dev accounts.
+    status: s.status === "removed" ? "canceled" : s.autoRenewing === false ? "canceling" : "active", live: s.status === "live" && !s.revenueExcluded,
     monthlyValue: s.monthlyValue, currentPeriodEnd: s.planExpiresAt, createdAt: s.planSince || s.installedAt, stripeSubscriptionId: null }));
   const failed = list.filter((p, i) => !val(rs[i])).concat(wixR && wixR.error ? [WX] : []);
   const live = all.filter((s) => s.live);
@@ -3972,7 +3974,8 @@ const siteName = (s) => s.siteName || (s.status === "removed" || s.siteRemoved ?
 const siteCell = (s) => `<a href="#" data-site="${esc(s.instanceId)}"><strong>${esc(siteName(s))}</strong></a>${s.siteUrl
   ? `<span class="sub"><a class="mono" href="${esc(s.siteUrl)}" target="_blank" rel="noopener">${esc(hostOf(s.siteUrl).replace(/^www\./, ""))}</a></span>`
   : s.status === "removed" ? `<span class="sub">details deleted on removal</span>` : ""}`;
-const wixPlanCell = (s) => `${wixPlanBadge(s.plan)}${s.billingCycle ? `<span class="sub">${esc(cycleLabel(s.billingCycle))}${s.autoRenewing === false ? " · renewal off" : ""}</span>` : ""}`;
+const wixPlanCell = (s) => `${wixPlanBadge(s.plan)}${s.revenueExcluded && s.plan !== "free" ? ` <span class="bdg line" title="Own or comped site: not revenue, not a paying site">not paying</span>` : ""}${s.billingCycle ? `<span class="sub">${esc(cycleLabel(s.billingCycle))}${s.autoRenewing === false ? " · renewal off" : ""}</span>` : ""}`;
+const isPayingSite = (s) => ["starter", "pro", "business"].includes(s.plan) && !s.revenueExcluded;
 const liveBadge = (s) => (s.status === "removed" ? `<span class="bdg crit">removed</span>` : `<span class="bdg good">live</span>`);
 const syncBadge = (st) => `<span class="bdg ${st === "ok" ? "good" : st === "reconnect" ? "warn" : "crit"}">${esc(st === "ok" ? "syncing" : st === "reconnect" ? "sign in again" : st)}</span>`;
 const sourceLabel = (src) => (src === "gbp" ? "Business Profile" : "Google search");
@@ -4058,14 +4061,14 @@ async function pageWix(ctx) {
     const state = { status: q.get("status") || "live", plan: q.get("plan") || "" };
     const PAIDS = ["starter", "pro", "business"];
     const filtered = () => sites.filter((s) => (state.status === "all" || s.status === state.status) &&
-      (!state.plan || (state.plan === "paid" ? PAIDS.includes(s.plan) : s.plan === state.plan)));
+      (!state.plan || (state.plan === "paid" ? isPayingSite(s) : s.plan === state.plan)));
     const live = sites.filter((s) => s.status === "live");
     const opt = (v, l, c) => `<option value="${v}" ${c === v ? "selected" : ""}>${esc(l)}</option>`;
     let tApi;
     paint(ctx, `${head()}
       ${kpis([
         { label: "Live sites", value: fmt(live.length), sub: `${fmt(sites.length - live.length)} removed since launch` },
-        { label: "Paying", value: fmt(live.filter((s) => PAIDS.includes(s.plan)).length), sub: money(sum(live, (s) => s.monthlyValue)) + "/mo est." },
+        { label: "Paying", value: fmt(live.filter(isPayingSite).length), sub: money(sum(live, (s) => s.monthlyValue)) + "/mo est." + (live.some((s) => s.revenueExcluded && PAIDS.includes(s.plan)) ? ` · ${fmt(live.filter((s) => s.revenueExcluded && PAIDS.includes(s.plan)).length)} not paying` : "") },
         { label: "With a widget live", value: fmt(live.filter((s) => s.livePages > 0 || s.views30d > 0).length), sub: "seen on a published page in 30 days" },
         { label: "Owners active · 30 days", value: fmt(live.filter((s) => s.lastActiveAt && Date.now() - new Date(s.lastActiveAt) < 30 * 86400000).length) },
       ])}
@@ -4256,7 +4259,7 @@ async function renderSite(id) {
     </div>
     <div class="dw-b">
       ${kpis([
-        { label: "MRR est.", value: s.monthlyValue ? money(s.monthlyValue) : "–", sub: s.billingCycle ? cycleLabel(s.billingCycle) + " billing" : s.plan === "free" ? "Free plan" : "cycle unknown" },
+        { label: "MRR est.", value: s.monthlyValue ? money(s.monthlyValue) : "–", sub: s.revenueExcluded && s.plan !== "free" ? "not paying: own or comped" : s.billingCycle ? cycleLabel(s.billingCycle) + " billing" : s.plan === "free" ? "Free plan" : "cycle unknown" },
         { label: "Widget views · 30d", value: fmt(s.views30d), sub: `${fmt(s.viewsAllTime)} all-time · ${plural(s.livePages, "live page")}` },
         { label: "Reviews synced", value: fmt(s.reviews), sub: plural(s.businesses, "business", "businesses") },
         { label: "Aria calls", value: fmt(s.ariaCalls), sub: s.lastAriaAt ? "last " + ago(s.lastAriaAt) : "never" },
@@ -4275,7 +4278,10 @@ async function renderSite(id) {
           + kv("Plan since", s.planSince ? date(s.planSince) : "–")
           + kv("Renews or ends", s.planExpiresAt ? date(s.planExpiresAt) : "–")
           + kv("Read from Wix", s.planCheckedAt ? ago(s.planCheckedAt) : "–")
-          + (s.status === "live" ? `<div class="row" style="margin-top:12px"><button class="btn sm" data-wsrefresh>${icon("refresh")}Refresh from Wix</button></div>` : `<p class="note" style="margin-top:10px">Removed ${date(s.removedAt)}: only the plan and dates are kept.</p>`) })}
+          + kv("Counts as revenue", s.revenueExcluded ? `<span class="warn-t">no</span> <span class="muted">· own or comped site</span>` : "yes")
+          + `<div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap">${s.status === "live" ? `<button class="btn sm" data-wsrefresh>${icon("refresh")}Refresh from Wix</button>` : ""}
+              <button class="btn sm" data-wsrev="${s.revenueExcluded ? "0" : "1"}" title="${s.revenueExcluded ? "Count this site's plan in MRR and paying sites again" : "Your own or a comped site: keep the plan, leave it out of MRR and paying sites"}">${s.revenueExcluded ? "Count as paying again" : "Not paying (own or comp site)"}</button></div>`
+          + (s.status === "live" ? "" : `<p class="note" style="margin-top:10px">Removed ${date(s.removedAt)}: only the plan and dates are kept.</p>`) })}
       </div>
       ${sec("Google businesses")}
       ${card({ flush: true, body: table({ rows: d.businesses, page: 0, empty: "No business connected.", cols: [
@@ -4301,10 +4307,17 @@ async function renderSite(id) {
     </div>`;
   mount(dw);
   bindClose();
+  const again = () => { if (siteFor === id) { siteFor = null; syncSite(id); } if (cur) rerender(); loadAttention(true); };
   const rb = dw.querySelector("[data-wsrefresh]");
   if (rb) rb.onclick = async () => {
     const r = await act(rb, () => send(B + "/sites/" + id + "/refresh", "POST"), (x) => x.message || "Refreshed");
-    if (r && siteFor === id) { siteFor = null; syncSite(id); if (cur && cur.page === "reviews-wix") rerender(); }
+    if (r) again();
+  };
+  const xb = dw.querySelector("[data-wsrev]");
+  if (xb) xb.onclick = async () => {
+    const excluded = xb.dataset.wsrev === "1";
+    const r = await act(xb, () => send(B + "/sites/" + id + "/revenue", "POST", { excluded }), excluded ? "Left out of MRR and paying sites" : "Counted as paying again");
+    if (r) again();
   };
 }
 
