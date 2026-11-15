@@ -38,6 +38,8 @@
       --crit:#c22a2a; --crit-mark:#d03b3b; --crit-soft:#fce9e9;
       --pink:#b4235f; --pink-soft:#fde9f1;
       --c-reviews:#2a78d6; --c-instagram:#e87ba4; --c-bouncer:#008300; --c-router:#6250d6; --c-grl:#eda100;
+      --c-rwf:#0f8f8f; --c-rwx:#b04a1f;
+      --c-framer:#0a7cff; --c-webflow:#4353ff; --c-wix:#1d1d1f; --c-web:#7a7980;
       --c-vpn:#2a78d6; --c-ink:#2a2930; --c-ctx:#dcdbd6; --c-accent:#2b50ff; --c-other:#a9a8a2;
       --grid:#edece8; --axis:#cdccc6; --band:rgba(22,21,27,.045);
       --tip-bg:#17161c; --tip-text:#f5f5f7; --tip-muted:rgba(245,245,247,.6); --tip-line:rgba(255,255,255,.1);
@@ -62,6 +64,8 @@
         --crit:#f27272; --crit-mark:#d03b3b; --crit-soft:rgba(208,59,59,.18);
         --pink:#f28bb5; --pink-soft:rgba(213,81,129,.18);
         --c-reviews:#3987e5; --c-instagram:#d55181; --c-bouncer:#008300; --c-router:#9085e9; --c-grl:#c98500;
+        --c-rwf:#2fb3b3; --c-rwx:#e0703f;
+        --c-framer:#4da3ff; --c-webflow:#7c86ff; --c-wix:#e9e9ec; --c-web:#8e8d95;
         --c-vpn:#3987e5; --c-ink:#e4e4e8; --c-ctx:#34343a; --c-accent:#5b7cff; --c-other:#5c5c63;
         --grid:#222226; --axis:#3a3a40; --band:rgba(255,255,255,.05);
         --tip-bg:#26262b; --tip-text:#f5f5f7; --tip-muted:rgba(245,245,247,.6); --tip-line:rgba(255,255,255,.09);
@@ -81,6 +85,8 @@
       --crit:#f27272; --crit-mark:#d03b3b; --crit-soft:rgba(208,59,59,.18);
       --pink:#f28bb5; --pink-soft:rgba(213,81,129,.18);
       --c-reviews:#3987e5; --c-instagram:#d55181; --c-bouncer:#008300; --c-router:#9085e9; --c-grl:#c98500;
+      --c-rwf:#2fb3b3; --c-rwx:#e0703f;
+      --c-framer:#4da3ff; --c-webflow:#7c86ff; --c-wix:#e9e9ec; --c-web:#8e8d95;
       --c-vpn:#3987e5; --c-ink:#e4e4e8; --c-ctx:#34343a; --c-accent:#5b7cff; --c-other:#5c5c63;
       --grid:#222226; --axis:#3a3a40; --band:rgba(255,255,255,.05);
       --tip-bg:#26262b; --tip-text:#f5f5f7; --tip-muted:rgba(245,245,247,.6); --tip-line:rgba(255,255,255,.09);
@@ -149,6 +155,40 @@
     .sdot { width:8px; height:8px; border-radius:50%; background:var(--good-mark); box-shadow:0 0 0 3px color-mix(in srgb, var(--good-mark) 18%, transparent); }
     .sdot.warning { background:var(--warn-mark); box-shadow:0 0 0 3px color-mix(in srgb, var(--warn-mark) 20%, transparent); }
     .sdot.critical { background:var(--crit-mark); box-shadow:0 0 0 3px color-mix(in srgb, var(--crit-mark) 20%, transparent); }
+    /* ── Platform scope: the picker under the brand, its menu, marks and the page chip ── */
+    .pfp { display:flex; align-items:center; gap:10px; width:100%; margin:6px 0 0; padding:7px 9px; border-radius:10px; border:1px solid var(--line);
+           background:var(--surface); text-align:left; box-shadow:var(--shadow-sm); transition:border-color .12s; }
+    .pfp:hover, .pfp[aria-expanded="true"] { border-color:var(--line-2); }
+    .pfp .t { flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.25; }
+    .pfp .t b { font-size:13px; font-weight:650; }
+    .pfp .t span { font-size:11.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .pfp > svg { width:15px; height:15px; color:var(--muted); }
+    .pfm { width:24px; height:24px; border-radius:7px; display:grid; place-items:center; flex:none; font-family:var(--disp); font-size:11.5px; font-weight:800;
+           background:color-mix(in srgb, var(--c) 16%, transparent); color:var(--c); }
+    .pfm svg { width:13px; height:13px; }
+    .nav-i .pfm { width:20px; height:20px; border-radius:6px; font-size:10px; margin-left:-2px; }
+    .pf-menu { position:fixed; z-index:70; width:236px; padding:5px; border-radius:12px; background:var(--surface); border:1px solid var(--line-2); box-shadow:var(--shadow-lg); }
+    .pf-menu button { display:flex; align-items:center; gap:10px; width:100%; padding:7px 8px; border-radius:8px; text-align:left; }
+    .pf-menu button:hover, .pf-menu button:focus-visible { background:var(--surface-3); outline:none; }
+    .pf-menu button.on { background:var(--accent-soft); }
+    .pf-menu .t { flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.25; }
+    .pf-menu .t b { font-weight:600; }
+    .pf-menu .t span { font-size:11.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .pf-menu .ck { width:15px; height:15px; color:var(--accent-text); }
+    .pf-menu hr { border:0; border-top:1px solid var(--line); margin:4px 2px; }
+    .scope-chip { display:inline-flex; align-items:center; gap:6px; height:22px; padding:0 3px 0 9px; margin-right:8px; border-radius:99px; font-size:12px; font-weight:600;
+                  vertical-align:1px; color:var(--text); background:color-mix(in srgb, var(--c) 13%, transparent); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--c) 32%, transparent); }
+    .scope-chip button { width:17px; height:17px; border-radius:50%; display:grid; place-items:center; color:var(--text-2); }
+    .scope-chip button:hover { background:var(--surface-3); color:var(--text); }
+    .scope-chip button svg { width:11px; height:11px; }
+    .plcard { position:relative; overflow:hidden; }
+    .plcard::before { content:""; position:absolute; left:0; top:0; right:0; height:3px; background:var(--c); opacity:.9; }
+    .plcard .card-b { padding-top:4px; }
+    .plcard .pl-r { display:flex; align-items:center; gap:8px; padding:6px 0; border-top:1px solid var(--line); color:inherit; text-decoration:none !important; font-size:12.5px; }
+    .plcard .pl-r:first-child { border-top:0; }
+    .plcard .pl-r:hover .pc { color:var(--text); }
+    .plcard .pl-r .v { margin-left:auto; font-weight:650; font-variant-numeric:tabular-nums; }
+    .plcard .pl-r .v small { color:var(--muted); font-weight:600; margin-left:4px; }
     .side-foot { margin-top:auto; padding-top:12px; }
     .who { display:flex; align-items:center; gap:10px; padding:8px 8px 8px 10px; border-radius:10px; border:1px solid var(--line); background:var(--surface); }
     .who .av { width:26px; height:26px; border-radius:50%; background:var(--accent-soft); color:var(--accent-text); display:grid; place-items:center; font-weight:700; font-size:12px; flex:none; }
@@ -488,6 +528,8 @@
     .alert.critical { background:var(--crit-soft); border-color:color-mix(in srgb, var(--crit-mark) 25%, transparent); } .alert.critical svg, .alert.critical b { color:var(--crit); }
     .alert.warning { background:var(--warn-soft); border-color:color-mix(in srgb, var(--warn-mark) 30%, transparent); } .alert.warning svg, .alert.warning b { color:var(--warn); }
     .alert.ok { background:var(--good-soft); border-color:color-mix(in srgb, var(--good-mark) 25%, transparent); } .alert.ok svg, .alert.ok b { color:var(--good); }
+    .alert.info { background:var(--accent-soft); border-color:color-mix(in srgb, var(--accent) 22%, transparent); } .alert.info svg, .alert.info b { color:var(--accent-text); }
+    .alert + .kpis, .alert + .alert { margin-top:12px; }
 
     /* ── Product cards (Home) ── */
     .pcard { position:relative; display:flex; flex-direction:column; gap:2px; padding:14px 16px 12px; color:inherit; text-decoration:none !important; overflow:hidden;
@@ -669,6 +711,7 @@
       <span class="mark"><svg width="15" height="15" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#fff"/><path d="M34,4H25L13,36H22Z" fill="#8b8bff"/></svg></span>
       <b>Vanssay</b><span>Admin</span>
     </div>
+    <button type="button" class="pfp" id="pf-btn" aria-haspopup="menu" aria-expanded="false" title="Show one platform, or all of them"></button>
     <nav id="nav"></nav>
     <div class="side-foot">
       <div class="who"><span class="av" id="who-av">·</span><span class="em" id="who-em"></span>
@@ -715,17 +758,54 @@ const TKEY = "vanssay.token";
    because its own /users payload already carries businesses + views. `c` is
    the product's series color, the same in every chart on every page. `tiers`
    is what the manual plan override offers. */
+/* ── Platforms ────────────────────────────────────────────────────────────────
+   Every marketplace Vanssay ships on. A new one is one row here plus its key
+   in the `platforms` of the products sold there; the picker, the sidebar, Home
+   and the money pages follow. `web` is the Instagram web app (any website). */
+const PLATFORM_LIST = [
+  { key: "framer",  label: "Framer",  mark: "F", c: "--c-framer" },
+  { key: "webflow", label: "Webflow", mark: "W", c: "--c-webflow" },
+  { key: "wix",     label: "Wix",     mark: "X", c: "--c-wix" },
+  { key: "web",     label: "Web app", mark: "◦", c: "--c-web" },
+];
+const PLAT = Object.fromEntries(PLATFORM_LIST.map((p) => [p.key, p]));
+
+// `platforms`: where the product is sold (first = where it started). `billing`:
+// "accounts" (Accounts service + Stripe, shared Vanssay accounts) or "wix" (Wix
+// Billing, one record per Wix site, no account: its own backend answers).
 const PRODUCTS = [
-  { key: "reviews",   label: "Reviews",   route: "reviews",   base: "",           icon: "star",     c: "--c-reviews",   cache: true,  activity: null,                    tiers: ["free", "pro", "ultra"] },
-  { key: "instagram", label: "Instagram", route: "instagram", base: "/instagram", icon: "insta",    c: "--c-instagram", cache: false, activity: ["/admin/feeds", "feeds"], tiers: ["free", "starter", "pro"] },
-  { key: "geoblock",  label: "Bouncer",   route: "bouncer",   base: "/geoblock",  icon: "shield",   c: "--c-bouncer",   cache: true,  activity: ["/admin/sites", "sites"], tiers: ["free", "pro", "ultra"] },
-  { key: "router",    label: "Router",    route: "router",    base: "/router",    icon: "signpost", c: "--c-router",    cache: true,  activity: ["/admin/sites", "sites"], tiers: ["free", "pro", "ultra"] },
+  { key: "reviews",   label: "Reviews",   route: "reviews",   base: "",           icon: "star",     c: "--c-reviews",   cache: true,  activity: null,                    tiers: ["free", "pro", "ultra"],    platforms: ["framer"], billing: "accounts" },
+  { key: "instagram", label: "Instagram", route: "instagram", base: "/instagram", icon: "insta",    c: "--c-instagram", cache: false, activity: ["/admin/feeds", "feeds"], tiers: ["free", "starter", "pro"], platforms: ["framer", "webflow", "web"], billing: "accounts" },
+  { key: "geoblock",  label: "Bouncer",   route: "bouncer",   base: "/geoblock",  icon: "shield",   c: "--c-bouncer",   cache: true,  activity: ["/admin/sites", "sites"], tiers: ["free", "pro", "ultra"],    platforms: ["framer"], billing: "accounts" },
+  { key: "router",    label: "Router",    route: "router",    base: "/router",    icon: "signpost", c: "--c-router",    cache: true,  activity: ["/admin/sites", "sites"], tiers: ["free", "pro", "ultra"],    platforms: ["framer"], billing: "accounts" },
+  { key: "reviews-webflow", label: "Reviews for Webflow", route: "reviews-webflow", base: "/reviews-webflow", icon: "star", c: "--c-rwf", cache: false, activity: null, tiers: ["free", "starter", "pro"], platforms: ["webflow"], billing: "accounts" },
+  { key: "reviews-wix", label: "Google Reviews 2027", route: "reviews-wix", base: "/reviews-wix", icon: "star", c: "--c-rwx", cache: false, activity: null, tiers: [], platforms: ["wix"], billing: "wix" },
 ];
 const PROD = Object.fromEntries(PRODUCTS.map((p) => [p.key, p]));
+// Products with Vanssay accounts: the Users page, the account drawer and the plan overrides.
+const ACCT_PRODUCTS = PRODUCTS.filter((p) => p.billing === "accounts");
 // A marketplace component sold through a Stripe Payment Link: no account, no
 // admin endpoints of its own, so it is not a PRODUCTS row (that list drives the
 // Users and plan-override UI). Its money still lands in /admin/sales byProduct.
-const COMPONENT = { key: "component:google-reviews-live", slug: "google-reviews-live", label: "Google Reviews Live", route: "google-reviews-live", icon: "box", c: "--c-grl" };
+const COMPONENT = { key: "component:google-reviews-live", slug: "google-reviews-live", label: "Google Reviews Live", route: "google-reviews-live", icon: "box", c: "--c-grl", platforms: ["framer"] };
+const WIX_APP_ID = "23b74734-3899-4774-9aa9-d45c29dd64cf";
+
+/* ── Platform scope ───────────────────────────────────────────────────────────
+   "all", or one platform key. Home, Users, Revenue and Subscriptions show only
+   that platform's products; the sidebar lists its products (or, on "all", the
+   platforms themselves). Company-wide pages (Invoices, Costs, Compliance…)
+   ignore it. Kept per browser; ?pf=<key> in an address sets it too. */
+const SCOPE_KEY = "vanssay.admin.platform";
+let SCOPE = PLAT[store.get(SCOPE_KEY)] ? store.get(SCOPE_KEY) : "all";
+const inScope = (p) => SCOPE === "all" || (p.platforms || []).includes(SCOPE);
+const scopedProducts = () => PRODUCTS.filter(inScope);
+const scopedAcct = () => ACCT_PRODUCTS.filter(inScope);
+const componentInScope = () => inScope(COMPONENT);
+const productsOn = (pf) => PRODUCTS.filter((p) => p.platforms.includes(pf));
+// Platforms that have something on them today (empty rows stay out of the picker).
+const livePlatforms = () => PLATFORM_LIST.filter((pl) => productsOn(pl.key).length || (pl.key === "framer"));
+const productOfRoute = (route) => PRODUCTS.find((p) => p.route === route) || (route === COMPONENT.route ? COMPONENT : null);
+const scopeLabel = () => (SCOPE === "all" ? "All platforms" : PLAT[SCOPE].label);
 // Stack order for money charts. A byProduct key that is none of these (a
 // product the admin no longer shows) is summed into "Other" so totals add up.
 const SALES_SERIES = PRODUCTS.map((p) => ({ key: p.key, label: p.label, c: p.c })).concat([{ key: COMPONENT.key, label: COMPONENT.label, c: COMPONENT.c }]);
@@ -793,14 +873,18 @@ const todayKey = () => new Date().toISOString().slice(0, 10);
 // it "Pro". `billing` ("lifetime", or a "lifetime_" subscription id) tells them apart.
 const isLifetime = (b) => b === "lifetime" || String(b || "").startsWith("lifetime_");
 // Reviews sells its `ultra` tier as "Agency"; the key stays `ultra` everywhere else.
-const tierLabel = (plan, product) => (plan === "ultra" && product === "reviews" ? "Agency" : cap(plan || "free"));
+// Wix's top plan is "business", folded onto `ultra` where plans are counted together.
+const tierLabel = (plan, product) => (plan === "ultra" && product === "reviews" ? "Agency" : plan === "ultra" && product === "reviews-wix" ? "Business" : cap(plan || "free"));
+const wixPlanBadge = (plan) => `<span class="bdg ${plan === "business" ? "ultra" : esc(plan || "free")}">${esc(cap(plan || "free"))}</span>`;
+const cycleLabel = (c) => (!c ? "" : /YEAR|ANNUAL/i.test(c) ? "yearly" : /MONTH/i.test(c) ? "monthly" : String(c).toLowerCase());
 function planBadge(plan, billing, product) {
   plan = plan || "free";
   if (isLifetime(billing)) return `<span class="bdg lifetime">Lifetime</span>`;
   const gift = billing === "gift" ? " · gift" : "";
   return `<span class="bdg ${esc(plan)}"${gift ? ' title="Gifted, pays nothing"' : ""}>${esc(tierLabel(plan, product))}${gift}</span>`;
 }
-const PLATFORMS = { framer: ["F", "Framer"], webflow: ["W", "Webflow"], web: ["W", "Web app"] };
+const PLATFORMS = Object.fromEntries(PLATFORM_LIST.map((p) => [p.key, [p.mark, p.label]]));
+const platMark = (pl, size) => pl ? `<span class="pfm" style="--c:var(${pl.c})${size ? `;width:${size}px;height:${size}px` : ""}">${esc(pl.mark)}</span>` : `<span class="pfm" style="--c:var(--c-accent)">${icon("layers")}</span>`;
 const platformLabel = (p) => (PLATFORMS[p] || PLATFORMS.framer)[1];
 const platformBadge = (p) => { const k = PLATFORMS[p] ? p : "framer"; return `<span class="plat"><i>${k === "web" ? "◦" : PLATFORMS[k][0]}</i>${PLATFORMS[k][1]}</span>`; };
 // Short codes the backends store for a failed Apify scrape.
@@ -998,7 +1082,7 @@ const unavailable = (label, r) => `<div class="empty">${icon("alertc")}${esc(lab
 const kv = (k, v) => `<div class="kv"><span>${k}</span><span>${v}</span></div>`;
 const copyBtn = (text, label) => `<button type="button" class="copy" data-copy="${esc(text)}" title="${esc(label || "Copy")}" aria-label="${esc(label || "Copy")}">${icon("copy")}</button>`;
 function alertBox(level, title, detail) {
-  const ic = level === "critical" ? "alertc" : level === "warning" ? "alertt" : "checkc";
+  const ic = level === "critical" ? "alertc" : level === "warning" ? "alertt" : level === "info" ? "info" : "checkc";
   return `<div class="alert ${level === "ok" ? "ok" : esc(level)}">${icon(ic)}<div><b>${esc(title)}</b><span>${esc(detail)}</span></div></div>`;
 }
 const skel = {
@@ -1711,30 +1795,45 @@ function rollup(rows, keyOf, add) {
    running the business. Every page and tab has its own address (#/instagram/
    funnel), so refresh, back/forward and bookmarks all land where you were, and
    ?u=<id> opens an account on top of whatever page you are on. */
-const NAV = [
-  { items: [
-    { id: "home", label: "Home", icon: "home" },
-    { id: "users", label: "Users", icon: "users" },
-  ] },
-  { title: "Money", items: [
-    { id: "revenue", label: "Revenue", icon: "revenue" },
-    { id: "subscriptions", label: "Subscriptions", icon: "repeat" },
-    { id: "invoices", label: "Invoices", icon: "invoice" },
-    { id: "costs", label: "Costs", icon: "coins" },
-  ] },
-  { title: "Products", items: PRODUCTS.map((p) => ({ id: p.route, label: p.label, icon: p.icon, c: p.c }))
-    .concat([{ id: COMPONENT.route, label: COMPONENT.label, icon: COMPONENT.icon, c: COMPONENT.c }]) },
-  { title: "Growth", items: [
-    { id: "website", label: "Website", icon: "globe" },
-    { id: "ranks", label: "Marketplace ranks", icon: "medal" },
-    { id: "suggestions", label: "Suggestions", icon: "bulb" },
-  ] },
-  { title: "Business", items: [
-    { id: "compliance", label: "Compliance", icon: "landmark" },
-    { id: "system", label: "System", icon: "pulse" },
-  ] },
-];
-const navItem = (id) => { for (const g of NAV) for (const it of g.items) if (it.id === id) return { ...it, group: g.title || "" }; return null; };
+/* The sidebar follows the platform scope. On "all" the Products group lists the
+   platforms (one row each, however many products they carry), so it stays short
+   as platforms are added; on one platform it lists that platform's products.
+   Users disappears where no product has Vanssay accounts (Wix: sites only). */
+const productItem = (p) => ({ id: p.route, label: p.label, icon: p.icon, c: p.c });
+function navGroups() {
+  const showUsers = scopedAcct().length > 0;
+  const products = SCOPE === "all"
+    ? { title: "Platforms", items: livePlatforms().map((pl) => ({ id: "pf:" + pl.key, label: pl.label, pf: pl, owns: productsOn(pl.key).map((p) => p.route).concat(pl.key === "framer" ? [COMPONENT.route] : []) })) }
+    : { title: PLAT[SCOPE].label, items: scopedProducts().map(productItem).concat(componentInScope() ? [productItem(COMPONENT)] : []) };
+  return [
+    { items: [{ id: "home", label: "Home", icon: "home" }].concat(showUsers ? [{ id: "users", label: "Users", icon: "users" }] : []) },
+    { title: "Money", items: [
+      { id: "revenue", label: "Revenue", icon: "revenue" },
+      { id: "subscriptions", label: "Subscriptions", icon: "repeat" },
+      { id: "invoices", label: "Invoices", icon: "invoice" },
+      { id: "costs", label: "Costs", icon: "coins" },
+    ] },
+    products,
+    { title: "Growth", items: [
+      { id: "website", label: "Website", icon: "globe" },
+      { id: "ranks", label: "Marketplace ranks", icon: "medal" },
+      { id: "suggestions", label: "Suggestions", icon: "bulb" },
+    ] },
+    { title: "Business", items: [
+      { id: "compliance", label: "Compliance", icon: "landmark" },
+      { id: "system", label: "System", icon: "pulse" },
+    ] },
+  ];
+}
+// Every page that exists, whatever the scope (crumbs and the palette need them all).
+function allNavItems() {
+  const out = [];
+  for (const g of navGroups()) if (g.title !== "Platforms" && !(g.items[0] && g.items[0].c)) g.items.forEach((it) => out.push({ ...it, group: g.title || "" }));
+  if (!out.some((x) => x.id === "users")) out.splice(1, 0, { id: "users", label: "Users", icon: "users", group: "" });
+  PRODUCTS.concat([COMPONENT]).forEach((p) => out.push({ ...productItem(p), group: PLAT[p.platforms[0]].label }));
+  return out;
+}
+const navItem = (id) => allNavItems().find((it) => it.id === id) || null;
 
 let NAVT = 0;          // bumped on every render; a response for an older one is dropped
 let cur = null;        // the route being shown
@@ -1750,7 +1849,8 @@ function parseHash() {
   const parts = path.split("/").filter(Boolean);
   return { page: parts[0] || "home", tab: parts[1] || null, q, path: parts.join("/") || "home" };
 }
-const routeKey = (r) => { const q = new URLSearchParams(r.q); q.delete("u"); q.delete("up"); q.sort(); return r.path + "?" + q; };
+const routeKey = (r) => { const q = new URLSearchParams(r.q); q.delete("u"); q.delete("up"); q.delete("ws"); q.delete("pf"); q.sort(); return r.path + "?" + q; };
+let shownScope = null; // the scope the page on screen was drawn for
 function setQuery(changes) { // page state that belongs in the address (filters), without a re-render
   const r = parseHash();
   for (const [k, v] of Object.entries(changes)) { if (v == null || v === "") r.q.delete(k); else r.q.set(k, v); }
@@ -1762,15 +1862,36 @@ function route() {
   const r = parseHash();
   const P = PAGES[r.page];
   if (!P) { location.replace("#/home"); return; }
+  // ?pf= in an address picks the scope; a product page from another platform moves the scope to its own.
+  const pf = r.q.get("pf");
+  if (pf && (pf === "all" || PLAT[pf]) && pf !== SCOPE) setScope(pf, { quiet: true });
+  const owner = productOfRoute(r.page);
+  if (owner && !inScope(owner)) setScope(owner.platforms[0], { quiet: true });
   if (P.tabs && (!r.tab || !P.tabs.some(([id]) => id === r.tab))) {
     const qs = r.q.toString();
     location.replace(`#/${r.page}/${P.tabs[0][0]}${qs ? "?" + qs : ""}`);
     return;
   }
-  const changed = !cur || routeKey(cur) !== routeKey(r);
+  const changed = !cur || shownScope !== SCOPE || routeKey(cur) !== routeKey(r);
   cur = r;
   if (changed) renderPage();
   syncDrawer(r.q.get("u"), r.q.get("up"));
+  syncSite(r.q.get("ws"));
+}
+// Switch the platform scope: the sidebar is rebuilt and the current page redrawn for
+// it (a product page that is not on the new platform gives way to Home).
+function setScope(k, o) {
+  o = o || {};
+  if (k !== "all" && !PLAT[k]) return;
+  SCOPE = k;
+  store.set(SCOPE_KEY, k);
+  renderNav(); paintPicker();
+  if (o.quiet) return;
+  const r = parseHash();
+  if (r.q.get("pf")) setQuery({ pf: null });
+  const owner = productOfRoute(r.page);
+  if (owner && !inScope(owner)) { location.hash = "#/home"; return; }
+  if (cur) renderPage();
 }
 window.addEventListener("hashchange", route);
 
@@ -1778,7 +1899,8 @@ async function renderPage(o) {
   o = o || {};
   const r = cur, P = PAGES[r.page];
   const token = ++NAVT;
-  stopPollers(); closePop();
+  shownScope = SCOPE;
+  stopPollers(); closePop(); closePicker();
   pageKeys = new Set();
   markNav(r.page);
   setCrumbs(r, P);
@@ -1826,21 +1948,59 @@ async function region(ctx, id, work) {
 
 /* ── Sidebar, crumbs, top bar ── */
 function renderNav() {
-  $("nav").innerHTML = NAV.map((g) => `<div class="nav-g">${g.title ? `<div class="nav-h">${esc(g.title)}</div>` : ""}${g.items.map((it) =>
-    `<a class="nav-i" href="#/${it.id}" data-nav="${it.id}">${it.c ? `<span class="pi" style="--c:var(${it.c})">${icon(it.icon)}</span>` : icon(it.icon)}<span class="lbl">${esc(it.label)}</span><span class="meta" data-meta="${it.id}"></span></a>`).join("")}</div>`).join("");
+  $("nav").innerHTML = navGroups().map((g) => `<div class="nav-g">${g.title ? `<div class="nav-h">${esc(g.title)}</div>` : ""}${g.items.map((it) => it.pf
+    // A platform row (scope "all"): picks the platform instead of opening a page.
+    ? `<button type="button" class="nav-i" data-scope="${it.pf.key}" data-nav="${it.id}" data-owns="${esc(it.owns.join(" "))}" title="Show ${esc(it.label)} only">${platMark(it.pf)}<span class="lbl">${esc(it.label)}</span><span class="meta"><span class="cnt">${fmt(it.owns.length)}</span></span></button>`
+    : `<a class="nav-i" href="#/${it.id}" data-nav="${it.id}">${it.c ? `<span class="pi" style="--c:var(${it.c})">${icon(it.icon)}</span>` : icon(it.icon)}<span class="lbl">${esc(it.label)}</span><span class="meta" data-meta="${it.id}"></span></a>`).join("")}</div>`).join("");
   paintAttentionMeta();
+  if (cur) markNav(cur.page);
 }
 function markNav(page) {
   document.querySelectorAll(".nav-i").forEach((a) => {
-    const on = a.dataset.nav === page;
+    const on = a.dataset.nav === page || (a.dataset.owns || "").split(" ").includes(page);
     a.classList.toggle("on", on);
     if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  });
+}
+/* The picker under the brand: which platform the scoped pages are showing. */
+function paintPicker() {
+  const b = $("pf-btn"); if (!b) return;
+  const pl = SCOPE === "all" ? null : PLAT[SCOPE];
+  const n = SCOPE === "all" ? PRODUCTS.length + 1 : scopedProducts().length + (componentInScope() ? 1 : 0);
+  b.innerHTML = `${platMark(pl)}<span class="t"><b>${esc(scopeLabel())}</b><span>${SCOPE === "all" ? `${plural(livePlatforms().length, "platform")} · ${plural(n, "product")}` : plural(n, "product")}</span></span>${icon("sort")}`;
+}
+let pickerEl = null;
+function closePicker() { if (pickerEl) { pickerEl.remove(); pickerEl = null; const b = $("pf-btn"); if (b) b.setAttribute("aria-expanded", "false"); } }
+function openPicker() {
+  if (pickerEl) { closePicker(); return; }
+  const b = $("pf-btn"), r = b.getBoundingClientRect();
+  const row = (k, pl, sub) => `<button type="button" role="menuitemradio" aria-checked="${SCOPE === k}" class="${SCOPE === k ? "on" : ""}" data-scope="${k}">${platMark(pl)}<span class="t"><b>${esc(pl ? pl.label : "All platforms")}</b><span>${sub}</span></span>${SCOPE === k ? `<span class="ck">${icon("check")}</span>` : ""}</button>`;
+  pickerEl = document.createElement("div");
+  pickerEl.className = "pf-menu"; pickerEl.setAttribute("role", "menu"); pickerEl.setAttribute("aria-label", "Platform");
+  pickerEl.innerHTML = row("all", null, "Totals across every marketplace") + `<hr>` + livePlatforms().map((pl) => {
+    const ps = productsOn(pl.key).concat(pl.key === "framer" ? [COMPONENT] : []);
+    return row(pl.key, pl, ps.map((p) => p.label).join(" · ") || "Nothing yet");
+  }).join("");
+  document.body.append(pickerEl);
+  pickerEl.style.left = Math.max(8, r.left) + "px";
+  pickerEl.style.top = Math.min(innerHeight - pickerEl.offsetHeight - 8, r.bottom + 6) + "px";
+  b.setAttribute("aria-expanded", "true");
+  const items = [...pickerEl.querySelectorAll("button")];
+  (items.find((x) => x.classList.contains("on")) || items[0]).focus();
+  pickerEl.addEventListener("keydown", (e) => {
+    const i = items.indexOf(document.activeElement);
+    if (e.key === "ArrowDown") { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+    else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); closePicker(); b.focus(); }
+    else if (e.key === "Tab") closePicker();
   });
 }
 function setCrumbs(r, P) {
   const it = navItem(r.page);
   const parts = [];
-  if (it && it.group) parts.push(`<span>${esc(it.group)}</span>`);
+  const owner = productOfRoute(r.page);
+  if (owner) parts.push(`<span>${esc(SCOPE !== "all" && inScope(owner) ? PLAT[SCOPE].label : PLAT[owner.platforms[0]].label)}</span>`);
+  else if (it && it.group) parts.push(`<span>${esc(it.group)}</span>`);
   const tab = P.tabs && r.tab ? P.tabs.find(([id]) => id === r.tab) : null;
   if (tab && r.tab !== P.tabs[0][0]) { parts.push(`<a href="#/${r.page}">${esc(P.title)}</a>`); parts.push(`<b>${esc(tab[1])}</b>`); }
   else parts.push(`<b>${esc(P.title)}</b>`);
@@ -1892,9 +2052,9 @@ async function loadAttention(fresh) {
     const rs = await Promise.allSettled([
       get("/admin/compliance", o), get("/router/admin/diagnostics", { ...o, ttl: 60000 }), get("/admin/diagnostics", o),
       get("/instagram/admin/outreach", o), get("/instagram/admin/free-on-domain", o), get("/admin/suggestions?limit=200", o),
-      get("/admin/expenses", o), get("/instagram/admin/expenses", o),
+      get("/admin/expenses", o), get("/instagram/admin/expenses", o), wixOverview(o),
     ]);
-    const [comp, rdiag, diag, reach, freeDom, sug, rexp, iexp] = rs.map(val);
+    const [comp, rdiag, diag, reach, freeDom, sug, rexp, iexp, wix] = rs.map(val);
     const items = [], meta = {};
     if (comp) {
       const today = comp.today;
@@ -1912,26 +2072,37 @@ async function loadAttention(fresh) {
       meta.compliance = late.length ? ["crit", late.length] : soon.length ? ["warn", soon.length] : null;
     }
     if (rdiag) {
-      (rdiag.warnings || []).forEach((w) => items.push({ level: w.level === "critical" ? "critical" : "warning", title: "Router: " + w.title, detail: w.detail, href: "#/system", k: "System" }));
+      (rdiag.warnings || []).forEach((w) => items.push({ level: w.level === "critical" ? "critical" : "warning", title: "Router: " + w.title, detail: w.detail, href: "#/system", k: "System", prod: "router" }));
       const lv = (rdiag.warnings || []).some((w) => w.level === "critical") ? "critical" : (rdiag.warnings || []).length ? "warning" : "good";
       const failing = (rdiag.checks || []).filter((c) => !c.ok);
-      if (failing.length && !(rdiag.warnings || []).length) items.push({ level: "warning", title: `Router health: ${failing.map((c) => c.name).join(", ")} failing`, detail: failing.map((c) => c.detail).join(" · "), href: "#/system", k: "System" });
+      if (failing.length && !(rdiag.warnings || []).length) items.push({ level: "warning", title: `Router health: ${failing.map((c) => c.name).join(", ")} failing`, detail: failing.map((c) => c.detail).join(" · "), href: "#/system", k: "System", prod: "router" });
       meta.system = failing.length && lv === "good" ? "warning" : lv;
     }
     if (diag) {
       const n = ((diag.windows || {})["24h"] || {}).empty_cache_read || 0;
-      if (n) items.push({ level: "info", title: `${plural(n, "empty widget read")} in the last 24 hours`, detail: "Someone looked at a connected business with nothing synced yet.", href: "#/system", k: "Reviews" });
+      if (n) items.push({ level: "info", title: `${plural(n, "empty widget read")} in the last 24 hours`, detail: "Someone looked at a connected business with nothing synced yet.", href: "#/system", k: "Reviews", prod: "reviews" });
     }
     let igCount = 0;
     if (freeDom && freeDom.feeds.length) {
       igCount += freeDom.feeds.length;
-      items.push({ level: "warning", title: `${plural(freeDom.feeds.length, "free feed")} not rendering on a customer's own domain`, detail: "The warmest upgrade conversations you have: the work is done and the site is live.", href: "#/instagram/leads", k: "Instagram" });
+      items.push({ level: "warning", title: `${plural(freeDom.feeds.length, "free feed")} not rendering on a customer's own domain`, detail: "The warmest upgrade conversations you have: the work is done and the site is live.", href: "#/instagram/leads", k: "Instagram", prod: "instagram" });
     }
     if (reach && (reach.counts.queued || 0)) {
       igCount += reach.counts.queued;
-      items.push({ level: "info", title: `${plural(reach.counts.queued, "Instagram DM")} ready to send`, detail: "Paywall drop-offs, each with a single-use 3-month code. Send them by hand, spaced out.", href: "#/instagram/leads", k: "Instagram" });
+      items.push({ level: "info", title: `${plural(reach.counts.queued, "Instagram DM")} ready to send`, detail: "Paywall drop-offs, each with a single-use 3-month code. Send them by hand, spaced out.", href: "#/instagram/leads", k: "Instagram", prod: "instagram" });
     }
     meta.instagram = igCount ? ["info", igCount] : null;
+    if (wix) {
+      let wn = 0;
+      const W = { k: "Wix", prod: "reviews-wix" };
+      if (wix.businesses.needsAttention) { wn += wix.businesses.needsAttention; items.push({ ...W, level: "warning", title: `${plural(wix.businesses.needsAttention, "Google connection")} to look at on Wix`, detail: "A sync error, or a Google account that has to sign in again. The widget keeps showing the last reviews it had.", href: "#/reviews-wix/businesses" }); }
+      if (wix.cancellations30d) { wn += wix.cancellations30d; items.push({ ...W, level: "warning", title: `${plural(wix.cancellations30d, "Wix plan cancellation")} in the last 30 days`, detail: "Auto-renewal turned off. The Events tab has the reason Wix passed on, when the owner gave one.", href: "#/reviews-wix/events" }); }
+      const bought = (wix.recentEvents || []).filter((e) => (e.kind === "plan_purchased" || e.kind === "plan_converted") && Date.now() - new Date(e.createdAt) < 7 * 86400000).length;
+      if (bought) items.push({ ...W, level: "info", title: `${plural(bought, "new paying Wix site")} this week`, detail: "From the Wix Billing webhooks.", href: "#/reviews-wix/events" });
+      const fresh = wix.installs.new7d;
+      if (fresh) items.push({ ...W, level: "info", title: `${plural(fresh, "new Wix install")} this week`, detail: `${fmt(wix.installs.live)} live installs in all, ${fmt(wix.plans.paid)} paying.`, href: "#/reviews-wix/sites" });
+      meta["reviews-wix"] = wn ? ["warn", wn] : fresh || bought ? ["info", fresh + bought] : null;
+    }
     if (sug) {
       const wk = (sug.recent || []).filter((s) => Date.now() - new Date(s.createdAt) < 7 * 86400000).length;
       if (wk) items.push({ level: "info", title: `${plural(wk, "new plugin idea")} this week`, detail: "From the “Suggest a plugin” form on vanssay.net.", href: "#/suggestions", k: "Growth" });
@@ -1953,16 +2124,18 @@ async function loadAttention(fresh) {
     const rank = { critical: 0, warning: 1, info: 2 };
     items.sort((x, y) => rank[x.level] - rank[y.level]);
     ATTN.items = items; ATTN.meta = meta; ATTN.loaded = true;
-    const urgent = items.filter((x) => x.level !== "info").length;
-    meta.home = urgent ? [items.some((x) => x.level === "critical") ? "crit" : "warn", urgent] : null;
     paintAttentionMeta();
     document.dispatchEvent(new CustomEvent("attention"));
   })().finally(() => { ATTN.busy = null; });
   return ATTN.busy;
 }
+// What concerns the platform on screen: company-wide items always, product items when the product is in scope.
+const scopedAttention = () => ATTN.items.filter((x) => !x.prod || inScope(PROD[x.prod]));
 function paintAttentionMeta() {
-  const m = ATTN.meta || {};
-  for (const id of ["home", "compliance", "instagram", "suggestions", "costs"]) setMeta(id, m[id] ? `<span class="cnt ${m[id][0]}">${esc(m[id][1])}</span>` : "");
+  const m = { ...(ATTN.meta || {}) };
+  const its = scopedAttention(), urgent = its.filter((x) => x.level !== "info").length;
+  m.home = urgent ? [its.some((x) => x.level === "critical") ? "crit" : "warn", urgent] : null;
+  for (const id of ["home", "compliance", "instagram", "reviews-wix", "suggestions", "costs"]) setMeta(id, m[id] ? `<span class="cnt ${m[id][0]}">${esc(m[id][1])}</span>` : "");
   setMeta("system", m.system ? `<span class="sdot ${m.system === "good" ? "" : m.system}" title="${m.system === "good" ? "All good" : "Needs a look"}"></span>` : "");
 }
 function setMeta(id, html) { const el = document.querySelector(`[data-meta="${id}"]`); if (el) el.innerHTML = html || ""; }
@@ -2009,12 +2182,14 @@ function openPalette() {
   const prevFocus = document.activeElement;
   const close = () => { root.remove(); document.removeEventListener("keydown", onKey, true); if (prevFocus && prevFocus.focus) prevFocus.focus(); };
   const pages = [];
-  NAV.forEach((g) => g.items.forEach((it) => {
-    pages.push({ kind: "page", label: it.label, sub: g.title || "", href: `#/${it.id}`, icon: it.icon, c: it.c });
+  allNavItems().forEach((it) => {
+    pages.push({ kind: "page", label: it.label, sub: it.group || "", href: `#/${it.id}`, icon: it.icon, c: it.c });
     const P = PAGES[it.id];
     if (P && P.tabs) P.tabs.slice(1).forEach(([tid, tl]) => pages.push({ kind: "page", label: `${it.label} › ${tl}`, sub: "", href: `#/${it.id}/${tid}`, icon: it.icon, c: it.c }));
-  }));
+  });
   const actions = () => [
+    ...[{ key: "all", label: "All platforms" }].concat(livePlatforms()).filter((pl) => pl.key !== SCOPE)
+      .map((pl) => ({ kind: "act", label: pl.key === "all" ? "Show every platform" : `Show ${pl.label} only`, icon: "layers", run: () => setScope(pl.key) })),
     { kind: "act", label: currentTheme() === "dark" ? "Switch to the light theme" : "Switch to the dark theme", icon: currentTheme() === "dark" ? "sun" : "moon", run: () => setTheme(currentTheme() === "dark" ? "light" : "dark") },
     { kind: "act", label: "Refresh this page", icon: "refresh", run: refreshPage },
     { kind: "act", label: "Check prod health (Places + Stripe)", icon: "pulse", run: () => { pendingSystemCheck = "prod"; if (cur && cur.page === "system") runPendingSystemCheck(); else location.hash = "#/system"; } },
@@ -2023,7 +2198,7 @@ function openPalette() {
   const draw = () => {
     const q = input.value.trim().toLowerCase();
     const pg = pages.map((x) => ({ ...x, s: palScore(x.label, q) })).filter((x) => x.s).sort((x, y) => y.s - x.s).slice(0, q ? 8 : 12);
-    const ac = actions().map((x) => ({ ...x, s: palScore(x.label, q) })).filter((x) => x.s).sort((x, y) => y.s - x.s).slice(0, q ? 4 : 4);
+    const ac = actions().map((x) => ({ ...x, s: palScore(x.label, q) })).filter((x) => x.s).sort((x, y) => y.s - x.s).slice(0, q ? 6 : 4);
     let us = [];
     if (q.length >= 2 && palUsers) us = palUsers.filter((u) => u.email.toLowerCase().includes(q)).slice(0, 8).map((u) => ({ kind: "user", label: u.email, sub: platformLabel(u.platform) + " · joined " + date(u.createdAt), id: u.id }));
     items = [...pg, ...us, ...ac];
@@ -2083,6 +2258,10 @@ async function copyText(t) {
   toast("Copied");
 }
 document.addEventListener("click", (e) => {
+  const sc = e.target.closest("[data-scope]");
+  if (sc) { e.preventDefault(); closePicker(); setScope(sc.dataset.scope); if ($("app").classList.contains("side-open")) $("app").classList.remove("side-open"); return; }
+  if (pickerEl && !e.target.closest(".pf-menu") && !e.target.closest("#pf-btn")) closePicker();
+  const ws = e.target.closest("[data-site]"); if (ws) { e.preventDefault(); openSite(ws.dataset.site); return; }
   const ib = e.target.closest("[data-info]"); if (ib) { e.preventDefault(); togglePop(ib); return; }
   if (popEl && !e.target.closest(".pop")) closePop();
   const cp = e.target.closest("[data-copy]"); if (cp) { e.preventDefault(); copyText(cp.dataset.copy); return; }
@@ -2096,7 +2275,11 @@ document.addEventListener("keydown", (e) => {
   const typing = e.target.closest && e.target.closest("input,textarea,select,[contenteditable]");
   if ((e.key === "k" || e.key === "K") && (e.ctrlKey || e.metaKey)) { e.preventDefault(); if ($("app").hidden) return; if ($("pal-root")) $("pal-root").remove(); else openPalette(); return; }
   if (e.key === "/" && !typing && !$("app").hidden) { e.preventDefault(); openPalette(); return; }
-  if (e.key === "Escape") { if (popEl) { closePop(); return; } if (drawerFor && !$("pal-root") && !document.querySelector(".dlg")) closeUser(); }
+  if (e.key === "Escape") {
+    if (popEl) { closePop(); return; }
+    if (siteFor && !$("pal-root") && !document.querySelector(".dlg")) { closeSite(); return; }
+    if (drawerFor && !$("pal-root") && !document.querySelector(".dlg")) closeUser();
+  }
 });
 
 /* ── Account drawer ───────────────────────────────────────────────────────────
@@ -2137,15 +2320,15 @@ async function renderDrawer(id, prefer, keep) {
     root.querySelector("[data-dwclose]").onclick = closeUser;
   }
   const [rs, igR, gbR, rtR] = await Promise.all([
-    Promise.allSettled(PRODUCTS.map((p) => acct("/users/" + id, p.key, { quiet: true }))),
+    Promise.allSettled(ACCT_PRODUCTS.map((p) => acct("/users/" + id, p.key, { quiet: true }))),
     get("/instagram/admin/users/" + id, { quiet: true }).then((x) => x, () => null),
     get("/geoblock/admin/sites", { quiet: true }).then((x) => x, () => null),
     get("/router/admin/sites", { quiet: true }).then((x) => x, () => null),
   ]);
   if (drawerFor !== id || !root.isConnected) return;
   const dets = {};
-  PRODUCTS.forEach((p, i) => { dets[p.key] = val(rs[i]); });
-  const base = PRODUCTS.map((p) => dets[p.key]).find(Boolean);
+  ACCT_PRODUCTS.forEach((p, i) => { dets[p.key] = val(rs[i]); });
+  const base = ACCT_PRODUCTS.map((p) => dets[p.key]).find(Boolean);
   const dw = root.querySelector(".dw");
   if (!base) {
     dw.innerHTML = `<div class="dw-h" style="padding-bottom:16px"><div class="dw-top"><div class="dw-id"><h2>Account</h2></div><button class="ib" data-dwclose aria-label="Close">${icon("x")}</button></div></div>
@@ -2164,17 +2347,18 @@ async function renderDrawer(id, prefer, keep) {
     instagram: !!ig && ((dets.instagram && dets.instagram.plan !== "free") || ig.feeds.length > 0 || (ig.funnel && ig.funnel.events > 0)),
     geoblock: (dets.geoblock && dets.geoblock.plan !== "free") || bSites.length > 0,
     router: (dets.router && dets.router.plan !== "free") || rSites.length > 0,
+    "reviews-webflow": !!dets["reviews-webflow"] && dets["reviews-webflow"].plan !== "free",
   };
-  const allSubs = PRODUCTS.flatMap((p) => (dets[p.key] ? dets[p.key].subscriptions : []).map((s) => ({ ...s, product: p })));
+  const allSubs = ACCT_PRODUCTS.flatMap((p) => (dets[p.key] ? dets[p.key].subscriptions : []).map((s) => ({ ...s, product: p })));
   const days = Math.floor((Date.now() - new Date(u.createdAt)) / 86400000);
-  const chips = PRODUCTS.map((p) => {
+  const chips = ACCT_PRODUCTS.map((p) => {
     const d = dets[p.key]; const plan = d ? d.plan : "free"; const paid = plan !== "free";
     const lifetime = d && d.subscriptions.some((s) => s.status === "active" && isLifetime(s.stripeSubscriptionId));
     return `<span class="pc${paid ? " paid" : ""}" style="--c:var(${p.c})${!uses[p.key] && !paid ? ";opacity:.5" : ""}" title="${esc(p.label)} · ${uses[p.key] ? "active" : "not using it"}"><i></i>${esc(p.label)}<small>${lifetime ? "Lifetime" : esc(tierLabel(plan, p.key))}</small></span>`;
   }).join("");
 
   // Activity: one block per product actually in use, the one asked for first.
-  const order = PRODUCTS.map((p) => p.key).sort((x, y) => (y === prefer) - (x === prefer));
+  const order = ACCT_PRODUCTS.map((p) => p.key).sort((x, y) => (y === prefer) - (x === prefer));
   const blocks = [];
   for (const k of order) {
     if (k === "reviews" && uses.reviews) {
@@ -2241,7 +2425,7 @@ async function renderDrawer(id, prefer, keep) {
 
   const manage = `${card({ title: "Email", body: `<div class="row"><input class="in" id="m-email" value="${esc(u.email)}" style="flex:1;min-width:220px" aria-label="Email" /><button class="btn primary" id="m-save-email">Save</button></div>` })}
     ${card({ title: "Plan per plugin", info: "A manual override: no Stripe charge. Saving cancels the plugin's active subscriptions for this account, then adds an open-ended comp subscription for a paid tier.",
-      body: PRODUCTS.map((p) => {
+      body: ACCT_PRODUCTS.map((p) => {
         const d = dets[p.key];
         if (!d) return `<div class="plan-row"><span class="pc" style="--c:var(${p.c})"><i></i>${esc(p.label)}</span><span class="muted">unavailable</span><span></span></div>`;
         const tiers = [...new Set([...p.tiers, d.plan])];
@@ -2327,7 +2511,8 @@ async function boot() {
     store.set("vanssay.notrack", "1");
     if (!booted) {
       booted = true;
-      renderNav(); paintThemeBtn();
+      renderNav(); paintThemeBtn(); paintPicker();
+      $("pf-btn").onclick = (e) => { e.stopPropagation(); openPicker(); };
       $("signout").innerHTML = icon("logout"); $("signout").onclick = signOut;
       $("menu-btn").innerHTML = icon("menu");
       $("menu-btn").onclick = () => $("app").classList.toggle("side-open");
@@ -2350,8 +2535,30 @@ async function boot() {
 /* ══ Pages ══════════════════════════════════════════════════════════════════ */
 
 /* Shared reads. Each is cached, so the pages that need the same answer share it. */
-const overviews = () => Promise.allSettled(PRODUCTS.map((p) => acct("/overview", p.key)));
+// Wix sells through Wix Billing, so its "bill" is shaped from its own backend's
+// overview: same fields as an Accounts /overview, MRR estimated at list price,
+// Business folded onto `ultra`. `estimated` marks it wherever money is shown.
+function wixBill(o) {
+  return {
+    wix: true, estimated: true, raw: o,
+    revenue: { mrr: o.revenue.mrr, arr: o.revenue.arr, lifetimeRevenue: 0, addOnRevenue: 0, lifetimeCount: 0, addOnCount: 0 },
+    plans: { free: o.plans.free || 0, starter: o.plans.starter || 0, pro: o.plans.pro || 0, ultra: o.plans.business || 0, lifetime: 0, gifted: 0, paid: o.plans.paid || 0 },
+    users: { total: o.installs.live, newThisMonth: o.installs.newThisMonth },
+    signups: [], sources: {},
+  };
+}
+const wixOverview = (o) => get(PROD["reviews-wix"].base + "/admin/overview", o);
+const overviews = () => Promise.allSettled(PRODUCTS.map((p) => (p.billing === "wix" ? wixOverview().then(wixBill) : acct("/overview", p.key))));
 const domainOverviews = () => Promise.allSettled(PRODUCTS.map((p) => (p.base ? get(p.base + "/admin/overview") : Promise.resolve(null))));
+// The Accounts answer that carries the shared account totals (users, signups, sources).
+const acctBill = (rs) => PRODUCTS.map((p, i) => (p.billing === "accounts" ? val(rs[i]) : null)).find(Boolean) || null;
+const mrrLabel = (b) => money(b.revenue.mrr) + (b.estimated ? `<small class="muted" title="Estimated at list price"> est.</small>` : "");
+// The chip a scoped page carries next to its subtitle, with a way back to every platform.
+function scopeChip() {
+  if (SCOPE === "all") return "";
+  const pl = PLAT[SCOPE];
+  return `<span class="scope-chip" style="--c:var(${pl.c})">${esc(pl.label)} only<button type="button" data-scope="all" title="Show every platform" aria-label="Show every platform">${icon("x")}</button></span>`;
+}
 const componentsData = () => get("/admin/components").then((x) => x, () => null);
 const salesPath = (range) => "/admin/sales" + (range === "all" ? "" : range === "12m" ? "?months=12" : "?days=" + range);
 
@@ -2386,9 +2593,10 @@ function salesSeries(d) {
     gran = "week";
   }
   const known = new Set(SALES_SERIES.map((s) => s.key));
-  const series = SALES_SERIES.filter((s) => rows.some((r) => r.byProduct[s.key])).map((s) => ({ id: s.key, label: s.label, c: s.c, values: rows.map((r) => r.byProduct[s.key] || 0) }));
+  const keep = SCOPE === "all" ? null : new Set(scopedSalesKeys());
+  const series = SALES_SERIES.filter((s) => (!keep || keep.has(s.key)) && rows.some((r) => r.byProduct[s.key])).map((s) => ({ id: s.key, label: s.label, c: s.c, values: rows.map((r) => r.byProduct[s.key] || 0) }));
   const other = rows.map((r) => sum(Object.entries(r.byProduct).filter(([k]) => !known.has(k)), ([, c]) => c));
-  if (other.some(Boolean)) series.push({ id: "other", label: "Other", c: "--c-other", values: other });
+  if (!keep && other.some(Boolean)) series.push({ id: "other", label: "Other", c: "--c-other", values: other });
   return { keys: rows.map((r) => r.key), gran, rows, series };
 }
 const centsAxis = (v) => "$" + compact(v / 100);
@@ -2397,14 +2605,15 @@ function moneyChart(ss, o) {
   return chart({
     keys: ss.keys, gran: ss.gran, series: ss.series, height: o.height || 240,
     fmt: (v) => moneyCents(v), axis: centsAxis, zero: "No sales", total: "Total",
-    extra: (i) => (ss.rows[i].count ? [["Payments", fmt(ss.rows[i].count)]] : null),
+    // A bucket's payment count spans every product, so it is only shown unscoped.
+    extra: (i) => (SCOPE === "all" && ss.rows[i].count ? [["Payments", fmt(ss.rows[i].count)]] : null),
     legendValue: o.legendTotals ? (x) => moneyCents(sum(x.values)) : null,
     empty: o.empty || "No sales in this window yet.", alt: "Money collected per " + ss.gran + ", stacked by product",
   });
 }
 function cumulativeChart(ss, height) {
   let run = 0;
-  const vals = ss.rows.map((r) => (run += r.cents));
+  const vals = ss.rows.map((r) => (run += scopedCents(r)));
   return chart({ keys: ss.keys, gran: ss.gran, height: height || 190, legend: false, fmt: (v) => moneyCents(v), axis: centsAxis,
     series: [{ id: "cum", label: "Collected", c: "--c-ink", type: "area", fill: 0.07, values: vals }],
     empty: "No sales yet.", alt: "Money collected to date" });
@@ -2414,9 +2623,45 @@ function cumulativeChart(ss, height) {
 function monthPace(s62) {
   const t = todayKey(), day = Number(t.slice(8)), mk = t.slice(0, 7);
   const lm = new Date(Date.UTC(Number(t.slice(0, 4)), Number(t.slice(5, 7)) - 2, 1)).toISOString().slice(0, 7);
-  let then = 0;
-  for (const b of s62.series) if (b.key.slice(0, 7) === lm && Number(b.key.slice(8)) <= day) then += b.cents;
-  return { now: s62.thisMonth.cents, then };
+  let then = 0, now = 0, last = 0;
+  for (const b of s62.series) {
+    const c = scopedCents(b);
+    if (b.key.slice(0, 7) === lm) { last += c; if (Number(b.key.slice(8)) <= day) then += c; }
+    if (b.key.slice(0, 7) === mk) now += c;
+  }
+  // "all" keeps the server's own month totals (they also count what no chart series names).
+  return SCOPE === "all" ? { now: s62.thisMonth.cents, then, last: s62.lastMonth.cents } : { now, then, last };
+}
+
+/* Money and sign-ups for the platform scope. Stripe's sales carry a product key
+   (byProduct), so a platform's cash is the sum of its products'. Wix money never
+   reaches Stripe: it shows as estimated MRR only. Instagram is one product on
+   several platforms; its money cannot be split by platform and counts in each. */
+const scopedSalesKeys = () => scopedProducts().map((p) => p.key).concat(componentInScope() ? [COMPONENT.key] : []);
+const scopedCents = (row) => (SCOPE === "all" ? row.cents : sum(scopedSalesKeys(), (k) => (row.byProduct || {})[k] || 0));
+const lastMonths = (n) => { const out = [], d = new Date(); for (let i = n - 1; i >= 0; i--) out.push(new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - i, 1)).toISOString().slice(0, 7)); return out; };
+// New sign-ups per month for the scope: Vanssay accounts (by the platform they signed up on) plus Wix installs.
+function scopeSignups(rs, users) {
+  const months = lastMonths(12), mk = months[11], lm = months[10];
+  const counts = new Map(months.map((m) => [m, 0]));
+  let total = 0, accounts = 0, installs = 0;
+  if (scopedAcct().length) {
+    if (SCOPE === "all") {
+      const any = acctBill(rs);
+      (any ? any.signups || [] : []).forEach((s) => { if (counts.has(s.month)) counts.set(s.month, counts.get(s.month) + s.count); });
+      total += any ? any.users.total : 0; accounts = any ? any.users.newThisMonth : 0;
+    } else {
+      const mine = (users || []).filter((u) => (u.platform || "framer") === SCOPE);
+      mine.forEach((u) => { const k = monthKeyOf(u.createdAt); if (counts.has(k)) counts.set(k, counts.get(k) + 1); });
+      total += mine.length; accounts = mine.filter((u) => monthKeyOf(u.createdAt) === mk).length;
+    }
+  }
+  const wp = PROD["reviews-wix"], wb = inScope(wp) ? val(rs[PRODUCTS.indexOf(wp)]) : null;
+  if (wb) {
+    (wb.raw.installs.series || []).forEach((d) => { const k = d.day.slice(0, 7); if (counts.has(k)) counts.set(k, counts.get(k) + d.installs); });
+    total += wb.raw.installs.live; installs = wb.raw.installs.newThisMonth;
+  }
+  return { months, values: months.map((m) => counts.get(m)), newThisMonth: counts.get(mk), lastMonth: counts.get(lm), total, accounts, installs, hasWix: !!wb };
 }
 
 /* ── Home ──────────────────────────────────────────────────────────────────── */
@@ -2424,135 +2669,184 @@ async function pageHome(ctx) {
   const h = new Date().getHours();
   const hello = h < 5 ? "Good night" : h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
   const today = new Date().toLocaleDateString(LOC, { weekday: "long", day: "numeric", month: "long" });
-  paint(ctx, `${pageHead({ title: hello, sub: `${today}. Here is how Vanssay is doing.` })}
+  const all = SCOPE === "all", pl = all ? null : PLAT[SCOPE];
+  const onlyWix = !all && !scopedAcct().length;
+  paint(ctx, `${pageHead({ title: hello, sub: `${scopeChip()}${today}. Here is how ${all ? "Vanssay" : esc(pl.label)} is doing.` })}
     <div id="h-kpis">${skel.kpis(6)}</div>
     <div class="grid g21 mb">
-      ${card({ title: "Money in · last 30 days", info: MONEY_INFO, act: cardLink("#/revenue", "Revenue"), body: `<div id="h-sales">${skel.card(258)}</div>` })}
+      ${onlyWix ? card({ title: "Installs and removals · last 30 days", info: "<p>Wix pays through Wix Billing, so no Wix sale reaches Stripe: there is no cash chart for this platform. Its monthly recurring above is estimated at list price.</p>", act: cardLink("#/reviews-wix", "Google Reviews 2027"), body: `<div id="h-sales">${skel.card(258)}</div>` })
+        : card({ title: "Money in · last 30 days", info: MONEY_INFO, act: cardLink("#/revenue", "Revenue"), body: `<div id="h-sales">${skel.card(258)}</div>` })}
       ${card({ title: "Needs attention", act: `<span id="h-att-n"></span>`, flush: true, body: `<div id="h-att">${skel.lines(6)}</div>` })}
     </div>
-    ${sec("Products")}
-    <div id="h-prods" class="grid mb" style="grid-template-columns:repeat(auto-fill,minmax(228px,1fr))">${skel.card(176).repeat(5)}</div>
+    ${sec(all ? "Platforms" : "Products", all ? { sub: "pick one to see only its numbers" } : {})}
+    <div id="h-prods" class="grid mb" style="grid-template-columns:repeat(auto-fill,minmax(${all ? 260 : 228}px,1fr))">${skel.card(176).repeat(all ? livePlatforms().length : Math.max(1, scopedProducts().length))}</div>
     <div class="grid g21">
-      ${card({ title: "New accounts · last 12 months", info: "<p>Every plugin shares one account base, so this counts each person once, whichever plugin they signed up from.</p>", act: cardLink("#/users", "Users"), body: `<div id="h-signups">${skel.card(200)}</div>` })}
+      ${card({ title: `${SCOPE === "wix" ? "New installs" : "New sign-ups"} · last 12 months`, info: "<p>Vanssay accounts are shared by every plugin, so a person counts once, on the platform they signed up from. A Wix site has no account: each install counts as one.</p>", act: scopedAcct().length ? cardLink("#/users", "Users") : cardLink("#/reviews-wix/sites", "Sites"), body: `<div id="h-signups">${skel.card(200)}</div>` })}
       ${card({ title: "Mix", body: `<div id="h-mix">${skel.lines(6)}</div>` })}
     </div>`);
 
   const ovP = overviews(), domP = domainOverviews(), cmpP = componentsData();
   const s62P = get("/admin/sales?days=62");
+  const usersP = !all && scopedAcct().length ? get("/admin/users?pageSize=1000").then((x) => x.users || [], () => []) : Promise.resolve(null);
 
   region(ctx, "h-kpis", async () => {
-    const [rs, cmp, s62] = await Promise.all([ovP, cmpP, s62P.then((x) => x, () => null)]);
-    const bills = PRODUCTS.map((p, i) => val(rs[i])).filter(Boolean);
-    if (!bills.length) throw new Error("Accounts service unavailable: " + why(rs[0]));
-    const any = bills[0];
+    const [rs, cmp, s62, users] = await Promise.all([ovP, cmpP, s62P.then((x) => x, () => null), usersP]);
+    const bills = scopedProducts().map((p) => val(rs[PRODUCTS.indexOf(p)])).filter(Boolean);
+    if (!bills.length) throw new Error("No billing service answered: " + why(rs[0]));
+    const est = bills.some((b) => b.estimated && b.revenue.mrr > 0);
+    // On one platform: paying ÷ everyone with a plan row in its plugins (a shared plugin's
+    // payers all count, so they are compared with all of its users, not this platform's sign-ups).
+    const users_ = sum(bills, (b) => (b.plans.free || 0) + (b.plans.paid || 0));
     const mrr = sum(bills, (b) => b.revenue.mrr);
     const paid = sum(bills, (b) => b.plans.paid);
     // Recurring only: a Lifetime buyer has paid, but is subscribed to nothing.
     const subs = sum(bills, (b) => b.plans.starter + b.plans.pro + b.plans.ultra);
-    const oneTime = sum(bills, (b) => (b.revenue.lifetimeRevenue || 0) + (b.revenue.addOnRevenue || 0)) + (cmp ? cmp.totals.revenueCents / 100 : 0);
-    const oneTimeN = sum(bills, (b) => (b.revenue.lifetimeCount || 0) + (b.revenue.addOnCount || 0)) + (cmp ? cmp.totals.sales : 0);
+    const comp = componentInScope() && cmp ? cmp.totals : null;
+    const oneTime = sum(bills, (b) => (b.revenue.lifetimeRevenue || 0) + (b.revenue.addOnRevenue || 0)) + (comp ? comp.revenueCents / 100 : 0);
+    const oneTimeN = sum(bills, (b) => (b.revenue.lifetimeCount || 0) + (b.revenue.addOnCount || 0)) + (comp ? comp.sales : 0);
     const gifted = sum(bills, (b) => b.plans.gifted || 0);
-    const sg = any.signups || [];
-    const lastMonthSignups = sg.length > 1 ? sg[sg.length - 2].count : 0;
+    const sg = scopeSignups(rs, users);
     const pace = s62 ? monthPace(s62) : null;
+    const signSub = sg.hasWix && scopedAcct().length ? `${fmt(sg.accounts)} accounts · ${fmt(sg.installs)} Wix installs` : `${fmt(sg.lastMonth)} last month · ${fmt(sg.total)} total`;
     return kpis([
-      { label: "Monthly recurring", value: money(mrr), sub: `${money(mrr * 12)} a year`, info: MRR_INFO, hero: true },
-      s62 ? { label: "Collected this month", value: moneyCents(s62.thisMonth.cents), href: "#/revenue",
+      { label: "Monthly recurring", value: money(mrr) + (est ? `<small>est.</small>` : ""), sub: `${money(mrr * 12)} a year${est ? " · Wix at list price" : ""}`, info: MRR_INFO, hero: true },
+      s62 && !onlyWix ? { label: "Collected this month", value: moneyCents(pace.now), href: "#/revenue",
         delta: delta(pace.now, pace.then, { vs: "vs the same days last month" }),
-        sub: `vs ${moneyCents(pace.then)} by this day last month`, spark: spark(s62.series.slice(-30).map((b) => b.cents), { c: "--c-accent" }) } : null,
-      { label: "One-time revenue", value: money(Math.round(oneTime * 100) / 100), href: "#/revenue", sub: `${plural(oneTimeN, "purchase")}, not recurring` },
-      { label: "New accounts this month", value: fmt(any.users.newThisMonth), href: "#/users", delta: delta(any.users.newThisMonth, lastMonthSignups),
-        sub: `${fmt(lastMonthSignups)} last month · ${fmt(any.users.total)} total`, spark: spark(sg.map((s) => s.count), { bars: true, c: "--c-accent" }) },
-      { label: "Paying subscriptions", value: fmt(subs), href: "#/subscriptions", sub: `+ ${fmt(oneTimeN)} one-time · ${fmt(gifted)} gifted` },
-      { label: "Conversion", value: pctOf(paid, any.users.total, 1), sub: "everyone who has paid ÷ accounts" },
+        sub: `vs ${moneyCents(pace.then)} by this day last month`, spark: spark(s62.series.slice(-30).map(scopedCents), { c: "--c-accent" }) } : null,
+      onlyWix ? null : { label: "One-time revenue", value: money(Math.round(oneTime * 100) / 100), href: "#/revenue", sub: `${plural(oneTimeN, "purchase")}, not recurring` },
+      { label: SCOPE === "wix" ? "New installs this month" : "New sign-ups this month", value: fmt(sg.newThisMonth), href: scopedAcct().length ? "#/users" : "#/reviews-wix/sites", delta: delta(sg.newThisMonth, sg.lastMonth),
+        sub: signSub, spark: spark(sg.values, { bars: true, c: "--c-accent" }) },
+      { label: onlyWix ? "Paying sites" : "Paying subscriptions", value: fmt(subs), href: onlyWix ? "#/reviews-wix/sites" : "#/subscriptions", sub: onlyWix ? planBreakdown(bills[0].plans, "reviews-wix") : `+ ${fmt(oneTimeN)} one-time · ${fmt(gifted)} gifted` },
+      all ? { label: "Conversion", value: pctOf(paid, sg.total, 1), sub: sg.hasWix ? "paying ÷ accounts and live Wix sites" : "everyone who has paid ÷ accounts" }
+        : { label: "Conversion", value: pctOf(paid, users_, 1), sub: onlyWix ? "paying ÷ live installs" : `paying ÷ users of ${esc(pl.label)}'s plugins` },
+      onlyWix ? { label: "Live installs", value: fmt(bills[0].raw.installs.live), href: "#/reviews-wix/sites", sub: `${fmt(bills[0].raw.installs.removed)} removed since launch` } : null,
     ]);
   });
 
   region(ctx, "h-sales", async () => {
+    if (onlyWix) {
+      const o = await wixOverview(), keys = dayRange(30), by = new Map(o.installs.series.map((d) => [d.day, d]));
+      return chart({ keys, gran: "day", height: 286, integer: true, empty: "No install in the last 30 days.",
+        series: [{ id: "in", label: "Installs", c: "--c-rwx", values: keys.map((k) => (by.get(k) || {}).installs || 0) }, { id: "out", label: "Removals", c: "--c-other", values: keys.map((k) => (by.get(k) || {}).removals || 0) }] });
+    }
     const s62 = await s62P;
     const last = { ...s62, series: s62.series.slice(-30), granularity: "day" };
     const ss = salesSeries(last);
+    const pace = monthPace(s62);
     return moneyChart(ss, { height: 286 }) + `<div class="row" style="justify-content:space-between;margin-top:10px;color:var(--muted);font-size:12.5px">
-      <span>This month so far <b class="t2">${moneyCents(s62.thisMonth.cents)}</b> · ${plural(s62.thisMonth.count, "payment")}</span>
-      <span>Last month <b class="t2">${moneyCents(s62.lastMonth.cents)}</b> · ${plural(s62.lastMonth.count, "payment")}</span></div>
+      <span>This month so far <b class="t2">${moneyCents(pace.now)}</b>${all ? ` · ${plural(s62.thisMonth.count, "payment")}` : ""}</span>
+      <span>Last month <b class="t2">${moneyCents(pace.last)}</b>${all ? ` · ${plural(s62.lastMonth.count, "payment")}` : ""}</span></div>
+      ${inScope(PROD["reviews-wix"]) ? `<p class="note" style="margin-top:6px">Wix money never reaches Stripe, so Google Reviews 2027 is not in this chart.</p>` : ""}
       ${s62.mixedCurrencies ? `<p class="note warn-t" style="margin-top:6px">Invoices in more than one currency are being summed as if they were one.</p>` : ""}`;
   });
 
   const paintAtt = () => {
     if (!ctx.live()) { document.removeEventListener("attention", paintAtt); return; }
     const el = $("h-att"); if (!el) return;
-    el.innerHTML = attentionList(ATTN.items, 5);
-    const n = ATTN.items.length;
-    $("h-att-n").innerHTML = n ? `<span class="cnt ${ATTN.items.some((x) => x.level === "critical") ? "crit" : ATTN.items.some((x) => x.level === "warning") ? "warn" : ""}">${n}</span>` : "";
+    const its = scopedAttention();
+    el.innerHTML = attentionList(its, 5);
+    const n = its.length;
+    $("h-att-n").innerHTML = n ? `<span class="cnt ${its.some((x) => x.level === "critical") ? "crit" : its.some((x) => x.level === "warning") ? "warn" : ""}">${n}</span>` : "";
   };
   document.addEventListener("attention", paintAtt);
   if (ATTN.loaded) paintAtt();
   loadAttention();
 
+  // Each product's card lines: what it does, in its own units.
+  const rows = {
+    reviews: (b, d) => b && b.usage ? [["Businesses", fmt(b.usage.businesses)], ["Widget views · mo", fmt(b.usage.viewsThisMonth)], ["“Powered by” clicks", fmt(b.powered.clicks)]] : [],
+    instagram: (b, d) => d ? [["Feeds", fmt(d.feeds)], ["Opened · 30d", d.funnel30d ? fmt(d.funnel30d.opened) : "–"], ["Views · mo", fmt(d.viewsThisMonth)]] : [["Domain data", "unavailable"]],
+    geoblock: (b, d) => d ? [["Protected sites", `${fmt(d.configs.total)} <span class="muted">(${fmt(d.configs.vpnEnabled)} VPN)</span>`], ["Blocked · mo", fmt(d.thisMonth.blocked)], ["Checked · mo", fmt(d.thisMonth.visits)]] : [["Domain data", "unavailable"]],
+    router: (b, d) => d ? [["Routed sites", `${fmt(d.configs.enabled)} on <span class="muted">/ ${fmt(d.configs.total)}</span>`], ["Redirects · mo", fmt(d.thisMonth.redirected)], ["Checked · mo", fmt(d.thisMonth.visits)]] : [["Domain data", "unavailable"]],
+    "reviews-webflow": (b, d) => d ? [["Businesses", fmt(d.businesses)], ["Reviews synced", fmt(d.reviews)], ["Widgets", fmt(d.widgets)]] : [["Domain data", "unavailable"]],
+    "reviews-wix": (b, d) => d ? [["Live installs", `${fmt(d.installs.live)} <span class="muted">· +${fmt(d.installs.newThisMonth)} this month</span>`], ["Widget views · 30d", fmt(d.views.last30d)], ["Aria calls · 30d", fmt(d.aria.last30d)]] : [["Domain data", "unavailable"]],
+  };
+
   region(ctx, "h-prods", async () => {
     const [rs, ds, cmp] = await Promise.all([ovP, domP, cmpP]);
     const bills = {}, doms = {};
     PRODUCTS.forEach((p, i) => { bills[p.key] = val(rs[i]); doms[p.key] = val(ds[i]); });
-    const rows = {
-      reviews: (b, d) => b && b.usage ? [["Businesses", fmt(b.usage.businesses)], ["Widget views · mo", fmt(b.usage.viewsThisMonth)], ["“Powered by” clicks", fmt(b.powered.clicks)]] : [],
-      instagram: (b, d) => d ? [["Feeds", fmt(d.feeds)], ["Opened · 30d", d.funnel30d ? fmt(d.funnel30d.opened) : "–"], ["Views · mo", fmt(d.viewsThisMonth)]] : [["Domain data", "unavailable"]],
-      geoblock: (b, d) => d ? [["Protected sites", `${fmt(d.configs.total)} <span class="muted">(${fmt(d.configs.vpnEnabled)} VPN)</span>`], ["Blocked · mo", fmt(d.thisMonth.blocked)], ["Checked · mo", fmt(d.thisMonth.visits)]] : [["Domain data", "unavailable"]],
-      router: (b, d) => d ? [["Routed sites", `${fmt(d.configs.enabled)} on <span class="muted">/ ${fmt(d.configs.total)}</span>`], ["Redirects · mo", fmt(d.thisMonth.redirected)], ["Checked · mo", fmt(d.thisMonth.visits)]] : [["Domain data", "unavailable"]],
-    };
-    const cards = PRODUCTS.map((p) => {
+    const c = cmp && (cmp.components || []).find((x) => x.slug === COMPONENT.slug);
+    // Every platform: one card each, listing its products and what they bring in. Shared
+    // products (Instagram) appear on each of their platforms, so the cards don't add up.
+    if (all) {
+      return livePlatforms().map((pl) => {
+        const ps = productsOn(pl.key);
+        const lines = ps.map((p) => {
+          const b = bills[p.key];
+          const shared = p.platforms.length > 1;
+          return `<a class="pl-r" href="#/${p.route}"><span class="pc${b && b.plans.paid ? " paid" : ""}" style="--c:var(${p.c})"><i></i>${esc(p.label)}</span>${shared ? `<small class="muted" title="Sold on ${esc(p.platforms.map((k) => PLAT[k].label).join(", "))}: its money can't be split by platform">shared</small>` : ""}
+            <span class="v">${b ? mrrLabel(b) : "–"}<small>/mo</small></span></a>`;
+        });
+        if (pl.key === "framer") lines.push(`<a class="pl-r" href="#/${COMPONENT.route}"><span class="pc" style="--c:var(${COMPONENT.c})"><i></i>${esc(COMPONENT.label)}</span><span class="v">${c && !c.unavailable ? moneyCents(c.revenueCents) : "–"}<small>one-time</small></span></a>`);
+        const paying = sum(ps, (p) => (bills[p.key] ? bills[p.key].plans.paid : 0));
+        return card({ cls: "plcard", style: `--c:var(${pl.c})`, title: `<span class="row" style="gap:9px">${platMark(pl)}${esc(pl.label)}</span>`,
+          act: `<button type="button" class="btn xs" data-scope="${pl.key}">Open${icon("right")}</button>`,
+          body: (lines.join("") || empty("Nothing on this platform yet.")) + `<div class="kv" style="margin-top:4px"><span>Paying</span><span>${fmt(paying)}</span></div>` });
+      }).join("");
+    }
+    const cards = scopedProducts().map((p) => {
       const b = bills[p.key], d = doms[p.key];
       const oneTime = b ? (b.revenue.lifetimeRevenue || 0) + (b.revenue.addOnRevenue || 0) : 0;
       return `<a class="card pcard" href="#/${p.route}" style="--c:var(${p.c})">
         <div class="pt"><span class="pi">${icon(p.icon)}</span>${esc(p.label)}${icon("arrow")}</div>
-        <div class="big">${b ? money(b.revenue.mrr) : "–"}<small>MRR</small>${oneTime ? `<small style="margin-left:10px">+ ${money(oneTime)} one-time</small>` : ""}</div>
-        ${b ? kv("Paying", `${fmt(b.plans.paid)} <span class="muted">· ${esc(planBreakdown(b.plans, p.key))}</span>`) : kv("Billing", "unavailable")}
-        ${rows[p.key](b, d).map(([k, v]) => kv(k, v)).join("")}</a>`;
+        <div class="big">${b ? money(b.revenue.mrr) : "–"}<small>${b && b.estimated ? "MRR est." : "MRR"}</small>${oneTime ? `<small style="margin-left:10px">+ ${money(oneTime)} one-time</small>` : ""}${p.platforms.length > 1 ? `<small style="margin-left:10px" title="Every platform together">all platforms</small>` : ""}</div>
+        ${b ? kv(b.wix ? "Paying sites" : "Paying", `${fmt(b.plans.paid)} <span class="muted">· ${esc(planBreakdown(b.plans, p.key))}</span>`) : kv("Billing", "unavailable")}
+        ${(rows[p.key] || (() => []))(b, b && b.wix ? b.raw : d).map(([k, v]) => kv(k, v)).join("")}</a>`;
     });
-    const c = cmp && (cmp.components || []).find((x) => x.slug === COMPONENT.slug);
-    const opened = c ? c.sales.length + c.abandoned : 0;
-    cards.push(`<a class="card pcard" href="#/${COMPONENT.route}" style="--c:var(${COMPONENT.c})">
-      <div class="pt"><span class="pi">${icon(COMPONENT.icon)}</span>${esc(COMPONENT.label)}${icon("arrow")}</div>
-      <div class="big">${c && !c.unavailable ? moneyCents(c.revenueCents) : "–"}<small>one-time</small></div>
-      ${c && !c.unavailable ? kv("Sales", fmt(c.sales.length)) + kv("Checkout conversion", pctOf(c.sales.length, opened)) + kv("Landing views", fmt(c.funnel ? c.funnel.landingViews : 0)) : kv("Stripe", c ? esc(c.unavailable) : "unavailable")}</a>`);
+    if (componentInScope()) {
+      const opened = c ? c.sales.length + c.abandoned : 0;
+      cards.push(`<a class="card pcard" href="#/${COMPONENT.route}" style="--c:var(${COMPONENT.c})">
+        <div class="pt"><span class="pi">${icon(COMPONENT.icon)}</span>${esc(COMPONENT.label)}${icon("arrow")}</div>
+        <div class="big">${c && !c.unavailable ? moneyCents(c.revenueCents) : "–"}<small>one-time</small></div>
+        ${c && !c.unavailable ? kv("Sales", fmt(c.sales.length)) + kv("Checkout conversion", pctOf(c.sales.length, opened)) + kv("Landing views", fmt(c.funnel ? c.funnel.landingViews : 0)) : kv("Stripe", c ? esc(c.unavailable) : "unavailable")}</a>`);
+    }
     return cards.join("");
   });
 
   region(ctx, "h-signups", async () => {
-    const rs = await ovP;
-    const any = PRODUCTS.map((p, i) => val(rs[i])).find(Boolean);
-    if (!any) throw new Error("Accounts service unavailable");
-    const sg = any.signups || [];
-    return chart({ keys: sg.map((s) => s.month), gran: "month", height: 290, integer: true,
-      series: [{ id: "n", label: "New accounts", c: "--c-accent", values: sg.map((s) => s.count) }], empty: "No signups in the last 12 months." });
+    const [rs, users] = await Promise.all([ovP, usersP]);
+    const sg = scopeSignups(rs, users);
+    if (!sg.total && !sg.values.some(Boolean) && !acctBill(rs) && scopedAcct().length) throw new Error("Accounts service unavailable");
+    return chart({ keys: sg.months, gran: "month", height: 290, integer: true,
+      series: [{ id: "n", label: SCOPE === "wix" ? "New installs" : "New sign-ups", c: pl ? pl.c : "--c-accent", values: sg.values }], empty: "Nobody new in the last 12 months." });
   });
 
   region(ctx, "h-mix", async () => {
     const rs = await ovP;
     const bills = {}; PRODUCTS.forEach((p, i) => { bills[p.key] = val(rs[i]); });
-    const any = PRODUCTS.map((p) => bills[p.key]).find(Boolean);
-    if (!any) throw new Error("Accounts service unavailable");
-    const mrr = sum(PRODUCTS, (p) => (bills[p.key] ? bills[p.key].revenue.mrr : 0));
-    const src = any.sources || {};
+    const ps = scopedProducts().filter((p) => bills[p.key]);
+    const mrr = sum(ps, (p) => bills[p.key].revenue.mrr);
+    const any = acctBill(rs), src = (any && any.sources) || {};
+    const wx = bills["reviews-wix"];
+    const signRows = PLATFORM_LIST.filter((x) => x.key !== "wix" && src[x.key] !== undefined).map((x) => ({ label: esc(x.key === "web" ? "Instagram web app" : x.label), value: src[x.key] || 0, c: x.c }))
+      .concat(wx ? [{ label: "Wix <span class=\"s\">sites, live</span>", value: wx.raw.installs.live, c: "--c-wix" }] : []);
     return `<div class="note" style="margin-bottom:6px">MRR by product</div>
-      ${barList(PRODUCTS.filter((p) => bills[p.key]).map((p) => ({ label: esc(p.label), value: bills[p.key].revenue.mrr, display: money(bills[p.key].revenue.mrr), c: p.c, href: "#/" + p.route })), { empty: "No recurring revenue yet." })}
+      ${barList(ps.map((p) => ({ label: esc(p.label) + (bills[p.key].estimated ? ` <span class="s">est.</span>` : ""), value: bills[p.key].revenue.mrr, display: money(bills[p.key].revenue.mrr), c: p.c, href: "#/" + p.route })), { empty: "No recurring revenue yet." })}
       <div class="kv" style="margin:6px 0 16px"><span>Total</span><span>${money(mrr)} / mo</span></div>
-      <div class="note" style="margin-bottom:6px">Where accounts signed up</div>
-      ${barList([["framer", "Framer"], ["webflow", "Webflow"], ["web", "Instagram web app"]].filter(([k]) => src[k] !== undefined).map(([k, l]) => ({ label: l, value: src[k] || 0 })), { c: "--c-accent" })}`;
+      ${all ? `<div class="note" style="margin-bottom:6px">Where people signed up</div>${barList(signRows, { c: "--c-accent" })}`
+        : wx && SCOPE === "wix" ? `<div class="note" style="margin-bottom:6px">Wix plans, live sites</div>${planMix(wx, PROD["reviews-wix"])}` : ""}`;
   });
 }
 
 /* ── Users ─────────────────────────────────────────────────────────────────── */
 async function pageUsers(ctx) {
   const q = ctx.r.q;
+  if (!scopedAcct().length) {
+    paint(ctx, `${pageHead({ title: "Users", sub: `${scopeChip()}Vanssay accounts, shared by every plugin that has them.` })}
+      ${card({ body: `<div class="empty">${icon("info")}<span>${esc(PLAT[SCOPE].label)} identifies each site on its own: no Vanssay account is ever created there. The sites are listed on <a href="#/reviews-wix/sites">Google Reviews 2027 › Sites</a>.</span></div>` })}`);
+    return;
+  }
+  const UP = ACCT_PRODUCTS; // every account product: "actively using" must see them all, whatever the scope
   const [rs, acts] = await Promise.all([
-    Promise.allSettled(PRODUCTS.map((p) => acct("/users?pageSize=1000", p.key))),
-    Promise.allSettled(PRODUCTS.map((p) => (p.activity ? get(p.base + p.activity[0]) : Promise.resolve(null)))),
+    Promise.allSettled(UP.map((p) => acct("/users?pageSize=1000", p.key))),
+    Promise.allSettled(UP.map((p) => (p.activity ? get(p.base + p.activity[0]) : Promise.resolve(null)))),
   ]);
   if (!ctx.live()) return;
   const base = val(rs[0]);
   if (!base) throw new Error(why(rs[0]) || "Users unavailable");
   const planOf = {}, activeIds = {};
-  PRODUCTS.forEach((p, i) => {
+  UP.forEach((p, i) => {
     const d = val(rs[i]);
     planOf[p.key] = new Map((d ? d.users : []).map((u) => [u.id, u]));
     const sd = val(acts[i]), list = sd && p.activity ? sd[p.activity[1]] : null;
@@ -2563,7 +2857,7 @@ async function pageUsers(ctx) {
   // views. The free signal is capped by each backend's own list size (feeds
   // take 200, sites 500), so a very old free account can age out of its badge.
   const users = base.users.map((u) => {
-    const prods = PRODUCTS.map((p) => {
+    const prods = UP.map((p) => {
       const row = planOf[p.key].get(u.id) || { plan: "free" };
       const active = row.plan !== "free" || (p.key === "reviews" ? (u.businesses || 0) > 0 || (u.viewsThisMonth || 0) > 0 : activeIds[p.key].has(u.id));
       return active ? { p, plan: row.plan, billing: row.billing } : null;
@@ -2571,30 +2865,35 @@ async function pageUsers(ctx) {
     return { ...u, prods, paying: prods.some((x) => x.plan !== "free") };
   });
   palUsers = base.users;
-  const mk = todayKey().slice(0, 7);
-  const newThisMonth = users.filter((u) => monthKeyOf(u.createdAt) === mk).length;
-  const active = users.filter((u) => u.prods.length).length;
-  const paying = users.filter((u) => u.paying).length;
-  const byMonth = new Map(); users.forEach((u) => { const k = monthKeyOf(u.createdAt); byMonth.set(k, (byMonth.get(k) || 0) + 1); });
-  const months = []; { const d = new Date(); d.setUTCDate(1); for (let i = 11; i >= 0; i--) { const x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - i, 1)); months.push(x.toISOString().slice(0, 7)); } }
 
-  const state = { platform: q.get("platform") || "", product: q.get("product") || "", status: q.get("status") || "" };
+  // A platform scope pins the platform filter: its accounts, plus anyone paying for one of its products.
+  const state = { platform: SCOPE !== "all" ? SCOPE : q.get("platform") || "", product: q.get("product") || "", status: q.get("status") || "" };
+  const scopedKeys = new Set(scopedAcct().map((p) => p.key));
+  const onPlatform = (u) => !state.platform || (u.platform || "framer") === state.platform || (SCOPE !== "all" && u.prods.some((x) => x.plan !== "free" && scopedKeys.has(x.p.key) && x.p.platforms.length === 1));
   const filtered = () => users.filter((u) =>
-    (!state.platform || (u.platform || "framer") === state.platform) &&
+    onPlatform(u) &&
     (!state.product || (state.product === "none" ? !u.prods.length : u.prods.some((x) => x.p.key === state.product))) &&
     (!state.status || (state.status === "paying" ? u.paying : state.status === "free" ? u.prods.length && !u.paying : !u.prods.length)));
+  // The KPIs count the scope's accounts ("all": everyone).
+  const pool = SCOPE === "all" ? users : users.filter(onPlatform);
+  const mk = todayKey().slice(0, 7);
+  const newThisMonth = pool.filter((u) => monthKeyOf(u.createdAt) === mk).length;
+  const active = pool.filter((u) => u.prods.length).length;
+  const paying = pool.filter((u) => SCOPE === "all" ? u.paying : u.prods.some((x) => x.plan !== "free" && scopedKeys.has(x.p.key))).length;
+  const byMonth = new Map(); pool.forEach((u) => { const k = monthKeyOf(u.createdAt); byMonth.set(k, (byMonth.get(k) || 0) + 1); });
+  const months = lastMonths(12);
   let tApi = null;
   const opt = (v, l, cur) => `<option value="${v}" ${cur === v ? "selected" : ""}>${esc(l)}</option>`;
-  const tools = `<select class="in" data-f="platform" aria-label="Platform">${opt("", "All platforms", state.platform)}${opt("framer", "Framer", state.platform)}${opt("webflow", "Webflow", state.platform)}${opt("web", "Web app", state.platform)}</select>
-    <select class="in" data-f="product" aria-label="Product">${opt("", "Any product", state.product)}${PRODUCTS.map((p) => opt(p.key, "Uses " + p.label, state.product)).join("")}${opt("none", "Not active anywhere", state.product)}</select>
+  const tools = `${SCOPE === "all" ? `<select class="in" data-f="platform" aria-label="Platform">${opt("", "All platforms", state.platform)}${PLATFORM_LIST.filter((x) => x.key !== "wix").map((x) => opt(x.key, x.label, state.platform)).join("")}</select>` : ""}
+    <select class="in" data-f="product" aria-label="Product">${opt("", "Any product", state.product)}${scopedAcct().map((p) => opt(p.key, "Uses " + p.label, state.product)).join("")}${opt("none", "Not active anywhere", state.product)}</select>
     <select class="in" data-f="status" aria-label="Status">${opt("", "Everyone", state.status)}${opt("paying", "Paying", state.status)}${opt("free", "Active on Free", state.status)}${opt("inactive", "Not active", state.status)}</select>`;
-  paint(ctx, `${pageHead({ title: "Users", sub: "Every account, where it signed up and which plugins it actually uses. Click one for the full picture and the overrides." })}
+  paint(ctx, `${pageHead({ title: "Users", sub: `${scopeChip()}Every account, where it signed up and which plugins it actually uses. Click one for the full picture and the overrides.` })}
     ${kpis([
-      { label: "Accounts", value: fmt(users.length), sub: `${fmt(newThisMonth)} new this month`, spark: spark(months.map((m) => byMonth.get(m) || 0), { bars: true }) },
-      { label: "Active in a plugin", value: fmt(active), sub: pctOf(active, users.length) + " of accounts" },
-      { label: "Paying", value: fmt(paying), sub: pctOf(paying, users.length, 1) + " of accounts, any plugin" },
-      { label: "Signed up on", value: `${fmt(users.filter((u) => (u.platform || "framer") === "framer").length)}<small>Framer</small>`,
-        sub: `${fmt(users.filter((u) => u.platform === "webflow").length)} Webflow · ${fmt(users.filter((u) => u.platform === "web").length)} web app` },
+      { label: "Accounts", value: fmt(pool.length), sub: `${fmt(newThisMonth)} new this month${SCOPE !== "all" ? ` · signed up on ${esc(PLAT[SCOPE].label)} or paying for its plugins` : ""}`, spark: spark(months.map((m) => byMonth.get(m) || 0), { bars: true }) },
+      { label: "Active in a plugin", value: fmt(active), sub: pctOf(active, pool.length) + " of accounts" },
+      { label: "Paying", value: fmt(paying), sub: pctOf(paying, pool.length, 1) + (SCOPE === "all" ? " of accounts, any plugin" : ` of accounts, for a ${esc(PLAT[SCOPE].label)} plugin`) },
+      SCOPE === "all" ? { label: "Signed up on", value: `${fmt(users.filter((u) => (u.platform || "framer") === "framer").length)}<small>Framer</small>`,
+        sub: `${fmt(users.filter((u) => u.platform === "webflow").length)} Webflow · ${fmt(users.filter((u) => u.platform === "web").length)} web app` } : null,
     ])}
     ${card({ flush: true, body: table({
       rows: filtered(), noun: "accounts", searchPh: "Search by email…", search: (u) => u.email, q: q.get("q") || "", tools, csv: "vanssay-users.csv",
@@ -2621,10 +2920,12 @@ async function pageRevenue(ctx) {
   const range = ["30", "90", "12m", "all"].includes(ctx.r.q.get("range")) ? ctx.r.q.get("range") : "all";
   const [d, s62, rs, cmp, sAll] = await Promise.all([get(salesPath(range)), get("/admin/sales?days=62").then((x) => x, () => null), overviews(), componentsData(), get(salesPath("all")).then((x) => x, () => null)]);
   if (!ctx.live()) return;
+  const all = SCOPE === "all";
   const bills = {}; PRODUCTS.forEach((p, i) => { bills[p.key] = val(rs[i]); });
-  const ok = PRODUCTS.filter((p) => bills[p.key]);
+  const ok = scopedProducts().filter((p) => bills[p.key]);
   const mrr = sum(ok, (p) => bills[p.key].revenue.mrr);
-  const c = cmp && (cmp.components || []).find((x) => x.slug === COMPONENT.slug);
+  const est = ok.some((p) => bills[p.key].estimated && bills[p.key].revenue.mrr > 0);
+  const c = componentInScope() && cmp && (cmp.components || []).find((x) => x.slug === COMPONENT.slug);
   const life = ok.filter((p) => bills[p.key].revenue.lifetimeRevenue).map((p) => ({ label: `${esc(p.label)} Lifetime`, sub: plural(bills[p.key].revenue.lifetimeCount, "licence"), value: bills[p.key].revenue.lifetimeRevenue, display: money(bills[p.key].revenue.lifetimeRevenue), c: p.c }));
   const adds = ok.filter((p) => bills[p.key].revenue.addOnRevenue).map((p) => ({ label: `${esc(p.label)} extra feeds`, sub: plural(bills[p.key].revenue.addOnCount, "slot"), value: bills[p.key].revenue.addOnRevenue, display: money(bills[p.key].revenue.addOnRevenue), c: p.c }));
   const comps = c && c.revenueCents ? [{ label: esc(COMPONENT.label), sub: plural(c.sales.length, "sale"), value: c.revenueCents / 100, display: moneyCents(c.revenueCents), c: COMPONENT.c, href: "#/" + COMPONENT.route }] : [];
@@ -2634,23 +2935,26 @@ async function pageRevenue(ctx) {
   const win = range === "all" ? "all time" : range === "12m" ? "last 12 months" : `last ${range} days`;
   const pace = s62 ? monthPace(s62) : null;
   const per = ss.gran === "week" ? "week" : ss.gran === "month" ? "month" : "day";
-  paint(ctx, `${pageHead({ title: "Revenue", sub: "Money that actually came in, by product, next to what recurs.",
+  const collected = all ? d.totals.cents : sum(ss.rows, scopedCents);
+  const wixIn = inScope(PROD["reviews-wix"]);
+  paint(ctx, `${pageHead({ title: "Revenue", sub: `${scopeChip()}Money that actually came in, by product, next to what recurs.`,
       ctl: seg("range", [["30", "30 days"], ["90", "90 days"], ["12m", "12 months"], ["all", "All time"]], range) })}
     ${d.mixedCurrencies ? alertBox("warning", "More than one currency", "Invoices in different currencies are summed as if they were one. Check the Invoices page.") : ""}
+    ${wixIn ? alertBox("info", "Wix money is estimated", "Wix sells Google Reviews 2027 through Wix Billing, so none of it reaches Stripe or the charts below. Its monthly recurring is counted at list price: before Wix's sales, coupons, VAT and share.") : ""}
     ${kpis([
-      { label: `Collected · ${win}`, value: moneyCents(d.totals.cents), sub: `${plural(d.totals.count, "payment")} · ${plural(d.totals.buyers, "buyer")}`, info: MONEY_INFO, hero: true },
-      s62 ? { label: "This month so far", value: moneyCents(pace.now), delta: delta(pace.now, pace.then), sub: `${moneyCents(s62.lastMonth.cents)} all of last month` } : null,
-      { label: "Monthly recurring", value: money(mrr), sub: `${money(mrr * 12)} a year`, info: MRR_INFO },
-      sAll ? { label: "Subscriptions, all time", value: money(Math.max(0, Math.round(sAll.totals.cents - oneTime * 100)) / 100), sub: `of ${moneyCents(sAll.totals.cents)} collected in total`,
+      { label: `Collected · ${win}`, value: moneyCents(collected), sub: all ? `${plural(d.totals.count, "payment")} · ${plural(d.totals.buyers, "buyer")}` : "through Stripe, this platform's products", info: MONEY_INFO, hero: true },
+      s62 ? { label: "This month so far", value: moneyCents(pace.now), delta: delta(pace.now, pace.then), sub: `${moneyCents(pace.last)} all of last month` } : null,
+      { label: "Monthly recurring", value: money(mrr) + (est ? "<small>est.</small>" : ""), sub: `${money(mrr * 12)} a year`, info: MRR_INFO },
+      sAll && all ? { label: "Subscriptions, all time", value: money(Math.max(0, Math.round(sAll.totals.cents - oneTime * 100)) / 100), sub: `of ${moneyCents(sAll.totals.cents)} collected in total`,
         info: "<p>Everything collected since the first sale, minus the one-time money (Lifetime licences, extra feeds, components). What is left is every subscription payment: first months and renewals.</p>" } : null,
       { label: "One-time, all time", value: money(Math.round(oneTime * 100) / 100), sub: "Lifetime, extra feeds, components" },
-      { label: "Average payment", value: d.totals.count ? moneyCents(d.totals.cents / d.totals.count) : "–", sub: win },
+      all ? { label: "Average payment", value: d.totals.count ? moneyCents(d.totals.cents / d.totals.count) : "–", sub: win } : null,
     ])}
     ${card({ title: `Money in, per ${per}`, sub: ss.gran === "week" && d.granularity === "day" ? "grouped by week to stay readable" : "", info: MONEY_INFO, cls: "mb", body: moneyChart(ss, { height: 280, legendTotals: true }) })}
     ${card({ title: d.allTime ? "Collected to date" : "Running total over this window", sub: d.allTime && d.firstSale ? "since the first sale on " + date(d.firstSale) : "", cls: "mb", body: cumulativeChart(ss, 190) })}
     <div class="grid g2">
-      ${card({ title: "Monthly recurring by product", info: MRR_INFO, body: barList(ok.map((p) => ({ label: esc(p.label), sub: planBreakdown(bills[p.key].plans, p.key), value: bills[p.key].revenue.mrr, display: money(bills[p.key].revenue.mrr) + "/mo", c: p.c, href: "#/" + p.route })).sort((x, y) => y.value - x.value), { empty: "No recurring revenue yet." })
-        + `<div class="kv" style="margin-top:8px"><span>Total</span><span>${money(mrr)} / mo · ${money(mrr * 12)} / yr</span></div>`, foot: `${fmt(ok.length)} of ${fmt(PRODUCTS.length)} billing services answered.` })}
+      ${card({ title: "Monthly recurring by product", info: MRR_INFO, body: barList(ok.map((p) => ({ label: esc(p.label) + (bills[p.key].estimated ? ` <span class="s">est.</span>` : ""), sub: planBreakdown(bills[p.key].plans, p.key), value: bills[p.key].revenue.mrr, display: money(bills[p.key].revenue.mrr) + "/mo", c: p.c, href: "#/" + p.route })).sort((x, y) => y.value - x.value), { empty: "No recurring revenue yet." })
+        + `<div class="kv" style="margin-top:8px"><span>Total</span><span>${money(mrr)} / mo · ${money(mrr * 12)} / yr</span></div>`, foot: `${fmt(ok.length)} of ${fmt(scopedProducts().length)} billing services answered.` })}
       ${card({ title: "One-time revenue", info: "<p>Valued per sale at the cash the buyer's invoice records, not at today's list price. Never added to MRR: it does not recur.</p>", body: barList(oneTimeRows, { empty: "No one-time sales yet." })
         + `<div class="kv" style="margin-top:8px"><span>Total</span><span>${money(Math.round(oneTime * 100) / 100)}</span></div>` })}
     </div>`);
@@ -2660,18 +2964,28 @@ async function pageRevenue(ctx) {
 /* ── Subscriptions ─────────────────────────────────────────────────────────── */
 async function pageSubscriptions(ctx) {
   const q = ctx.r.q;
-  const prod = PROD[q.get("product")] ? q.get("product") : "all";
+  const SP = scopedAcct(), WX = PROD["reviews-wix"], wixIn = inScope(WX);
+  const choices = SP.concat(wixIn ? [WX] : []);
+  const prod = choices.some((p) => p.key === q.get("product")) ? q.get("product") : "all";
   const scope = q.get("show") === "all" ? "all" : "live";
-  const list = prod === "all" ? PRODUCTS : [PROD[prod]];
-  const [rs, users] = await Promise.all([
+  const list = prod === "all" ? SP : prod === WX.key ? [] : [PROD[prod]];
+  const withWix = wixIn && (prod === "all" || prod === WX.key);
+  const [rs, users, wixR] = await Promise.all([
     Promise.allSettled(list.map((p) => acct("/subscriptions", p.key))),
-    get("/admin/users?pageSize=1000").then((x) => x.users, () => []),
+    SP.length ? get("/admin/users?pageSize=1000").then((x) => x.users, () => []) : Promise.resolve([]),
+    withWix ? get(WX.base + "/admin/sites").then((x) => x, (e) => ({ error: e })) : Promise.resolve(null),
   ]);
   if (!ctx.live()) return;
   const idOf = new Map(users.map((u) => [u.email, u.id]));
   const all = [];
   list.forEach((p, i) => { const d = val(rs[i]); if (d) d.subscriptions.forEach((s) => all.push({ ...s, product: p })); });
-  const failed = list.filter((p, i) => !val(rs[i]));
+  // Wix Billing has no subscription record of ours: each paying site is one, live or (removed) canceled.
+  if (wixR && wixR.sites) wixR.sites.filter((s) => ["starter", "pro", "business"].includes(s.plan)).forEach((s) => all.push({
+    wix: true, instanceId: s.instanceId, email: s.ownerEmail || s.siteName || s.instanceId, siteName: s.siteName, product: WX,
+    plan: s.plan === "business" ? "ultra" : s.plan, cycle: s.billingCycle,
+    status: s.status === "removed" ? "canceled" : s.autoRenewing === false ? "canceling" : "active", live: s.status === "live",
+    monthlyValue: s.monthlyValue, currentPeriodEnd: s.planExpiresAt, createdAt: s.planSince || s.installedAt, stripeSubscriptionId: null }));
+  const failed = list.filter((p, i) => !val(rs[i])).concat(wixR && wixR.error ? [WX] : []);
   const live = all.filter((s) => s.live);
   const mrr = sum(live, (s) => s.monthlyValue);
   const lifetimes = all.filter((s) => s.lifetime && (s.status === "active" || s.status === "trialing"));
@@ -2679,8 +2993,10 @@ async function pageSubscriptions(ctx) {
   const rows = scope === "live" ? all.filter((s) => s.live || (s.lifetime && s.status === "active")) : all;
   const byKey = (arr, f) => { const m = new Map(); arr.forEach((x) => { const k = f(x); m.set(k, (m.get(k) || 0) + 1); }); return m; };
   const tierCounts = byKey(live, (s) => s.product.key + ":" + s.plan);
-  paint(ctx, `${pageHead({ title: "Subscriptions", sub: "Every subscription record, live and historical. Lifetime licences are listed with them but never count as MRR.",
-      ctl: seg("prod", [["all", "All"]].concat(PRODUCTS.map((p) => [p.key, p.label])), prod) + seg("show", [["live", "Live"], ["all", "All records"]], scope) })}
+  paint(ctx, `${pageHead({ title: "Subscriptions", sub: `${scopeChip()}Every subscription record, live and historical. Lifetime licences are listed with them but never count as MRR.${wixIn ? " Wix sites are billed by Wix: their MRR is at list price." : ""}`,
+      // A segmented switch while it fits; a menu once a platform's worth of products would overflow it.
+      ctl: (choices.length > 5 ? `<select class="in" data-prodsel aria-label="Product"><option value="all">Every product</option>${choices.map((p) => `<option value="${p.key}" ${prod === p.key ? "selected" : ""}>${esc(p.label)}</option>`).join("")}</select>`
+        : choices.length > 1 ? seg("prod", [["all", "All"]].concat(choices.map((p) => [p.key, p.label])), prod) : "") + seg("show", [["live", "Live"], ["all", "All records"]], scope) })}
     ${failed.length ? alertBox("warning", "Some billing services did not answer", failed.map((p) => p.label).join(", ") + " · their subscriptions are missing below.") : ""}
     ${kpis([
       { label: "Monthly recurring", value: money(mrr), sub: `${money(mrr * 12)} a year · live subscriptions`, hero: true },
@@ -2695,22 +3011,24 @@ async function pageSubscriptions(ctx) {
     ${card({ flush: true, body: table({
       rows, noun: "records", searchPh: "Search by email…", search: (s) => s.email + " " + (s.stripeSubscriptionId || ""), csv: "vanssay-subscriptions.csv",
       sort: { key: "createdAt", dir: "desc" }, empty: scope === "live" ? "No live subscription." : "No subscriptions yet.",
-      onRow: (s) => { const id = idOf.get(s.email); if (id) openUser(id, s.product.key); else toast("No account found for " + s.email, "err"); },
+      onRow: (s) => { if (s.wix) { openSite(s.instanceId); return; } const id = idOf.get(s.email); if (id) openUser(id, s.product.key); else toast("No account found for " + s.email, "err"); },
       cols: [
-        { key: "email", label: "Email", v: (s) => `<strong>${esc(s.email)}</strong>` },
+        { key: "email", label: "Email", v: (s) => `<strong>${esc(s.email)}</strong>${s.wix && s.siteName && s.siteName !== s.email ? `<span class="sub">${esc(s.siteName)}</span>` : ""}` },
         { key: "product", label: "Plugin", sort: (s) => s.product.label, csv: (s) => s.product.label, v: (s) => `<span class="pc" style="--c:var(${s.product.c})"><i></i>${esc(s.product.label)}</span>` },
         { key: "plan", label: "Plan", csv: (s) => (s.lifetime ? "lifetime" : s.plan), v: (s) => planBadge(s.plan, s.lifetime ? "lifetime" : s.gift ? "gift" : null, s.product.key) },
         { key: "status", label: "Status", v: (s) => statusBadge(s.status) },
         { key: "monthlyValue", label: "MRR", r: true, v: (s) => (s.monthlyValue ? money(s.monthlyValue) : `<span class="muted">${s.lifetime ? "one-time" : "–"}</span>`) },
         { key: "currentPeriodEnd", label: "Renews / ends", v: (s) => (s.currentPeriodEnd ? date(s.currentPeriodEnd) : `<span class="muted">${s.lifetime ? "never" : "–"}</span>`), csv: (s) => s.currentPeriodEnd },
         { key: "createdAt", label: "Started", v: (s) => date(s.createdAt), csv: (s) => s.createdAt },
-        { key: "stripeSubscriptionId", label: "Stripe", sort: false, csv: (s) => s.stripeSubscriptionId || "",
-          v: (s) => s.stripeSubscriptionId && s.stripeSubscriptionId.startsWith("sub_")
+        { key: "stripeSubscriptionId", label: "Billed by", sort: false, csv: (s) => (s.wix ? "Wix Billing" : s.stripeSubscriptionId || ""),
+          v: (s) => s.wix ? `<span class="muted">Wix Billing${s.cycle ? " · " + esc(cycleLabel(s.cycle)) : ""}</span>` : s.stripeSubscriptionId && s.stripeSubscriptionId.startsWith("sub_")
             ? `<a class="mono" href="https://dashboard.stripe.com/subscriptions/${esc(s.stripeSubscriptionId)}" target="_blank" rel="noopener" title="Open in Stripe">${esc(s.stripeSubscriptionId.slice(0, 12))}…</a>`
             : `<span class="muted">${s.gift ? "gift" : s.lifetime ? "one-time" : s.stripeSubscriptionId ? esc(s.stripeSubscriptionId.slice(0, 14)) : "manual"}</span>` },
       ],
     }) })}`);
   onSeg(ctx.view, "prod", (v) => { setQuery({ product: v === "all" ? null : v }); rerender(); });
+  const ps = ctx.view.querySelector("[data-prodsel]");
+  if (ps) ps.onchange = () => { setQuery({ product: ps.value === "all" ? null : ps.value }); rerender(); };
   onSeg(ctx.view, "show", (v) => { setQuery({ show: v === "all" ? "all" : null }); rerender(); });
 }
 
@@ -2882,7 +3200,7 @@ function planMix(bill, p) {
   const pl = bill.plans;
   const rows = [["Free", pl.free], ["Starter", pl.starter], ["Pro", pl.pro], [tierLabel("ultra", p.key), pl.ultra], ["Lifetime", pl.lifetime], ["Gifted", pl.gifted]]
     .filter(([, n], i) => n || i === 0).map(([label, n]) => ({ label, value: n || 0, c: label === "Free" ? "--c-other" : p.c }));
-  return barList(rows, { keepZero: true }) + `<div class="kv" style="margin-top:8px"><span>Paid of all accounts</span><span>${pctOf(pl.paid, pl.free + pl.paid, 1)}</span></div>`;
+  return barList(rows, { keepZero: true }) + `<div class="kv" style="margin-top:8px"><span>Paid of all ${p.billing === "wix" ? "live sites" : "accounts"}</span><span>${pctOf(pl.paid, pl.free + pl.paid, 1)}</span></div>`;
 }
 const minis = (items) => `<div class="minis">${items.map(([v, l]) => `<div><b>${v}</b><span>${l}</span></div>`).join("")}</div>`;
 function cacheCard(d, r, p, label) {
@@ -3473,6 +3791,417 @@ function pageRouter(ctx) {
   });
 }
 
+/* ── Reviews for Webflow ───────────────────────────────────────────────────────
+   Accounts and Stripe billing go through Vanssay Accounts (product
+   reviews-webflow); its own backend only answers totals so far. */
+const RWF_TABS = [["overview", "Overview"], ["users", "Accounts"]];
+async function pageReviewsWebflow(ctx) {
+  const p = PROD["reviews-webflow"], tab = ctx.r.tab;
+  const head = () => productHead(p, "The Reviews app on the Webflow Marketplace: Vanssay accounts, Stripe plans and Google Business Profile import.", RWF_TABS, tab,
+    `<a class="btn sm" href="https://webflow.vanssay.net/reviews/" target="_blank" rel="noopener">${icon("ext")}Web app</a>`);
+  if (tab === "overview") {
+    const rs = await Promise.allSettled([acct("/overview", p.key), get(p.base + "/admin/overview")]);
+    if (!ctx.live()) return;
+    const [bill, dom] = rs.map(val);
+    paint(ctx, `${head()}
+      ${kpis([...billingKpis(bill, p),
+        dom ? { label: "Google connections", value: fmt(dom.connections), sub: "owners signed in with Google" } : null,
+        dom ? { label: "Businesses", value: fmt(dom.businesses), sub: plural(dom.reviews, "review") + " synced" } : null,
+        dom ? { label: "Widgets", value: fmt(dom.widgets) } : null])}
+      ${!bill ? card({ body: unavailable("Billing", rs[0]), cls: "mb" }) : ""}
+      ${!dom ? card({ body: unavailable("The Webflow backend", rs[1]), cls: "mb" }) : ""}
+      <div class="grid g2">
+        ${card({ title: "Plan mix", body: planMix(bill, p) })}
+        ${card({ title: "What this page can show", body: `<p class="note">The Webflow backend only answers totals for now: Google connections, businesses, reviews and widgets. Sites, views and activity per site need admin routes there, like the Wix ones: a backend deploy, left for after Webflow's review decision.</p>` })}
+      </div>`);
+    return;
+  }
+  if (tab === "users") {
+    const d = await acct("/users?pageSize=1000", p.key);
+    if (!ctx.live()) return;
+    const rows = d.users.filter((u) => u.platform === "webflow" || (u.plan && u.plan !== "free"));
+    const paying = rows.filter((u) => u.plan && u.plan !== "free");
+    paint(ctx, `${head()}
+      ${kpis([
+        { label: "Accounts", value: fmt(rows.length), sub: "signed up on Webflow, or paying for this app" },
+        { label: "Paying", value: fmt(paying.length), sub: pctOf(paying.length, rows.length, 1) + " of them" },
+        { label: "New this month", value: fmt(rows.filter((u) => monthKeyOf(u.createdAt) === todayKey().slice(0, 7)).length) },
+      ])}
+      ${card({ flush: true, body: table({ rows, noun: "accounts", searchPh: "Search by email…", search: (u) => u.email, sort: { key: "createdAt", dir: "desc" }, csv: "reviews-webflow-accounts.csv",
+        onRow: (u) => openUser(u.id, p.key), empty: "No account yet.",
+        cols: [
+          { key: "email", label: "Email", v: (u) => `<strong>${esc(u.email)}</strong>` },
+          { key: "plan", label: "Plan", v: (u) => planBadge(u.plan, u.billing, p.key) },
+          { key: "platform", label: "Signed up on", v: (u) => platformBadge(u.platform), csv: (u) => platformLabel(u.platform) },
+          { key: "createdAt", label: "Joined", v: (u) => `${date(u.createdAt)}<span class="sub">${ago(u.createdAt)}</span>`, csv: (u) => u.createdAt },
+        ] }) })}`);
+  }
+}
+
+/* ── Google Reviews 2027 (Wix) ─────────────────────────────────────────────────
+   Wix bills each site through Wix Billing and knows it by its app instance: no
+   Vanssay account, no Stripe. Everything here comes from the Wix backend's own
+   tables (webhooks, Get App Instance, widgets, views, Aria calls). What Wix keeps
+   to itself (listing views, App Market search, payouts) stays in its dashboard.
+   Money is at list price: Wix never says what a site actually paid. */
+const WX_TABS = [["overview", "Overview"], ["sites", "Sites"], ["businesses", "Businesses"], ["widgets", "Widgets"], ["aria", "Aria"], ["events", "Events"]];
+const WX_EVENT = { installed: ["Installed", ""], removed: ["Removed", "crit"], plan_purchased: ["Bought a plan", "good"], plan_changed: ["Changed plan", ""], plan_cancelled: ["Turned off renewal", "warn"], plan_converted: ["Trial to paid", "good"], plan_reactivated: ["Reactivated", "good"], plan_transferred: ["Plan transferred", ""], other: ["Other", ""] };
+const WX_LAYOUTS = { slider: "Slider", floatingbadge: "Floating badge", grid: "Grid", masonry: "Masonry", marquee: "Marquee", list: "List", ratingcard: "Rating card", badge: "Badge", ratingstrip: "Rating strip", floatingcard: "Floating card" };
+const WX_PROMPT = { not_asked: "Not asked yet", later: "Said “not now” once", done: "Done (left a review or said no twice)" };
+const ARIA_C = ["--c-rwx", "--c-reviews", "--c-instagram", "--c-bouncer", "--c-router", "--c-grl", "--c-rwf", "--c-accent", "--c-other"];
+const layoutName = (k) => WX_LAYOUTS[k] || cap(k);
+const eventBadge = (k) => { const [l, t] = WX_EVENT[k] || [k, ""]; return `<span class="bdg ${t}">${esc(l)}</span>`; };
+function eventDetail(e) {
+  const d = e.detail || {}, parts = [];
+  if (d.previousVendorProductId) parts.push(`from ${esc(cap(String(d.previousVendorProductId).toLowerCase()))}${d.previousCycle ? " " + esc(cycleLabel(d.previousCycle)) : ""}`);
+  if (d.cancelReason) parts.push(esc(String(d.cancelReason).toLowerCase().replace(/_/g, " ")));
+  if (d.userReason) parts.push(`“${esc(d.userReason)}”`);
+  if (d.couponName) parts.push("coupon " + esc(d.couponName));
+  if (d.expiresOn) parts.push("until " + date(d.expiresOn));
+  if (d.originInstanceId) parts.push("copied from another site");
+  if (e.eventType === "backfill") parts.push(`<span class="muted">rebuilt from the install record</span>`);
+  return parts.join(" · ") || `<span class="muted">–</span>`;
+}
+const siteName = (s) => s.siteName || (s.status === "removed" || s.siteRemoved ? "Removed site" : "Unnamed site");
+const siteCell = (s) => `<a href="#" data-site="${esc(s.instanceId)}"><strong>${esc(siteName(s))}</strong></a>${s.siteUrl
+  ? `<span class="sub"><a class="mono" href="${esc(s.siteUrl)}" target="_blank" rel="noopener">${esc(hostOf(s.siteUrl).replace(/^www\./, ""))}</a></span>`
+  : s.status === "removed" ? `<span class="sub">details deleted on removal</span>` : ""}`;
+const wixPlanCell = (s) => `${wixPlanBadge(s.plan)}${s.billingCycle ? `<span class="sub">${esc(cycleLabel(s.billingCycle))}${s.autoRenewing === false ? " · renewal off" : ""}</span>` : ""}`;
+const liveBadge = (s) => (s.status === "removed" ? `<span class="bdg crit">removed</span>` : `<span class="bdg good">live</span>`);
+const syncBadge = (st) => `<span class="bdg ${st === "ok" ? "good" : st === "reconnect" ? "warn" : "crit"}">${esc(st === "ok" ? "syncing" : st === "reconnect" ? "sign in again" : st)}</span>`;
+const sourceLabel = (src) => (src === "gbp" ? "Business Profile" : "Google search");
+// Days with nothing recorded are missing from the answers: lay them out on a full calendar.
+function dayRange(n) { const out = []; for (let i = n - 1; i >= 0; i--) out.push(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10)); return out; }
+
+async function pageWix(ctx) {
+  const p = PROD["reviews-wix"], tab = ctx.r.tab, q = ctx.r.q, B = p.base + "/admin";
+  const links = `<a class="btn sm" href="https://dev.wix.com/apps/${WIX_APP_ID}/home" target="_blank" rel="noopener">${icon("ext")}Wix app dashboard</a>
+    <a class="btn sm" href="https://www.wix.com/app-market/google-reviews-2027" target="_blank" rel="noopener">${icon("ext")}Listing</a>`;
+  const head = (ctl) => productHead(p, "Google reviews for Wix sites, billed by Wix per site: installs, plans, Google connections, widgets, Aria and every Wix webhook.", WX_TABS, tab, ctl ?? links);
+
+  if (tab === "overview") {
+    const o = await get(B + "/overview");
+    if (!ctx.live()) return;
+    let ins = o.installs.series, gran = "day";
+    if (ins.length > 92) { ins = rollup(ins, (d) => weekOf(d.day), (acc, d, k) => { acc = acc || { day: k, installs: 0, removals: 0 }; acc.installs += d.installs; acc.removals += d.removals; return acc; }); gran = "week"; }
+    const vKeys = dayRange(90), vMap = new Map(o.views.series.map((d) => [d.day, d.views]));
+    const f = o.funnel, bill = wixBill(o);
+    const promptRows = Object.entries(o.reviewPrompt).map(([k, n]) => ({ label: esc(WX_PROMPT[k] || k), value: n, c: k === "done" ? "--c-rwx" : "--c-other" }));
+    const alerts = [
+      o.businesses.needsAttention ? alertBox("warning", `${plural(o.businesses.needsAttention, "Google connection")} to look at`, "A sync error, or a Google account that has to sign in again. Widgets keep the reviews they last had.") : "",
+      o.autoRenewOff ? alertBox("warning", `${plural(o.autoRenewOff, "paying site")} turned off auto-renewal`, "They keep the plan until it ends, then fall back to Free.") : "",
+      o.cycles.unknown ? alertBox("info", `${plural(o.cycles.unknown, "paying site")} without billing details`, "Monthly or yearly is unknown until the site is read from Wix again: use “Refresh every site” at the bottom.") : "",
+    ].join("");
+    paint(ctx, `${head()}
+      ${alerts ? `<div class="alerts">${alerts}</div>` : ""}
+      ${kpis([
+        { label: "Monthly recurring", value: money(o.revenue.mrr) + "<small>est.</small>", sub: `${money(o.revenue.arr)} a year at list price`, hero: true,
+          info: `<p>Each paying site at its plan's list price: monthly ${["starter", "pro", "business"].map((k) => cap(k) + " " + money(o.prices.monthly[k])).join(", ")}; yearly per month ${["starter", "pro", "business"].map((k) => cap(k) + " " + money(o.prices.yearly[k])).join(", ")}.</p><p>Wix never tells us what a site paid: sales, coupons, VAT and Wix's share (none the first 12 months, then 20% plus 2.5% fees) all happen on its side.</p>` },
+        { label: "Paying sites", value: fmt(o.plans.paid), sub: `${planBreakdown(bill.plans, p.key)}${o.plans.paid ? ` · ${fmt(o.cycles.yearly)} yearly` : ""}`, href: "#/reviews-wix/sites?plan=paid" },
+        { label: "Live installs", value: fmt(o.installs.live), sub: `+${fmt(o.installs.new30d)} in 30 days · ${fmt(o.installs.removed30d)} removed`, href: "#/reviews-wix/sites",
+          spark: spark(o.installs.series.slice(-30).map((d) => d.installs), { bars: true, c: p.c }) },
+        { label: "Owners active · 7 days", value: fmt(o.activity.active7d), sub: `${fmt(o.activity.active30d)} in 30 days, of ${fmt(o.installs.live)}`, info: "<p>A site's owner opened the app's dashboard or its settings panel in the Wix editor.</p>" },
+        { label: "Widget views · 30 days", value: fmt(o.views.last30d), sub: `${fmt(o.views.thisMonth)} this month · ${fmt(o.views.allTime)} all-time`, href: "#/reviews-wix/widgets" },
+        { label: "Aria calls · 30 days", value: fmt(o.aria.last30d), sub: `${plural(o.aria.sites, "site")} · ${fmt(o.aria.allTime)} all-time`, href: "#/reviews-wix/aria" },
+      ])}
+      <div class="grid g21 mb">
+        ${card({ title: `Installs and removals per ${gran}`, sub: o.installs.firstInstall ? "since the first install on " + date(o.installs.firstInstall) : "", body: chart({ keys: ins.map((d) => d.day), gran, height: 260, integer: true,
+          series: [{ id: "in", label: "Installs", c: p.c, values: ins.map((d) => d.installs) }, { id: "out", label: "Removals", c: "--c-other", values: ins.map((d) => d.removals) }], empty: "No install yet." }) })}
+        ${card({ title: "Setup", sub: "live sites, furthest step", info: "<p>Of the sites that have the app today: how many connected a Google business, made a widget, have it live on a published page (seen in the last 30 days), and pay.</p>",
+          body: funnel([
+            { label: "Have the app", value: f.installed },
+            { label: "Connected Google", value: f.googleConnected },
+            { label: "Made a widget", value: f.widget },
+            { label: "Live on a page", desc: "Seen on the published site in the last 30 days", value: f.livePage },
+            { label: "Paying", value: f.paid, noLeak: true },
+          ], { c: p.c, empty: "No live site yet." }) })}
+      </div>
+      <div class="grid g3 mb">
+        ${card({ title: "Plan mix", body: planMix(bill, p) + kv("Monthly · yearly", `${fmt(o.cycles.monthly)} · ${fmt(o.cycles.yearly)}${o.cycles.unknown ? ` <span class="muted">· ${fmt(o.cycles.unknown)} unknown</span>` : ""}`) + kv("Paying sites that left", fmt(o.removedPaid)) })}
+        ${card({ title: "Widget views per day", sub: "last 90 days", body: chart({ keys: vKeys, gran: "day", height: 210, integer: true, series: [{ id: "v", label: "Views", c: p.c, values: vKeys.map((k) => vMap.get(k) || 0) }], empty: "No view on a published site yet." }) })}
+        ${card({ title: "Google and reviews", body: minis([[fmt(o.businesses.total), "businesses connected"], [fmt(o.businesses.reviews), "reviews synced"], [fmt(o.businesses.gbp), "via Business Profile"], [fmt(o.businesses.places), "via Google search"]])
+          + `<div class="kv" style="margin-top:12px"><span>Client links sent · used</span><span>${fmt(o.invites.created)} · ${fmt(o.invites.used)}</span></div>` })}
+      </div>
+      <div class="grid g3 mb">
+        ${card({ title: "Layouts", sub: plural(o.widgets.total, "widget") + (o.widgets.paused ? ` · ${fmt(o.widgets.paused)} paused` : ""), body: barList(Object.entries(o.widgets.byLayout).map(([k, n]) => ({ label: esc(layoutName(k)), value: n, c: p.c })).sort((a, b) => b.value - a.value), { empty: "No widget yet." }) })}
+        ${card({ title: "App Market review ask", info: "<p>The dashboard asks once, never blocking: “not now” comes back once, a click on the review link or a second “not now” ends it.</p>", body: barList(promptRows.sort((a, b) => b.value - a.value), { empty: "No live site." }) })}
+        ${card({ title: "Sites by language", sub: "and currency, app version", body: barList(Object.entries(o.locales).map(([k, n]) => ({ label: esc(k === "unknown" ? "Not read yet" : k), value: n, c: "--c-other" })).sort((a, b) => b.value - a.value), { empty: "No live site." })
+          + `<div class="kv" style="margin-top:8px"><span>Currencies</span><span>${Object.entries(o.currencies).map(([k, n]) => `${esc(k === "unknown" ? "?" : k)} ${fmt(n)}`).join(" · ") || "–"}</span></div>`
+          + `<div class="kv"><span>App versions</span><span>${Object.entries(o.appVersions).map(([k, n]) => `${esc(k === "unknown" ? "?" : k)} ${fmt(n)}`).join(" · ") || "–"}</span></div>` })}
+      </div>
+      ${card({ title: "Latest Wix events", act: cardLink("#/reviews-wix/events", "Every event"), flush: true, cls: "mb", body: table({ rows: o.recentEvents, page: 0, sort: { key: "createdAt", dir: "desc" }, empty: "No webhook received yet.",
+        onRow: (e) => openSite(e.instanceId), cols: [
+          { key: "createdAt", label: "When", v: (e) => `${dt(e.createdAt)}<span class="sub">${ago(e.createdAt)}</span>` },
+          { key: "siteName", label: "Site", v: (e) => esc(e.siteName || "Removed site") },
+          { key: "kind", label: "Event", v: (e) => eventBadge(e.kind) },
+          { key: "plan", label: "Plan", v: (e) => (e.plan ? esc(cap(e.plan)) + (e.cycle ? ` <span class="muted">${esc(cycleLabel(e.cycle))}</span>` : "") : `<span class="muted">–</span>`) },
+          { key: "detail", label: "Detail", sort: false, v: eventDetail },
+        ] }) })}
+      ${card({ title: "Read every site from Wix again", body: `<div class="row" style="justify-content:space-between;gap:16px;flex-wrap:wrap"><p class="note" style="max-width:62ch">Asks Wix for each live site's plan, billing cycle, renewal, owner, language and app version. Runs on its own whenever a site opens the app or a billing webhook arrives; use this after a change on Wix's side, or to fill sites installed before this page existed.</p>
+        <button class="btn" data-wxrefresh>${icon("refresh")}Refresh every site</button></div>
+        <p class="note" style="margin-top:10px">Not available through any Wix API, so only in the <a href="https://dev.wix.com/apps/${WIX_APP_ID}/home" target="_blank" rel="noopener">Wix app dashboard</a>: listing views, App Market search, Wix's own install counts, payouts and App Market reviews.</p>` })}`);
+    const rb = pageEl(ctx).querySelector("[data-wxrefresh]");
+    if (rb) rb.onclick = async () => { const r = await act(rb, () => send(B + "/refresh", "POST"), (x) => `Read ${plural(x.refreshed, "site")} from Wix${x.failed ? ` · ${fmt(x.failed)} did not answer` : ""}`); if (r) rerender(); };
+    return;
+  }
+
+  if (tab === "sites") {
+    const d = await get(B + "/sites");
+    if (!ctx.live()) return;
+    const sites = d.sites;
+    const state = { status: q.get("status") || "live", plan: q.get("plan") || "" };
+    const PAIDS = ["starter", "pro", "business"];
+    const filtered = () => sites.filter((s) => (state.status === "all" || s.status === state.status) &&
+      (!state.plan || (state.plan === "paid" ? PAIDS.includes(s.plan) : s.plan === state.plan)));
+    const live = sites.filter((s) => s.status === "live");
+    const opt = (v, l, c) => `<option value="${v}" ${c === v ? "selected" : ""}>${esc(l)}</option>`;
+    let tApi;
+    paint(ctx, `${head()}
+      ${kpis([
+        { label: "Live sites", value: fmt(live.length), sub: `${fmt(sites.length - live.length)} removed since launch` },
+        { label: "Paying", value: fmt(live.filter((s) => PAIDS.includes(s.plan)).length), sub: money(sum(live, (s) => s.monthlyValue)) + "/mo est." },
+        { label: "With a widget live", value: fmt(live.filter((s) => s.livePages > 0 || s.views30d > 0).length), sub: "seen on a published page in 30 days" },
+        { label: "Owners active · 30 days", value: fmt(live.filter((s) => s.lastActiveAt && Date.now() - new Date(s.lastActiveAt) < 30 * 86400000).length) },
+      ])}
+      ${card({ flush: true, body: table({ rows: filtered(), noun: "sites", searchPh: "Search site, URL or owner…", search: (s) => [s.siteName, s.siteUrl, s.ownerEmail, s.instanceId].join(" "), sort: { key: "installedAt", dir: "desc" }, csv: "wix-sites.csv",
+        onRow: (s) => openSite(s.instanceId), ref: (a) => { tApi = a; }, empty: "No site matches.",
+        tools: `<select class="in" data-f="status" aria-label="Status">${opt("live", "Live", state.status)}${opt("removed", "Removed", state.status)}${opt("all", "Live and removed", state.status)}</select>
+          <select class="in" data-f="plan" aria-label="Plan">${opt("", "Any plan", state.plan)}${opt("paid", "Paying", state.plan)}${opt("free", "Free", state.plan)}${PAIDS.map((k) => opt(k, cap(k), state.plan)).join("")}</select>`,
+        bind: (el) => el.querySelectorAll("[data-f]").forEach((s) => s.addEventListener("change", () => { state[s.dataset.f] = s.value; setQuery({ [s.dataset.f]: s.value === (s.dataset.f === "status" ? "live" : "") ? null : s.value }); tApi.setRows(filtered()); })),
+        cols: [
+          { key: "siteName", label: "Site", v: siteCell, csv: (s) => s.siteName || "" },
+          { key: "siteUrl", label: "URL", hide: true },
+          { key: "ownerEmail", label: "Owner", v: (s) => (s.ownerEmail ? esc(s.ownerEmail) : `<span class="muted">–</span>`) },
+          { key: "plan", label: "Plan", sort: (s) => ["free", "starter", "pro", "business"].indexOf(s.plan), v: wixPlanCell, csv: (s) => s.plan + (s.billingCycle ? " " + cycleLabel(s.billingCycle) : "") },
+          { key: "status", label: "Status", v: liveBadge },
+          { key: "businesses", label: "Google", r: true, v: (s) => (s.businesses ? `${fmt(s.businesses)}${s.rating ? ` <span class="muted">· ${s.rating}★</span>` : ""}${s.needsAttention ? ` <span class="bdg warn" title="Needs a look">!</span>` : ""}` : `<span class="muted">–</span>`) },
+          { key: "views30d", label: "Views · 30d", r: true, v: (s) => (s.widgets ? fmt(s.views30d) + `<span class="sub">${plural(s.widgets, "widget")} · ${plural(s.livePages, "page")}</span>` : `<span class="muted">no widget</span>`) },
+          { key: "ariaCalls", label: "Aria", r: true, v: (s) => (s.ariaCalls ? fmt(s.ariaCalls) : `<span class="muted">–</span>`) },
+          { key: "installedAt", label: "Installed", v: (s) => `${date(s.installedAt)}<span class="sub">${s.removedAt ? "removed " + date(s.removedAt) : ago(s.installedAt)}</span>`, csv: (s) => s.installedAt },
+          { key: "lastActiveAt", label: "Last opened", v: (s) => (s.lastActiveAt ? ago(s.lastActiveAt) : `<span class="muted">–</span>`), csv: (s) => s.lastActiveAt || "" },
+          { key: "monthlyValue", label: "MRR est.", r: true, v: (s) => (s.monthlyValue ? money(s.monthlyValue) : `<span class="muted">–</span>`) },
+        ] }) })}`);
+    return;
+  }
+
+  if (tab === "businesses") {
+    const d = await get(B + "/businesses");
+    if (!ctx.live()) return;
+    const b = d.businesses, bad = b.filter((x) => x.syncStatus !== "ok" || (x.connectionStatus && x.connectionStatus !== "ok"));
+    paint(ctx, `${head()}
+      ${kpis([
+        { label: "Businesses", value: fmt(b.length), sub: plural(new Set(b.map((x) => x.instanceId)).size, "site") },
+        { label: "Via Business Profile", value: fmt(b.filter((x) => x.source === "gbp").length), sub: "owner signed in: every review" },
+        { label: "Via Google search", value: fmt(b.filter((x) => x.source === "places").length), sub: "the 5 public reviews" },
+        { label: "Need a look", value: fmt(bad.length), sub: "sync error or sign-in again" },
+      ])}
+      ${card({ flush: true, body: table({ rows: b, noun: "businesses", searchPh: "Search business, site or Google account…", search: (x) => [x.name, x.address, x.siteName, x.siteUrl, x.googleEmail].join(" "), sort: { key: "createdAt", dir: "desc" }, csv: "wix-businesses.csv",
+        onRow: (x) => openSite(x.instanceId), empty: "No business connected yet.",
+        cols: [
+          { key: "name", label: "Business", v: (x) => `${x.mapsUrl ? `<a href="${esc(x.mapsUrl)}" target="_blank" rel="noopener"><strong>${esc(x.name)}</strong></a>` : `<strong>${esc(x.name)}</strong>`}${x.address ? `<span class="sub">${esc(x.address)}</span>` : ""}` },
+          { key: "siteName", label: "Site", v: (x) => `<a href="#" data-site="${esc(x.instanceId)}">${esc(x.siteName || "Unnamed site")}</a><span class="sub">${esc(cap(x.plan))}</span>` },
+          { key: "source", label: "Source", v: (x) => esc(sourceLabel(x.source)) },
+          { key: "rating", label: "Rating", r: true, v: (x) => (x.rating ? x.rating.toFixed(1) + "★" : "–") },
+          { key: "googleReviews", label: "Reviews", r: true, v: (x) => `${fmt(x.googleReviews)}<span class="sub">${fmt(x.synced)} synced</span>` },
+          { key: "syncStatus", label: "Sync", v: (x) => syncBadge(x.connectionStatus && x.connectionStatus !== "ok" ? x.connectionStatus : x.syncStatus) + (x.syncError ? `<span class="sub" title="${esc(x.syncError)}">${esc(x.syncError.slice(0, 60))}</span>` : "") },
+          { key: "lastSyncedAt", label: "Last synced", v: (x) => (x.lastSyncedAt ? ago(x.lastSyncedAt) : "–"), csv: (x) => x.lastSyncedAt || "" },
+          { key: "googleEmail", label: "Google account", v: (x) => (x.googleEmail ? `<span class="mono">${esc(x.googleEmail)}</span>` : `<span class="muted">–</span>`) },
+          { key: "createdAt", label: "Connected", v: (x) => date(x.createdAt), csv: (x) => x.createdAt },
+        ] }) })}`);
+    return;
+  }
+
+  if (tab === "widgets") {
+    const d = await get(B + "/widgets");
+    if (!ctx.live()) return;
+    const w = d.widgets;
+    const byLayout = new Map();
+    for (const x of w) { const e = byLayout.get(x.layout) || { n: 0, views: 0 }; e.n++; e.views += x.views30d; byLayout.set(x.layout, e); }
+    paint(ctx, `${head()}
+      ${kpis([
+        { label: "Widgets", value: fmt(w.length), sub: plural(new Set(w.map((x) => x.instanceId)).size, "site") },
+        { label: "Live on a page", value: fmt(w.filter((x) => x.livePages > 0).length), sub: "seen on a published page in 30 days" },
+        { label: "Views · 30 days", value: fmt(sum(w, (x) => x.views30d)), sub: fmt(sum(w, (x) => x.viewsAllTime)) + " all-time" },
+        { label: "Paused", value: fmt(w.filter((x) => x.paused).length) },
+      ])}
+      <div class="grid g12">
+        ${card({ title: "Layouts", sub: "widgets · views in 30 days", body: barList([...byLayout.entries()].map(([k, x]) => ({ label: esc(layoutName(k)), sub: plural(x.views, "view"), value: x.n, c: p.c })).sort((a, b) => b.value - a.value), { empty: "No widget yet." }) })}
+        ${card({ flush: true, body: table({ rows: w, noun: "widgets", searchPh: "Search widget, site or page…", search: (x) => [x.name, x.siteName, x.siteUrl, x.id, ...x.pageList.map((pg) => pg.title + " " + pg.path)].join(" "), sort: { key: "views30d", dir: "desc" }, csv: "wix-widgets.csv",
+          onRow: (x) => openSite(x.instanceId), empty: "No widget yet.",
+          cols: [
+            { key: "name", label: "Widget", v: (x) => `<strong>${esc(x.name)}</strong><span class="sub mono">${esc(x.id)}</span>` },
+            { key: "siteName", label: "Site", v: (x) => `<a href="#" data-site="${esc(x.instanceId)}">${esc(x.siteName || "Unnamed site")}</a><span class="sub">${esc(cap(x.plan))}</span>` },
+            { key: "layout", label: "Layout", v: (x) => esc(layoutName(x.layout)) + (x.locations > 1 ? `<span class="sub">${plural(x.locations, "location")}</span>` : "") + (x.paused ? ` <span class="bdg">paused</span>` : "") },
+            { key: "views30d", label: "Views · 30d", r: true, v: (x) => fmt(x.views30d) + `<span class="sub">${fmt(x.viewsAllTime)} all-time</span>` },
+            { key: "livePages", label: "Pages", v: (x) => (x.pageList.length ? x.pageList.map((pg) => `<span class="${pg.lastSeenAt && Date.now() - new Date(pg.lastSeenAt) < 30 * 86400000 ? "" : "muted"}" title="${esc(pg.path)}${pg.lastSeenAt ? " · last seen " + date(pg.lastSeenAt) : " · never seen live"}">${esc(pg.title || pg.path)}</span>`).join(", ") : `<span class="muted">not placed</span>`), csv: (x) => x.pageList.map((pg) => pg.path).join(" ") },
+            { key: "updatedAt", label: "Edited", v: (x) => ago(x.updatedAt), csv: (x) => x.updatedAt },
+          ] }) })}
+      </div>`);
+    return;
+  }
+
+  if (tab === "aria") {
+    const [o, sd] = await Promise.all([get(B + "/overview"), get(B + "/sites")]);
+    if (!ctx.live()) return;
+    const a = o.aria, keys = dayRange(90);
+    const tools = a.byTool.map((t) => t.tool);
+    const colorOf = (t) => ARIA_C[tools.indexOf(t) % ARIA_C.length];
+    const by = new Map(); a.series.forEach((r) => by.set(r.day + "|" + r.tool, r.calls));
+    const failures = sum(a.byTool, (t) => t.failures);
+    const users = sd.sites.filter((s) => s.ariaCalls > 0);
+    paint(ctx, `${head()}
+      ${kpis([
+        { label: "Calls · 30 days", value: fmt(a.last30d), sub: fmt(a.allTime) + " all-time" },
+        { label: "Sites using Aria", value: fmt(a.sites), sub: pctOf(a.sites, o.installs.live) + " of live sites" },
+        { label: "Failed calls", value: fmt(failures), sub: pctOf(failures, a.allTime, 1) + " of all calls" },
+        { label: "Tools used", value: `${fmt(tools.length)}<small>of 8</small>` },
+      ])}
+      <div class="grid g21 mb">
+        ${card({ title: "Calls per day, by tool", sub: "last 90 days", body: chart({ keys, gran: "day", height: 260, integer: true, series: tools.map((t) => ({ id: t, label: t, c: colorOf(t), values: keys.map((k) => by.get(k + "|" + t) || 0) })), empty: "Aria has not called a tool yet. Counting started with this page." }) })}
+        ${card({ title: "Tools", sub: "all-time", body: barList(a.byTool.map((t) => ({ label: `<span class="mono">${esc(t.tool)}</span>`, sub: t.failures ? plural(t.failures, "failure") : "", value: t.calls, c: colorOf(t.tool) })), { empty: "No call yet." }) })}
+      </div>
+      ${card({ title: "Sites that used Aria", flush: true, body: table({ rows: users, noun: "sites", sort: { key: "ariaCalls", dir: "desc" }, onRow: (s) => openSite(s.instanceId), empty: "No site has used Aria yet.", cols: [
+        { key: "siteName", label: "Site", v: siteCell },
+        { key: "plan", label: "Plan", v: wixPlanCell },
+        { key: "ariaCalls", label: "Calls", r: true, v: (s) => fmt(s.ariaCalls) },
+        { key: "lastAriaAt", label: "Last call", v: (s) => (s.lastAriaAt ? `${dt(s.lastAriaAt)}<span class="sub">${ago(s.lastAriaAt)}</span>` : "–") },
+      ] }) })}`);
+    return;
+  }
+
+  if (tab === "events") {
+    const d = await get(B + "/events?limit=1000");
+    if (!ctx.live()) return;
+    const ev = d.events, since = Date.now() - 30 * 86400000;
+    const n30 = (k) => ev.filter((e) => (Array.isArray(k) ? k.includes(e.kind) : e.kind === k) && new Date(e.createdAt) > since).length;
+    let kind = q.get("kind") || "", tApi;
+    const rowsFor = () => ev.filter((e) => !kind || e.kind === kind);
+    paint(ctx, `${head()}
+      ${kpis([
+        { label: "Installs · 30 days", value: fmt(n30("installed")) },
+        { label: "Removals · 30 days", value: fmt(n30("removed")) },
+        { label: "Plans bought or changed · 30 days", value: fmt(n30(["plan_purchased", "plan_changed", "plan_converted", "plan_reactivated"])) },
+        { label: "Renewals turned off · 30 days", value: fmt(n30("plan_cancelled")) },
+      ])}
+      ${card({ flush: true, info: "<p>Every webhook Wix sends the app, as it arrives, without personal data. Rows marked “rebuilt” were filled from the install records when this history started (15 Nov 2026).</p>", title: "Wix webhooks", body: table({ rows: rowsFor(), noun: "events", searchPh: "Search site or reason…", search: (e) => [e.siteName, e.siteUrl, e.instanceId, JSON.stringify(e.detail || {})].join(" "), sort: { key: "createdAt", dir: "desc" }, csv: "wix-events.csv",
+        onRow: (e) => openSite(e.instanceId), ref: (x) => { tApi = x; },
+        tools: `<select class="in" data-kind aria-label="Event"><option value="">Every event</option>${Object.entries(WX_EVENT).map(([k, [l]]) => `<option value="${k}" ${kind === k ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>`,
+        bind: (el) => { el.querySelector("[data-kind]").onchange = (e) => { kind = e.target.value; setQuery({ kind }); tApi.setRows(rowsFor()); }; },
+        cols: [
+          { key: "createdAt", label: "When", v: (e) => `${dt(e.createdAt)}<span class="sub">${ago(e.createdAt)}</span>`, csv: (e) => e.createdAt },
+          { key: "siteName", label: "Site", v: (e) => `${esc(e.siteName || (e.siteRemoved ? "Removed site" : "Unknown site"))}<span class="sub mono">${esc(e.instanceId.slice(0, 8))}…</span>`, csv: (e) => e.siteName || e.instanceId },
+          { key: "kind", label: "Event", v: (e) => eventBadge(e.kind), csv: (e) => e.kind },
+          { key: "plan", label: "Plan", v: (e) => (e.plan ? esc(cap(e.plan)) + (e.cycle ? ` <span class="muted">${esc(cycleLabel(e.cycle))}</span>` : "") : `<span class="muted">–</span>`) },
+          { key: "detail", label: "Detail", sort: false, v: eventDetail, csv: (e) => JSON.stringify(e.detail || {}) },
+          { key: "eventType", label: "Wix name", v: (e) => `<span class="mono">${esc(e.eventType)}</span>` },
+        ] }) })}`);
+  }
+}
+
+/* One Wix site on top of any page (?ws=<instance id>), like the account drawer:
+   plan and billing, owner, its Google businesses, widgets with their pages, and
+   its webhook history. */
+let siteFor = null, sitePushed = false;
+function openSite(id) {
+  if (!id) return;
+  const r = parseHash();
+  r.q.set("ws", id);
+  const h = "#/" + r.path + "?" + r.q.toString();
+  if (siteFor) { history.replaceState(null, "", h); cur = parseHash(); syncSite(id); }
+  else { sitePushed = true; location.hash = h; }
+}
+function closeSite() {
+  if (sitePushed) { sitePushed = false; history.back(); return; }
+  setQuery({ ws: null });
+  syncSite(null);
+}
+function syncSite(id) {
+  if (!id) { const root = $("ws-root"); if (root) root.remove(); siteFor = null; sitePushed = false; return; }
+  if (siteFor === id) return;
+  siteFor = id;
+  renderSite(id);
+}
+async function renderSite(id) {
+  let root = $("ws-root");
+  if (!root) { root = document.createElement("div"); root.id = "ws-root"; $("layer").append(root); }
+  root.innerHTML = `<div class="scrim" data-wsx></div><aside class="dw" role="dialog" aria-modal="true" aria-label="Wix site">
+    <div class="dw-h" style="padding-bottom:16px"><div class="dw-top"><div class="sk" style="width:40px;height:40px;border-radius:12px"></div><div class="dw-id"><div class="sk" style="height:18px;width:60%"></div><div class="sk" style="height:12px;width:40%;margin-top:8px"></div></div>
+    <button class="ib" data-wsclose aria-label="Close">${icon("x")}</button></div></div><div class="dw-b">${skel.lines(6)}</div></aside>`;
+  const bindClose = () => { root.querySelectorAll("[data-wsx],[data-wsclose]").forEach((el) => { el.onclick = closeSite; }); };
+  bindClose();
+  const B = PROD["reviews-wix"].base + "/admin";
+  let d;
+  try { d = await get(B + "/sites/" + id, { quiet: true, fresh: true }); }
+  catch (e) {
+    if (siteFor !== id) return;
+    root.querySelector(".dw-b").innerHTML = `<div class="region-err">${icon("alertc")}<b>Couldn't load this site</b><span>${esc(e.message)}</span></div>`;
+    return;
+  }
+  if (siteFor !== id || !root.isConnected) return;
+  const s = d.site;
+  const days = Math.floor((Date.now() - new Date(s.installedAt)) / 86400000);
+  const dw = root.querySelector(".dw");
+  dw.innerHTML = `<div class="dw-h" style="padding-bottom:16px">
+      <div class="dw-top"><div class="dw-av" style="background:color-mix(in srgb, var(--c-rwx) 15%, transparent);color:var(--c-rwx)">${esc((siteName(s))[0].toUpperCase())}</div>
+        <div class="dw-id"><h2 title="${esc(siteName(s))}">${esc(siteName(s))}</h2>
+          <div class="m">${wixPlanBadge(s.plan)}${liveBadge(s)}<span>Installed ${date(s.installedAt)} · ${days < 1 ? "today" : plural(days, "day") + " ago"}</span>
+            <span class="idrow mono" title="${esc(s.instanceId)}">${esc(s.instanceId.slice(0, 8))}…${copyBtn(s.instanceId, "Copy instance id")}</span></div></div>
+        <button class="ib" data-wsclose aria-label="Close" title="Close (Esc)">${icon("x")}</button></div>
+    </div>
+    <div class="dw-b">
+      ${kpis([
+        { label: "MRR est.", value: s.monthlyValue ? money(s.monthlyValue) : "–", sub: s.billingCycle ? cycleLabel(s.billingCycle) + " billing" : s.plan === "free" ? "Free plan" : "cycle unknown" },
+        { label: "Widget views · 30d", value: fmt(s.views30d), sub: `${fmt(s.viewsAllTime)} all-time · ${plural(s.livePages, "live page")}` },
+        { label: "Reviews synced", value: fmt(s.reviews), sub: plural(s.businesses, "business", "businesses") },
+        { label: "Aria calls", value: fmt(s.ariaCalls), sub: s.lastAriaAt ? "last " + ago(s.lastAriaAt) : "never" },
+      ])}
+      <div class="grid g2" style="margin-top:14px">
+        ${card({ title: "Site and owner", body: kv("Website", s.siteUrl ? `<a class="wrapurl" href="${esc(s.siteUrl)}" target="_blank" rel="noopener">${esc(s.siteUrl.replace(/^https?:\/\//, ""))}</a>` : `<span class="muted">${s.status === "removed" ? "deleted on removal" : "–"}</span>`)
+          + kv("Owner", s.ownerEmail ? `<span class="idrow">${esc(s.ownerEmail)}${copyBtn(s.ownerEmail, "Copy email")}</span>` : "–")
+          + kv("Last opened the app", s.lastActiveAt ? `${dt(s.lastActiveAt)} <span class="muted">· ${ago(s.lastActiveAt)}</span>` : "–")
+          + kv("Language · currency", `${esc(s.locale || "–")} · ${esc(s.currency || "–")}`)
+          + kv("App version", esc(s.appVersion || "–"))
+          + kv("Review ask", esc(WX_PROMPT[s.reviewPrompt || "not_asked"] || s.reviewPrompt))
+          + kv("Client links sent · used", `${fmt(s.invites)} · ${fmt(s.invitesUsed)}`) })}
+        ${card({ title: "Wix Billing", body: kv("Plan", wixPlanBadge(s.plan))
+          + kv("Billing", esc(cycleLabel(s.billingCycle) || "–"))
+          + kv("Auto-renewal", s.autoRenewing == null ? "–" : s.autoRenewing ? "on" : `<span class="warn-t">off</span>`)
+          + kv("Plan since", s.planSince ? date(s.planSince) : "–")
+          + kv("Renews or ends", s.planExpiresAt ? date(s.planExpiresAt) : "–")
+          + kv("Read from Wix", s.planCheckedAt ? ago(s.planCheckedAt) : "–")
+          + (s.status === "live" ? `<div class="row" style="margin-top:12px"><button class="btn sm" data-wsrefresh>${icon("refresh")}Refresh from Wix</button></div>` : `<p class="note" style="margin-top:10px">Removed ${date(s.removedAt)}: only the plan and dates are kept.</p>`) })}
+      </div>
+      ${sec("Google businesses")}
+      ${card({ flush: true, body: table({ rows: d.businesses, page: 0, empty: "No business connected.", cols: [
+        { key: "name", label: "Business", v: (b) => `${b.mapsUrl ? `<a href="${esc(b.mapsUrl)}" target="_blank" rel="noopener">${esc(b.name)}</a>` : esc(b.name)}<span class="sub">${esc(sourceLabel(b.source))}${b.connection && b.connection.googleEmail ? " · " + esc(b.connection.googleEmail) : ""}</span>` },
+        { key: "rating", label: "Rating", r: true, v: (b) => (b.rating ? b.rating.toFixed(1) + "★" : "–") },
+        { key: "googleReviews", label: "Reviews", r: true, v: (b) => `${fmt(b.googleReviews)}<span class="sub">${fmt(b.synced)} synced</span>` },
+        { key: "syncStatus", label: "Sync", v: (b) => syncBadge(b.connection && b.connection.status !== "ok" ? b.connection.status : b.syncStatus) + (b.syncError ? `<span class="sub">${esc(b.syncError.slice(0, 70))}</span>` : "") },
+        { key: "lastSyncedAt", label: "Last synced", v: (b) => (b.lastSyncedAt ? ago(b.lastSyncedAt) : "–") },
+      ] }) })}
+      ${sec("Widgets")}
+      ${card({ flush: true, body: table({ rows: d.widgets, page: 0, empty: "No widget.", cols: [
+        { key: "name", label: "Widget", v: (w) => `${esc(w.name)}<span class="sub">${esc(layoutName(w.layout))}${w.locations > 1 ? " · " + plural(w.locations, "location") : ""}${w.paused ? " · paused" : ""}</span>` },
+        { key: "views30d", label: "Views · 30d", r: true, v: (w) => fmt(w.views30d) },
+        { key: "pages", label: "Pages", sort: false, v: (w) => (w.pages.length ? w.pages.map((pg) => `${esc(pg.title || pg.path)} <span class="muted">${pg.lastSeenAt ? "· seen " + ago(pg.lastSeenAt) : "· not seen live"}</span>`).join("<br>") : `<span class="muted">not placed</span>`) },
+      ] }) })}
+      ${sec("History")}
+      ${card({ flush: true, body: table({ rows: d.events, page: 0, sort: { key: "createdAt", dir: "desc" }, empty: "No event recorded.", cols: [
+        { key: "createdAt", label: "When", v: (e) => dt(e.createdAt) },
+        { key: "kind", label: "Event", v: (e) => eventBadge(e.kind) },
+        { key: "plan", label: "Plan", v: (e) => (e.plan ? esc(cap(e.plan)) + (e.cycle ? ` <span class="muted">${esc(cycleLabel(e.cycle))}</span>` : "") : "–") },
+        { key: "detail", label: "Detail", sort: false, v: eventDetail },
+      ] }) })}
+    </div>`;
+  mount(dw);
+  bindClose();
+  const rb = dw.querySelector("[data-wsrefresh]");
+  if (rb) rb.onclick = async () => {
+    const r = await act(rb, () => send(B + "/sites/" + id + "/refresh", "POST"), (x) => x.message || "Refreshed");
+    if (r && siteFor === id) { siteFor = null; syncSite(id); if (cur && cur.page === "reviews-wix") rerender(); }
+  };
+}
+
 /* ── Google Reviews Live (component) ───────────────────────────────────────────
    A component is a file, not a service: paid for once through a Stripe Payment
    Link, downloaded, and never seen by our backend again. Stripe is the whole
@@ -4018,6 +4747,8 @@ const PAGES = {
   instagram: { title: "Instagram", render: pageInstagram, tabs: IG_TABS },
   bouncer: { title: "Bouncer", render: pageBouncer, tabs: GEO_TABS },
   router: { title: "Router", render: pageRouter, tabs: GEO_TABS },
+  "reviews-webflow": { title: "Reviews for Webflow", render: pageReviewsWebflow, tabs: RWF_TABS },
+  "reviews-wix": { title: "Google Reviews 2027", render: pageWix, tabs: WX_TABS },
   "google-reviews-live": { title: "Google Reviews Live", render: pageComponent },
   website: { title: "Website", render: pageWebsite },
   ranks: { title: "Marketplace ranks", render: pageRanks },
