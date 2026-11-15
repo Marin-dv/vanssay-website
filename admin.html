@@ -809,6 +809,10 @@ const scopeLabel = () => (SCOPE === "all" ? "All platforms" : PLAT[SCOPE].label)
 // Stack order for money charts. A byProduct key that is none of these (a
 // product the admin no longer shows) is summed into "Other" so totals add up.
 const SALES_SERIES = PRODUCTS.map((p) => ({ key: p.key, label: p.label, c: p.c })).concat([{ key: COMPONENT.key, label: COMPONENT.label, c: COMPONENT.c }]);
+// The same money under two names in /admin/sales byProduct: an invoiced component sale
+// carries its invoice's product (the slug), an older one folded in from Stripe "component:<slug>".
+const SALES_ALIASES = { [COMPONENT.key]: [COMPONENT.slug] };
+const salesOf = (row, key) => ((row.byProduct || {})[key] || 0) + sum(SALES_ALIASES[key] || [], (k) => (row.byProduct || {})[k] || 0);
 
 /* ── Small helpers ── */
 const $ = (id) => document.getElementById(id);
@@ -2592,9 +2596,9 @@ function salesSeries(d) {
     });
     gran = "week";
   }
-  const known = new Set(SALES_SERIES.map((s) => s.key));
+  const known = new Set(SALES_SERIES.flatMap((s) => [s.key, ...(SALES_ALIASES[s.key] || [])]));
   const keep = SCOPE === "all" ? null : new Set(scopedSalesKeys());
-  const series = SALES_SERIES.filter((s) => (!keep || keep.has(s.key)) && rows.some((r) => r.byProduct[s.key])).map((s) => ({ id: s.key, label: s.label, c: s.c, values: rows.map((r) => r.byProduct[s.key] || 0) }));
+  const series = SALES_SERIES.filter((s) => (!keep || keep.has(s.key)) && rows.some((r) => salesOf(r, s.key))).map((s) => ({ id: s.key, label: s.label, c: s.c, values: rows.map((r) => salesOf(r, s.key)) }));
   const other = rows.map((r) => sum(Object.entries(r.byProduct).filter(([k]) => !known.has(k)), ([, c]) => c));
   if (!keep && other.some(Boolean)) series.push({ id: "other", label: "Other", c: "--c-other", values: other });
   return { keys: rows.map((r) => r.key), gran, rows, series };
@@ -2638,7 +2642,7 @@ function monthPace(s62) {
    reaches Stripe: it shows as estimated MRR only. Instagram is one product on
    several platforms; its money cannot be split by platform and counts in each. */
 const scopedSalesKeys = () => scopedProducts().map((p) => p.key).concat(componentInScope() ? [COMPONENT.key] : []);
-const scopedCents = (row) => (SCOPE === "all" ? row.cents : sum(scopedSalesKeys(), (k) => (row.byProduct || {})[k] || 0));
+const scopedCents = (row) => (SCOPE === "all" ? row.cents : sum(scopedSalesKeys(), (k) => salesOf(row, k)));
 const lastMonths = (n) => { const out = [], d = new Date(); for (let i = n - 1; i >= 0; i--) out.push(new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - i, 1)).toISOString().slice(0, 7)); return out; };
 // New sign-ups per month for the scope: Vanssay accounts (by the platform they signed up on) plus Wix installs.
 function scopeSignups(rs, users) {
@@ -2662,6 +2666,98 @@ function scopeSignups(rs, users) {
     total += wb.raw.installs.live; installs = wb.raw.installs.newThisMonth;
   }
   return { months, values: months.map((m) => counts.get(m)), newThisMonth: counts.get(mk), lastMonth: counts.get(lm), total, accounts, installs, hasWix: !!wb };
+}
+
+/* Shared products (Instagram: Framer, Webflow, web app) have one Stripe account and
+   one plan list. Their money goes to the platform each payer signed up on: live
+   subscriptions for MRR and plans, invoices (matched by email) for cash. The other
+   platforms get exactly what traces to them; the product's first platform keeps
+   the rest, so the parts always add up to the product's total and nothing that
+   can't be traced leaves the platform it started on. */
+const SHARED = PRODUCTS.filter((p) => p.billing === "accounts" && p.platforms.length > 1);
+let splitP = null, splitAt = 0;
+function loadSplit() {
+  if (!SHARED.length) return Promise.resolve(null);
+  if (splitP && Date.now() - splitAt < TTL) return splitP;
+  splitAt = Date.now();
+  splitP = Promise.all([
+    get("/admin/users?pageSize=1000"), get("/admin/invoices?limit=500"),
+    Promise.all(SHARED.map((p) => acct("/subscriptions", p.key))),
+  ]).then(([u, inv, subs]) => buildSplit(u.users || [], inv.invoices || [], subs), (e) => { console.warn("Platform split unavailable:", e.message); splitP = null; return null; });
+  return splitP;
+}
+function buildSplit(users, invoices, subsList) {
+  const platOf = new Map(users.map((u) => [String(u.email || "").toLowerCase(), u.platform || "framer"]));
+  const accountsOn = {};
+  users.forEach((u) => { const k = u.platform || "framer"; accountsOn[k] = (accountsOn[k] || 0) + 1; });
+  const products = {};
+  SHARED.forEach((p, i) => {
+    const home = p.platforms[0];
+    const where = (email) => { const k = platOf.get(String(email || "").toLowerCase()); return k && p.platforms.includes(k) ? k : home; };
+    const per = {};
+    p.platforms.forEach((k) => { per[k] = { mrr: 0, starter: 0, pro: 0, ultra: 0, lifetime: 0, gifted: 0, days: {}, months: {}, cash: 0 }; });
+    for (const s of (subsList[i] && subsList[i].subscriptions) || []) {
+      const o = per[where(s.email)];
+      if (s.live) o.mrr += s.monthlyValue || 0;
+      if (s.status !== "active" && s.status !== "trialing") continue;
+      if (s.lifetime) o.lifetime++;
+      else if (s.gift) o.gifted++;
+      else if (o[s.plan] !== undefined) o[s.plan]++;
+    }
+    for (const x of invoices) {
+      if (x.product !== p.key || !x.supplyDate) continue;
+      const o = per[where(x.buyerEmail)], d = String(x.supplyDate).slice(0, 10), m = d.slice(0, 7);
+      o.days[d] = (o.days[d] || 0) + x.amountCents; o.months[m] = (o.months[m] || 0) + x.amountCents; o.cash += x.amountCents;
+    }
+    products[p.key] = { home, per, where };
+  });
+  return { accountsOn, products };
+}
+// A product's bill on one platform. Not shared, no split, or "all": the bill itself.
+function billOn(p, bill, pf, split) {
+  const sp = split && bill && split.products[p.key];
+  if (!sp || !pf || pf === "all") return bill;
+  const avgLife = bill.revenue.lifetimeCount ? bill.revenue.lifetimeRevenue / bill.revenue.lifetimeCount : 0;
+  // What traces to platform k. Free = that platform's accounts not paying for the product.
+  const part = (k) => {
+    const o = sp.per[k], paid = o.starter + o.pro + o.ultra + o.lifetime;
+    return { mrr: o.mrr, starter: o.starter, pro: o.pro, ultra: o.ultra, lifetime: o.lifetime, gifted: o.gifted, paid,
+      free: Math.max(0, (split.accountsOn[k] || 0) - paid), lifetimeRevenue: o.lifetime * avgLife, lifetimeCount: o.lifetime };
+  };
+  let v;
+  if (pf !== sp.home) v = { ...part(pf), addOnRevenue: 0, addOnCount: 0 };
+  else {
+    // The first platform keeps whatever the others can't claim.
+    const o = p.platforms.filter((k) => k !== sp.home).map(part);
+    const minus = (k, total) => Math.max(0, total - sum(o, (x) => x[k]));
+    v = { mrr: minus("mrr", bill.revenue.mrr), starter: minus("starter", bill.plans.starter), pro: minus("pro", bill.plans.pro), ultra: minus("ultra", bill.plans.ultra),
+      lifetime: minus("lifetime", bill.plans.lifetime || 0), gifted: minus("gifted", bill.plans.gifted || 0), paid: minus("paid", bill.plans.paid), free: minus("free", bill.plans.free),
+      lifetimeRevenue: minus("lifetimeRevenue", bill.revenue.lifetimeRevenue || 0), lifetimeCount: minus("lifetimeCount", bill.revenue.lifetimeCount || 0),
+      addOnRevenue: bill.revenue.addOnRevenue || 0, addOnCount: bill.revenue.addOnCount || 0 };
+  }
+  return { ...bill, split: pf,
+    revenue: { ...bill.revenue, mrr: Math.round(v.mrr * 100) / 100, arr: Math.round(v.mrr * 1200) / 100, lifetimeRevenue: v.lifetimeRevenue, lifetimeCount: v.lifetimeCount, addOnRevenue: v.addOnRevenue, addOnCount: v.addOnCount },
+    plans: { ...bill.plans, free: v.free, starter: v.starter, pro: v.pro, ultra: v.ultra, lifetime: v.lifetime, gifted: v.gifted, paid: v.paid } };
+}
+// /admin/sales for the scope: a shared product's cash in each bucket is what traces to
+// this platform (or, on its first platform, the bucket minus what traces elsewhere).
+// Returns a copy: the cached answer is never changed.
+function scopeSales(d, split) {
+  if (!d || SCOPE === "all" || !split) return d;
+  const parts = SHARED.filter(inScope).map((p) => [p, split.products[p.key]]).filter(([, sp]) => sp);
+  if (!parts.length) return d;
+  const cashOn = (o, key) => (key.length === 7 ? o.months[key] : o.days[key]) || 0;
+  const series = d.series.map((r) => {
+    const byProduct = { ...r.byProduct };
+    for (const [p, sp] of parts) {
+      const orig = byProduct[p.key] || 0;
+      byProduct[p.key] = SCOPE === sp.home
+        ? Math.max(0, orig - sum(p.platforms.filter((k) => k !== sp.home), (k) => cashOn(sp.per[k], r.key)))
+        : Math.min(orig, cashOn(sp.per[SCOPE], r.key));
+    }
+    return { ...r, byProduct };
+  });
+  return { ...d, series };
 }
 
 /* ── Home ──────────────────────────────────────────────────────────────────── */
@@ -2688,10 +2784,12 @@ async function pageHome(ctx) {
   const ovP = overviews(), domP = domainOverviews(), cmpP = componentsData();
   const s62P = get("/admin/sales?days=62");
   const usersP = !all && scopedAcct().length ? get("/admin/users?pageSize=1000").then((x) => x.users || [], () => []) : Promise.resolve(null);
+  const splitP = loadSplit();
 
   region(ctx, "h-kpis", async () => {
-    const [rs, cmp, s62, users] = await Promise.all([ovP, cmpP, s62P.then((x) => x, () => null), usersP]);
-    const bills = scopedProducts().map((p) => val(rs[PRODUCTS.indexOf(p)])).filter(Boolean);
+    const [rs, cmp, s62raw, users, split] = await Promise.all([ovP, cmpP, s62P.then((x) => x, () => null), usersP, splitP]);
+    const s62 = scopeSales(s62raw, split);
+    const bills = scopedProducts().map((p) => billOn(p, val(rs[PRODUCTS.indexOf(p)]), SCOPE, split)).filter(Boolean);
     if (!bills.length) throw new Error("No billing service answered: " + why(rs[0]));
     const est = bills.some((b) => b.estimated && b.revenue.mrr > 0);
     // On one platform: paying ÷ everyone with a plan row in its plugins (a shared plugin's
@@ -2729,7 +2827,8 @@ async function pageHome(ctx) {
       return chart({ keys, gran: "day", height: 286, integer: true, empty: "No install in the last 30 days.",
         series: [{ id: "in", label: "Installs", c: "--c-rwx", values: keys.map((k) => (by.get(k) || {}).installs || 0) }, { id: "out", label: "Removals", c: "--c-other", values: keys.map((k) => (by.get(k) || {}).removals || 0) }] });
     }
-    const s62 = await s62P;
+    const [s62raw, split] = await Promise.all([s62P, splitP]);
+    const s62 = scopeSales(s62raw, split);
     const last = { ...s62, series: s62.series.slice(-30), granularity: "day" };
     const ss = salesSeries(last);
     const pace = monthPace(s62);
@@ -2763,34 +2862,37 @@ async function pageHome(ctx) {
   };
 
   region(ctx, "h-prods", async () => {
-    const [rs, ds, cmp] = await Promise.all([ovP, domP, cmpP]);
+    const [rs, ds, cmp, split] = await Promise.all([ovP, domP, cmpP, splitP]);
     const bills = {}, doms = {};
     PRODUCTS.forEach((p, i) => { bills[p.key] = val(rs[i]); doms[p.key] = val(ds[i]); });
     const c = cmp && (cmp.components || []).find((x) => x.slug === COMPONENT.slug);
-    // Every platform: one card each, listing its products and what they bring in. Shared
-    // products (Instagram) appear on each of their platforms, so the cards don't add up.
+    // Every platform: one card each, listing its products and what they bring in there.
+    // A shared product (Instagram) shows on each platform only what its payers there bring.
     if (all) {
       return livePlatforms().map((pl) => {
         const ps = productsOn(pl.key);
+        const on = (p) => billOn(p, bills[p.key], pl.key, split);
         const lines = ps.map((p) => {
-          const b = bills[p.key];
+          const b = on(p);
           const shared = p.platforms.length > 1;
-          return `<a class="pl-r" href="#/${p.route}"><span class="pc${b && b.plans.paid ? " paid" : ""}" style="--c:var(${p.c})"><i></i>${esc(p.label)}</span>${shared ? `<small class="muted" title="Sold on ${esc(p.platforms.map((k) => PLAT[k].label).join(", "))}: its money can't be split by platform">shared</small>` : ""}
+          return `<a class="pl-r" href="#/${p.route}"${shared ? ` title="Also sold on ${esc(p.platforms.filter((k) => k !== pl.key).map((k) => PLAT[k].label).join(", "))}. ${b && b.split ? "Only what payers who signed up on " + esc(pl.label) + " bring." : "Could not be split by platform: the product's total."}"` : ""}><span class="pc${b && b.plans.paid ? " paid" : ""}" style="--c:var(${p.c})"><i></i>${esc(p.label)}</span>${shared && !(b && b.split) ? `<small class="muted">all platforms</small>` : ""}
             <span class="v">${b ? mrrLabel(b) : "–"}<small>/mo</small></span></a>`;
         });
         if (pl.key === "framer") lines.push(`<a class="pl-r" href="#/${COMPONENT.route}"><span class="pc" style="--c:var(${COMPONENT.c})"><i></i>${esc(COMPONENT.label)}</span><span class="v">${c && !c.unavailable ? moneyCents(c.revenueCents) : "–"}<small>one-time</small></span></a>`);
-        const paying = sum(ps, (p) => (bills[p.key] ? bills[p.key].plans.paid : 0));
+        const paying = sum(ps, (p) => (on(p) ? on(p).plans.paid : 0));
         return card({ cls: "plcard", style: `--c:var(${pl.c})`, title: `<span class="row" style="gap:9px">${platMark(pl)}${esc(pl.label)}</span>`,
           act: `<button type="button" class="btn xs" data-scope="${pl.key}">Open${icon("right")}</button>`,
           body: (lines.join("") || empty("Nothing on this platform yet.")) + `<div class="kv" style="margin-top:4px"><span>Paying</span><span>${fmt(paying)}</span></div>` });
       }).join("");
     }
     const cards = scopedProducts().map((p) => {
-      const b = bills[p.key], d = doms[p.key];
+      const b = billOn(p, bills[p.key], SCOPE, split), d = doms[p.key];
       const oneTime = b ? (b.revenue.lifetimeRevenue || 0) + (b.revenue.addOnRevenue || 0) : 0;
+      const shared = p.platforms.length > 1;
       return `<a class="card pcard" href="#/${p.route}" style="--c:var(${p.c})">
         <div class="pt"><span class="pi">${icon(p.icon)}</span>${esc(p.label)}${icon("arrow")}</div>
-        <div class="big">${b ? money(b.revenue.mrr) : "–"}<small>${b && b.estimated ? "MRR est." : "MRR"}</small>${oneTime ? `<small style="margin-left:10px">+ ${money(oneTime)} one-time</small>` : ""}${p.platforms.length > 1 ? `<small style="margin-left:10px" title="Every platform together">all platforms</small>` : ""}</div>
+        <div class="big">${b ? money(b.revenue.mrr) : "–"}<small>${b && b.estimated ? "MRR est." : "MRR"}</small>${oneTime ? `<small style="margin-left:10px">+ ${money(oneTime)} one-time</small>` : ""}</div>
+        ${shared ? `<p class="note" style="margin:-2px 0 4px">${b && b.split ? `Money from payers who signed up on ${esc(PLAT[SCOPE].label)}; usage below counts every platform.` : "Every platform together."}</p>` : ""}
         ${b ? kv(b.wix ? "Paying sites" : "Paying", `${fmt(b.plans.paid)} <span class="muted">· ${esc(planBreakdown(b.plans, p.key))}</span>`) : kv("Billing", "unavailable")}
         ${(rows[p.key] || (() => []))(b, b && b.wix ? b.raw : d).map(([k, v]) => kv(k, v)).join("")}</a>`;
     });
@@ -2813,8 +2915,8 @@ async function pageHome(ctx) {
   });
 
   region(ctx, "h-mix", async () => {
-    const rs = await ovP;
-    const bills = {}; PRODUCTS.forEach((p, i) => { bills[p.key] = val(rs[i]); });
+    const [rs, split] = await Promise.all([ovP, splitP]);
+    const bills = {}; PRODUCTS.forEach((p, i) => { bills[p.key] = billOn(p, val(rs[i]), SCOPE, split); });
     const ps = scopedProducts().filter((p) => bills[p.key]);
     const mrr = sum(ps, (p) => bills[p.key].revenue.mrr);
     const any = acctBill(rs), src = (any && any.sources) || {};
@@ -2918,10 +3020,11 @@ async function pageUsers(ctx) {
 /* ── Revenue ───────────────────────────────────────────────────────────────── */
 async function pageRevenue(ctx) {
   const range = ["30", "90", "12m", "all"].includes(ctx.r.q.get("range")) ? ctx.r.q.get("range") : "all";
-  const [d, s62, rs, cmp, sAll] = await Promise.all([get(salesPath(range)), get("/admin/sales?days=62").then((x) => x, () => null), overviews(), componentsData(), get(salesPath("all")).then((x) => x, () => null)]);
+  const [d0, s620, rs, cmp, sAll0, split] = await Promise.all([get(salesPath(range)), get("/admin/sales?days=62").then((x) => x, () => null), overviews(), componentsData(), get(salesPath("all")).then((x) => x, () => null), loadSplit()]);
   if (!ctx.live()) return;
+  const d = scopeSales(d0, split), s62 = scopeSales(s620, split), sAll = scopeSales(sAll0, split);
   const all = SCOPE === "all";
-  const bills = {}; PRODUCTS.forEach((p, i) => { bills[p.key] = val(rs[i]); });
+  const bills = {}; PRODUCTS.forEach((p, i) => { bills[p.key] = billOn(p, val(rs[i]), SCOPE, split); });
   const ok = scopedProducts().filter((p) => bills[p.key]);
   const mrr = sum(ok, (p) => bills[p.key].revenue.mrr);
   const est = ok.some((p) => bills[p.key].estimated && bills[p.key].revenue.mrr > 0);
@@ -2970,15 +3073,18 @@ async function pageSubscriptions(ctx) {
   const scope = q.get("show") === "all" ? "all" : "live";
   const list = prod === "all" ? SP : prod === WX.key ? [] : [PROD[prod]];
   const withWix = wixIn && (prod === "all" || prod === WX.key);
-  const [rs, users, wixR] = await Promise.all([
+  const [rs, users, wixR, split] = await Promise.all([
     Promise.allSettled(list.map((p) => acct("/subscriptions", p.key))),
     SP.length ? get("/admin/users?pageSize=1000").then((x) => x.users, () => []) : Promise.resolve([]),
     withWix ? get(WX.base + "/admin/sites").then((x) => x, (e) => ({ error: e })) : Promise.resolve(null),
+    SCOPE !== "all" ? loadSplit() : Promise.resolve(null),
   ]);
   if (!ctx.live()) return;
   const idOf = new Map(users.map((u) => [u.email, u.id]));
   const all = [];
-  list.forEach((p, i) => { const d = val(rs[i]); if (d) d.subscriptions.forEach((s) => all.push({ ...s, product: p })); });
+  // A shared product on one platform: only the subscriptions whose payer signed up there.
+  const here = (p, s) => { const sp = split && split.products[p.key]; return !sp || sp.where(s.email) === SCOPE; };
+  list.forEach((p, i) => { const d = val(rs[i]); if (d) d.subscriptions.forEach((s) => { if (here(p, s)) all.push({ ...s, product: p }); }); });
   // Wix Billing has no subscription record of ours: each paying site is one, live or (removed) canceled.
   if (wixR && wixR.sites) wixR.sites.filter((s) => ["starter", "pro", "business"].includes(s.plan)).forEach((s) => all.push({
     wix: true, instanceId: s.instanceId, email: s.ownerEmail || s.siteName || s.instanceId, siteName: s.siteName, product: WX,
