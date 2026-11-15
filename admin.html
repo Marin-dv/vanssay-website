@@ -671,6 +671,8 @@
     .toast svg { width:16px; height:16px; flex:none; }
     .toast.ok svg { color:#4cc75e; } .toast.err svg { color:#f27272; }
     .toast.out { animation:toastout .2s ease forwards; }
+    .toast.upd { gap:12px; } .toast.upd svg { color:var(--accent-2); }
+    .toast.upd button { font-weight:650; color:#fff; background:var(--accent); border-radius:7px; padding:5px 10px; }
     @keyframes toastin { from { transform:translateY(10px); opacity:0; } }
     @keyframes toastout { to { transform:translateY(6px); opacity:0; } }
 
@@ -2496,6 +2498,29 @@ async function renderDrawer(id, prefer, keep) {
   show(drawerTab);
 }
 
+/* ── A newer admin is online ──────────────────────────────────────────────────
+   The Home Screen app keeps the page it first opened (iOS keeps it alive for
+   days, GitHub Pages caches it 10 minutes), so a deploy could go unseen. On
+   start, every 10 minutes and whenever the app comes back to the foreground,
+   the page is fetched fresh and its script compared with the one running; if
+   it changed, a lasting toast offers to reload. */
+const RUNNING_SCRIPT = (() => { const s = [...document.scripts].filter((x) => !x.src).pop(); return s ? s.textContent.replace(/\r\n/g, "\n").trim() : ""; })();
+let updateOffered = false;
+async function checkForUpdate() {
+  if (updateOffered || !RUNNING_SCRIPT) return;
+  try {
+    const html = await fetch("/admin.html?v=" + Date.now(), { cache: "no-store" }).then((r) => (r.ok ? r.text() : ""));
+    const m = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].pop();
+    if (!m || m[1].replace(/\r\n/g, "\n").trim() === RUNNING_SCRIPT) return;
+    updateOffered = true;
+    const el = document.createElement("div");
+    el.className = "toast upd"; el.setAttribute("role", "status");
+    el.innerHTML = `${icon("refresh")}<span>A new version of the admin is online.</span><button type="button">Reload</button>`;
+    el.querySelector("button").onclick = () => location.reload();
+    $("toasts").append(el);
+  } catch (e) { /* offline: the next check will tell */ }
+}
+
 /* ── Sign-in and boot ── */
 function showGate(msg) {
   $("app").hidden = true; $("gate").hidden = false;
@@ -2541,6 +2566,9 @@ async function boot() {
       $("main").addEventListener("scroll", closePop, { passive: true });
       $("main").addEventListener("click", (e) => { if ($("app").classList.contains("side-open") && !e.target.closest("#menu-btn")) $("app").classList.remove("side-open"); });
       setInterval(() => loadAttention(), 5 * 60 * 1000);
+      setTimeout(checkForUpdate, 5000);
+      setInterval(checkForUpdate, 10 * 60 * 1000);
+      document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkForUpdate(); });
     }
     cur = null; route();
     loadAttention();
