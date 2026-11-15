@@ -4759,7 +4759,7 @@ async function pageSystem(ctx) {
   paint(ctx, `${pageHead({ title: "System", sub: "Live backend health, on-demand checks against the real services, and onboarding failures that used to leave no trace." })}
     ${sec("Router · live load", { sub: `<span id="live-at">${rd ? "updated " + clock() : ""}</span>`, act: `<span class="sdot ${level === "ok" ? "" : level}" id="live-dot"></span><button class="btn xs ghost" id="live-toggle">${icon(LIVE.paused ? "play" : "pause")}${LIVE.paused ? "Resume" : "Pause"}</button>` })}
     <div id="live">${rd ? routerLive(rd) : card({ body: unavailable("Router health", rs[0]) })}</div>
-    ${sec("Outage alerts", { sub: "a notification on this device when scraping breaks" })}
+    ${sec("Notifications", { sub: "sales, new people and outages, pushed to your phone" })}
     ${card({ title: "Push notifications", id: "push-card", body: `<div id="push-out" class="note">Checking…</div><div id="push-kinds" style="margin-top:16px"></div>`,
       info: "<p><b>Sales</b>: every payment Stripe invoices (new subscription, plan change, Lifetime, extra feed, component) and every Wix plan bought, at list price. <b>Renewals</b>: a subscription charged again. <b>New accounts</b> and <b>new Wix installs</b>: one each. <b>Outages</b>: Apify rejecting our token, 3 scrapes failing within 30 minutes, or a sibling backend's alert; at most one per hour for the same problem.</p><p>The switches apply to every device. Each kind is capped at 30 an hour. On an iPhone this only works from the app added to the Home Screen (iOS 16.4 or later).</p>" })}
     ${sec("On-demand checks", { sub: "real calls: press them, don't poll them" })}
