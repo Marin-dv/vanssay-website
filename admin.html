@@ -3993,7 +3993,12 @@ async function pageReviewsWebflow(ctx) {
    tables (webhooks, Get App Instance, widgets, views, Aria calls). What Wix keeps
    to itself (listing views, App Market search, payouts) stays in its dashboard.
    Money is at list price: Wix never says what a site actually paid. */
-const WX_TABS = [["overview", "Overview"], ["sites", "Sites"], ["businesses", "Businesses"], ["widgets", "Widgets"], ["aria", "Aria"], ["events", "Events"]];
+const WX_TABS = [["overview", "Overview"], ["sites", "Sites"], ["businesses", "Businesses"], ["widgets", "Widgets"], ["reviews", "Reviews"], ["aria", "Aria"], ["events", "Events"]];
+const WIX_LISTING = "https://www.wix.com/app-market/vanssay-google-reviews-vanssay";
+const stars = (n) => `<span style="color:#f5a623;letter-spacing:1px" aria-label="${n} out of 5">${"★".repeat(n)}</span><span class="muted" style="letter-spacing:1px">${"★".repeat(Math.max(0, 5 - n))}</span>`;
+// Wix's own moderation: unpublished wins, then published; neither yet = waiting for Wix.
+const reviewState = (r) => (r.unpublishedAt ? "hidden" : r.publishedAt ? "public" : "pending");
+const REVIEW_STATE = { public: ["On the listing", "good"], pending: ["Waiting for Wix", "warn"], hidden: ["Unpublished by Wix", "crit"] };
 const WX_EVENT = { installed: ["Installed", ""], removed: ["Removed", "crit"], plan_purchased: ["Bought a plan", "good"], plan_changed: ["Changed plan", ""], plan_cancelled: ["Turned off renewal", "warn"], plan_converted: ["Trial to paid", "good"], plan_reactivated: ["Reactivated", "good"], plan_transferred: ["Plan transferred", ""], other: ["Other", ""] };
 const WX_LAYOUTS = { slider: "Slider", floatingbadge: "Floating badge", grid: "Grid", masonry: "Masonry", marquee: "Marquee", list: "List", ratingcard: "Rating card", badge: "Badge", ratingstrip: "Rating strip", floatingcard: "Floating card" };
 const WX_PROMPT = { not_asked: "Not asked yet", later: "Said “not now” once", done: "Done (left a review or said no twice)" };
@@ -4026,7 +4031,7 @@ function dayRange(n) { const out = []; for (let i = n - 1; i >= 0; i--) out.push
 async function pageWix(ctx) {
   const p = PROD["reviews-wix"], tab = ctx.r.tab, q = ctx.r.q, B = p.base + "/admin";
   const links = `<a class="btn sm" href="https://dev.wix.com/apps/${WIX_APP_ID}/home" target="_blank" rel="noopener">${icon("ext")}Wix app dashboard</a>
-    <a class="btn sm" href="https://www.wix.com/app-market/google-reviews-2027" target="_blank" rel="noopener">${icon("ext")}Listing</a>`;
+    <a class="btn sm" href="${WIX_LISTING}" target="_blank" rel="noopener">${icon("ext")}Listing</a>`;
   const head = (ctl) => productHead(p, "Google reviews for Wix sites, billed by Wix per site: installs, plans, Google connections, widgets, Aria and every Wix webhook.", WX_TABS, tab, ctl ?? links);
 
   if (tab === "overview") {
@@ -4089,7 +4094,7 @@ async function pageWix(ctx) {
         ] }) })}
       ${card({ title: "Read every site from Wix again", body: `<div class="row" style="justify-content:space-between;gap:16px;flex-wrap:wrap"><p class="note" style="max-width:62ch">Asks Wix for each live site's plan, billing cycle, renewal, owner, language and app version. Runs on its own whenever a site opens the app or a billing webhook arrives; use this after a change on Wix's side, or to fill sites installed before this page existed.</p>
         <button class="btn" data-wxrefresh>${icon("refresh")}Refresh every site</button></div>
-        <p class="note" style="margin-top:10px">Not available through any Wix API, so only in the <a href="https://dev.wix.com/apps/${WIX_APP_ID}/home" target="_blank" rel="noopener">Wix app dashboard</a>: listing views, App Market search, Wix's own install counts, payouts and App Market reviews.</p>` })}`);
+        <p class="note" style="margin-top:10px">Not available through any Wix API, so only in the <a href="https://dev.wix.com/apps/${WIX_APP_ID}/home" target="_blank" rel="noopener">Wix app dashboard</a>: listing views, App Market search, Wix's own install counts and payouts. App Market reviews are on the <a href="#/reviews-wix/reviews">Reviews</a> tab.</p>` })}`);
     const rb = pageEl(ctx).querySelector("[data-wxrefresh]");
     if (rb) rb.onclick = async () => { const r = await act(rb, () => send(B + "/refresh", "POST"), (x) => `Read ${plural(x.refreshed, "site")} from Wix${x.failed ? ` · ${fmt(x.failed)} did not answer` : ""}`); if (r) rerender(); };
     return;
@@ -4187,6 +4192,40 @@ async function pageWix(ctx) {
             { key: "updatedAt", label: "Edited", v: (x) => ago(x.updatedAt), csv: (x) => x.updatedAt },
           ] }) })}
       </div>`);
+    return;
+  }
+
+  if (tab === "reviews") {
+    const d = await get(B + "/app-reviews");
+    if (!ctx.live()) return;
+    const rv = d.reviews, pub = rv.filter((r) => reviewState(r) === "public");
+    const avg = pub.length ? sum(pub, (r) => r.rating) / pub.length : 0;
+    const unanswered = rv.filter((r) => !r.replies.length && reviewState(r) !== "hidden").length;
+    const reply = (r) => `<a class="btn sm" href="${esc(d.replyUrl)}" target="_blank" rel="noopener" title="Wix app dashboard › Reviews">${icon("ext")}${r.replies.length ? "Edit reply" : "Reply"}</a>`;
+    const refresh = `<button class="btn sm" data-rvfresh>${icon("refresh")}Fetch from Wix</button><a class="btn sm" href="${esc(d.replyUrl)}" target="_blank" rel="noopener">${icon("ext")}Reply in Wix</a>`;
+    paint(ctx, `${head(refresh + `<a class="btn sm" href="${WIX_LISTING}" target="_blank" rel="noopener">${icon("ext")}Listing</a>`)}
+      ${d.error ? `<div class="alerts">${alertBox("warning", "Wix did not answer", `${esc(d.error)}. The reviews are still in the <a href="${esc(d.replyUrl)}" target="_blank" rel="noopener">Wix app dashboard</a>.`)}</div>` : ""}
+      ${rv.some((r) => reviewState(r) === "hidden") ? `<div class="alerts">${alertBox("info", "Some reviews are unpublished by Wix", "Wix moderates App Market reviews and does not say why one is taken down. They stay listed here but are not on the listing and do not count in its rating.")}</div>` : ""}
+      ${kpis([
+        { label: "Rating on the listing", value: pub.length ? avg.toFixed(1) + "<small>★</small>" : "–", sub: plural(pub.length, "public review"), hero: true },
+        { label: "Reviews received", value: fmt(rv.length), sub: `${fmt(rv.filter((r) => reviewState(r) === "pending").length)} waiting · ${fmt(rv.filter((r) => reviewState(r) === "hidden").length)} unpublished` },
+        { label: "Not answered yet", value: fmt(unanswered), sub: "public or waiting, no reply" },
+        { label: "From our sites", value: fmt(rv.filter((r) => r.site).length), sub: "reviewer's site found in the Sites list" },
+      ])}
+      ${card({ title: "App Market reviews", sub: d.fetchedAt ? "read from Wix " + ago(d.fetchedAt) : "", flush: true,
+        info: "<p>Read from the public endpoint the App Market listing uses, every 10 minutes at most. Wix has no API to reply: “Reply” opens the Reviews page of the Wix app dashboard, where every review has its reply box.</p>",
+        body: table({ rows: rv, noun: "reviews", searchPh: "Search review, reviewer or site…", search: (r) => [r.title, r.text, r.author, r.site?.siteName, r.site?.siteUrl, ...r.replies.map((x) => x.text)].join(" "), sort: { key: "createdAt", dir: "desc" }, csv: "wix-app-reviews.csv",
+          empty: "No review on the App Market yet.",
+          cols: [
+            { key: "createdAt", label: "When", v: (r) => `${date(r.createdAt)}<span class="sub">${ago(r.createdAt)}</span>`, csv: (r) => r.createdAt },
+            { key: "rating", label: "Rating", v: (r) => stars(r.rating), csv: (r) => r.rating },
+            { key: "title", label: "Review", sort: false, v: (r) => `<strong>${esc(r.title || "(no title)")}</strong>${r.text ? `<span class="sub" style="white-space:normal;max-width:56ch">${esc(r.text)}</span>` : ""}${r.replies.map((x) => `<span class="sub" style="white-space:normal;max-width:56ch;border-left:2px solid var(--line);padding-left:8px;margin-top:6px">↳ <b>${esc(x.author || "Reply")}</b>${x.createdAt ? " · " + date(x.createdAt) : ""}: ${esc(x.text)}</span>`).join("")}`, csv: (r) => `${r.title} | ${r.text}` },
+            { key: "author", label: "Reviewer", v: (r) => `${esc(r.author || "–")}${r.site ? `<span class="sub"><a href="#" data-site="${esc(r.site.instanceId)}">${esc(r.site.siteName || "Unnamed site")}</a> · ${esc(cap(r.site.plan))}${r.site.removed ? " · removed" : ""}</span>` : `<span class="sub muted">site not in our list</span>`}`, csv: (r) => r.author || "" },
+            { key: "state", label: "Status", sort: (r) => reviewState(r), v: (r) => { const [l, t] = REVIEW_STATE[reviewState(r)]; return `<span class="bdg ${t}">${esc(l)}</span>${r.unpublishedAt ? `<span class="sub">${date(r.unpublishedAt)}</span>` : ""}${r.reported ? `<span class="sub">${plural(r.reported, "report")}</span>` : ""}`; }, csv: (r) => reviewState(r) },
+            { key: "replies", label: "Reply", sort: (r) => r.replies.length, v: reply, csv: (r) => (r.replies.length ? "replied" : "") },
+          ] }) })}`);
+    const fb = pageEl(ctx).querySelector("[data-rvfresh]");
+    if (fb) fb.onclick = async () => { const r = await act(fb, () => get(B + "/app-reviews?fresh=1", { fresh: true }), (x) => (x.error ? "Wix did not answer" : `Read ${plural(x.reviews.length, "review")} from Wix`)); if (r) { CACHE.delete(B + "/app-reviews"); rerender(); } };
     return;
   }
 
