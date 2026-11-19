@@ -3947,7 +3947,7 @@ const RWF_TABS = [["overview", "Overview"], ["users", "Accounts"]];
 async function pageReviewsWebflow(ctx) {
   const p = PROD["reviews-webflow"], tab = ctx.r.tab;
   const head = () => productHead(p, "The Reviews app on the Webflow Marketplace: Vanssay accounts, Stripe plans and Google Business Profile import.", RWF_TABS, tab,
-    `<a class="btn sm" href="https://webflow.vanssay.net/reviews/" target="_blank" rel="noopener">${icon("ext")}Web app</a>`);
+    `<a class="btn sm" href="https://app.vanssay.net/reviews/" target="_blank" rel="noopener">${icon("ext")}Web app</a>`);
   if (tab === "overview") {
     const rs = await Promise.allSettled([acct("/overview", p.key), get(p.base + "/admin/overview")]);
     if (!ctx.live()) return;

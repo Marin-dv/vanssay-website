@@ -47,10 +47,10 @@ footer a{color:#71717a}
 <nav><div class="nav-in"><a class="logo" href="/"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden="true"><path d="M6,4H15L27,36H18Z" fill="#0e7afe"/><path d="M34,4H25L13,36H22Z" fill="#7c5cff"/></svg>Vanssay</a><a href="/reviews/webflow/" style="font-size:14px;font-weight:600">Reviews for Webflow →</a></div></nav>
 <main>
   <h1>Reviews - Vanssay Terms of Service</h1>
-  <p class="date">For the Webflow App "Reviews - Vanssay". Last updated: November 7, 2026</p>
+  <p class="date">For the Webflow App "Reviews - Vanssay". Last updated: November 19, 2026</p>
 
   <div class="callout">
-    <p><b>The short version.</b> Reviews - Vanssay shows the Google reviews of a business you own or manage on your Webflow site. Your free Vanssay account is created from your Webflow sign-in. The Free plan works on your <code>*.webflow.io</code> address only. Paid plans add custom domains. Reviews refresh about once a day. The App adds one script to your site's footer through Webflow's Custom Code API and removes it when you ask, or when you uninstall.</p>
+    <p><b>The short version.</b> Reviews - Vanssay shows the Google reviews of a business you own or manage on your Webflow site. Your free Vanssay account is created from your Webflow sign-in. The Free plan works on your <code>*.webflow.io</code> address only. Paid plans add custom domains. Reviews refresh about once a day. When you place a widget on a page, the App adds one script to that page's footer through Webflow's Custom Code API, and removes it when you remove the widget, when you ask, or when you uninstall. Your Webflow site plan must allow custom code.</p>
   </div>
 
   <div class="toc">
@@ -71,7 +71,7 @@ footer a{color:#71717a}
   </div>
 
   <h2 id="s1">1. Who we are and what these terms cover</h2>
-  <p>These terms govern your use of <b>Reviews - Vanssay</b> (the "App"): the Webflow App and its Designer Extension, the Reviews web app at <code>webflow.vanssay.net/reviews</code>, the script the App adds to your published Webflow site, and the Vanssay servers behind them. The App is operated by <b>Marin de Vanssay</b>, sole trader (micro-entreprise), SIREN 107304735, France, contactable at <a href="mailto:support@vanssay.net">support@vanssay.net</a> ("we", "us").</p>
+  <p>These terms govern your use of <b>Reviews - Vanssay</b> (the "App"): the Webflow App and its Designer Extension, the Reviews web app at <code>app.vanssay.net/reviews</code>, the script the App adds to your published Webflow site, and the Vanssay servers behind them. The App is operated by <b>Marin de Vanssay</b>, sole trader (micro-entreprise), SIREN 107304735, France, contactable at <a href="mailto:support@vanssay.net">support@vanssay.net</a> ("we", "us").</p>
   <p>By installing the App you agree to these terms and to the <a href="/reviews/webflow/privacy/">Reviews - Vanssay Privacy Policy</a>. These two pages are the complete terms for the App.</p>
   <p>The App is an independent product. It is not affiliated with, endorsed by, or sponsored by Google LLC or Webflow, Inc. Google and Google Business Profile are trademarks of Google LLC.</p>
 
@@ -79,7 +79,7 @@ footer a{color:#71717a}
   <ul>
     <li>You connect a Google Business Profile you own or manage (by signing in with Google), or search a business (up to 5 public reviews). We import its reviews and you choose which show, in one of eight layouts (Grid, Slider, Masonry, Marquee, List, Rating card, Badge and Floating).</li>
     <li>With the Designer app, you place a widget block on a page. The Designer canvas does not run custom code, so the block shows a placeholder there.</li>
-    <li>The App adds one script to your site's footer (see §6). On your published site, that script shows the widget in place of the block.</li>
+    <li>Placing a widget adds the App's script to that page's footer, and only that page (see §6). On your published site, that script shows the widget in place of the block.</li>
     <li>Widgets are not real-time. They show the reviews we last retrieved from Google, refreshed about once every 24 hours.</li>
   </ul>
 
@@ -97,7 +97,7 @@ footer a{color:#71717a}
     <tr><td><b>Price</b></td><td>$0</td><td>$7.99 / month or $79.90 / year</td><td>$17.99 / month or $179.90 / year</td></tr>
     <tr><td><b>Where widgets show</b></td><td>Your <code>*.webflow.io</code> address only</td><td>Your <code>*.webflow.io</code> address and custom domains</td><td>Your <code>*.webflow.io</code> address and custom domains</td></tr>
     <tr><td><b>Google businesses</b></td><td>1</td><td>1</td><td>Up to 10</td></tr>
-    <tr><td><b>Widgets and views</b></td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
+    <tr><td><b>Widgets</b></td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
     <tr><td><b>"Google reviews by Vanssay" link</b></td><td>Shown</td><td>Not shown</td><td>Not shown</td></tr>
     <tr><td><b>Support</b></td><td>Email</td><td>Email</td><td>Priority email</td></tr>
   </table></div>
@@ -120,13 +120,13 @@ footer a{color:#71717a}
 
   <h2 id="s6">6. The code we add to your Webflow site</h2>
   <ul>
-    <li><b>What we add.</b> One script, registered with Webflow under the name <code>VanssayReviews</code> and applied to your <b>site-wide footer custom code</b>. It is loaded from <code>api.vanssay.net</code>, a fixed version with an integrity hash, so it cannot change once registered. It shows your widgets where you placed them and does nothing else on your pages. What it sends is described in the <a href="/reviews/webflow/privacy/#site">Privacy Policy, §5</a>.</li>
-    <li><b>How we add it.</b> Only through Webflow's official Custom Code API, only on the sites you authorize when you install the App, or when you add a site or turn the App back on. Your other custom code is left as it is. We never ask you to paste code by hand, and the App never publishes your site for you.</li>
-    <li><b>Updates.</b> A new version of the script is registered as a new version. We never change a registered version in place.</li>
-    <li><b>Removing it.</b> Use <b>Remove from this site</b> in the web app or the Designer app. This removes every version of our script from that site and leaves your other custom code untouched. Then publish your site.</li>
+    <li><b>What we add.</b> One script, registered with Webflow under the name <code>VanssayReviews</code> and applied to the <b>footer custom code of the pages where you placed a widget</b>, and only those pages. It is loaded from <code>api.vanssay.net</code>, a fixed version with an integrity hash, so it cannot change once registered. It shows your widgets where you placed them, inside their own container, and changes nothing else on your pages. What it sends is described in the <a href="/reviews/webflow/privacy/#site">Privacy Policy, §5</a>.</li>
+    <li><b>How we add it.</b> Only through Webflow's official Custom Code API, only on pages of sites you authorized, when you press Add to page in the Designer app or turn the App back on for a site. Installing the App adds nothing. Your other custom code is left as it is. We never ask you to paste code by hand, and the App never publishes your site for you.</li>
+    <li><b>Updates.</b> A new version of the script is a new file and a new registered version, which Webflow reviews and approves before we use it. We never change a registered version or what its address serves. After approval we put the new version on the pages that carry the old one; your live site changes only when you next publish.</li>
+    <li><b>Removing it.</b> <b>Remove from this page</b> in the Designer app deletes a widget's block and, with the page's last widget, our script from that page. <b>Remove from this site</b> in the web app or the Designer app removes every version of our script from every page of that site. Your other custom code stays untouched. Then publish your site.</li>
     <li><b>Uninstalling.</b> Uninstalling the App in Webflow ends our access, and Webflow removes the script the App added (live after your next publish). Two things stay in your Designer project for you to delete, because only you can edit your canvas: the widget blocks you placed, and the style named "Vanssay Reviews placeholder". Step-by-step instructions are in the <a href="/reviews/webflow/docs/#remove">documentation</a>.</li>
     <li><b>Your authorization.</b> Authorize only sites you own or are authorized to manage. The access token Webflow issues is stored encrypted and used only for the purposes above.</li>
-    <li><b>Custom code and your Webflow plan.</b> Whether Webflow runs custom code on your published site depends on your Webflow site and Workspace plan. That is set by Webflow, not by us.</li>
+    <li><b>Custom code and your Webflow plan.</b> Whether Webflow runs custom code on your published site depends on your Webflow site plan. That is set by Webflow, not by us, and no Vanssay plan (Free included) changes it.</li>
   </ul>
 
   <h2 id="s7">7. Acceptable use</h2>
