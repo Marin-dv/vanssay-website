@@ -4020,13 +4020,131 @@ const siteName = (s) => s.siteName || (s.status === "removed" || s.siteRemoved ?
 const siteCell = (s) => `<a href="#" data-site="${esc(s.instanceId)}"><strong>${esc(siteName(s))}</strong></a>${s.siteUrl
   ? `<span class="sub"><a class="mono" href="${esc(s.siteUrl)}" target="_blank" rel="noopener">${esc(hostOf(s.siteUrl).replace(/^www\./, ""))}</a></span>`
   : s.status === "removed" ? `<span class="sub">details deleted on removal</span>` : ""}`;
-const wixPlanCell = (s) => `${wixPlanBadge(s.plan)}${s.revenueExcluded && s.plan !== "free" ? ` <span class="bdg line" title="Own or comped site: not revenue, not a paying site">not paying</span>` : ""}${s.billingCycle ? `<span class="sub">${esc(cycleLabel(s.billingCycle))}${s.autoRenewing === false ? " · renewal off" : ""}</span>` : ""}`;
+const wixPlanCell = (s) => `${wixPlanBadge(s.plan)}${s.giftProUntil ? ` <span class="bdg pro" title="Early-user gift: free Pro until ${esc(date(s.giftProUntil))}">Pro gift</span>` : ""}${s.revenueExcluded && s.plan !== "free" ? ` <span class="bdg line" title="Own or comped site: not revenue, not a paying site">not paying</span>` : ""}${s.billingCycle ? `<span class="sub">${esc(cycleLabel(s.billingCycle))}${s.autoRenewing === false ? " · renewal off" : ""}</span>` : ""}`;
 const isPayingSite = (s) => ["starter", "pro", "business"].includes(s.plan) && !s.revenueExcluded;
 const liveBadge = (s) => (s.status === "removed" ? `<span class="bdg crit">removed</span>` : `<span class="bdg good">live</span>`);
 const syncBadge = (st) => `<span class="bdg ${st === "ok" ? "good" : st === "reconnect" ? "warn" : "crit"}">${esc(st === "ok" ? "syncing" : st === "reconnect" ? "sign in again" : st)}</span>`;
 const sourceLabel = (src) => (src === "gbp" ? "Business Profile" : "Google search");
 // Days with nothing recorded are missing from the answers: lay them out on a full calendar.
 function dayRange(n) { const out = []; for (let i = n - 1; i >= 0; i--) out.push(new Date(Date.now() - i * 86400000).toISOString().slice(0, 10)); return out; }
+
+/* Early-user gift campaign (Wix backend services/earlyGift.ts), on the Reviews tab: a free Pro
+   year by email to Free sites, a separate review request 5 days later that never mentions the
+   gift (Wix bans incentives for reviews), and a notice 3 weeks before a gift ends. Start, stop,
+   cap and follow it here. */
+const GIFT_STAGE = {
+  queued: ["In line for the gift", "pro"], too_new: ["Installed < 24h", ""], paying: ["Paying: no gift", ""], own_site: ["Own or comped", ""],
+  no_email: ["No owner email", ""], left_out: ["Left out", "warn"], unsubscribed: ["Unsubscribed", "crit"], removed: ["Removed the app", "crit"],
+  review_scheduled: ["Review email planned", "pro"], no_business: ["Review waits for a business", "warn"], review_due: ["Review email due", "pro"],
+  reviewed: ["Already reviewed", "good"], done: ["Both emails sent", "good"],
+};
+const giftStage = (s) => { const [l, t] = GIFT_STAGE[s.stage] || [s.stage, ""]; return `<span class="bdg ${t}">${esc(l)}</span>${s.nextAt ? `<span class="sub">${s.stage === "too_new" ? "from" : "on"} ${esc(dt(s.nextAt))}</span>` : ""}`; };
+const dash = `<span class="muted">–</span>`;
+
+function giftSection(g) {
+  if (!g || g.error) return `${sec("Early-user gift")}${card({ body: empty(`Campaign data unavailable${g && g.error ? ": " + esc(g.error) : ""}`, "alertc") })}`;
+  const s = g.settings, c = g.counts, rv = g.reviews, R = g.rules;
+  const ctl = `${s.running ? `<span class="bdg good">Running</span>` : `<span class="bdg line">Stopped</span>`}
+    <button class="btn sm" data-gtest title="The three emails, sent to your admin address">${icon("mail")}Send me a test</button>
+    ${s.running ? `<button class="btn sm danger" data-grun="0">${icon("pause")}Stop</button>` : `<button class="btn sm primary" data-grun="1">${icon("play")}Start</button>`}`;
+  const alerts = [
+    !g.mail.configured ? alertBox("critical", "Emails are not set up", "BREVO_API_KEY is missing from the Wix backend's .env: nothing can be sent until it is added.") : "",
+    s.lastError ? alertBox("warning", "The last run hit an error", `${s.lastError} (${ago(s.lastErrorAt)}). It tries again every ${R.tickMinutes} minutes.`) : "",
+    !s.running && s.stopReason ? alertBox("info", s.stopReason, `Stopped ${ago(s.stoppedAt)}. Links already sent keep working until they expire, and the notice before a gift ends still goes out.`) : "",
+  ].join("");
+  const rate = c.giftSent ? Math.round((c.claimed / c.giftSent) * 100) + "%" : "–";
+  const started = Boolean(s.firstStartedAt);
+  return `${sec("Early-user gift", { sub: "a free Pro year by email, then a separate review request", act: ctl })}
+    ${alerts ? `<div class="alerts">${alerts}</div>` : ""}
+    ${kpis([
+      { label: "Gift emails sent", value: fmt(c.giftSent), sub: `${fmt(c.queued)} in line · ${fmt(c.tooNew)} installed < 24h`, hero: true },
+      { label: "Gifts activated", value: fmt(c.claimed), sub: `${rate} of the emails · ${fmt(c.activeGifts)} on Pro now` },
+      { label: "Review emails sent", value: fmt(c.reviewSent), sub: `${fmt(c.reviewScheduled)} planned · ${fmt(c.reviewDue)} due · ${fmt(c.waitingForBusiness)} wait for a business` },
+      { label: "App Market reviews since start", value: started ? fmt(rv.sinceStart) + (rv.sinceStartAvg ? `<small>${rv.sinceStartAvg.toFixed(1)}★</small>` : "") : "–",
+        sub: rv.error ? "Wix did not answer" : started ? `${fmt(rv.fromRecipients)} from emailed sites${rv.fromRecipientsAvg ? ` (${rv.fromRecipientsAvg.toFixed(1)}★)` : ""}` : "not started yet" },
+    ])}
+    ${card({ title: "How it runs", cls: "mb",
+      info: "<p>Wix's review policy bans discounts, trials or gifts in exchange for reviews, so the gift asks for nothing and the review email never mentions it. Both go to every eligible site, whatever it thinks of the app.</p>",
+      body: `<ul class="note" style="margin:0 0 0 18px;padding:0;display:grid;gap:6px">
+          <li>Every ${R.tickMinutes} minutes, at most ${R.perTick} emails, from ${esc(g.mail.from)}. Replies go to ${esc(g.mail.replyTo)}.</li>
+          <li><b>Gift:</b> each Free site installed ${R.minInstallHours}h+ ago gets one email with a free Pro year, activated from a link that works ${R.claimDays} days. Paying, own and comped sites are skipped. Starting leaves out your own sites (your email or any @vanssay.net).</li>
+          <li><b>Review request:</b> ${R.reviewDelayDays} days later, activated or not. It waits until the site has a Google business and skips sites that already reviewed.</li>
+          <li><b>Ending notice:</b> ${R.endingNoticeDays} days before a gift ends, even while stopped.</li>
+        </ul>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px">
+          <label for="g-auto" class="note" style="margin:0">Stop on its own after</label>
+          <input class="in" id="g-auto" type="number" min="1" step="1" inputmode="numeric" style="width:96px" value="${s.autoStopAfterClaims ?? ""}" placeholder="never" />
+          <span class="note" style="margin:0">gifts activated</span>
+          <button class="btn sm" data-gauto>Save</button>
+        </div>
+        <p class="note" style="margin:12px 0 0">${s.running ? `Running since ${esc(dt(s.startedAt))}` : s.stoppedAt ? `Stopped ${ago(s.stoppedAt)}` : "Never started"}${s.lastRunAt ? ` · last run ${ago(s.lastRunAt)}` : ""}.</p>`,
+      foot: `<details class="fold" data-gprev style="margin:-10px -16px -12px"><summary style="border-top:0">${icon("right")}Preview the three emails</summary><div class="gprev" style="padding:12px 16px">${skel.card(200)}</div></details>` })}`;
+}
+
+function giftSites(g) {
+  if (!g || g.error) return "";
+  const rows = g.sites.filter((s) => s.status === "live" || s.giftEmailAt);
+  return card({ id: "g-sites", title: "Sites in the early-user gift", sub: plural(rows.length, "site"), flush: true,
+    info: "<p>Every live site, plus removed ones that got an email. “Leave out” stops all campaign emails to a site (and its review email if still pending). A site whose owner unsubscribed stays out.</p>",
+    body: table({ rows, noun: "sites", searchPh: "Search site or email…", search: (s) => [s.siteName, s.siteUrl, s.ownerEmail].join(" "), sort: { key: "installedAt", dir: "asc" }, csv: "wix-early-gift.csv", empty: "No site yet.",
+      cols: [
+        { key: "siteName", label: "Site", v: siteCell, csv: (s) => s.siteName || "" },
+        { key: "ownerEmail", label: "Owner", v: (s) => (s.ownerEmail ? `<span class="mono">${esc(s.ownerEmail)}</span>` : dash), csv: (s) => s.ownerEmail || "" },
+        { key: "installedAt", label: "Installed", v: (s) => `${date(s.installedAt)}<span class="sub">${ago(s.installedAt)}</span>`, csv: (s) => s.installedAt },
+        { key: "plan", label: "Plan", v: (s) => `${wixPlanBadge(s.plan)}${s.giftActive ? ` <span class="bdg pro">Pro gift</span><span class="sub">until ${esc(date(s.giftProUntil))}</span>` : ""}`, csv: (s) => s.plan + (s.giftActive ? " + gift" : "") },
+        { key: "stage", label: "Where it is", v: giftStage, csv: (s) => s.stage },
+        { key: "giftEmailAt", label: "Gift email", v: (s) => (s.giftEmailAt ? `${date(s.giftEmailAt)}<span class="sub">${s.giftClaimedAt ? "activated " + esc(date(s.giftClaimedAt)) : "not activated"}</span>` : dash), csv: (s) => s.giftEmailAt || "" },
+        { key: "reviewEmailAt", label: "Review email", v: (s) => (s.reviewEmailAt ? date(s.reviewEmailAt) : dash), csv: (s) => s.reviewEmailAt || "" },
+        { key: "review", label: "Their review", sort: (s) => (s.review ? s.review.rating : -1), v: (s) => (s.review ? `${stars(s.review.rating)}<span class="sub">${date(s.review.createdAt)}</span>` : dash), csv: (s) => (s.review ? s.review.rating : "") },
+        { key: "act", label: "", sort: false, csv: () => "",
+          v: (s) => (s.status !== "live" || s.emailOptOutBy === "owner" ? "" : `<button class="btn sm" data-gleave="${esc(s.instanceId)}" data-v="${s.emailOptOut ? 0 : 1}">${s.emailOptOut ? "Put back" : "Leave out"}</button>`) },
+      ] }) });
+}
+
+function bindGift(ctx, B, g) {
+  if (!g || g.error) return;
+  const root = pageEl(ctx), R = g.rules;
+  const run = root.querySelector("[data-grun]");
+  if (run) run.onclick = async () => {
+    const on = run.dataset.grun === "1";
+    if (on && !(await ask({ title: "Start the early-user gift?",
+      body: `${esc(plural(g.counts.queued, "Free site"))} in line get the gift email, at most ${R.perTick} every ${R.tickMinutes} minutes, starting now. Each gets a separate review request ${R.reviewDelayDays} days later. Your own sites are left out first. You can stop it at any time.`,
+      confirm: "Start" }))) return;
+    const r = await act(run, () => send(B + "/early-gift", "POST", { running: on }), (x) => (on
+      ? `Started${x.run ? `: ${plural(x.run.gifts, "gift email")} sent` : ""}${x.ownSitesLeftOut ? ` · ${plural(x.ownSitesLeftOut, "own site")} left out` : ""}${x.run && x.run.error ? ` · error: ${x.run.error}` : ""}`
+      : "Stopped: no new emails"));
+    if (r) rerender();
+  };
+  const tb = root.querySelector("[data-gtest]");
+  if (tb) tb.onclick = () => act(tb, () => send(B + "/early-gift/test", "POST"), (x) => `${x.sent} test emails sent to ${x.to}`);
+  const ab = root.querySelector("[data-gauto]");
+  if (ab) ab.onclick = async () => {
+    const v = root.querySelector("#g-auto").value.trim(), n = v === "" ? null : Number(v);
+    if (n !== null && (!Number.isInteger(n) || n < 1)) return toast("A whole number from 1, or empty for no automatic stop", "err");
+    const r = await act(ab, () => send(B + "/early-gift", "POST", { autoStopAfterClaims: n }), n ? `Stops on its own after ${plural(n, "gift")} activated` : "No automatic stop");
+    if (r) rerender();
+  };
+  const pv = root.querySelector("[data-gprev]");
+  if (pv) pv.addEventListener("toggle", async () => {
+    if (!pv.open || pv.dataset.loaded) return;
+    pv.dataset.loaded = "1";
+    const box = pv.querySelector(".gprev"), names = ["Gift (day 0)", `Review request (day ${R.reviewDelayDays})`, `Ending notice (${R.endingNoticeDays} days before the end)`];
+    try {
+      const all = await Promise.all(["gift", "review", "ending"].map((k) => get(B + "/early-gift/preview?kind=" + k, { quiet: true })));
+      box.innerHTML = all.map((m, i) => `<div style="margin:0 0 18px"><p class="note" style="margin:0 0 6px"><b>${esc(names[i])}</b> · subject: ${esc(m.subject)}</p>
+        <iframe title="${esc(m.subject)}" sandbox srcdoc="${esc(m.html)}" style="display:block;width:100%;height:470px;border:1px solid var(--line);border-radius:10px;background:#fff"></iframe></div>`).join("")
+        + `<p class="note" style="margin:0">Made up for the preview (“Sample Bakery”): its buttons lead nowhere.</p>`;
+    } catch (e) { box.innerHTML = empty("Preview unavailable: " + esc(e.message), "alertc"); }
+  });
+  const sites = root.querySelector("#g-sites");
+  if (sites) sites.addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-gleave]");
+    if (!b) return;
+    const leftOut = b.dataset.v === "1";
+    const r = await act(b, () => send(B + "/early-gift/sites/" + b.dataset.gleave, "POST", { leftOut }), leftOut ? "Left out of the campaign" : "Back in the campaign");
+    if (r) rerender();
+  });
+}
 
 async function pageWix(ctx) {
   const p = PROD["reviews-wix"], tab = ctx.r.tab, q = ctx.r.q, B = p.base + "/admin";
@@ -4196,7 +4314,7 @@ async function pageWix(ctx) {
   }
 
   if (tab === "reviews") {
-    const d = await get(B + "/app-reviews");
+    const [d, g] = await Promise.all([get(B + "/app-reviews"), get(B + "/early-gift").catch((e) => ({ error: e.message }))]);
     if (!ctx.live()) return;
     const rv = d.reviews, pub = rv.filter((r) => reviewState(r) === "public");
     const avg = pub.length ? sum(pub, (r) => r.rating) / pub.length : 0;
@@ -4212,6 +4330,7 @@ async function pageWix(ctx) {
         { label: "Not answered yet", value: fmt(unanswered), sub: "public or waiting, no reply" },
         { label: "From our sites", value: fmt(rv.filter((r) => r.site).length), sub: "reviewer's site found in the Sites list" },
       ])}
+      ${giftSection(g)}
       ${card({ title: "App Market reviews", sub: d.fetchedAt ? "read from Wix " + ago(d.fetchedAt) : "", flush: true,
         info: "<p>Read from the public endpoint the App Market listing uses, every 10 minutes at most. Wix has no API to reply: “Reply” opens the Reviews page of the Wix app dashboard, where every review has its reply box.</p>",
         body: table({ rows: rv, noun: "reviews", searchPh: "Search review, reviewer or site…", search: (r) => [r.title, r.text, r.author, r.site?.siteName, r.site?.siteUrl, ...r.replies.map((x) => x.text)].join(" "), sort: { key: "createdAt", dir: "desc" }, csv: "wix-app-reviews.csv",
@@ -4223,9 +4342,11 @@ async function pageWix(ctx) {
             { key: "author", label: "Reviewer", v: (r) => `${esc(r.author || "–")}${r.site ? `<span class="sub"><a href="#" data-site="${esc(r.site.instanceId)}">${esc(r.site.siteName || "Unnamed site")}</a> · ${esc(cap(r.site.plan))}${r.site.removed ? " · removed" : ""}</span>` : `<span class="sub muted">site not in our list</span>`}`, csv: (r) => r.author || "" },
             { key: "state", label: "Status", sort: (r) => reviewState(r), v: (r) => { const [l, t] = REVIEW_STATE[reviewState(r)]; return `<span class="bdg ${t}">${esc(l)}</span>${r.unpublishedAt ? `<span class="sub">${date(r.unpublishedAt)}</span>` : ""}${r.reported ? `<span class="sub">${plural(r.reported, "report")}</span>` : ""}`; }, csv: (r) => reviewState(r) },
             { key: "replies", label: "Reply", sort: (r) => r.replies.length, v: reply, csv: (r) => (r.replies.length ? "replied" : "") },
-          ] }) })}`);
+          ] }) })}
+      ${giftSites(g)}`);
     const fb = pageEl(ctx).querySelector("[data-rvfresh]");
-    if (fb) fb.onclick = async () => { const r = await act(fb, () => get(B + "/app-reviews?fresh=1", { fresh: true }), (x) => (x.error ? "Wix did not answer" : `Read ${plural(x.reviews.length, "review")} from Wix`)); if (r) { CACHE.delete(B + "/app-reviews"); rerender(); } };
+    if (fb) fb.onclick = async () => { const r = await act(fb, () => get(B + "/app-reviews?fresh=1", { fresh: true }), (x) => (x.error ? "Wix did not answer" : `Read ${plural(x.reviews.length, "review")} from Wix`)); if (r) { CACHE.delete(B + "/app-reviews"); CACHE.delete(B + "/early-gift"); rerender(); } };
+    bindGift(ctx, B, g);
     return;
   }
 
